@@ -11,7 +11,8 @@ import {
   Store,
   Package,
   ChevronDown,
-  PlusCircle
+  PlusCircle,
+  FileText
 } from "lucide-react";
 import { Tooltip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
 import { useSettings } from "@/context/SettingsContext";
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/inventory", label: "Inventori",   icon: Package },
   { href: "/customers", label: "Pelanggan",   icon: Users },
   { href: "/orders",    label: "Pesanan",     icon: ShoppingCart },
+  { href: "/reports",   label: "Laporan",     icon: FileText },
   { href: "/settings",  label: "Pengaturan",  icon: Settings },
 ];
 
