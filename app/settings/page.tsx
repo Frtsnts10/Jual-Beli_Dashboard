@@ -1,207 +1,212 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import {
-  Button,
-  Input,
-  Card,
-  CardBody,
-  CardHeader,
-  Avatar,
-  Divider,
-} from "@heroui/react";
-import { Upload, Save, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Input, Button, Select, SelectItem, Card, CardBody } from "@heroui/react";
+import { Save, Store, Phone, DollarSign, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { useSettings } from "@/context/SettingsContext";
+import { updateShopSettings, createShop } from "@/lib/supabase/shop_settings";
 
-import { useAuth } from "@/components/auth-provider";
-import {
-  getProfile,
-  updateProfile,
-  uploadAvatar,
-  type Profile,
-} from "@/lib/supabase/profile";
+const ALL_CURRENCIES = [
+  { code: "IDR", name: "Rupiah Indonesia", symbol: "Rp" },
+  { code: "USD", name: "US Dollar", symbol: "$" },
+  { code: "EUR", name: "Euro", symbol: "€" },
+  { code: "GBP", name: "British Pound", symbol: "£" },
+  { code: "SGD", name: "Singapore Dollar", symbol: "S$" },
+  { code: "MYR", name: "Malaysian Ringgit", symbol: "RM" },
+  { code: "THB", name: "Thai Baht", symbol: "฿" },
+  { code: "PHP", name: "Philippine Peso", symbol: "₱" },
+  { code: "VND", name: "Vietnamese Dong", symbol: "₫" },
+  { code: "JPY", name: "Japanese Yen", symbol: "¥" },
+  { code: "CNY", name: "Chinese Yuan", symbol: "¥" },
+  { code: "KRW", name: "South Korean Won", symbol: "₩" },
+];
 
 export default function SettingsPage() {
-  const { user } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [website, setWebsite] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { activeShop, refreshShops, shops } = useSettings();
+  
+  const [storeName, setStoreName] = useState("");
+  const [waNumber, setWaNumber] = useState("");
+  const [currency, setCurrency] = useState("IDR");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
+  // Sync state when activeShop changes
   useEffect(() => {
-    async function loadProfile() {
-      if (user) {
-        setLoading(true);
-        const data = await getProfile(user.id);
-
-        if (data) {
-          setProfile(data);
-          setUsername(data.username || "");
-          setFullName(data.full_name || "");
-          setWebsite(data.website || "");
-          setAvatarUrl(data.avatar_url);
-        }
-        setLoading(false);
-      }
+    if (activeShop) {
+      setStoreName(activeShop.shop_name);
+      setWaNumber(activeShop.whatsapp_number || "");
+      setCurrency(activeShop.currency || "IDR");
+    } else {
+      setStoreName("");
+      setWaNumber("");
+      setCurrency("IDR");
     }
-    loadProfile();
-  }, [user]);
+  }, [activeShop]);
 
-  const handleUpdateProfile = async () => {
-    if (!user) return;
-    setLoading(true);
+  const handleSave = async () => {
+    if (!activeShop) return;
+    setIsSaving(true);
     try {
-      await updateProfile({
-        id: user.id,
-        username,
-        full_name: fullName,
-        website,
-        avatar_url: avatarUrl,
-        updated_at: new Date().toISOString(),
+      await updateShopSettings(activeShop.id, {
+        shop_name: storeName,
+        whatsapp_number: waNumber,
+        currency: currency
       });
-      alert("Profile updated successfully!");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      alert("Failed to update profile.");
+      await refreshShops();
+      toast.success("Pengaturan toko berhasil diperbarui!");
+    } catch (err: any) {
+      toast.error("Gagal menyimpan: " + err.message);
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
-  const handleAvatarUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    if (!user || !event.target.files || event.target.files.length === 0) return;
-    setLoading(true);
+  const handleAddNew = async () => {
+    setIsAdding(true);
     try {
-      const file = event.target.files[0];
-      const publicUrl = await uploadAvatar(file, user.id);
-
-      setAvatarUrl(publicUrl);
-      await updateProfile({ id: user.id, avatar_url: publicUrl }); // Auto save avatar
-    } catch (error) {
-      console.error("Error uploading avatar:", error);
-      alert("Failed to upload avatar.");
+      await createShop({
+        shop_name: "Toko Baru",
+        whatsapp_number: "",
+        currency: "IDR"
+      });
+      await refreshShops();
+      toast.success("Toko baru berhasil ditambahkan!");
+    } catch (err: any) {
+      toast.error("Gagal menambahkan toko: " + err.message);
     } finally {
-      setLoading(false);
+      setIsAdding(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-default-500">
-          Manage your profile and account preferences.
-        </p>
+    <>
+      <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+        <div>
+          <h1 className="page-title">Pengaturan Toko</h1>
+          <p className="page-subtitle">Kelola informasi dan preferensi untuk {activeShop?.shop_name || "toko Anda"}</p>
+        </div>
+        <Button 
+          onPress={handleAddNew} 
+          isLoading={isAdding}
+          startContent={<Plus size={18} />}
+          variant="flat"
+          className="bg-white/5 border border-white/10 hover:bg-white/10"
+        >
+          Tambah Toko Baru
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Sidebar / Navigation (Optional, could be tabs) */}
-        <Card className="h-fit">
-          <CardBody className="p-4 space-y-2">
-            <Button
-              fullWidth
-              className="justify-start"
-              color="primary"
-              startContent={<User size={18} />}
-              variant="flat"
-            >
-              Profile
-            </Button>
-            {/* Add more settings tabs later */}
-          </CardBody>
-        </Card>
-
-        {/* Main Content */}
-        <div className="md:col-span-2 space-y-6">
-          <Card>
-            <CardHeader className="flex flex-col items-start px-6 pt-6 pb-0">
-              <h2 className="text-xl font-semibold">Public Profile</h2>
-              <p className="text-small text-default-500">
-                This information will be displayed publicly.
-              </p>
-            </CardHeader>
-            <Divider className="my-4" />
-            <CardBody className="px-6 pb-6 space-y-6">
-              {/* Avatar Section */}
-              <div className="flex items-center gap-6">
-                <Avatar
-                  isBordered
-                  className="w-24 h-24 text-large"
-                  src={avatarUrl || user?.user_metadata?.avatar_url}
-                />
-                <div className="space-y-2">
-                  <Button
-                    isLoading={loading}
-                    startContent={<Upload size={18} />}
-                    variant="flat"
-                    onPress={() => fileInputRef.current?.click()}
-                  >
-                    Change Avatar
-                  </Button>
-                  <p className="text-tiny text-default-400">
-                    JPG, GIF or PNG. 1MB max.
-                  </p>
-                  <input
-                    ref={fileInputRef}
-                    accept="image/*"
-                    className="hidden"
-                    type="file"
-                    onChange={handleAvatarUpload}
+      <div className="page-content">
+        {!activeShop ? (
+          <div className="glass-card" style={{ padding: 40, textAlign: "center" }}>
+            <p className="text-gray-400">Belum ada toko yang dipilih atau dibuat.</p>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+              <div className="glass-card">
+                <div className="glass-card-header">
+                  <p className="glass-card-title">Identitas Toko</p>
+                </div>
+                <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 20 }}>
+                  <Input
+                    label="Nama Toko"
+                    value={storeName}
+                    onValueChange={setStoreName}
+                    startContent={<Store size={16} className="text-gray-500" />}
+                    variant="bordered"
+                    classNames={{ inputWrapper: "login-input-wrapper" }}
+                  />
+                  <Input
+                    label="WhatsApp Admin"
+                    placeholder="628xxxxxxxxxx"
+                    value={waNumber}
+                    onValueChange={setWaNumber}
+                    startContent={<Phone size={16} className="text-gray-500" />}
+                    variant="bordered"
+                    classNames={{ inputWrapper: "login-input-wrapper" }}
                   />
                 </div>
               </div>
 
-              <Divider />
+              <div className="glass-card">
+                <div className="glass-card-header">
+                  <p className="glass-card-title">Mata Uang & Regional</p>
+                </div>
+                <div style={{ padding: 20 }}>
+                  <Select
+                    label="Pilih Mata Uang"
+                    selectedKeys={[currency]}
+                    onSelectionChange={(keys) => setCurrency(Array.from(keys)[0] as string)}
+                    startContent={<DollarSign size={16} className="text-gray-500" />}
+                    variant="bordered"
+                    classNames={{ trigger: "login-input-wrapper" }}
+                  >
+                    {ALL_CURRENCIES.map((c) => (
+                      <SelectItem key={c.code} textValue={c.code}>
+                        {c.code} - {c.name} ({c.symbol})
+                      </SelectItem>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+            </div>
 
-              {/* Form Fields */}
-              <div className="space-y-4">
-                <Input
-                  description="Your unique handle on the platform."
-                  label="Username"
-                  placeholder="johndoe"
-                  value={username}
-                  variant="bordered"
-                  onValueChange={setUsername}
-                />
-                <Input
-                  label="Full Name"
-                  placeholder="John Doe"
-                  value={fullName}
-                  variant="bordered"
-                  onValueChange={setFullName}
-                />
-                <Input
-                  label="Website"
-                  placeholder="https://example.com"
-                  startContent={
-                    <span className="text-default-400 text-small">
-                      https://
-                    </span>
-                  }
-                  value={website}
-                  variant="bordered"
-                  onValueChange={setWebsite}
-                />
+            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+              <div className="glass-card">
+                <div className="glass-card-header">
+                  <p className="glass-card-title">Daftar Toko Anda</p>
+                </div>
+                <div style={{ padding: "12px 20px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {shops.map(s => (
+                      <div 
+                        key={s.id} 
+                        style={{ 
+                          padding: "12px 16px", 
+                          borderRadius: 12, 
+                          background: s.id === activeShop.id ? "rgba(139,92,246,0.1)" : "rgba(255,255,255,0.02)",
+                          border: s.id === activeShop.id ? "1px solid rgba(139,92,246,0.3)" : "1px solid rgba(255,255,255,0.05)",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center"
+                        }}
+                      >
+                        <div>
+                          <p style={{ fontSize: 13, fontWeight: 600 }}>{s.shop_name}</p>
+                          <p style={{ fontSize: 11, color: "var(--text-muted)" }}>{s.currency} · {s.whatsapp_number || "No WA belum diatur"}</p>
+                        </div>
+                        {s.id === activeShop.id && (
+                          <span style={{ fontSize: 10, fontWeight: 700, color: "var(--accent-light)", background: "rgba(139,92,246,0.1)", padding: "2px 8px", borderRadius: 4 }}>AKTIF</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              <div className="flex justify-end pt-4">
+              <div style={{ marginTop: "auto" }}>
                 <Button
-                  color="primary"
-                  isLoading={loading}
+                  isLoading={isSaving}
+                  onPress={handleSave}
                   startContent={<Save size={18} />}
-                  onPress={handleUpdateProfile}
+                  style={{
+                    width: "100%",
+                    background: "linear-gradient(135deg, #8b5cf6, #6d28d9)",
+                    color: "white",
+                    fontWeight: 600,
+                    height: 48,
+                    borderRadius: 12
+                  }}
                 >
-                  Save Changes
+                  Simpan Perubahan
                 </Button>
               </div>
-            </CardBody>
-          </Card>
-        </div>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }

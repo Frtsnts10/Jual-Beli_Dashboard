@@ -2,125 +2,130 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Button,
-  Input,
-  Link,
-  Card,
-  CardBody,
-  CardHeader,
-  CardFooter,
-} from "@heroui/react";
-import { Mail, Lock } from "lucide-react";
-
-import { createClient } from "@/lib/supabase/client";
+import { Input, Button } from "@heroui/react";
+import { Eye, EyeOff, LogIn, ShieldCheck } from "lucide-react";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const supabase = createClient();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setError(null);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    } else {
-      router.push("/");
-      router.refresh();
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (res.ok) {
+        router.push("/");
+        router.refresh();
+      } else {
+        setError("Username atau password salah.");
+      }
+    } catch {
+      setError("Terjadi kesalahan. Coba lagi.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // const signInWithGoogle = async () => {
-  //   await supabase.auth.signInWithOAuth({
-  //     provider: "google",
-  //     options: {
-  //       redirectTo: `${window.location.origin}/auth/callback`,
-  //     },
-  //   });
-  // };
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-default-50 px-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="flex flex-col gap-1 items-center pb-0 pt-6">
-          <h1 className="text-xl font-bold">Welcome Back</h1>
-          <p className="text-small text-default-500">Log in to your account</p>
-        </CardHeader>
-        <CardBody className="gap-4 py-6">
+    <div className="login-page">
+      {/* Animated background orbs */}
+      <div className="orb orb-1" />
+      <div className="orb orb-2" />
+      <div className="orb orb-3" />
+
+      <div className="login-card">
+        {/* Logo */}
+        <div className="login-logo">
+          <div className="logo-icon">
+            <ShieldCheck size={26} style={{ color: "#a78bfa" }} />
+          </div>
+          <h1 className="login-title">Shop Dashboard</h1>
+          <p className="login-subtitle">Admin Panel — Masuk untuk melanjutkan</p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleLogin} className="login-form">
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <label className="login-label">Username</label>
+            <Input
+              id="username"
+              placeholder="Masukkan username"
+              value={username}
+              onValueChange={setUsername}
+              variant="bordered"
+              classNames={{ inputWrapper: "login-input-wrapper" }}
+              autoComplete="username"
+              required
+            />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <label className="login-label">Password</label>
+            <Input
+              id="password"
+              placeholder="Masukkan password"
+              value={password}
+              onValueChange={setPassword}
+              type={showPassword ? "text" : "password"}
+              variant="bordered"
+              classNames={{ inputWrapper: "login-input-wrapper" }}
+              endContent={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "var(--text-muted)",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: 0,
+                    transition: "color 0.15s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              }
+              autoComplete="current-password"
+              required
+            />
+          </div>
+
           {error && (
-            <div className="p-3 rounded-lg bg-danger-50 text-danger text-small">
+            <div className="login-error">
               {error}
             </div>
           )}
 
-          <div className="flex flex-col gap-2">
-            {/* <Button
-              fullWidth
-              startContent={<Chrome size={20} />}
-              variant="flat"
-              onPress={signInWithGoogle}
-            >
-              Continue with Google
-            </Button>
-
-            <div className="flex items-center gap-2 my-2">
-              <Divider className="flex-1" />
-              <span className="text-tiny text-default-400">OR</span>
-              <Divider className="flex-1" />
-            </div> */}
-
-            <Input
-              autoFocus
-              endContent={
-                <Mail className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-              }
-              label="Email"
-              placeholder="Enter your email"
-              value={email}
-              variant="bordered"
-              onValueChange={setEmail}
-            />
-            <Input
-              endContent={
-                <Lock className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-              }
-              label="Password"
-              placeholder="Enter your password"
-              type="password"
-              value={password}
-              variant="bordered"
-              onValueChange={setPassword}
-            />
-          </div>
-
           <Button
-            fullWidth
-            color="primary"
-            isLoading={loading}
-            onPress={handleLogin}
+            type="submit"
+            isLoading={isLoading}
+            className="login-btn h-11"
           >
-            Login
+            {!isLoading && <LogIn size={16} />}
+            <span>{isLoading ? "Memverifikasi..." : "Masuk"}</span>
           </Button>
-        </CardBody>
-        <CardFooter className="flex justify-center pb-6 pt-0">
-          <p className="text-small text-default-500">
-            Don&apos;t have an account?{" "}
-            <Link className="cursor-pointer" href="/signup" size="sm">
-              Sign up
-            </Link>
-          </p>
-        </CardFooter>
-      </Card>
+        </form>
+
+        <p className="login-footer">
+          © 2025 Shop Dashboard. All rights reserved.
+        </p>
+      </div>
     </div>
   );
 }
