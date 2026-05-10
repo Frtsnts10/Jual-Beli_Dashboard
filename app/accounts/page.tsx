@@ -629,15 +629,17 @@ export default function AccountsPage() {
         size="lg"
         onOpenChange={(open) => { if (!open) resetForm(); onOpenChange(); }}
         classNames={{
-          base: "bg-[#111118] border border-white/[0.08]",
-          header: "border-b border-white/[0.06]",
-          footer: "border-t border-white/[0.06]",
+          base: "bg-[#0f0f18] border border-white/[0.08] shadow-2xl",
+          closeButton: "hover:bg-white/5 top-4 right-4",
+          header: "!p-6 !border-b !border-white/[0.06]",
+          footer: "!p-6 !border-t !border-white/[0.06]",
+          backdrop: "bg-[#08080f]/60 backdrop-blur-xl",
         }}
       >
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{editId ? "Edit Akun" : "Tambah Akun Baru"}</ModalHeader>
+              <ModalHeader className="!p-6 !border-b !border-white/[0.06]">{editId ? "Edit Akun" : "Tambah Akun Baru"}</ModalHeader>
               <ModalBody className="py-5 gap-4">
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                   <Input
@@ -783,7 +785,7 @@ export default function AccountsPage() {
                   classNames={{ inputWrapper: "login-input-wrapper" }}
                 />
               </ModalBody>
-              <ModalFooter>
+              <ModalFooter className="!p-6 !border-t !border-white/[0.06]">
                 <Button
                   variant="light"
                   color="danger"

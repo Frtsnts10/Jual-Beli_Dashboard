@@ -9,12 +9,13 @@ export type Subscription = {
   whatsapp_number: string;
   subscription_plan: string | null;
   selling_price: number | null;
-  start_date: string;
+  start_date: string | null;
   duration: number | null;
   expiry_date: string | null;
   inventory?: {
     app_name: string;
     capital_cost: number;
+    login_email: string;
   };
 };
 
@@ -33,7 +34,8 @@ export function subscribeToSubscriptions(profileId: string | undefined, callback
         *,
         inventory (
           app_name,
-          capital_cost
+          capital_cost,
+          login_email
         )
       `)
       .eq("profile_id", profileId)

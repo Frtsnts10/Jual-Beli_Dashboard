@@ -406,12 +406,15 @@ export default function InventoryPage() {
         classNames={{
           base: "bg-[#0f0f18] border border-white/[0.08] shadow-2xl",
           closeButton: "hover:bg-white/5 top-4 right-4",
+          header: "!p-6 !border-b !border-white/[0.06]",
+          footer: "!p-6 !border-t !border-white/[0.06]",
+          backdrop: "bg-[#08080f]/60 backdrop-blur-xl",
         }}
       >
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>
+              <ModalHeader className="!p-6 !border-b !border-white/[0.06]">
                 <div className="modal-header-inner">
                   <div className="modal-icon purple">
                     <Package size={18} />
@@ -573,7 +576,7 @@ export default function InventoryPage() {
 
                 </div>
               </ModalBody>
-              <ModalFooter>
+              <ModalFooter className="!p-6 !border-t !border-white/[0.06]">
                 <button className="modal-btn-secondary" onClick={() => { resetForm(); onClose(); }}>Batal</button>
                 <button
                   disabled={isLoading}
