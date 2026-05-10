@@ -132,60 +132,73 @@ export default function DashboardPage() {
         {/* Middle Content - Equal Height Containers */}
         <div style={{ 
           display: "grid", 
-          gridTemplateColumns: "1fr 340px", 
-          gap: 24, 
+          gridTemplateColumns: "repeat(4, 1fr)", 
+          gap: 16, 
           marginTop: 24,
-          alignItems: "stretch" // Ensure equal height
+          alignItems: "stretch" 
         }}>
           
-          {/* Recent Subscriptions */}
-          <div className="glass-card" style={{ display: "flex", flexDirection: "column" }}>
+          {/* Recent Subscriptions - Span 3 Columns to match top cards */}
+          <div className="glass-card" style={{ gridColumn: "span 3", display: "flex", flexDirection: "column" }}>
             <div className="glass-card-header">
               <p className="glass-card-title">Langganan Terbaru</p>
               <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
                 {recentActivity.length} entri terbaru
               </span>
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
               {recentActivity.length === 0 ? (
-                <div className="empty-state">
+                <div className="empty-state" style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                   <div className="empty-state-icon">📄</div>
                   <p className="empty-state-text">Belum ada data langganan</p>
                 </div>
               ) : (
-                recentActivity.map((sub) => {
-                  const isExp = sub.expiry_date && new Date(sub.expiry_date) < new Date();
-                  return (
-                    <div key={sub.id} className="activity-item">
-                      <div className={`activity-dot ${isExp ? "activity-dot-red" : "activity-dot-green"}`} />
-                      <div style={{ flex: 1 }}>
-                        <p className="activity-text">
-                          <strong>{sub.customer_name}</strong> membeli <strong>{sub.inventory?.app_name || "Produk"}</strong>
-                        </p>
-                        <p className="activity-time">
-                          {sub.expiry_date ? `Berakhir: ${new Date(sub.expiry_date).toLocaleDateString("id-ID")}` : "Tanpa expiry"} · {sub.whatsapp_number}
-                        </p>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {recentActivity.map((sub) => {
+                    const isExp = sub.expiry_date && new Date(sub.expiry_date) < new Date();
+                    return (
+                      <div key={sub.id} className="activity-item" style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", alignItems: "center", gap: 16 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                          <div className={`activity-dot ${isExp ? "activity-dot-red" : "activity-dot-green"}`} />
+                          <div style={{ overflow: "hidden" }}>
+                            <p className="activity-text" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              <strong>{sub.customer_name}</strong>
+                            </p>
+                            <p className="activity-time" style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                              {sub.inventory?.app_name || "Produk"}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+                          {sub.expiry_date ? (
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <Calendar size={12} />
+                              <span>{new Date(sub.expiry_date).toLocaleDateString("id-ID")}</span>
+                            </div>
+                          ) : "Tanpa expiry"}
+                        </div>
+
+                        <div style={{ textAlign: "right", minWidth: 100 }}>
+                          <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>
+                            {formatCurrency(sub.selling_price || 0, currency)}
+                          </p>
+                        </div>
                       </div>
-                      <div style={{ textAlign: "right" }}>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>
-                          {formatCurrency(sub.selling_price || 0, currency)}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
 
           {/* Side Panel: Financial Summary & Expiry Alerts */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <div style={{ gridColumn: "span 1", display: "flex", flexDirection: "column", gap: 16 }}>
             
             {/* Profit Summary */}
             <div className="glass-card" style={{ 
               background: "linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1))", 
-              border: "1px solid rgba(139,92,246,0.2)",
-              height: "fit-content"
+              border: "1px solid rgba(139,92,246,0.2)"
             }}>
               <div style={{ padding: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>

@@ -1,46 +1,53 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Input, Button, Select, SelectItem, Card, CardBody } from "@heroui/react";
-import { Save, Store, Phone, DollarSign, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Button } from "@heroui/react";
+import { Save, Store, Globe, ShieldCheck, ListChecks, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSettings } from "@/context/SettingsContext";
-import { updateShopSettings, createShop } from "@/lib/supabase/shop_settings";
+import { updateShopSettings, deleteShop } from "@/lib/supabase/shop_settings";
 
-const ALL_CURRENCIES = [
-  { code: "IDR", name: "Rupiah Indonesia", symbol: "Rp" },
-  { code: "USD", name: "US Dollar", symbol: "$" },
-  { code: "EUR", name: "Euro", symbol: "€" },
-  { code: "GBP", name: "British Pound", symbol: "£" },
-  { code: "SGD", name: "Singapore Dollar", symbol: "S$" },
-  { code: "MYR", name: "Malaysian Ringgit", symbol: "RM" },
-  { code: "THB", name: "Thai Baht", symbol: "฿" },
-  { code: "PHP", name: "Philippine Peso", symbol: "₱" },
-  { code: "VND", name: "Vietnamese Dong", symbol: "₫" },
-  { code: "JPY", name: "Japanese Yen", symbol: "¥" },
-  { code: "CNY", name: "Chinese Yuan", symbol: "¥" },
-  { code: "KRW", name: "South Korean Won", symbol: "₩" },
-];
+/** Dynamic currency list — Intl API, no hardcoded array */
+function useAllCurrencies() {
+  return useMemo(() => {
+    try {
+      const codes = (Intl as any).supportedValuesOf("currency") as string[];
+      const names = new Intl.DisplayNames(["id"], { type: "currency" });
+      return codes.map((code: string) => ({ code, name: names.of(code) || code }));
+    } catch {
+      return [
+        { code: "IDR", name: "Rupiah Indonesia" }, { code: "USD", name: "Dolar AS" },
+        { code: "EUR", name: "Euro" }, { code: "GBP", name: "Pound Britania" },
+        { code: "SGD", name: "Dolar Singapura" }, { code: "MYR", name: "Ringgit Malaysia" },
+        { code: "JPY", name: "Yen Jepang" },
+      ];
+    }
+  }, []);
+}
+
+const FormField = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div className="form-field">
+    <label className="form-label">{label}</label>
+    {children}
+  </div>
+);
 
 export default function SettingsPage() {
-  const { activeShop, refreshShops, shops } = useSettings();
-  
-  const [storeName, setStoreName] = useState("");
-  const [waNumber, setWaNumber] = useState("");
-  const [currency, setCurrency] = useState("IDR");
-  const [isSaving, setIsSaving] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
+  const { activeShop, refreshShops, shops, setActiveShopId } = useSettings();
 
-  // Sync state when activeShop changes
+  const currencies = useAllCurrencies();
+  const [storeName, setStoreName] = useState("");
+  const [waNumber, setWaNumber]   = useState("");
+  const [currency, setCurrency]   = useState("IDR");
+  const [isSaving, setIsSaving]   = useState(false);
+
   useEffect(() => {
     if (activeShop) {
       setStoreName(activeShop.shop_name);
       setWaNumber(activeShop.whatsapp_number || "");
       setCurrency(activeShop.currency || "IDR");
     } else {
-      setStoreName("");
-      setWaNumber("");
-      setCurrency("IDR");
+      setStoreName(""); setWaNumber(""); setCurrency("IDR");
     }
   }, [activeShop]);
 
@@ -48,162 +55,182 @@ export default function SettingsPage() {
     if (!activeShop) return;
     setIsSaving(true);
     try {
-      await updateShopSettings(activeShop.id, {
-        shop_name: storeName,
-        whatsapp_number: waNumber,
-        currency: currency
-      });
+      await updateShopSettings(activeShop.id, { shop_name: storeName, whatsapp_number: waNumber, currency });
       await refreshShops();
       toast.success("Pengaturan toko berhasil diperbarui!");
     } catch (err: any) {
       toast.error("Gagal menyimpan: " + err.message);
-    } finally {
-      setIsSaving(false);
-    }
+    } finally { setIsSaving(false); }
   };
 
-  const handleAddNew = async () => {
-    setIsAdding(true);
+  const handleDeleteShop = async (id: string, name: string) => {
+    if (shops.length <= 1) { toast.error("Anda harus memiliki setidaknya satu toko."); return; }
+    if (!confirm(`Hapus toko "${name}" beserta seluruh datanya? Tindakan ini tidak dapat dibatalkan.`)) return;
     try {
-      await createShop({
-        shop_name: "Toko Baru",
-        whatsapp_number: "",
-        currency: "IDR"
-      });
+      await deleteShop(id);
       await refreshShops();
-      toast.success("Toko baru berhasil ditambahkan!");
+      toast.success("Toko berhasil dihapus.");
     } catch (err: any) {
-      toast.error("Gagal menambahkan toko: " + err.message);
-    } finally {
-      setIsAdding(false);
+      toast.error("Gagal menghapus: " + err.message);
     }
   };
 
   return (
     <>
-      <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-        <div>
-          <h1 className="page-title">Pengaturan Toko</h1>
-          <p className="page-subtitle">Kelola informasi dan preferensi untuk {activeShop?.shop_name || "toko Anda"}</p>
-        </div>
-        <Button 
-          onPress={handleAddNew} 
-          isLoading={isAdding}
-          startContent={<Plus size={18} />}
-          variant="flat"
-          className="bg-white/5 border border-white/10 hover:bg-white/10"
-        >
-          Tambah Toko Baru
-        </Button>
+      <div className="page-header">
+        <h1 className="page-title">Pengaturan Toko</h1>
+        <p className="page-subtitle">Konfigurasi profil dan preferensi operasional</p>
       </div>
 
       <div className="page-content">
         {!activeShop ? (
-          <div className="glass-card" style={{ padding: 40, textAlign: "center" }}>
-            <p className="text-gray-400">Belum ada toko yang dipilih atau dibuat.</p>
+          <div className="glass-card" style={{ padding: 60, textAlign: "center" }}>
+            <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+              <Store size={28} style={{ color: "var(--text-muted)" }} />
+            </div>
+            <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 6 }}>Belum Ada Toko Terpilih</p>
+            <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Silakan pilih toko dari sidebar.</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 420px", gap: 24, alignItems: "start" }}>
+
+            {/* Left: Form */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+              {/* Identitas */}
               <div className="glass-card">
-                <div className="glass-card-header">
-                  <p className="glass-card-title">Identitas Toko</p>
+                <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.015)" }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <ShieldCheck size={16} style={{ color: "#60a5fa" }} />
+                  </div>
+                  <p className="glass-card-title">Identitas & Kontak</p>
                 </div>
-                <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 20 }}>
-                  <Input
-                    label="Nama Toko"
-                    value={storeName}
-                    onValueChange={setStoreName}
-                    startContent={<Store size={16} className="text-gray-500" />}
-                    variant="bordered"
-                    classNames={{ inputWrapper: "login-input-wrapper" }}
-                  />
-                  <Input
-                    label="WhatsApp Admin"
-                    placeholder="628xxxxxxxxxx"
-                    value={waNumber}
-                    onValueChange={setWaNumber}
-                    startContent={<Phone size={16} className="text-gray-500" />}
-                    variant="bordered"
-                    classNames={{ inputWrapper: "login-input-wrapper" }}
-                  />
+                <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+                  <FormField label="Nama Toko">
+                    <input
+                      className="form-input"
+                      placeholder="cth. My Digital Shop"
+                      value={storeName}
+                      onChange={e => setStoreName(e.target.value)}
+                    />
+                  </FormField>
+                  <FormField label="WhatsApp Admin">
+                    <input
+                      className="form-input"
+                      placeholder="cth. 628123456789"
+                      value={waNumber}
+                      onChange={e => setWaNumber(e.target.value)}
+                    />
+                  </FormField>
                 </div>
               </div>
 
+              {/* Currency */}
               <div className="glass-card">
-                <div className="glass-card-header">
+                <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.015)" }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Globe size={16} style={{ color: "#34d399" }} />
+                  </div>
                   <p className="glass-card-title">Mata Uang & Regional</p>
                 </div>
-                <div style={{ padding: 20 }}>
-                  <Select
-                    label="Pilih Mata Uang"
-                    selectedKeys={[currency]}
-                    onSelectionChange={(keys) => setCurrency(Array.from(keys)[0] as string)}
-                    startContent={<DollarSign size={16} className="text-gray-500" />}
-                    variant="bordered"
-                    classNames={{ trigger: "login-input-wrapper" }}
+                <div style={{ padding: "20px 24px" }}>
+                  <FormField label="Mata Uang">
+                    <select
+                      className="form-input form-select"
+                      value={currency}
+                      onChange={e => setCurrency(e.target.value)}
+                    >
+                      {currencies.map(c => (
+                        <option key={c.code} value={c.code}>{c.code} — {c.name}</option>
+                      ))}
+                    </select>
+                  </FormField>
+                  <p style={{ marginTop: 10, fontSize: 11, color: "var(--text-muted)", fontStyle: "italic", lineHeight: 1.6 }}>
+                    * Perubahan mata uang mempengaruhi tampilan nominal di seluruh halaman dashboard.
+                  </p>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <Button
+                isLoading={isSaving}
+                onPress={handleSave}
+                startContent={<Save size={18} />}
+                style={{
+                  height: 52,
+                  background: "linear-gradient(135deg, #8b5cf6, #6d28d9)",
+                  color: "white",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  borderRadius: 12,
+                  boxShadow: "0 4px 20px rgba(139,92,246,0.3)"
+                }}
+              >
+                Simpan Perubahan
+              </Button>
+            </div>
+
+            {/* Right: Shop List */}
+            <div className="glass-card">
+              <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.015)" }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <ListChecks size={16} style={{ color: "#a78bfa" }} />
+                </div>
+                <p className="glass-card-title">Daftar Toko Anda</p>
+              </div>
+              <div style={{ padding: "12px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
+                {shops.map(s => (
+                  <div
+                    key={s.id}
+                    className="settings-shop-item"
+                    style={{
+                      padding: "12px 14px",
+                      borderRadius: 12,
+                      background: s.id === activeShop.id ? "rgba(139,92,246,0.07)" : "rgba(255,255,255,0.02)",
+                      border: s.id === activeShop.id ? "1px solid rgba(139,92,246,0.2)" : "1px solid rgba(255,255,255,0.05)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      cursor: s.id !== activeShop.id ? "pointer" : "default",
+                      transition: "all 0.15s",
+                    }}
+                    onClick={() => s.id !== activeShop.id && setActiveShopId(s.id)}
                   >
-                    {ALL_CURRENCIES.map((c) => (
-                      <SelectItem key={c.code} textValue={c.code}>
-                        {c.code} - {c.name} ({c.symbol})
-                      </SelectItem>
-                    ))}
-                  </Select>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-              <div className="glass-card">
-                <div className="glass-card-header">
-                  <p className="glass-card-title">Daftar Toko Anda</p>
-                </div>
-                <div style={{ padding: "12px 20px" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {shops.map(s => (
-                      <div 
-                        key={s.id} 
-                        style={{ 
-                          padding: "12px 16px", 
-                          borderRadius: 12, 
-                          background: s.id === activeShop.id ? "rgba(139,92,246,0.1)" : "rgba(255,255,255,0.02)",
-                          border: s.id === activeShop.id ? "1px solid rgba(139,92,246,0.3)" : "1px solid rgba(255,255,255,0.05)",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center"
-                        }}
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 9,
+                      background: s.id === activeShop.id ? "rgba(139,92,246,0.2)" : "rgba(255,255,255,0.04)",
+                      border: `1px solid ${s.id === activeShop.id ? "rgba(139,92,246,0.3)" : "rgba(255,255,255,0.08)"}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0
+                    }}>
+                      <Store size={16} style={{ color: s.id === activeShop.id ? "#a78bfa" : "var(--text-muted)" }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: s.id === activeShop.id ? "#c4b5fd" : "var(--text-primary)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {s.shop_name}
+                      </p>
+                      <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "2px 0 0" }}>
+                        {s.currency} · {s.whatsapp_number || "No WA"}
+                      </p>
+                    </div>
+                    {s.id === activeShop.id ? (
+                      <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", background: "rgba(139,92,246,0.15)", color: "#a78bfa", border: "1px solid rgba(139,92,246,0.3)", padding: "2px 7px", borderRadius: 4, flexShrink: 0 }}>
+                        Aktif
+                      </span>
+                    ) : (
+                      <button
+                        className="action-btn danger"
+                        onClick={(e) => { e.stopPropagation(); handleDeleteShop(s.id, s.shop_name); }}
+                        style={{ flexShrink: 0 }}
                       >
-                        <div>
-                          <p style={{ fontSize: 13, fontWeight: 600 }}>{s.shop_name}</p>
-                          <p style={{ fontSize: 11, color: "var(--text-muted)" }}>{s.currency} · {s.whatsapp_number || "No WA belum diatur"}</p>
-                        </div>
-                        {s.id === activeShop.id && (
-                          <span style={{ fontSize: 10, fontWeight: 700, color: "var(--accent-light)", background: "rgba(139,92,246,0.1)", padding: "2px 8px", borderRadius: 4 }}>AKTIF</span>
-                        )}
-                      </div>
-                    ))}
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
-                </div>
-              </div>
-
-              <div style={{ marginTop: "auto" }}>
-                <Button
-                  isLoading={isSaving}
-                  onPress={handleSave}
-                  startContent={<Save size={18} />}
-                  style={{
-                    width: "100%",
-                    background: "linear-gradient(135deg, #8b5cf6, #6d28d9)",
-                    color: "white",
-                    fontWeight: 600,
-                    height: 48,
-                    borderRadius: 12
-                  }}
-                >
-                  Simpan Perubahan
-                </Button>
+                ))}
               </div>
             </div>
+
           </div>
         )}
       </div>
