@@ -1,31 +1,35 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
-  Input,
-  Button,
-  Select,
-  SelectItem,
-  Textarea,
+  Pagination,
   Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
   useDisclosure,
-  Pagination,
   Tooltip,
 } from "@heroui/react";
-import {
-  Search,
-  Plus,
-  Pencil,
-  Trash2,
-  Copy,
-  Check,
-  Download,
-  Upload,
+import { 
+  Search, 
+  Plus, 
+  Pencil, 
+  Trash2, 
+  Copy, 
+  Check, 
+  Download, 
+  Upload, 
   FileText,
+  Package,
+  Calendar,
+  KeyRound,
+  DollarSign,
+  ShieldCheck,
+  Hash,
+  Users,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -41,240 +45,215 @@ import { formatCurrency } from "@/lib/utils";
 
 const STATUSES = ["Tersedia", "Terjual", "Nonaktif"] as const;
 
-const EMPTY_FORM = {
-  app_name: "",
-  profile_name: "",
-  login_email: "",
-  login_password: "",
-  capital_cost: "",
-  restock_date: "",
-  supplier_billing_date: "",
-  status: "Tersedia" as InventoryItem["status"],
-};
+// Preset slot types — user can also type a custom value
+const SLOT_PRESETS = ["1 User", "2 User", "Semi Priv", "Full Priv", "Sharing"];
 
-
-function CopyButton({ text }: { text: string }) {
+const CopyButton = ({ text }: { text: string }) => {
   const [copied, setCopied] = useState(false);
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(text);
+  const onCopy = () => {
+    navigator.clipboard.writeText(text);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <button
-      onClick={handleCopy}
-      style={{
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: copied ? "var(--success)" : "var(--text-muted)",
-        padding: "2px",
-        display: "inline-flex",
-        transition: "color 0.15s",
-      }}
-    >
+    <button onClick={onCopy} className="copy-btn">
       {copied ? <Check size={12} /> : <Copy size={12} />}
     </button>
   );
-}
+};
 
 export default function InventoryPage() {
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("semua");
-  const [page, setPage] = useState(1);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const { activeShop } = useSettings();
   const currency = activeShop?.currency || "IDR";
-
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [items, setItems] = useState<InventoryItem[]>([]);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("semua");
+  const [page, setPage] = useState(1);
   const rowsPerPage = 10;
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [customSlot, setCustomSlot] = useState("");
+  const [form, setForm] = useState({
+    app_name: "",
+    profile_name: "",
+    login_email: "",
+    login_password: "",
+    pin: "",
+    slot_type: "",
+    quantity: 1,
+    capital_cost: "" as any,
+    restock_date: "",
+    supplier_billing_date: "",
+    status: "Tersedia" as InventoryItem["status"],
+  });
 
   useEffect(() => {
-    if (!activeShop?.id) {
-      setItems([]);
-      setIsLoading(false);
-      return;
-    }
-
-    const unsub = subscribeToInventory(activeShop.id, (data) => {
-      setItems(data);
-      setIsLoading(false);
-    });
-    return () => unsub();
+    if (!activeShop?.id) return;
+    const unsub = subscribeToInventory(activeShop.id, setItems);
+    return unsub;
   }, [activeShop?.id]);
 
   const filtered = useMemo(() => {
-    return items.filter((a) => {
+    return items.filter((item) => {
       const matchSearch =
-        a.app_name.toLowerCase().includes(search.toLowerCase()) ||
-        a.login_email.toLowerCase().includes(search.toLowerCase()) ||
-        (a.profile_name ?? "").toLowerCase().includes(search.toLowerCase());
-      const matchStatus =
-        statusFilter === "semua" || a.status === statusFilter;
+        item.app_name.toLowerCase().includes(search.toLowerCase()) ||
+        item.login_email.toLowerCase().includes(search.toLowerCase()) ||
+        (item.profile_name?.toLowerCase() || "").includes(search.toLowerCase()) ||
+        (item.slot_type?.toLowerCase() || "").includes(search.toLowerCase());
+      const matchStatus = statusFilter === "semua" || item.status === statusFilter;
       return matchSearch && matchStatus;
     });
   }, [items, search, statusFilter]);
 
-  const pages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
-  const paged = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    return filtered.slice(start, start + rowsPerPage);
-  }, [page, filtered]);
+  const pages = Math.ceil(filtered.length / rowsPerPage) || 1;
+  const paged = filtered.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   const resetForm = () => {
-    setForm(EMPTY_FORM);
+    setForm({ app_name: "", profile_name: "", login_email: "", login_password: "", pin: "", slot_type: "", quantity: 1, capital_cost: "", restock_date: "", supplier_billing_date: "", status: "Tersedia" });
     setEditId(null);
+    setCustomSlot("");
+    setShowPassword(false);
   };
 
-  const openAdd = () => {
-    resetForm();
-    onOpen();
-  };
+  const openAdd = () => { resetForm(); onOpen(); };
 
   const openEdit = (item: InventoryItem) => {
-    setEditId(item.id);
+    const slotIsPreset = SLOT_PRESETS.includes(item.slot_type || "");
     setForm({
       app_name: item.app_name,
-      profile_name: item.profile_name ?? "",
+      profile_name: item.profile_name || "",
       login_email: item.login_email,
       login_password: item.login_password,
-      capital_cost: item.capital_cost?.toString() ?? "",
-      restock_date: item.restock_date ?? "",
-      supplier_billing_date: item.supplier_billing_date ?? "",
+      pin: item.pin || "",
+      slot_type: slotIsPreset ? (item.slot_type || "") : "custom",
+      quantity: item.quantity ?? 1,
+      capital_cost: item.capital_cost ?? "",
+      restock_date: item.restock_date || "",
+      supplier_billing_date: item.supplier_billing_date || "",
       status: item.status,
     });
+    if (!slotIsPreset && item.slot_type) setCustomSlot(item.slot_type);
+    setEditId(item.id);
     onOpen();
+  };
+
+  const resolvedSlotType = () => {
+    if (form.slot_type === "custom") return customSlot.trim() || null;
+    return form.slot_type || null;
   };
 
   const handleSave = async () => {
-    if (!form.app_name.trim() || !form.login_email.trim() || !form.login_password.trim()) {
-      toast.error("Nama Aplikasi, Email, dan Password wajib diisi");
+    if (!activeShop?.id) return;
+    if (!form.app_name || !form.login_email || !form.login_password) {
+      toast.error("Mohon lengkapi data wajib (Aplikasi, Email, Password)");
+      return;
+    }
+    if (form.pin && !/^\d{4}$/.test(form.pin)) {
+      toast.error("PIN harus tepat 4 digit angka");
       return;
     }
     setIsLoading(true);
     try {
       const payload = {
-        ...form,
+        app_name: form.app_name,
+        profile_name: form.profile_name || null,
+        login_email: form.login_email,
+        login_password: form.login_password,
+        pin: form.pin || null,
+        slot_type: resolvedSlotType(),
+        quantity: Number(form.quantity) || 1,
         capital_cost: form.capital_cost ? Number(form.capital_cost) : null,
         restock_date: form.restock_date || null,
         supplier_billing_date: form.supplier_billing_date || null,
-        profile_id: activeShop?.id || "",
+        status: form.status,
+        profile_id: activeShop.id,
       };
       if (editId) {
         await updateInventoryItem(editId, payload);
-        toast.success("Item inventori berhasil diperbarui");
+        toast.success("Item berhasil diperbarui");
       } else {
-        await addInventoryItem({
-          ...payload,
-          id: crypto.randomUUID(),
-        });
-        toast.success("Item inventori berhasil ditambahkan");
+        await addInventoryItem(payload as any);
+        toast.success("Item berhasil ditambahkan");
       }
+      onOpenChange();
       resetForm();
-      onClose();
     } catch (err: any) {
-      toast.error("Gagal menyimpan: " + (err.message ?? "Kesalahan tidak diketahui"));
+      toast.error("Gagal menyimpan: " + (err.message ?? "Unknown error"));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Hapus item "${name}" dari inventori?`)) return;
+    if (!confirm(`Hapus item "${name}"?`)) return;
     try {
       await deleteInventoryItem(id);
       toast.success("Item berhasil dihapus");
-    } catch {
-      toast.error("Gagal menghapus item");
-    }
+    } catch { toast.error("Gagal menghapus"); }
   };
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const XLSX = (window as any).XLSX;
-    if (!XLSX) {
-      toast.error("Library Excel belum siap.");
-      return;
-    }
+    if (!XLSX) { toast.error("Library Excel belum siap."); return; }
     const file = e.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = async (evt) => {
       try {
         setIsLoading(true);
-        const bstr = evt.target?.result;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const wsname = wb.SheetNames[0];
-        const ws = wb.Sheets[wsname];
+        const wb = XLSX.read(evt.target?.result, { type: "binary" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(ws) as any[];
-
-        const mapped: Omit<InventoryItem, "id">[] = data.map((row) => ({
+        if (!data.length) { toast.error("File kosong"); return; }
+        const mapped = data.map((r: any) => ({
           profile_id: activeShop?.id || "",
-          app_name: row.Aplikasi || row.app_name || "Tanpa Nama",
-          profile_name: row.Profile || row.profile_name || null,
-          login_email: row.Email || row.login_email || "",
-          login_password: row.Password || row.login_password || "",
-          capital_cost: row.Modal || row.capital_cost ? Number(row.Modal || row.capital_cost) : null,
-          restock_date: row.TglRestock || row.restock_date || null,
-          supplier_billing_date: row.TglBilling || row.supplier_billing_date || null,
-          status: (row.Status || "Tersedia") as InventoryItem["status"],
+          app_name: r.Aplikasi || r.app_name || "Tanpa Nama",
+          profile_name: r.Profile || r.profile_name || null,
+          login_email: r.Email || r.login_email || "",
+          login_password: r.Password || r.login_password || "",
+          pin: r.PIN || r.pin || null,
+          slot_type: r.Jenis || r.slot_type || null,
+          quantity: r.Qty ? Number(r.Qty) : 1,
+          capital_cost: r.Modal ? Number(r.Modal) : null,
+          restock_date: r.TglRestock || null,
+          supplier_billing_date: r.TglBilling || null,
+          status: (r.Status || "Tersedia") as InventoryItem["status"],
         }));
-
-        if (mapped.length === 0) {
-          toast.error("File kosong atau format tidak sesuai");
-          return;
-        }
         await addInventoryItems(mapped);
-        toast.success(`${mapped.length} item berhasil diimpor`);
+        toast.success(`${mapped.length} item diimpor`);
         if (fileInputRef.current) fileInputRef.current.value = "";
       } catch (err: any) {
-        toast.error("Gagal mengimpor: " + err.message);
-      } finally {
-        setIsLoading(false);
-      }
+        toast.error("Gagal: " + err.message);
+      } finally { setIsLoading(false); }
     };
     reader.readAsBinaryString(file);
   };
 
   const handleExport = () => {
     const XLSX = (window as any).XLSX;
-    if (!XLSX) {
-      toast.error("Library Excel belum siap.");
-      return;
-    }
-    const exportData = items.map((item) => ({
-      Aplikasi: item.app_name,
-      Profile: item.profile_name,
-      Email: item.login_email,
-      Password: item.login_password,
-      Modal: item.capital_cost,
-      Status: item.status,
-      TglRestock: item.restock_date,
-      TglBilling: item.supplier_billing_date,
-    }));
-
+    if (!XLSX) { toast.error("Library Excel belum siap."); return; }
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(exportData);
+    const ws = XLSX.utils.json_to_sheet(items.map(i => ({
+      Aplikasi: i.app_name, Profile: i.profile_name, Email: i.login_email,
+      Password: i.login_password, PIN: i.pin, Jenis: i.slot_type, Qty: i.quantity,
+      Modal: i.capital_cost, Status: i.status, TglRestock: i.restock_date, TglBilling: i.supplier_billing_date,
+    })));
     XLSX.utils.book_append_sheet(wb, ws, "Inventory");
-    XLSX.writeFile(wb, `Inventory_Shop_${new Date().toISOString().split("T")[0]}.xlsx`);
+    XLSX.writeFile(wb, `Inventory_${new Date().toISOString().split("T")[0]}.xlsx`);
   };
 
   const handleDownloadTemplate = () => {
     const XLSX = (window as any).XLSX;
-    if (!XLSX) {
-      toast.error("Library Excel belum siap.");
-      return;
-    }
-    const headers = [["Aplikasi", "Profile", "Email", "Password", "Modal", "Status", "TglRestock", "TglBilling"]];
+    if (!XLSX) { toast.error("Library Excel belum siap."); return; }
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(headers);
-    XLSX.utils.book_append_sheet(wb, ws, "Template Inventory");
+    const ws = XLSX.utils.aoa_to_sheet([["Aplikasi", "Profile", "Email", "Password", "PIN", "Jenis", "Qty", "Modal", "Status", "TglRestock", "TglBilling"]]);
+    XLSX.utils.book_append_sheet(wb, ws, "Template");
     XLSX.writeFile(wb, "Template_Inventory.xlsx");
-    toast.success("Template berhasil diunduh");
+    toast.success("Template diunduh");
   };
 
   return (
@@ -286,208 +265,323 @@ export default function InventoryPage() {
 
       <div className="page-content">
         <div className="glass-card">
-          <div className="glass-card-header" style={{ flexDirection: "column", gap: 16, alignItems: "stretch" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
-                <Input
-                  placeholder="Cari aplikasi, profil, email..."
-                  value={search}
-                  onValueChange={(v) => { setSearch(v); setPage(1); }}
-                  startContent={<Search size={16} className="text-gray-400" />}
-                  size="sm"
-                  variant="bordered"
-                  classNames={{ 
-                    inputWrapper: "login-input-wrapper table-search-wrapper", 
-                    base: "w-[380px]" 
-                  }}
-                />
-                <div className="table-actions">
-                  {(["semua", ...STATUSES]).map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setStatusFilter(s)}
-                      className={`table-action-btn ${statusFilter === s ? "active" : ""}`}
-                    >
-                      {s === "semua" ? "Semua" : s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {/* Toolbar */}
+          <div className="table-toolbar">
+            <div className="table-toolbar-left">
+              <div className="search-box">
+                <Search size={15} className="search-icon" />
                 <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleImport}
-                  accept=".xlsx,.xls"
-                  style={{ display: "none" }}
+                  className="search-input"
+                  placeholder="Cari aplikasi, profil, jenis..."
+                  value={search}
+                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                 />
-                <div className="secondary-actions">
-                  <Button 
-                    size="sm" 
-                    variant="light"
-                    className="secondary-action-btn"
-                    startContent={<FileText size={14} />}
-                    onPress={handleDownloadTemplate}
-                  >
-                    Template
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="light"
-                    className="secondary-action-btn"
-                    startContent={<Upload size={14} />}
-                    onPress={() => fileInputRef.current?.click()}
-                  >
-                    Impor
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="light"
-                    className="secondary-action-btn"
-                    startContent={<Download size={14} />}
-                    onPress={handleExport}
-                  >
-                    Ekspor
-                  </Button>
-                </div>
-                <button
-                  onClick={openAdd}
-                  className="btn-primary"
-                  style={{
-                    padding: "8px 24px",
-                    borderRadius: "10px",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    border: "none",
-                    color: "white",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
-                    boxShadow: "0 2px 12px rgba(139,92,246,0.3)",
-                    transition: "all 0.15s",
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(1.08)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.filter = "none"; e.currentTarget.style.transform = "none"; }}
-                >
-                  <Plus size={13} />
-                  Tambah Stok
-                </button>
               </div>
+              <div className="filter-tabs">
+                {(["semua", ...STATUSES]).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => { setStatusFilter(s); setPage(1); }}
+                    className={`filter-tab ${statusFilter === s ? "active" : ""}`}
+                  >
+                    {s === "semua" ? "Semua" : s}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="table-toolbar-right">
+              <input type="file" ref={fileInputRef} onChange={handleImport} accept=".xlsx,.xls" style={{ display: "none" }} />
+              <div className="btn-group">
+                <button className="btn-ghost" onClick={handleDownloadTemplate}><FileText size={14} /> Template</button>
+                <button className="btn-ghost" onClick={() => fileInputRef.current?.click()}><Upload size={14} /> Impor</button>
+                <button className="btn-ghost" onClick={handleExport}><Download size={14} /> Ekspor</button>
+              </div>
+              <button className="btn-primary" onClick={openAdd}>
+                <Plus size={16} /> Tambah Stok
+              </button>
             </div>
           </div>
 
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          {/* Table */}
+          <div className="data-table-wrap">
+            <table className="data-table">
               <thead>
-                <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                  {["Aplikasi / Profil", "Info Login", "Status", "Tanggal", "Modal", "Aksi"].map((h) => (
-                    <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--text-muted)", letterSpacing: "0.05em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                      {h}
-                    </th>
-                  ))}
+                <tr>
+                  <th>Aplikasi / Profil</th>
+                  <th>Info Login</th>
+                  <th>Jenis / PIN</th>
+                  <th>Qty</th>
+                  <th>Status</th>
+                  <th>Tanggal</th>
+                  <th>Modal</th>
+                  <th className="text-center">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {paged.length === 0 ? (
                   <tr>
-                    <td colSpan={6}>
+                    <td colSpan={8}>
                       <div className="empty-state">
                         <div className="empty-state-icon">📦</div>
                         <p className="empty-state-text">Inventory kosong</p>
                       </div>
                     </td>
                   </tr>
-                ) : (
-                  paged.map((item) => (
-                    <tr key={item.id} style={{ borderBottom: "1px solid var(--border)", transition: "background 0.15s" }}>
-                      <td style={{ padding: "13px 16px" }}>
-                        <p style={{ fontWeight: 600, fontSize: 13.5, color: "var(--text-primary)" }}>{item.app_name}</p>
-                        <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{item.profile_name || "Tanpa Profil"}</p>
-                      </td>
-                      <td style={{ padding: "13px 16px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <span style={{ fontSize: 12, color: "var(--text-secondary)", fontFamily: "monospace" }}>{item.login_email}</span>
-                          <CopyButton text={item.login_email} />
+                ) : paged.map((item) => (
+                  <tr key={item.id} className="data-row">
+                    <td>
+                      <p className="cell-primary">{item.app_name}</p>
+                      <p className="cell-secondary">{item.profile_name || "Tanpa Profil"}</p>
+                    </td>
+                    <td>
+                      <div className="cell-copy-row">
+                        <span className="cell-mono">{item.login_email}</span>
+                        <CopyButton text={item.login_email} />
+                      </div>
+                      <div className="cell-copy-row">
+                        <span className="cell-mono cell-secondary">••••••••</span>
+                        <CopyButton text={item.login_password} />
+                      </div>
+                    </td>
+                    <td>
+                      {item.slot_type && (
+                        <span className="inv-badge slot">{item.slot_type}</span>
+                      )}
+                      {item.pin && (
+                        <div className="cell-copy-row" style={{ marginTop: item.slot_type ? 4 : 0 }}>
+                          <span className="cell-mono" style={{ fontSize: 11, letterSpacing: "0.15em" }}>PIN: {item.pin}</span>
+                          <CopyButton text={item.pin} />
                         </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <span style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "monospace" }}>••••••••</span>
-                          <CopyButton text={item.login_password} />
-                        </div>
-                      </td>
-                      <td style={{ padding: "13px 16px" }}>
-                        <span className={`badge ${item.status === "Tersedia" ? "badge-ready" : item.status === "Terjual" ? "badge-sold" : "badge-expired"}`}>
-                          {item.status}
-                        </span>
-                      </td>
-                      <td style={{ padding: "13px 16px", fontSize: 11.5, color: "var(--text-secondary)" }}>
-                        <p>Restock: {item.restock_date || "-"}</p>
-                        <p>Billing: {item.supplier_billing_date || "-"}</p>
-                      </td>
-                      <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>
-                        {item.capital_cost ? formatCurrency(item.capital_cost, currency) : "-"}
-                      </td>
-                      <td style={{ padding: "13px 16px" }}>
-                        <div style={{ display: "flex", gap: 6 }}>
-                          <Tooltip content="Edit">
-                            <button onClick={() => openEdit(item)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 4 }}><Pencil size={15} /></button>
-                          </Tooltip>
-                          <Tooltip content="Hapus">
-                            <button onClick={() => handleDelete(item.id, item.app_name)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 4 }}><Trash2 size={15} /></button>
-                          </Tooltip>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
+                      )}
+                      {!item.slot_type && !item.pin && <span className="cell-secondary">—</span>}
+                    </td>
+                    <td>
+                      <span className="inv-qty-badge">{item.quantity ?? 1}</span>
+                    </td>
+                    <td>
+                      <span className={`status-badge ${item.status === "Tersedia" ? "green" : item.status === "Terjual" ? "amber" : "red"}`}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="cell-date-row"><Calendar size={11} className="cell-icon" /> <span className="cell-secondary">Restock:</span> <span className="cell-date">{item.restock_date || "—"}</span></div>
+                      <div className="cell-date-row"><Calendar size={11} className="cell-icon" /> <span className="cell-secondary">Billing:</span> <span className="cell-date">{item.supplier_billing_date || "—"}</span></div>
+                    </td>
+                    <td>
+                      <p className="cell-primary">{item.capital_cost ? formatCurrency(item.capital_cost, currency) : "—"}</p>
+                    </td>
+                    <td>
+                      <div className="cell-actions">
+                        <Tooltip content="Edit" color="secondary" size="sm">
+                          <button className="action-btn" onClick={() => openEdit(item)}><Pencil size={14} /></button>
+                        </Tooltip>
+                        <Tooltip content="Hapus" color="danger" size="sm">
+                          <button className="action-btn danger" onClick={() => handleDelete(item.id, item.app_name)}><Trash2 size={14} /></button>
+                        </Tooltip>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
 
           {filtered.length > rowsPerPage && (
-            <div style={{ padding: "14px 20px", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{filtered.length} item ditemukan</span>
+            <div className="table-footer">
+              <span className="table-count">{filtered.length} item ditemukan</span>
               <Pagination isCompact showControls color="secondary" page={page} total={pages} onChange={setPage} />
             </div>
           )}
         </div>
       </div>
 
-      <Modal backdrop="blur" isOpen={isOpen} placement="center" size="lg" onOpenChange={(open) => { if (!open) resetForm(); onOpenChange(); }} classNames={{ base: "bg-[#111118] border border-white/[0.08]", header: "border-b border-white/[0.06]", footer: "border-t border-white/[0.06]" }}>
+      {/* Add / Edit Modal */}
+      <Modal
+        backdrop="blur"
+        isOpen={isOpen}
+        onOpenChange={(open) => { if (!open) resetForm(); onOpenChange(); }}
+        placement="center"
+        size="2xl"
+        scrollBehavior="inside"
+        classNames={{
+          base: "bg-[#0f0f18] border border-white/[0.08] shadow-2xl",
+          closeButton: "hover:bg-white/5 top-4 right-4",
+        }}
+      >
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{editId ? "Edit Item Inventori" : "Tambah Stok Baru"}</ModalHeader>
-              <ModalBody className="py-5 gap-4">
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <Input label="Nama Aplikasi" placeholder="cth. Netflix" value={form.app_name} onValueChange={(v) => setForm(f => ({ ...f, app_name: v }))} variant="bordered" classNames={{ inputWrapper: "login-input-wrapper" }} />
-                  <Input label="Profil" placeholder="cth. Erna" value={form.profile_name} onValueChange={(v) => setForm(f => ({ ...f, profile_name: v }))} variant="bordered" classNames={{ inputWrapper: "login-input-wrapper" }} />
+              <ModalHeader>
+                <div className="modal-header-inner">
+                  <div className="modal-icon purple">
+                    <Package size={18} />
+                  </div>
+                  <div>
+                    <h2 className="modal-title">{editId ? "Edit Item Inventori" : "Tambah Stok Baru"}</h2>
+                    <p className="modal-subtitle">Lengkapi detail akun untuk inventori Anda</p>
+                  </div>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <Input label="Email Login" value={form.login_email} onValueChange={(v) => setForm(f => ({ ...f, login_email: v }))} variant="bordered" classNames={{ inputWrapper: "login-input-wrapper" }} />
-                  <Input label="Password Login" value={form.login_password} onValueChange={(v) => setForm(f => ({ ...f, login_password: v }))} variant="bordered" classNames={{ inputWrapper: "login-input-wrapper" }} />
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <Input label="Tgl Restock" type="date" value={form.restock_date} onValueChange={(v) => setForm(f => ({ ...f, restock_date: v }))} variant="bordered" classNames={{ inputWrapper: "login-input-wrapper" }} />
-                  <Input label="Tgl Tagihan Supplier" type="date" value={form.supplier_billing_date} onValueChange={(v) => setForm(f => ({ ...f, supplier_billing_date: v }))} variant="bordered" classNames={{ inputWrapper: "login-input-wrapper" }} />
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <Input label="Modal (Rp)" type="number" placeholder="0" value={form.capital_cost} onValueChange={(v) => setForm(f => ({ ...f, capital_cost: v }))} variant="bordered" classNames={{ inputWrapper: "login-input-wrapper" }} />
-                  <Select label="Status" selectedKeys={[form.status]} onSelectionChange={(keys) => setForm(f => ({ ...f, status: Array.from(keys)[0] as any }))} variant="bordered" classNames={{ trigger: "login-input-wrapper" }}>
-                    {STATUSES.map(s => <SelectItem key={s}>{s}</SelectItem>)}
-                  </Select>
+              </ModalHeader>
+              <ModalBody>
+                <div className="modal-form-body">
+
+                  {/* Section 1: Account Info */}
+                  <div className="modal-section">
+                    <div className="modal-section-header">
+                      <div className="modal-section-icon purple"><Package size={11} /></div>
+                      <p className="modal-section-label">Informasi Akun</p>
+                    </div>
+                    <div className="form-grid-2">
+                      <div className="form-field">
+                        <label className="form-label">Nama Aplikasi <span className="form-required">*</span></label>
+                        <input className="form-input" placeholder="cth. Netflix" value={form.app_name} onChange={e => setForm(f => ({ ...f, app_name: e.target.value }))} />
+                      </div>
+                      <div className="form-field">
+                        <label className="form-label">Profil / Label <span className="form-optional">Opsional</span></label>
+                        <input className="form-input" placeholder="cth. Erna" value={form.profile_name} onChange={e => setForm(f => ({ ...f, profile_name: e.target.value }))} />
+                      </div>
+                    </div>
+                    <div className="form-grid-2">
+                      <div className="form-field">
+                        <label className="form-label">Email Login <span className="form-required">*</span></label>
+                        <input className="form-input" placeholder="email@example.com" value={form.login_email} onChange={e => setForm(f => ({ ...f, login_email: e.target.value }))} />
+                      </div>
+                      <div className="form-field">
+                        <label className="form-label">Password Login <span className="form-required">*</span></label>
+                        <div className="input-with-action">
+                          <input className="form-input" type={showPassword ? "text" : "password"} placeholder="Password akun" value={form.login_password} onChange={e => setForm(f => ({ ...f, login_password: e.target.value }))} />
+                          <button type="button" className="input-action-btn" onClick={() => setShowPassword(v => !v)}>
+                            {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 2: Slot & PIN */}
+                  <div className="modal-section">
+                    <div className="modal-section-header">
+                      <div className="modal-section-icon amber"><KeyRound size={11} /></div>
+                      <p className="modal-section-label">Jenis & Akses <span className="form-optional" style={{ marginLeft: 6 }}>Opsional</span></p>
+                    </div>
+                    
+                    {/* Slot type pills */}
+                    <div className="form-field">
+                      <label className="form-label"><Users size={12} style={{ display: "inline", marginRight: 4 }} />Jenis Slot</label>
+                      <div className="slot-pills">
+                        {SLOT_PRESETS.map(s => (
+                          <button
+                            key={s}
+                            type="button"
+                            className={`slot-pill ${form.slot_type === s ? "active" : ""}`}
+                            onClick={() => setForm(f => ({ ...f, slot_type: f.slot_type === s ? "" : s }))}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                        <button
+                          type="button"
+                          className={`slot-pill ${form.slot_type === "custom" ? "active" : ""}`}
+                          onClick={() => setForm(f => ({ ...f, slot_type: f.slot_type === "custom" ? "" : "custom" }))}
+                        >
+                          + Lainnya
+                        </button>
+                      </div>
+                      {form.slot_type === "custom" && (
+                        <input
+                          className="form-input"
+                          style={{ marginTop: 10 }}
+                          placeholder="Masukkan jenis custom..."
+                          value={customSlot}
+                          onChange={e => setCustomSlot(e.target.value)}
+                        />
+                      )}
+                    </div>
+
+                    {/* PIN + Quantity in a row */}
+                    <div className="form-grid-2">
+                      <div className="form-field">
+                        <label className="form-label"><Hash size={12} style={{ display: "inline", marginRight: 4 }} />PIN <span className="form-optional">4 digit</span></label>
+                        <input
+                          className="form-input"
+                          placeholder="0000"
+                          maxLength={4}
+                          inputMode="numeric"
+                          pattern="\d{4}"
+                          value={form.pin}
+                          onChange={e => {
+                            const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                            setForm(f => ({ ...f, pin: v }));
+                          }}
+                        />
+                      </div>
+                      <div className="form-field">
+                        <label className="form-label">Jumlah Stok <span className="form-required">*</span></label>
+                        <input
+                          className="form-input"
+                          type="number"
+                          min="1"
+                          placeholder="1"
+                          value={form.quantity}
+                          onChange={e => setForm(f => ({ ...f, quantity: Number(e.target.value) || 1 }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Schedule & Cost */}
+                  <div className="modal-section">
+                    <div className="modal-section-header">
+                      <div className="modal-section-icon blue"><Calendar size={11} /></div>
+                      <p className="modal-section-label">Jadwal & Biaya <span className="form-optional" style={{ marginLeft: 6 }}>Opsional</span></p>
+                    </div>
+                    <div className="form-grid-2">
+                      <div className="form-field">
+                        <label className="form-label">Tanggal Restock</label>
+                        <input className="form-input" type="date" value={form.restock_date} onChange={e => setForm(f => ({ ...f, restock_date: e.target.value }))} />
+                      </div>
+                      <div className="form-field">
+                        <label className="form-label">Tgl Tagihan Supplier</label>
+                        <input className="form-input" type="date" value={form.supplier_billing_date} onChange={e => setForm(f => ({ ...f, supplier_billing_date: e.target.value }))} />
+                      </div>
+                    </div>
+                    <div className="form-field">
+                      <label className="form-label"><DollarSign size={12} style={{ display: "inline", marginRight: 4 }} />Modal ({currency})</label>
+                      <input className="form-input" type="number" placeholder="0" min="0" value={form.capital_cost} onChange={e => setForm(f => ({ ...f, capital_cost: e.target.value }))} />
+                    </div>
+                  </div>
+
+                  {/* Section 4: Status */}
+                  <div className="modal-section">
+                    <div className="modal-section-header">
+                      <div className="modal-section-icon green"><ShieldCheck size={11} /></div>
+                      <p className="modal-section-label">Status Stok</p>
+                    </div>
+                    <div className="slot-pills">
+                      {STATUSES.map(s => (
+                        <button
+                          key={s}
+                          type="button"
+                          className={`slot-pill ${form.status === s ? `active status-${s.toLowerCase()}` : ""}`}
+                          onClick={() => setForm(f => ({ ...f, status: s }))}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" color="danger" onPress={() => { resetForm(); onClose(); }}>Batal</Button>
-                <Button
-                  isLoading={isLoading}
-                  onPress={handleSave}
-                  style={{ background: "linear-gradient(135deg, #8b5cf6, #6d28d9)", color: "white", fontWeight: 600, paddingLeft: 28, paddingRight: 28 }}
+                <button className="modal-btn-secondary" onClick={() => { resetForm(); onClose(); }}>Batal</button>
+                <button
+                  disabled={isLoading}
+                  onClick={handleSave}
+                  className="modal-btn-primary"
                 >
-                  {editId ? "Simpan Perubahan" : "Tambah Stok"}
-                </Button>
+                  {isLoading ? "Menyimpan..." : (editId ? "Simpan Perubahan" : "Tambah Stok")}
+                </button>
               </ModalFooter>
             </>
           )}

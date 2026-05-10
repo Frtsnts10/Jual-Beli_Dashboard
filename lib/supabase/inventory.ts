@@ -7,6 +7,9 @@ export type InventoryItem = {
   profile_name: string | null;
   login_email: string;
   login_password: string;
+  pin: string | null;              // Optional 4-digit PIN
+  slot_type: string | null;       // e.g. "1 User", "2 User", "Semi Priv"
+  quantity: number;               // Stock quantity, default 1
   capital_cost: number | null;
   restock_date: string | null;
   supplier_billing_date: string | null;
