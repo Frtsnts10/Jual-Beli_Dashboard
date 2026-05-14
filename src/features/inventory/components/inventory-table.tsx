@@ -67,6 +67,20 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [currentFamilyPage, setCurrentFamilyPage] = useState(1);
   const [currentSoloPage, setCurrentSoloPage] = useState(1);
+  const [isFamilyTransitioning, setIsFamilyTransitioning] = useState(false);
+  const [isSoloTransitioning, setIsSoloTransitioning] = useState(false);
+
+  const handleFamilyPageChange = (p: number) => {
+    setIsFamilyTransitioning(true);
+    setCurrentFamilyPage(p);
+    setTimeout(() => setIsFamilyTransitioning(false), 150);
+  };
+
+  const handleSoloPageChange = (p: number) => {
+    setIsSoloTransitioning(true);
+    setCurrentSoloPage(p);
+    setTimeout(() => setIsSoloTransitioning(false), 150);
+  };
 
   const formatCustomPrice = (amount: number) => {
     if (currency.toUpperCase() === "IDR") {
@@ -243,7 +257,7 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
         </div>
 
         {groupedEntries.length > 0 ? (
-          <div className="grid grid-cols-1 gap-5">
+          <div className={`grid grid-cols-1 gap-5 transition-all duration-150 ${isFamilyTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
             {paginatedFamilyGroups.map(([groupName, groupMembers]) => {
               const maxCapacity = groupName.toLowerCase().includes("netflix") ? 5 : 6;
               const isFull = groupMembers.length >= maxCapacity;
@@ -372,7 +386,7 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() => setCurrentFamilyPage((p) => Math.max(1, p - 1))}
+                onClick={() => handleFamilyPageChange(Math.max(1, currentFamilyPage - 1))}
                 disabled={currentFamilyPage === 1}
                 className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
@@ -382,7 +396,7 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
                 <button
                   key={page}
                   type="button"
-                  onClick={() => setCurrentFamilyPage(page)}
+                  onClick={() => handleFamilyPageChange(page)}
                   className={`w-7 h-7 font-bold rounded-sm transition-all flex items-center justify-center ${
                     currentFamilyPage === page
                       ? "bg-indigo-600 text-white shadow-xs"
@@ -394,7 +408,7 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
               ))}
               <button
                 type="button"
-                onClick={() => setCurrentFamilyPage((p) => Math.min(totalFamilyPages, p + 1))}
+                onClick={() => handleFamilyPageChange(Math.min(totalFamilyPages, currentFamilyPage + 1))}
                 disabled={currentFamilyPage === totalFamilyPages}
                 className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
@@ -429,7 +443,7 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
                   <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Pool Router</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
+              <tbody className={`divide-y divide-slate-50 dark:divide-slate-800/60 transition-all duration-150 ${isSoloTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
                 {paginatedSoloItems.map((item) => {
                   const isDeleting = deletingId === item.id;
                   const isUpdating = updatingId === item.id;
@@ -553,7 +567,7 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => setCurrentSoloPage((p) => Math.max(1, p - 1))}
+                  onClick={() => handleSoloPageChange(Math.max(1, currentSoloPage - 1))}
                   disabled={currentSoloPage === 1}
                   className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >
@@ -563,7 +577,7 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
                   <button
                     key={page}
                     type="button"
-                    onClick={() => setCurrentSoloPage(page)}
+                    onClick={() => handleSoloPageChange(page)}
                     className={`w-7 h-7 font-bold rounded-sm transition-all flex items-center justify-center ${
                       currentSoloPage === page
                         ? "bg-indigo-600 text-white shadow-xs"
@@ -575,7 +589,7 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
                 ))}
                 <button
                   type="button"
-                  onClick={() => setCurrentSoloPage((p) => Math.min(totalSoloPages, p + 1))}
+                  onClick={() => handleSoloPageChange(Math.min(totalSoloPages, currentSoloPage + 1))}
                   disabled={currentSoloPage === totalSoloPages}
                   className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >

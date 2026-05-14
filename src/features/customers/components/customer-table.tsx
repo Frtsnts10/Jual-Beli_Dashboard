@@ -20,6 +20,13 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
   const [activeFormId, setActiveFormId] = useState<string | null>(null);
   const [processingStream, setProcessingStream] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const handlePageChange = (newPage: number) => {
+    setIsTransitioning(true);
+    setCurrentPage(newPage);
+    setTimeout(() => setIsTransitioning(false), 150);
+  };
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [streamActionTarget, setStreamActionTarget] = useState<{
@@ -217,7 +224,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                 <th className="px-5 py-3.5">Ordered Asset Streams & Expiry Lifecycles</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+            <tbody className={`divide-y divide-slate-100 dark:divide-slate-800/60 text-xs transition-all duration-150 ${isTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
               {paginatedCustomers.map((c) => {
                 const isDeleting = deletingId === c.id;
                 const isAppending = appendingId === c.id;
@@ -492,7 +499,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
                 className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
@@ -502,7 +509,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                 <button
                   key={page}
                   type="button"
-                  onClick={() => setCurrentPage(page)}
+                  onClick={() => handlePageChange(page)}
                   className={`w-7 h-7 font-bold rounded-sm transition-all flex items-center justify-center ${
                     currentPage === page
                       ? "bg-indigo-600 text-white shadow-xs"
@@ -514,7 +521,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               ))}
               <button
                 type="button"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
                 className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >

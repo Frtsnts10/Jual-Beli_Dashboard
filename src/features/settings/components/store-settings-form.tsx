@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Save, AlertOctagon, Image as ImageIcon, Globe, Upload } from "lucide-react";
+import { Save, AlertOctagon, Image as ImageIcon, Globe, Upload, Sun, Moon, Monitor } from "lucide-react";
 import { updateStoreSettingsAction, deleteStoreAction } from "../actions/settings-actions";
 
 interface StoreSettingsFormProps {
@@ -9,9 +9,10 @@ interface StoreSettingsFormProps {
   initialName: string;
   initialLogo?: string;
   initialCurrency?: string;
+  hideDangerPanel?: boolean;
 }
 
-export function StoreSettingsForm({ storeId, initialName, initialLogo = "", initialCurrency = "USD" }: StoreSettingsFormProps) {
+export function StoreSettingsForm({ storeId, initialName, initialLogo = "", initialCurrency = "USD", hideDangerPanel = false }: StoreSettingsFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -20,6 +21,22 @@ export function StoreSettingsForm({ storeId, initialName, initialLogo = "", init
   // Client preview and storage states
   const [logoPreview, setLogoPreview] = useState(initialLogo);
   const [currency, setCurrency] = useState(initialCurrency);
+  const [activeTheme, setActiveTheme] = useState("system");
+
+  React.useEffect(() => {
+    const t = localStorage.getItem("theme") || "system";
+    setActiveTheme(t);
+  }, []);
+
+  const handleThemeChange = (t: string) => {
+    setActiveTheme(t);
+    localStorage.setItem("theme", t);
+    if (t === "dark" || (t === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
 
   // Client-side HTML5 auto-compression image resizing utility matching requirements
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,7 +140,7 @@ export function StoreSettingsForm({ storeId, initialName, initialLogo = "", init
   }, []);
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="h-full flex flex-col justify-between space-y-6 font-sans">
       <form
         onSubmit={handleSubmit}
         className="p-6 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
@@ -136,13 +153,13 @@ export function StoreSettingsForm({ storeId, initialName, initialLogo = "", init
         </div>
 
         {success && (
-          <div className="p-2.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl font-medium">
+          <div className="p-2.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl font-medium animate-bounce-once">
             Workspace configuration matrix synchronised to persistent Supabase memory successfully.
           </div>
         )}
 
         {error && (
-          <div className="p-2.5 text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl font-medium">
+          <div className="p-2.5 text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl font-medium animate-shake-soft">
             {error}
           </div>
         )}
@@ -219,27 +236,116 @@ export function StoreSettingsForm({ storeId, initialName, initialLogo = "", init
         </div>
       </form>
 
-      {/* Danger matrix panel */}
-      <div className="p-6 bg-red-50/50 dark:bg-red-950/20 rounded-sm border border-red-100 dark:border-red-900/40 space-y-3 transition-colors">
-        <div className="flex items-center gap-2">
-          <AlertOctagon className="w-4 h-4 text-red-600" />
-          <h3 className="text-xs font-bold text-red-950 dark:text-red-400 uppercase tracking-wider">
-            Danger Deletion Area
-          </h3>
-        </div>
-        <p className="text-xs text-red-800/80 dark:text-red-300/80 leading-relaxed max-w-2xl">
-          Instantly drops the active shard pointer and deletes memory footprints irrevocably. Data exports must be captured prior to triggering execution.
-        </p>
+      {/* UI Theme Switcher Matrix */}
+      <div className="p-6 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-3 transition-colors">
         <div>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+            <Monitor className="w-4 h-4 text-indigo-500" /> Interface Appearance Preferences
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Configure system color mapping parameters instantly. Selections trigger real-time persistent local storage syncing.
+          </p>
+        </div>
+
+        <div className="inline-flex p-1 bg-slate-100 dark:bg-[#0b0f19] rounded-sm border border-slate-200/80 dark:border-slate-800 gap-1 text-xs font-bold">
           <button
             type="button"
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 active:scale-95 disabled:opacity-50 text-white text-xs font-bold rounded-sm shadow-sm transition-all"
+            onClick={() => handleThemeChange("system")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xs transition-all ${
+              activeTheme === "system"
+                ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs"
+                : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
+            }`}
           >
-            {isDeleting ? "Dropping Shard..." : "Purge Workspace Instance"}
+            <Monitor className="w-3.5 h-3.5" />
+            <span>System</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleThemeChange("light")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xs transition-all ${
+              activeTheme === "light"
+                ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs"
+                : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
+            }`}
+          >
+            <Sun className="w-3.5 h-3.5" />
+            <span>Light</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleThemeChange("dark")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xs transition-all ${
+              activeTheme === "dark"
+                ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs"
+                : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
+            }`}
+          >
+            <Moon className="w-3.5 h-3.5" />
+            <span>Dark</span>
           </button>
         </div>
+      </div>
+
+      {/* Danger matrix panel */}
+      {!hideDangerPanel && (
+        <div className="p-6 bg-red-50/50 dark:bg-red-950/20 rounded-sm border border-red-100 dark:border-red-900/40 space-y-3 transition-colors">
+          <div className="flex items-center gap-2">
+            <AlertOctagon className="w-4 h-4 text-red-600" />
+            <h3 className="text-xs font-bold text-red-950 dark:text-red-400 uppercase tracking-wider">
+              Danger Deletion Area
+            </h3>
+          </div>
+          <p className="text-xs text-red-800/80 dark:text-red-300/80 leading-relaxed max-w-2xl">
+            Instantly drops the active shard pointer and deletes memory footprints irrevocably. Data exports must be captured prior to triggering execution.
+          </p>
+          <div>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 active:scale-95 disabled:opacity-50 text-white text-xs font-bold rounded-sm shadow-sm transition-all"
+            >
+              {isDeleting ? "Dropping Shard..." : "Purge Workspace Instance"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function DangerZonePanel({ storeId }: { storeId: string }) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (!confirm("CRITICAL WARNING: This action drops the tenant partition and cascades deletion across all bounded inventory, customer vectors, and ticket rows. Confirm drop?")) {
+      return;
+    }
+    setIsDeleting(true);
+    await deleteStoreAction(storeId);
+  }
+
+  return (
+    <div className="p-6 bg-red-50/50 dark:bg-red-950/20 rounded-sm border border-red-100 dark:border-red-900/40 space-y-3 transition-colors">
+      <div className="flex items-center gap-2">
+        <AlertOctagon className="w-4 h-4 text-red-600" />
+        <h3 className="text-xs font-bold text-red-950 dark:text-red-400 uppercase tracking-wider">
+          Danger Deletion Area
+        </h3>
+      </div>
+      <p className="text-xs text-red-800/80 dark:text-red-300/80 leading-relaxed max-w-2xl">
+        Instantly drops the active shard pointer and deletes memory footprints irrevocably. Data exports must be captured prior to triggering execution.
+      </p>
+      <div>
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="px-4 py-2 bg-red-600 hover:bg-red-700 active:scale-95 disabled:opacity-50 text-white text-xs font-bold rounded-sm shadow-sm transition-all"
+        >
+          {isDeleting ? "Dropping Shard..." : "Purge Workspace Instance"}
+        </button>
       </div>
     </div>
   );

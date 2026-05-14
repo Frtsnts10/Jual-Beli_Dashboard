@@ -116,10 +116,10 @@ export function PricingCard({ storeId, isSubscribed }: PricingCardProps) {
         <div className="pt-6 mt-6 border-t border-white/10 relative z-10">
           <button
             onClick={handleUpgrade}
-            disabled={isSubscribed || isPending}
-            className="w-full py-3 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 active:scale-95 text-white text-xs font-bold rounded-sm text-center shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            disabled={isPending}
+            className="w-full py-3 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 active:scale-95 text-white text-xs font-bold rounded-sm text-center shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
           >
-            {isPending ? "Connecting Secure Vector..." : isSubscribed ? "Plan Fully Provisioned" : "Upgrade Workspace Shard"}
+            {isPending ? "Connecting Secure Vector..." : isSubscribed ? "Simulate Stripe Gateway" : "Upgrade Workspace Shard"}
           </button>
         </div>
       </div>

@@ -31,8 +31,13 @@ export async function getDashboardStats(storeId: string) {
   const nowMs = Date.now();
   const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
 
+  let bannedCustomers = 0;
+
   customers.forEach((c) => {
     const products = Array.isArray(c.purchased_products) ? c.purchased_products : [];
+    const hasBanned = products.some((p: any) => p.status === "banned");
+    if (hasBanned) bannedCustomers++;
+
     products.forEach((p: any) => {
       if (!p.expire_date) return;
       const expMs = new Date(p.expire_date).getTime();
@@ -60,5 +65,6 @@ export async function getDashboardStats(storeId: string) {
     activeStreams,
     expiringSoonStreams,
     expiredStreams,
+    bannedCustomers,
   };
 }

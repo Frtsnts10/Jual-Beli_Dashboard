@@ -2,7 +2,7 @@ import React from "react";
 import { getDashboardStats } from "@/features/dashboard/server/get-dashboard-stats";
 import { StatsCard } from "@/features/dashboard/components/stats-card";
 import { ChartCard } from "@/features/dashboard/components/chart-card";
-import { Package, Users, DollarSign, AlertCircle, ShoppingCart, CheckCircle, Clock, AlertTriangle, RefreshCw } from "lucide-react";
+import { Package, Users, DollarSign, AlertCircle, ShoppingCart, CheckCircle, Clock, AlertTriangle, RefreshCw, UserX } from "lucide-react";
 
 export default async function TenantDashboardPage({
   params,
@@ -58,7 +58,7 @@ export default async function TenantDashboardPage({
           </span>
           <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             title="Active Accounts"
             value={stats.activeStreams}
@@ -79,6 +79,13 @@ export default async function TenantDashboardPage({
             icon={AlertTriangle}
             description="Lapsed duration coverage mapping streams"
             trend={stats.expiredStreams > 0 ? "Requires Renewal" : "Clean Pool"}
+          />
+          <StatsCard
+            title="Banned Customers"
+            value={stats.bannedCustomers}
+            icon={UserX}
+            description="Violation mitigation subsets"
+            trend={stats.bannedCustomers > 0 ? "Restricted" : "Clean Pool"}
           />
         </div>
       </div>

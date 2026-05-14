@@ -4,6 +4,7 @@ import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server
 import { StoreSwitcher } from "@/features/stores/components/store-switcher";
 import { DashboardNav } from "@/features/dashboard/components/dashboard-nav";
 import { UserButton } from "@/features/auth/components/user-button";
+import { NotificationBell } from "@/features/notifications/components/notification-bell";
 
 export default async function TenantStoreLayout({
   children,
@@ -49,6 +50,7 @@ export default async function TenantStoreLayout({
           </span>
         </div>
         <div className="flex items-center gap-3">
+          <NotificationBell storeId={storeId} />
           <UserButton />
         </div>
       </header>
