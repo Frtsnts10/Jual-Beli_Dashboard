@@ -110,33 +110,19 @@ export function StoreSettingsForm({ storeId, initialName, initialLogo = "", init
     await deleteStoreAction(storeId);
   }
 
-  // Extract supported currency keys and native formatting descriptors using internal JS libraries
+  // Return deterministic, static currency structures to guarantee perfect React SSR hydration matches
   const currencies = useMemo(() => {
-    const codes = typeof Intl !== "undefined" && Intl.supportedValuesOf 
-      ? Intl.supportedValuesOf("currency") 
-      : ["USD", "EUR", "GBP", "JPY", "IDR", "AUD", "CAD", "CNY", "SGD"];
-      
-    const names = typeof Intl !== "undefined" && Intl.DisplayNames 
-      ? new Intl.DisplayNames(["en"], { type: "currency" }) 
-      : null;
-
-    return codes.map((code) => {
-      let symbol = code;
-      try {
-        const parts = new Intl.NumberFormat("en-US", { style: "currency", currency: code, currencyDisplay: "narrowSymbol" }).formatToParts(0);
-        const p = parts.find((pt) => pt.type === "currency");
-        if (p) symbol = p.value;
-      } catch (e) {}
-
-      let name = code;
-      try {
-        if (names) {
-          name = names.of(code) || code;
-        }
-      } catch (e) {}
-
-      return { code, symbol, name };
-    });
+    return [
+      { code: "USD", symbol: "$", name: "US Dollar" },
+      { code: "IDR", symbol: "Rp", name: "Indonesian Rupiah" },
+      { code: "EUR", symbol: "€", name: "Euro" },
+      { code: "GBP", symbol: "£", name: "British Pound" },
+      { code: "JPY", symbol: "¥", name: "Japanese Yen" },
+      { code: "AUD", symbol: "A$", name: "Australian Dollar" },
+      { code: "CAD", symbol: "C$", name: "Canadian Dollar" },
+      { code: "SGD", symbol: "S$", name: "Singapore Dollar" },
+      { code: "CNY", symbol: "¥", name: "Chinese Yuan" },
+    ];
   }, []);
 
   return (
