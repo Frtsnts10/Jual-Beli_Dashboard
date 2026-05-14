@@ -22,7 +22,7 @@ export function DashboardNav() {
   ];
 
   return (
-    <aside className="w-64 h-full overflow-y-auto border-r border-slate-200/80 dark:border-slate-800/80 bg-white/60 dark:bg-[#0b0f19]/60 backdrop-blur-md p-4 shrink-0 hidden md:block font-sans transition-colors">
+    <aside className="w-64 h-full overflow-y-auto border-r border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#0b0f19] p-4 shrink-0 hidden md:block font-sans transition-colors">
       <div className="space-y-1">
         {routes.map((route) => {
           const Icon = route.icon;
