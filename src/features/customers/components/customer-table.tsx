@@ -153,7 +153,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
     reader.readAsText(file);
   };
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   const totalPages = Math.ceil(customers.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCustomers = customers.slice(startIndex, startIndex + itemsPerPage);

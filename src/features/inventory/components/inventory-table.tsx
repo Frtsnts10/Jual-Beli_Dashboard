@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { InventoryItem, deleteInventoryItemAction, updateItemGroupingAction, updateInventoryItemAction, importInventoryCsvAction } from "../actions/inventory-actions";
-import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, UserMinus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle } from "lucide-react";
+import { InventoryForm } from "./inventory-form";
+import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, UserMinus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
 import { Select, ListBox, ListBoxItem } from "@heroui/react";
@@ -63,6 +64,9 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [currentFamilyPage, setCurrentFamilyPage] = useState(1);
+  const [currentSoloPage, setCurrentSoloPage] = useState(1);
 
   const formatCustomPrice = (amount: number) => {
     if (currency.toUpperCase() === "IDR") {
@@ -167,8 +171,65 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
   // Independent items without designated group pools
   const ungroupedItems = items.filter((item) => !item.group_name);
 
+  const itemsPerPage = 5;
+  const groupedEntries = Object.entries(groupedItems);
+  const totalFamilyPages = Math.ceil(groupedEntries.length / itemsPerPage);
+  const startFamilyIndex = (currentFamilyPage - 1) * itemsPerPage;
+  const paginatedFamilyGroups = groupedEntries.slice(startFamilyIndex, startFamilyIndex + itemsPerPage);
+
+  const totalSoloPages = Math.ceil(ungroupedItems.length / itemsPerPage);
+  const startSoloIndex = (currentSoloPage - 1) * itemsPerPage;
+  const paginatedSoloItems = ungroupedItems.slice(startSoloIndex, startSoloIndex + itemsPerPage);
+
   return (
     <div className="space-y-8 font-sans">
+      {/* Top Controller Header Block */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-sm">
+              {items.length} Total Inventory Shards
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(true)}
+            className="h-[34px] px-3.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-sm text-xs font-bold shadow-sm transition-all flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Digital Inventory Row</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Dynamic Creation Modal Embed */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div 
+            className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-sm shadow-2xl relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(false)}
+              className="absolute top-4 right-4 z-10 w-7 h-7 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-sm flex items-center justify-center transition-colors text-base font-bold"
+            >
+              ×
+            </button>
+            <div className="pt-2">
+              <InventoryForm 
+                storeId={storeId} 
+                currency={currency} 
+                onSuccess={() => setIsCreateModalOpen(false)} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* SECTION 1: Family Pools Hub (Grouped View) */}
       <div className="space-y-4">
         <div>
@@ -181,9 +242,9 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
           </p>
         </div>
 
-        {Object.keys(groupedItems).length > 0 ? (
+        {groupedEntries.length > 0 ? (
           <div className="grid grid-cols-1 gap-5">
-            {Object.entries(groupedItems).map(([groupName, groupMembers]) => {
+            {paginatedFamilyGroups.map(([groupName, groupMembers]) => {
               const maxCapacity = groupName.toLowerCase().includes("netflix") ? 5 : 6;
               const isFull = groupMembers.length >= maxCapacity;
 
@@ -298,6 +359,50 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
             No family-based pool slots assigned. Create Google, YouTube, or Canva items to trigger bucket allocation logic.
           </div>
         )}
+
+        {totalFamilyPages > 1 && (
+          <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border border-slate-100 dark:border-slate-800 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+              Showing Family Pools <strong className="text-slate-700 dark:text-slate-200">{startFamilyIndex + 1}</strong> to{" "}
+              <strong className="text-slate-700 dark:text-slate-200">
+                {Math.min(startFamilyIndex + itemsPerPage, groupedEntries.length)}
+              </strong>{" "}
+              of <strong className="text-slate-700 dark:text-slate-200">{groupedEntries.length}</strong> master groups
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setCurrentFamilyPage((p) => Math.max(1, p - 1))}
+                disabled={currentFamilyPage === 1}
+                className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              >
+                Prev
+              </button>
+              {Array.from({ length: totalFamilyPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  type="button"
+                  onClick={() => setCurrentFamilyPage(page)}
+                  className={`w-7 h-7 font-bold rounded-sm transition-all flex items-center justify-center ${
+                    currentFamilyPage === page
+                      ? "bg-indigo-600 text-white shadow-xs"
+                      : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setCurrentFamilyPage((p) => Math.min(totalFamilyPages, p + 1))}
+                disabled={currentFamilyPage === totalFamilyPages}
+                className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* SECTION 2: Independent Assets List */}
@@ -325,7 +430,7 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
-                {ungroupedItems.map((item) => {
+                {paginatedSoloItems.map((item) => {
                   const isDeleting = deletingId === item.id;
                   const isUpdating = updatingId === item.id;
 
@@ -435,6 +540,50 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
               </tbody>
             </table>
           </div>
+
+          {totalSoloPages > 1 && (
+            <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                Showing Solo Items <strong className="text-slate-700 dark:text-slate-200">{startSoloIndex + 1}</strong> to{" "}
+                <strong className="text-slate-700 dark:text-slate-200">
+                  {Math.min(startSoloIndex + itemsPerPage, ungroupedItems.length)}
+                </strong>{" "}
+                of <strong className="text-slate-700 dark:text-slate-200">{ungroupedItems.length}</strong> solo rows
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setCurrentSoloPage((p) => Math.max(1, p - 1))}
+                  disabled={currentSoloPage === 1}
+                  className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  Prev
+                </button>
+                {Array.from({ length: totalSoloPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => setCurrentSoloPage(page)}
+                    className={`w-7 h-7 font-bold rounded-sm transition-all flex items-center justify-center ${
+                      currentSoloPage === page
+                        ? "bg-indigo-600 text-white shadow-xs"
+                        : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setCurrentSoloPage((p) => Math.min(totalSoloPages, p + 1))}
+                  disabled={currentSoloPage === totalSoloPages}
+                  className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

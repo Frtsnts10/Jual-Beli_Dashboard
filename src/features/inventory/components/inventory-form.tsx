@@ -9,9 +9,10 @@ import { Select, ListBox, ListBoxItem } from "@heroui/react";
 interface InventoryFormProps {
   storeId: string;
   currency?: string;
+  onSuccess?: () => void;
 }
 
-export function InventoryForm({ storeId, currency = "USD" }: InventoryFormProps) {
+export function InventoryForm({ storeId, currency = "USD", onSuccess }: InventoryFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,6 +84,7 @@ export function InventoryForm({ storeId, currency = "USD" }: InventoryFormProps)
       setSellingPriceStr("");
       setProductName("");
       setTierVariant("");
+      onSuccess?.();
     }
   }
 

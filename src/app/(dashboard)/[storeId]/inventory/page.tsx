@@ -1,6 +1,5 @@
 import React from "react";
 import { getInventoryAction } from "@/features/inventory/actions/inventory-actions";
-import { InventoryForm } from "@/features/inventory/components/inventory-form";
 import { InventoryTable } from "@/features/inventory/components/inventory-table";
 
 import { createServerSupabase } from "@/lib/supabase/server";
@@ -27,8 +26,6 @@ export default async function TenantInventoryPage({
           Map streaming inventory rows, configure credentials, and manage auto-allocated Family Shard partitions.
         </p>
       </div>
-
-      <InventoryForm storeId={storeId} currency={currency} />
 
       <div className="pt-2">
         <InventoryTable storeId={storeId} items={items} currency={currency} />
