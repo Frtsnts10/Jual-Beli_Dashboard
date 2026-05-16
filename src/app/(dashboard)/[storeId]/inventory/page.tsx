@@ -20,13 +20,6 @@ export default async function TenantInventoryPage({
 
   return (
     <div className="space-y-6 font-sans transition-colors">
-      <div>
-        <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Tenant Stock Management</h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-          Map streaming inventory rows, configure credentials, and manage auto-allocated Family Shard partitions.
-        </p>
-      </div>
-
       <div className="pt-2">
         <InventoryTable storeId={storeId} items={items} currency={currency} />
       </div>

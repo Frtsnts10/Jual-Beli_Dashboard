@@ -6,7 +6,6 @@ import { CustomerForm } from "./customer-form";
 import { Trash2, Loader2, User, ShoppingBag, Plus, Calendar, Clock, Download, Upload, Ban, CalendarPlus, UserMinus } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
-import { Select, ListBox, ListBoxItem } from "@heroui/react";
 
 interface CustomerTableProps {
   storeId: string;
@@ -86,6 +85,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
   };
 
   // Base Template Download Handlers
+  // Export Handlers
   const downloadCustomerTemplate = () => {
     const headers = "name;email;phone;product_name;product_variant;duration_days;bought_date\n";
     const example = "Jane Premium;jane@streaming.com;+15550192;Netflix Access;1user;30;2026-05-12\n";
@@ -99,8 +99,21 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
     document.body.removeChild(link);
   };
 
+  const exportCustomersCsv = () => {
+    const headers = "name;email;phone;orders_count\n";
+    const rows = customers.map(c => 
+      `${c.name};${c.email || ""};${c.phone || ""};${Array.isArray(c.purchased_products) ? c.purchased_products.length : 0}`
+    ).join("\n");
+    const blob = new Blob([headers + rows], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `customers_export_${storeId.slice(0, 8)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-  // Dump JSON Array payload locally
   const exportDatabaseDump = () => {
     const payload = JSON.stringify({ store_id: storeId, timestamp: new Date().toISOString(), customers }, null, 2);
     const blob = new Blob([payload], { type: "application/json" });
@@ -166,22 +179,24 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
   const paginatedCustomers = customers.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-8 font-sans">
       {/* Top Controller Header Block */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-sm">
-              {customers.length} Client Shards
-            </span>
-          </div>
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Customer CRM Vectors</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Bind external purchasing profiles and inspect transaction counts securely.
+          </p>
         </div>
 
-        <div className="flex items-center gap-2 self-end sm:self-auto">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-sm border border-indigo-100/40 dark:border-indigo-900/40">
+            {customers.length} Client Shards
+          </span>
           <button
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
-            className="h-[34px] px-3.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-sm text-xs font-bold shadow-sm transition-all flex items-center gap-1.5"
+            className="h-[38px] px-5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-sm text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" />
             <span>Register Customer</span>
@@ -215,7 +230,43 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
       )}
 
       {/* Table Main Component */}
-      <div className="bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              Customer Database Matrix
+            </h3>
+            <p className="text-[10px] text-slate-500 mt-0.5">Directly manage profile ownerships and linked streaming asset segments.</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={exportCustomersCsv}
+              className="h-[34px] px-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5" /> CSV Export
+            </button>
+            <button
+              onClick={exportDatabaseDump}
+              className="h-[34px] px-3.5 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200/50 dark:border-indigo-800/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <Plus className="w-3.5 h-3.5" /> JSON Dump
+            </button>
+            <label className="h-[34px] px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+              <Upload className="w-3.5 h-3.5" /> Import
+              <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
+            </label>
+            <button
+              onClick={downloadCustomerTemplate}
+              className="h-[34px] px-3.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5" /> Template
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -396,26 +447,18 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 className="px-2 py-1 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-[11px] font-bold text-slate-800 dark:text-slate-200 focus:outline-none"
                               />
                               <div className="flex flex-col justify-end w-full">
-                                <Select
+                                <select
                                   aria-label="Append Variant"
-                                  placeholder="Variant"
-                                  selectedKey={appendVariant || null}
-                                  onSelectionChange={(key) => setAppendVariant(key ? key.toString() : "")}
-                                  className="w-full"
+                                  value={appendVariant}
+                                  onChange={(e) => setAppendVariant(e.target.value)}
+                                  className="w-full h-[26px] px-1.5 py-0 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-[11px] font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
                                 >
-                                  <Select.Trigger className="w-full h-[26px] min-h-[26px] py-0 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-none flex items-center justify-between px-2 text-[11px] font-medium text-slate-800 dark:text-slate-200">
-                                    <Select.Value />
-                                  </Select.Trigger>
-                                  <Select.Popover style={{ width: "var(--trigger-width)" }} className="bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-2xl z-50 overflow-hidden">
-                                    <ListBox className="p-1.5 outline-none space-y-0.5 max-h-60 overflow-y-auto">
-                                      {appendVariantOptions.map((opt) => (
-                                        <ListBoxItem key={opt} textValue={opt} className="px-2.5 py-1.5 text-xs rounded-sm hover:bg-indigo-50 dark:hover:bg-indigo-950/40 focus:bg-indigo-50 dark:focus:bg-indigo-950/40 cursor-pointer text-slate-700 dark:text-slate-300 font-medium select-none outline-none transition-colors">
-                                          {opt}
-                                        </ListBoxItem>
-                                      ))}
-                                    </ListBox>
-                                  </Select.Popover>
-                                </Select>
+                                  {appendVariantOptions.map((opt) => (
+                                    <option key={opt} value={opt}>
+                                      {opt}
+                                    </option>
+                                  ))}
+                                </select>
                               </div>
                               <select
                                 value={appendDuration}
@@ -531,45 +574,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           </div>
         )}
       </div>
-
-      <div className="p-5 bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-sm shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors">
-        <div>
-          <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-            <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Database CSV Template & Backup Engine
-          </h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Retrieve base payload strings perfectly matched to customer structures.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="h-[34px] px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-sm text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95">
-            {isImporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-            <span>{isImporting ? "Parsing..." : "Import CSV Records"}</span>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              disabled={isImporting}
-              className="hidden"
-            />
-          </label>
-          <button
-            type="button"
-            onClick={downloadCustomerTemplate}
-            className="h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] hover:bg-slate-100 dark:hover:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-200 transition-all flex items-center gap-1.5 active:scale-95"
-          >
-            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" /> Customer Template CSV
-          </button>
-          <button
-            type="button"
-            onClick={exportDatabaseDump}
-            className="h-[34px] px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-sm text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 active:scale-95"
-          >
-            <Upload className="w-3.5 h-3.5" /> Dump CRM Payload JSON
-          </button>
-        </div>
-      </div>
+    </div>
 
       {/* Stream Modal Embed */}
       {streamActionTarget && (

@@ -3,10 +3,9 @@
 import React, { useState } from "react";
 import { InventoryItem, deleteInventoryItemAction, updateItemGroupingAction, updateInventoryItemAction, importInventoryCsvAction } from "../actions/inventory-actions";
 import { InventoryForm } from "./inventory-form";
-import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, UserMinus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus } from "lucide-react";
+import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus, Package } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
-import { Select, ListBox, ListBoxItem } from "@heroui/react";
 
 interface InventoryTableProps {
   storeId: string;
@@ -114,13 +113,28 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
   };
 
   const downloadProductTemplate = () => {
-    const headers = "name;profile_tier;profile_name;email;password;pin;base_price;selling_price;stock\n";
-    const example = "Netflix Matrix;1user;test-a;account@domain.com;pass123;1234;12.00;19.99;1\n";
+    const headers = "name;profile_tier;profile_name;email;password;pin;base_price;selling_price;stock;group_name\n";
+    const example = "Netflix Matrix;1user;test-a;account@domain.com;pass123;1234;12.00;19.99;1;Family Pool Alpha\n";
     const blob = new Blob([headers + example], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
     link.setAttribute("download", "inventory_import_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportData = (data: InventoryItem[], filename: string) => {
+    const headers = "name;profile_tier;profile_name;email;password;pin;base_price;selling_price;stock;group_name;date_buy;date_expired\n";
+    const rows = data.map(item => 
+      `${item.name};${item.profile_tier || ""};${item.profile_name || ""};${item.email || ""};${item.password || ""};${item.pin || ""};${item.base_price};${item.selling_price};${item.stock};${item.group_name || ""};${item.date_buy || ""};${item.date_expired || ""}`
+    ).join("\n");
+    const blob = new Blob([headers + rows], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -198,20 +212,22 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
   return (
     <div className="space-y-8 font-sans">
       {/* Top Controller Header Block */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-sm">
-              {items.length} Total Inventory Shards
-            </span>
-          </div>
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Tenant Stock Management</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Map streaming inventory rows, configure credentials, and manage auto-allocated Family Shard partitions.
+          </p>
         </div>
 
-        <div className="flex items-center gap-2 self-end sm:self-auto">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-sm border border-indigo-100/40 dark:border-indigo-900/40">
+            {items.length} Total Inventory Shards
+          </span>
           <button
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
-            className="h-[34px] px-3.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-sm text-xs font-bold shadow-sm transition-all flex items-center gap-1.5"
+            className="h-[38px] px-5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-sm text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" />
             <span>Add Digital Inventory Row</span>
@@ -246,14 +262,33 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
 
       {/* SECTION 1: Family Pools Hub (Grouped View) */}
       <div className="space-y-4">
-        <div>
-          <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            Family Pool Allocation Nodes (Shared Shard Grouping)
-          </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Auto-allocated pool constraints map 5 or 6 member profiles natively per master partition.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              Family Pool Allocation Nodes (Shared Shard Grouping)
+            </h3>
+            <p className="text-[10px] text-slate-500 mt-0.5">Auto-allocated pool constraints map 5 or 6 member profiles natively per master partition.</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => exportData(items.filter(i => !!i.group_name), "family_inventory_export.csv")}
+              className="h-[34px] px-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5" /> Export
+            </button>
+            <label className="h-[34px] px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+              <Upload className="w-3.5 h-3.5" /> Import
+              <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
+            </label>
+            <button
+              onClick={downloadProductTemplate}
+              className="h-[34px] px-3.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5" /> Template
+            </button>
+          </div>
         </div>
 
         {groupedEntries.length > 0 ? (
@@ -419,15 +454,35 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
         )}
       </div>
 
-      {/* SECTION 2: Independent Assets List */}
-      <div className="space-y-4 pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
-        <div>
-          <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
-            Independent Resale Array (Solo Variants & Base Accounts)
-          </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Individual streaming items operating outside strict family slot pooling constraints.
-          </p>
+      {/* SECTION 2: Independent Resale Array (Solo items) */}
+      <div className="space-y-4 pt-8 border-t border-slate-200/60 dark:border-slate-800/60">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <Package className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              Independent Resale Array (Solo Variants & Base Accounts)
+            </h3>
+            <p className="text-[10px] text-slate-500 mt-0.5">Individual streaming items operating outside strict family slot pooling constraints.</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => exportData(ungroupedItems, "solo_inventory_export.csv")}
+              className="h-[34px] px-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5" /> Export
+            </button>
+            <label className="h-[34px] px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+              <Upload className="w-3.5 h-3.5" /> Import
+              <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
+            </label>
+            <button
+              onClick={downloadProductTemplate}
+              className="h-[34px] px-3.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5" /> Template
+            </button>
+          </div>
         </div>
 
         <div className="bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
@@ -601,37 +656,7 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
         </div>
       </div>
 
-      <div className="p-5 bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-sm shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors">
-        <div>
-          <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-            <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Inventory CSV Template Hub
-          </h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Retrieve base payload strings perfectly matched to product variants and profile structures.
-          </p>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="h-[34px] px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-sm text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95">
-            {isImporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-            <span>{isImporting ? "Parsing..." : "Import CSV Stock"}</span>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              disabled={isImporting}
-              className="hidden"
-            />
-          </label>
-          <button
-            type="button"
-            onClick={downloadProductTemplate}
-            className="h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] hover:bg-slate-100 dark:hover:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-200 transition-all flex items-center gap-1.5 active:scale-95"
-          >
-            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" /> Product Template CSV
-          </button>
-        </div>
-      </div>
 
       {editingItem && (
         <EditInventoryModal
@@ -775,26 +800,17 @@ function EditInventoryModal({
             </div>
             <div className="flex flex-col justify-end w-full">
               <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tier Variant</label>
-              <Select
-                aria-label="Tier Variant"
-                placeholder="Select variant"
-                selectedKey={profileTier || null}
-                onSelectionChange={(key) => setProfileTier(key ? key.toString() : "")}
-                className="w-full"
+              <select
+                value={profileTier}
+                onChange={(e) => setProfileTier(e.target.value)}
+                className="w-full h-[34px] px-2.5 py-1 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
               >
-                <Select.Trigger className="w-full h-[34px] min-h-[34px] bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm shadow-none flex items-center justify-between px-3 text-xs font-semibold text-slate-800 dark:text-slate-100">
-                  <Select.Value />
-                </Select.Trigger>
-                <Select.Popover style={{ width: "var(--trigger-width)" }} className="bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-2xl z-50 overflow-hidden">
-                  <ListBox className="p-1.5 outline-none space-y-0.5 max-h-60 overflow-y-auto">
-                    {tierOptions.map((opt) => (
-                      <ListBoxItem key={opt} textValue={opt} className="px-2.5 py-1.5 text-xs rounded-sm hover:bg-indigo-50 dark:hover:bg-indigo-950/40 focus:bg-indigo-50 dark:focus:bg-indigo-950/40 cursor-pointer text-slate-700 dark:text-slate-300 font-medium select-none outline-none transition-colors">
-                        {opt}
-                      </ListBoxItem>
-                    ))}
-                  </ListBox>
-                </Select.Popover>
-              </Select>
+                {tierOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Designation</label>

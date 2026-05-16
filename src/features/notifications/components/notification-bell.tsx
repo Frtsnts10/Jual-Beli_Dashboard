@@ -22,8 +22,6 @@ export function NotificationBell({ storeId }: { storeId: string }) {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000); // refresh every minute
-    return () => clearInterval(interval);
   }, [storeId]);
 
   return (

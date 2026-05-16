@@ -92,7 +92,7 @@ export default async function TenantDashboardPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <ChartCard />
+          <ChartCard data={stats.chartData} />
         </div>
         <div className="space-y-4">
           <div className="p-5 bg-gradient-to-br from-indigo-50 dark:from-indigo-950/20 to-violet-50 dark:to-violet-950/10 rounded-sm border border-indigo-100/60 dark:border-indigo-900/40 font-sans transition-colors">

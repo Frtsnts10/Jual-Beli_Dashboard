@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { UserPlus, ShoppingBag, Clock, ChevronDown } from "lucide-react";
 import { createCustomerAction } from "../actions/customer-actions";
 import { getTierConfigForProduct } from "@/config/product-tiers";
-import { Select, ListBox, ListBoxItem } from "@heroui/react";
 import { COUNTRY_CODES } from "@/config/countries";
 
 interface CustomerFormProps {
@@ -233,27 +232,18 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
           {/* Variant Tier Mapping */}
           <div className="flex flex-col justify-end w-full">
             <label className="block text-[9px] font-bold text-slate-400 uppercase mb-1">Variant Access</label>
-            <Select
+            <select
               name="product_variant"
-              aria-label="Variant Access"
-              placeholder="Select variant"
-              selectedKey={productVariant || null}
-              onSelectionChange={(key) => setProductVariant(key ? key.toString() : "")}
-              className="w-full"
+              value={productVariant}
+              onChange={(e) => setProductVariant(e.target.value)}
+              className="w-full h-[34px] px-2.5 py-1.5 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
             >
-              <Select.Trigger className="w-full h-[34px] min-h-[34px] bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-none flex items-center justify-between px-3 text-xs font-semibold text-slate-800 dark:text-slate-100">
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popover style={{ width: "var(--trigger-width)" }} className="bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-2xl z-50 overflow-hidden">
-                <ListBox className="p-1.5 outline-none space-y-0.5 max-h-60 overflow-y-auto">
-                  {tierOptions.map((opt) => (
-                    <ListBoxItem key={opt} textValue={opt} className="px-2.5 py-1.5 text-xs rounded-sm hover:bg-indigo-50 dark:hover:bg-indigo-950/40 focus:bg-indigo-50 dark:focus:bg-indigo-950/40 cursor-pointer text-slate-700 dark:text-slate-300 font-medium select-none outline-none transition-colors">
-                      {opt}
-                    </ListBoxItem>
-                  ))}
-                </ListBox>
-              </Select.Popover>
-            </Select>
+              {tierOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Preset Duration Cycles Selector */}

@@ -20,7 +20,7 @@ export async function getNotificationsAction(storeId: string): Promise<Notificat
   const adminSupabase = await createAdminSupabase();
 
   const [invRes, custRes] = await Promise.all([
-    adminSupabase.from("inventory_items").select("*").eq("store_id", storeId),
+    adminSupabase.from("inventory").select("*").eq("store_id", storeId),
     adminSupabase.from("customers").select("*").eq("store_id", storeId),
   ]);
 
