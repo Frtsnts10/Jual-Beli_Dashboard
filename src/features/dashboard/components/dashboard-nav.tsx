@@ -97,16 +97,22 @@ export function DashboardNav() {
       {/* Floating Hamburger Button removed in favor of top header bar trigger */}
 
       {/* Slide-Over Menu Overlay for Mobile/Tablet */}
-      {mounted && isOpen && (
-        <div className="md:hidden fixed inset-0 z-[9998] flex">
+      {mounted && (
+        <div className={`md:hidden fixed inset-0 z-[9998] flex transition-all duration-300 ${
+          isOpen ? "pointer-events-auto" : "pointer-events-none"
+        }`}>
           {/* Backdrop */}
           <div 
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300"
+            className={`fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity duration-300 ease-out ${
+              isOpen ? "opacity-100" : "opacity-0"
+            }`}
           />
 
           {/* Drawer Panel */}
-          <div className="relative w-72 h-full bg-white dark:bg-[#0b0f19] border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col p-6 space-y-6 shadow-2xl z-[9999] transition-all duration-300 animate-in slide-in-from-left">
+          <div className={`relative w-72 h-full bg-white dark:bg-[#0b0f19] border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col p-6 space-y-6 shadow-2xl z-[9999] transition-transform duration-300 ease-in-out transform ${
+            isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}>
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
               <div>
                 <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Shard Console</p>
