@@ -91,7 +91,7 @@ export function EditProfileForm({
       const { data: factors, error: listErr } = await supabase.auth.mfa.listFactors();
       if (listErr) throw listErr;
 
-      const totpFactor = factors.totp.find(f => f.status === 'verified');
+      const totpFactor = factors.totp.find((f: any) => f.status === 'verified');
       if (!totpFactor) {
         setEnable2fa(false);
         return;
