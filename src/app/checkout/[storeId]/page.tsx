@@ -24,28 +24,28 @@ export default async function SimulatedStripeCheckoutPage({
 
   const billingInfo = {
     monthly: {
-      price: "$49.00",
+      price: "$29.00",
       description: "Billed per active calendar cycle",
       mode: "Monthly",
       days: 30,
       planName: "Shop Dashboard Pro (Monthly)",
     },
     yearly: {
-      price: "$399.00",
+      price: "$59.00",
       description: "Billed per year (Save 30%)",
       mode: "Yearly",
       days: 365,
       planName: "Shop Dashboard Pro (Yearly)",
     },
     lifetime: {
-      price: "$999.00",
+      price: "$99.00",
       description: "Paid once, own forever",
       mode: "Lifetime / One-Time",
       days: null,
       planName: "Shop Dashboard Pro (Lifetime)",
     }
   }[interval as "monthly" | "yearly" | "lifetime"] || {
-    price: "$49.00",
+    price: "$29.00",
     description: "Billed per active calendar cycle",
     mode: "Monthly",
     days: 30,

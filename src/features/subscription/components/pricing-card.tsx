@@ -27,7 +27,7 @@ export function PricingCard({ storeId, isSubscribed }: PricingCardProps) {
 
   const pricingData = {
     monthly: {
-      price: "$49",
+      price: "$29",
       suffix: " / workspace month",
       cta: "Upgrade Monthly Shard",
       badge: "Standard Premium",
@@ -39,7 +39,7 @@ export function PricingCard({ storeId, isSubscribed }: PricingCardProps) {
       ]
     },
     yearly: {
-      price: "$399",
+      price: "$59",
       suffix: " / workspace year",
       cta: "Upgrade Yearly Shard",
       badge: "Premium Saver (Save 30%)",
@@ -53,7 +53,7 @@ export function PricingCard({ storeId, isSubscribed }: PricingCardProps) {
       ]
     },
     lifetime: {
-      price: "$999",
+      price: "$99",
       suffix: " / one-time lifetime",
       cta: "Acquire Lifetime Access",
       badge: "Best Value (Lifetime)",
