@@ -90,7 +90,8 @@ export function DashboardNav() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle navigation menu"
-        className="md:hidden fixed bottom-6 right-6 z-50 p-4 rounded-full bg-indigo-600 text-white shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center border border-indigo-500/30 cursor-pointer"
+        className="md:hidden fixed z-50 p-4 rounded-full bg-indigo-600 text-white shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center border border-indigo-500/30 cursor-pointer"
+        style={{ bottom: "24px", right: "24px" }}
       >
         {isOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
       </button>
