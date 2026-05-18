@@ -16,40 +16,60 @@ export default async function SimulatedStripeCheckoutPage({
   const interval = resolvedSearchParams?.interval || "monthly";
 
   const supabase = await createServerSupabase();
-  const { data: store } = await supabase.from("stores").select("name, owner_id").eq("id", storeId).single();
+  const { data: store } = await supabase.from("stores").select("name, owner_id, currency").eq("id", storeId).single();
 
   if (!store) {
     redirect("/dashboard");
   }
 
+  const currency = store?.currency || "IDR";
+
+  const formatPrice = (usdAmount: number) => {
+    if (currency.toUpperCase() === "IDR") {
+      const amount = usdAmount * 15000;
+      return new Intl.NumberFormat("id-ID", { 
+        style: "currency", 
+        currency: "IDR", 
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0 
+      }).format(amount);
+    }
+    return new Intl.NumberFormat("en-US", { 
+      style: "currency", 
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 
+    }).format(usdAmount);
+  };
+
   const billingInfo = {
     monthly: {
-      price: "$29.00",
-      description: "Billed per active calendar cycle",
-      mode: "Monthly",
+      price: formatPrice(29),
+      description: currency.toUpperCase() === "IDR" ? "Ditagih per siklus kalender aktif" : "Billed per active calendar cycle",
+      mode: currency.toUpperCase() === "IDR" ? "Bulanan" : "Monthly",
       days: 30,
-      planName: "Shop Dashboard Pro (Monthly)",
+      planName: currency.toUpperCase() === "IDR" ? "Shop Dashboard Pro (Bulanan)" : "Shop Dashboard Pro (Monthly)",
     },
     yearly: {
-      price: "$59.00",
-      description: "Billed per year (Save 30%)",
-      mode: "Yearly",
+      price: formatPrice(59),
+      description: currency.toUpperCase() === "IDR" ? "Ditagih per tahun (Hemat 30%)" : "Billed per year (Save 30%)",
+      mode: currency.toUpperCase() === "IDR" ? "Tahunan" : "Yearly",
       days: 365,
-      planName: "Shop Dashboard Pro (Yearly)",
+      planName: currency.toUpperCase() === "IDR" ? "Shop Dashboard Pro (Tahunan)" : "Shop Dashboard Pro (Yearly)",
     },
     lifetime: {
-      price: "$99.00",
-      description: "Paid once, own forever",
-      mode: "Lifetime / One-Time",
+      price: formatPrice(99),
+      description: currency.toUpperCase() === "IDR" ? "Bayar sekali, miliki selamanya" : "Paid once, own forever",
+      mode: currency.toUpperCase() === "IDR" ? "Lifetime / Sekali Bayar" : "Lifetime / One-Time",
       days: null,
-      planName: "Shop Dashboard Pro (Lifetime)",
+      planName: currency.toUpperCase() === "IDR" ? "Shop Dashboard Pro (Lifetime)" : "Shop Dashboard Pro (Lifetime)",
     }
   }[interval as "monthly" | "yearly" | "lifetime"] || {
-    price: "$29.00",
-    description: "Billed per active calendar cycle",
-    mode: "Monthly",
+    price: formatPrice(29),
+    description: currency.toUpperCase() === "IDR" ? "Ditagih per siklus kalender aktif" : "Billed per active calendar cycle",
+    mode: currency.toUpperCase() === "IDR" ? "Bulanan" : "Monthly",
     days: 30,
-    planName: "Shop Dashboard Pro (Monthly)",
+    planName: currency.toUpperCase() === "IDR" ? "Shop Dashboard Pro (Bulanan)" : "Shop Dashboard Pro (Monthly)",
   };
 
   // Define Server Action to activate subscription mapping directly inside database bindings

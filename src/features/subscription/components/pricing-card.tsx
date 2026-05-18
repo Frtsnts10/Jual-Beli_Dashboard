@@ -7,9 +7,10 @@ import { createCheckoutSessionAction } from "../server/subscription-actions";
 interface PricingCardProps {
   storeId: string;
   isSubscribed: boolean;
+  currency?: string;
 }
 
-export function PricingCard({ storeId, isSubscribed }: PricingCardProps) {
+export function PricingCard({ storeId, isSubscribed, currency = "USD" }: PricingCardProps) {
   const [isPending, setIsPending] = useState(false);
   const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly" | "lifetime">("monthly");
 
@@ -25,10 +26,28 @@ export function PricingCard({ storeId, isSubscribed }: PricingCardProps) {
     }
   };
 
+  const formatPrice = (usdAmount: number) => {
+    if (currency.toUpperCase() === "IDR") {
+      const amount = usdAmount * 15000;
+      return new Intl.NumberFormat("id-ID", { 
+        style: "currency", 
+        currency: "IDR", 
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0 
+      }).format(amount);
+    }
+    return new Intl.NumberFormat("en-US", { 
+      style: "currency", 
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0 
+    }).format(usdAmount);
+  };
+
   const pricingData = {
     monthly: {
-      price: "$29",
-      suffix: " / workspace month",
+      price: formatPrice(29),
+      suffix: currency.toUpperCase() === "IDR" ? " / workspace bulan" : " / workspace month",
       cta: "Upgrade Monthly Shard",
       badge: "Standard Premium",
       features: [
@@ -39,8 +58,8 @@ export function PricingCard({ storeId, isSubscribed }: PricingCardProps) {
       ]
     },
     yearly: {
-      price: "$59",
-      suffix: " / workspace year",
+      price: formatPrice(59),
+      suffix: currency.toUpperCase() === "IDR" ? " / workspace tahun" : " / workspace year",
       cta: "Upgrade Yearly Shard",
       badge: "Premium Saver (Save 30%)",
       features: [
@@ -53,8 +72,8 @@ export function PricingCard({ storeId, isSubscribed }: PricingCardProps) {
       ]
     },
     lifetime: {
-      price: "$99",
-      suffix: " / one-time lifetime",
+      price: formatPrice(99),
+      suffix: currency.toUpperCase() === "IDR" ? " / lifetime sekali bayar" : " / one-time lifetime",
       cta: "Acquire Lifetime Access",
       badge: "Best Value (Lifetime)",
       features: [
@@ -130,8 +149,10 @@ export function PricingCard({ storeId, isSubscribed }: PricingCardProps) {
               Essential data logging setup for simple proof-of-concept workspaces.
             </p>
             <div className="mb-6">
-              <span className="text-4xl font-black text-slate-900 dark:text-slate-100">$0</span>
-              <span className="text-xs text-slate-400 dark:text-slate-500 font-bold"> / month forever</span>
+              <span className="text-4xl font-black text-slate-900 dark:text-slate-100">{formatPrice(0)}</span>
+              <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">
+                {currency.toUpperCase() === "IDR" ? " / bulan selamanya" : " / month forever"}
+              </span>
             </div>
             <ul className="space-y-3 text-xs text-slate-600 dark:text-slate-300 font-medium">
               <li className="flex items-center gap-2.5">

@@ -3,6 +3,7 @@ import { getSubscriptionStatus } from "@/features/subscription/server/subscripti
 import { SubscriptionStatus } from "@/features/subscription/components/subscription-status";
 import { PricingCard } from "@/features/subscription/components/pricing-card";
 import { CheckCircle2, Sparkles } from "lucide-react";
+import { createServerSupabase } from "@/lib/supabase/server";
 
 export default async function TenantSubscriptionPage({
   params,
@@ -15,7 +16,13 @@ export default async function TenantSubscriptionPage({
   const resolvedSearchParams = await searchParams;
   const isPaymentSuccess = resolvedSearchParams?.payment_success === "true";
 
-  const status = await getSubscriptionStatus(storeId);
+  const supabase = await createServerSupabase();
+  const [storeRes, status] = await Promise.all([
+    supabase.from("stores").select("currency").eq("id", storeId).single(),
+    getSubscriptionStatus(storeId),
+  ]);
+
+  const currency = storeRes.data?.currency || "IDR";
 
   return (
     <div className="space-y-8 font-sans pb-12 animate-in fade-in duration-300">
@@ -54,7 +61,7 @@ export default async function TenantSubscriptionPage({
           <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Provision Resource Scales</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Upgrade your active shard to bypass API limits instantly</p>
         </div>
-        <PricingCard storeId={storeId} isSubscribed={status.isSubscribed} />
+        <PricingCard storeId={storeId} isSubscribed={status.isSubscribed} currency={currency} />
       </div>
     </div>
   );
