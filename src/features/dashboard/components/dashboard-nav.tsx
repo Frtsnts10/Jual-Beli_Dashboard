@@ -20,6 +20,11 @@ export function DashboardNav() {
   const pathname = usePathname();
   const storeId = params?.storeId as string;
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (!storeId) return null;
 
@@ -87,17 +92,19 @@ export function DashboardNav() {
       </aside>
 
       {/* Floating Hamburger Toggle Button for Mobile/Tablet */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Toggle navigation menu"
-        className="md:hidden fixed p-4 rounded-full bg-indigo-600 text-white shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center border border-indigo-500/30 cursor-pointer"
-        style={{ bottom: "24px", right: "24px", zIndex: 9999 }}
-      >
-        {isOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
-      </button>
+      {mounted && (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle navigation menu"
+          className="md:hidden fixed p-4 rounded-full bg-indigo-600 text-white shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center border border-indigo-500/30 cursor-pointer"
+          style={{ bottom: "24px", right: "24px", zIndex: 9999 }}
+        >
+          {isOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
+        </button>
+      )}
 
       {/* Slide-Over Menu Overlay for Mobile/Tablet */}
-      {isOpen && (
+      {mounted && isOpen && (
         <div className="md:hidden fixed inset-0 z-[9998] flex">
           {/* Backdrop */}
           <div 
@@ -114,13 +121,19 @@ export function DashboardNav() {
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                className="p-1 rounded-sm text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors"
               >
-                <X className="w-4.5 h-4.5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex-1 space-y-1.5 overflow-y-auto pr-1">
+            <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
+              <div className="mb-4 px-2">
+                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
+                  Mobile Shard Gateway
+                </p>
+              </div>
+
               {routes.map((route) => {
                 const Icon = route.icon;
                 const isActive = pathname === route.href || (pathname?.startsWith(route.href) && route.href !== `/${storeId}/dashboard`);
@@ -130,13 +143,18 @@ export function DashboardNav() {
                     key={route.name}
                     href={route.href}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-sm text-xs font-bold transition-all duration-200 ${
+                    className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-sm text-[11px] font-bold transition-all duration-200 ${
                       isActive
-                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-200/20 dark:shadow-none"
+                        ? "bg-indigo-600 text-white shadow-md"
                         : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-indigo-600 dark:hover:text-indigo-400"
                     }`}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-400 dark:text-slate-500"}`} />
+                    <Icon 
+                      className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
+                        isActive ? "text-white" : "text-slate-400 group-hover:text-indigo-500 dark:text-slate-500"
+                      }`} 
+                      strokeWidth={isActive ? 3 : 2.5}
+                    />
                     <span>{route.name}</span>
                   </Link>
                 );
