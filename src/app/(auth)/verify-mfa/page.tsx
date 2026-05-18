@@ -10,7 +10,6 @@ export default function VerifyMfaPage() {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const supabase = createClient();
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +19,7 @@ export default function VerifyMfaPage() {
     setError(null);
 
     try {
+      const supabase = createClient();
       // 1. Get the factors
       const { data: factors, error: factorsErr } = await supabase.auth.mfa.listFactors();
       if (factorsErr) throw factorsErr;
