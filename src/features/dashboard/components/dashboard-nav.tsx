@@ -24,6 +24,9 @@ export function DashboardNav() {
 
   React.useEffect(() => {
     setMounted(true);
+    const handleToggle = () => setIsOpen((prev) => !prev);
+    window.addEventListener("toggle-mobile-nav", handleToggle);
+    return () => window.removeEventListener("toggle-mobile-nav", handleToggle);
   }, []);
 
   if (!storeId) return null;
@@ -91,17 +94,7 @@ export function DashboardNav() {
         </div>
       </aside>
 
-      {/* Floating Hamburger Toggle Button for Mobile/Tablet */}
-      {mounted && (
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle navigation menu"
-          className="md:hidden fixed p-4 rounded-full bg-indigo-600 text-white shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center border border-indigo-500/30 cursor-pointer"
-          style={{ bottom: "24px", right: "24px", zIndex: 9999 }}
-        >
-          {isOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
-        </button>
-      )}
+      {/* Floating Hamburger Button removed in favor of top header bar trigger */}
 
       {/* Slide-Over Menu Overlay for Mobile/Tablet */}
       {mounted && isOpen && (

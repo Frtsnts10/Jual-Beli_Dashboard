@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server";
 import { StoreSwitcher } from "@/features/stores/components/store-switcher";
 import { DashboardNav } from "@/features/dashboard/components/dashboard-nav";
+import { MobileNavTrigger } from "@/features/dashboard/components/mobile-nav-trigger";
 import { UserButton } from "@/features/auth/components/user-button";
 import { NotificationBell } from "@/features/notifications/components/notification-bell";
 import { getSubscriptionStatus } from "@/features/subscription/server/subscription-actions";
@@ -49,7 +50,8 @@ export default async function TenantStoreLayout({
     <div className="flex h-screen flex-col overflow-hidden bg-slate-50 dark:bg-[#090d16] font-sans transition-colors">
       {/* Premium Multi-Tenant Top Bar Navigation */}
       <header className="shrink-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#0b0f19] px-4 transition-all">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <MobileNavTrigger />
           <StoreSwitcher stores={displayStores} profileId={profileId} />
           <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-[11px] font-bold text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
