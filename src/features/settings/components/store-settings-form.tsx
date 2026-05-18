@@ -141,7 +141,7 @@ export function StoreSettingsForm({
     <div className="h-full flex flex-col justify-between space-y-6 font-sans">
       <form
         onSubmit={handleSubmit}
-        className="p-6 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
+        className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
       >
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Tenant Properties Matrix</h3>
@@ -277,7 +277,7 @@ export function StoreSettingsForm({
       </form>
 
       {/* UI Theme Switcher Matrix */}
-      <div className="p-6 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-3 transition-colors">
+      <div className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-3 transition-colors">
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
             <Monitor className="w-4 h-4 text-indigo-500" /> Interface Appearance Preferences
@@ -329,7 +329,7 @@ export function StoreSettingsForm({
 
       {/* Danger matrix panel */}
       {!hideDangerPanel && (
-        <div className="p-6 bg-red-50/50 dark:bg-red-950/20 rounded-sm border border-red-100 dark:border-red-900/40 space-y-3 transition-colors">
+        <div className="p-4 sm:p-6 bg-red-50/50 dark:bg-red-950/20 rounded-sm border border-red-100 dark:border-red-900/40 space-y-3 transition-colors">
           <div className="flex items-center gap-2">
             <AlertOctagon className="w-4 h-4 text-red-600" />
             <h3 className="text-xs font-bold text-red-950 dark:text-red-400 uppercase tracking-wider">
@@ -367,7 +367,7 @@ export function DangerZonePanel({ storeId }: { storeId: string }) {
   }
 
   return (
-    <div className="p-6 bg-red-50/50 dark:bg-red-950/20 rounded-sm border border-red-100 dark:border-red-900/40 space-y-3 transition-colors">
+    <div className="p-4 sm:p-6 bg-red-50/50 dark:bg-red-950/20 rounded-sm border border-red-100 dark:border-red-900/40 space-y-3 transition-colors">
       <div className="flex items-center gap-2">
         <AlertOctagon className="w-4 h-4 text-red-600" />
         <h3 className="text-xs font-bold text-red-950 dark:text-red-400 uppercase tracking-wider">

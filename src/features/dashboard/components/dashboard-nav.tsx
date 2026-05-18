@@ -90,15 +90,15 @@ export function DashboardNav() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle navigation menu"
-        className="md:hidden fixed z-50 p-4 rounded-full bg-indigo-600 text-white shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center border border-indigo-500/30 cursor-pointer"
-        style={{ bottom: "24px", right: "24px" }}
+        className="md:hidden fixed p-4 rounded-full bg-indigo-600 text-white shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center border border-indigo-500/30 cursor-pointer"
+        style={{ bottom: "24px", right: "24px", zIndex: 9999 }}
       >
         {isOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
       </button>
 
       {/* Slide-Over Menu Overlay for Mobile/Tablet */}
       {isOpen && (
-        <div className="md:hidden fixed inset-0 z-40 flex">
+        <div className="md:hidden fixed inset-0 z-[9998] flex">
           {/* Backdrop */}
           <div 
             onClick={() => setIsOpen(false)}
@@ -106,7 +106,7 @@ export function DashboardNav() {
           />
 
           {/* Drawer Panel */}
-          <div className="relative w-72 h-full bg-white dark:bg-[#0b0f19] border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col p-6 space-y-6 shadow-2xl z-50 transition-all duration-300 animate-in slide-in-from-left">
+          <div className="relative w-72 h-full bg-white dark:bg-[#0b0f19] border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col p-6 space-y-6 shadow-2xl z-[9999] transition-all duration-300 animate-in slide-in-from-left">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
               <div>
                 <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Shard Console</p>
