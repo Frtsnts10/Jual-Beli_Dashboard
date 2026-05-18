@@ -47,6 +47,8 @@ export function StoreSettingsForm({
     setLang(val);
     localStorage.setItem("dashboard-language", val);
     window.dispatchEvent(new Event("dashboard-language-changed"));
+    // Instantly reload the page to apply the selected language globally!
+    window.location.reload();
   };
 
   const handleThemeChange = (t: string) => {
