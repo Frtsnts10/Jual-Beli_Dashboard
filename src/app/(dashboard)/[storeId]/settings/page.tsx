@@ -24,10 +24,13 @@ export default async function TenantSettingsPage({
   const { data: userRes } = await supabase.auth.getUser();
   const user = userRes.user;
 
+  // Retrieve live enrolled MFA factors list from Supabase Auth Server
+  const { data: factors } = await supabase.auth.mfa.listFactors();
+
   const initialName = user?.user_metadata?.full_name || "Workspace Admin";
   const initialEmail = user?.email || "";
   const initialAvatar = user?.user_metadata?.avatar_url || "";
-  const initial2fa = user?.user_metadata?.two_factor_enabled === true;
+  const initial2fa = factors?.totp?.some((f: any) => f.status === "verified") === true;
   const initialRestData = JSON.stringify(user?.user_metadata?.rest_data || {});
 
   return (
