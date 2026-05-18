@@ -11,9 +11,130 @@ import {
   MessageSquareWarning, 
   Settings, 
   CreditCard,
-  Menu,
   X
 } from "lucide-react";
+
+const navTranslations = {
+  id: {
+    coreModules: "Modul Utama",
+    overview: "Ikhtisar",
+    orders: "Antrean Pesanan",
+    inventory: "Inventaris",
+    customers: "Pelanggan",
+    complaints: "Meja Keluhan",
+    billing: "Paket Tagihan",
+    settings: "Pengaturan",
+    status: "Status",
+    liveSync: "Sinkronisasi Shard Langsung",
+    console: "Konsol Shard",
+    activeModules: "Modul Shard Aktif",
+    mobileGateway: "Gerbang Shard Seluler",
+    telemetry: "Telemetri",
+    mobileSession: "Sesi Seluler Aktif"
+  },
+  en: {
+    coreModules: "Core Modules",
+    overview: "Overview",
+    orders: "Orders Queue",
+    inventory: "Inventory",
+    customers: "Customers",
+    complaints: "Complaints Desk",
+    billing: "Billing Plan",
+    settings: "Settings",
+    status: "Status",
+    liveSync: "Live Shard Sync",
+    console: "Shard Console",
+    activeModules: "Active Shard Modules",
+    mobileGateway: "Mobile Shard Gateway",
+    telemetry: "Telemetry",
+    mobileSession: "Live Mobile Session"
+  },
+  es: {
+    coreModules: "Módulos Principales",
+    overview: "Resumen",
+    orders: "Cola de Pedidos",
+    inventory: "Inventario",
+    customers: "Clientes",
+    complaints: "Mesa de Quejas",
+    billing: "Plan de Facturación",
+    settings: "Configuración",
+    status: "Estado",
+    liveSync: "Sincronización en Vivo",
+    console: "Consola de Shard",
+    activeModules: "Módulos de Shard Activos",
+    mobileGateway: "Puerta de Enlace Móvil",
+    telemetry: "Telemetría",
+    mobileSession: "Sesión Móvil en Vivo"
+  },
+  fr: {
+    coreModules: "Modules Principaux",
+    overview: "Vue d'ensemble",
+    orders: "File d'attente",
+    inventory: "Inventaire",
+    customers: "Clients",
+    complaints: "Bureau des Plaintes",
+    billing: "Facturation",
+    settings: "Paramètres",
+    status: "Statut",
+    liveSync: "Synchro Shard en Direct",
+    console: "Console Shard",
+    activeModules: "Modules Shard Actifs",
+    mobileGateway: "Passerelle Shard Mobile",
+    telemetry: "Télémétrie",
+    mobileSession: "Session Mobile en Direct"
+  },
+  de: {
+    coreModules: "Kernmodule",
+    overview: "Übersicht",
+    orders: "Bestellwarteschlange",
+    inventory: "Inventar",
+    customers: "Kunden",
+    complaints: "Beschwerdestelle",
+    billing: "Abrechnungsplan",
+    settings: "Einstellungen",
+    status: "Status",
+    liveSync: "Live Shard Synchronisierung",
+    console: "Shard-Konsole",
+    activeModules: "Aktive Shard-Module",
+    mobileGateway: "Mobiles Shard-Gateway",
+    telemetry: "Telemetrie",
+    mobileSession: "Live-Mobile-Sitzung"
+  },
+  ja: {
+    coreModules: "コアモジュール",
+    overview: "ダッシュボード",
+    orders: "注文管理",
+    inventory: "在庫管理",
+    customers: "顧客管理",
+    complaints: "お問い合わせ対応",
+    billing: "請求プラン",
+    settings: "設定",
+    status: "ステータス",
+    liveSync: "リアルタイム同期中",
+    console: "シャードコンソール",
+    activeModules: "アクティブシャードモジュール",
+    mobileGateway: "モバイルシャードゲートウェイ",
+    telemetry: "テレメトリ",
+    mobileSession: "モバイルセッション稼働中"
+  },
+  zh: {
+    coreModules: "核心模块",
+    overview: "控制台主页",
+    orders: "订单队列",
+    inventory: "库存管理",
+    customers: "客户列表",
+    complaints: "客户投诉",
+    billing: "服务方案",
+    settings: "系统设置",
+    status: "状态",
+    liveSync: "数据实时同步中",
+    console: "分片终端控制台",
+    activeModules: "活动分片控制模块",
+    mobileGateway: "移动端控制台通道",
+    telemetry: "数据遥测",
+    mobileSession: "移动端会话正常"
+  }
+};
 
 export function DashboardNav() {
   const params = useParams();
@@ -21,24 +142,46 @@ export function DashboardNav() {
   const storeId = params?.storeId as string;
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [lang, setLang] = useState<keyof typeof navTranslations>("id");
 
   React.useEffect(() => {
     setMounted(true);
+    
+    // Read preference on mount
+    const savedLang = (localStorage.getItem("dashboard-language") || "id") as keyof typeof navTranslations;
+    if (navTranslations[savedLang]) {
+      setLang(savedLang);
+    }
+
     const handleToggle = () => setIsOpen((prev) => !prev);
+    const handleLangChange = () => {
+      const updatedLang = (localStorage.getItem("dashboard-language") || "id") as keyof typeof navTranslations;
+      if (navTranslations[updatedLang]) {
+        setLang(updatedLang);
+      }
+    };
+
     window.addEventListener("toggle-mobile-nav", handleToggle);
-    return () => window.removeEventListener("toggle-mobile-nav", handleToggle);
+    window.addEventListener("dashboard-language-changed", handleLangChange);
+    
+    return () => {
+      window.removeEventListener("toggle-mobile-nav", handleToggle);
+      window.removeEventListener("dashboard-language-changed", handleLangChange);
+    };
   }, []);
 
   if (!storeId) return null;
 
+  const t = navTranslations[lang] || navTranslations.id;
+
   const routes = [
-    { name: "Overview", href: `/${storeId}/dashboard`, icon: LayoutDashboard },
-    { name: "Orders Queue", href: `/${storeId}/orders`, icon: ShoppingCart },
-    { name: "Inventory", href: `/${storeId}/inventory`, icon: Package },
-    { name: "Customers", href: `/${storeId}/customers`, icon: Users },
-    { name: "Complaints Desk", href: `/${storeId}/complaints`, icon: MessageSquareWarning },
-    { name: "Billing Plan", href: `/${storeId}/subscription`, icon: CreditCard },
-    { name: "Settings", href: `/${storeId}/settings`, icon: Settings },
+    { name: t.overview, href: `/${storeId}/dashboard`, icon: LayoutDashboard },
+    { name: t.orders, href: `/${storeId}/orders`, icon: ShoppingCart },
+    { name: t.inventory, href: `/${storeId}/inventory`, icon: Package },
+    { name: t.customers, href: `/${storeId}/customers`, icon: Users },
+    { name: t.complaints, href: `/${storeId}/complaints`, icon: MessageSquareWarning },
+    { name: t.billing, href: `/${storeId}/subscription`, icon: CreditCard },
+    { name: t.settings, href: `/${storeId}/settings`, icon: Settings },
   ];
 
   return (
@@ -48,7 +191,7 @@ export function DashboardNav() {
         <div className="flex-1 px-4 py-6 space-y-1.5">
           <div className="mb-4 px-3">
             <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
-              Core Modules
+              {t.coreModules}
             </p>
           </div>
           
@@ -85,16 +228,14 @@ export function DashboardNav() {
 
         <div className="p-4 border-t border-slate-100 dark:border-slate-800/40">
           <div className="bg-slate-50 dark:bg-slate-900/40 rounded-sm p-3 border border-slate-100 dark:border-slate-800/60">
-            <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">Status</p>
+            <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">{t.status}</p>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300">Live Shard Sync</span>
+              <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300">{t.liveSync}</span>
             </div>
           </div>
         </div>
       </aside>
-
-      {/* Floating Hamburger Button removed in favor of top header bar trigger */}
 
       {/* Slide-Over Menu Overlay for Mobile/Tablet */}
       {mounted && (
@@ -115,8 +256,8 @@ export function DashboardNav() {
           }`}>
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
               <div>
-                <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Shard Console</p>
-                <h4 className="text-sm font-black text-slate-850 dark:text-slate-100 mt-0.5">Active Shard Modules</h4>
+                <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">{t.console}</p>
+                <h4 className="text-sm font-black text-slate-850 dark:text-slate-100 mt-0.5">{t.activeModules}</h4>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
@@ -129,7 +270,7 @@ export function DashboardNav() {
             <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
               <div className="mb-4 px-2">
                 <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
-                  Mobile Shard Gateway
+                  {t.mobileGateway}
                 </p>
               </div>
 
@@ -164,8 +305,8 @@ export function DashboardNav() {
               <div className="bg-slate-50 dark:bg-slate-900/40 rounded-sm p-3 border border-slate-100 dark:border-slate-800/60 flex items-center gap-2.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <div>
-                  <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">Telemetry</p>
-                  <p className="text-[10px] font-bold text-slate-650 dark:text-slate-350">Live Mobile Session</p>
+                  <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">{t.telemetry}</p>
+                  <p className="text-[10px] font-bold text-slate-650 dark:text-slate-350">{t.mobileSession}</p>
                 </div>
               </div>
             </div>
