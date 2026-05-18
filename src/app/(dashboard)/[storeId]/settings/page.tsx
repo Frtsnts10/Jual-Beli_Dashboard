@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { StoreSettingsForm, DangerZonePanel } from "@/features/settings/components/store-settings-form";
 import { EditProfileForm } from "@/features/auth/components/edit-profile-form";
+import { SettingsHeader } from "@/features/settings/components/settings-header";
 
 export default async function TenantSettingsPage({
   params,
@@ -35,12 +36,7 @@ export default async function TenantSettingsPage({
 
   return (
     <div className="space-y-6 font-sans max-w-full pb-12">
-      <div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Workspace Identity Bindings</h2>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Configure domain signatures, brand logos, and global currency parameters.
-        </p>
-      </div>
+      <SettingsHeader />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch animate-in fade-in duration-300">
         {/* Left Column: Principal Authentication & Profile Desk */}
