@@ -271,8 +271,8 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/80 dark:bg-[#0b0f19]/80 border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                <th className="px-5 py-3.5 w-1/4 sm:w-3/12">Customer Profile</th>
-                <th className="px-5 py-3.5">Ordered Asset Streams & Expiry Lifecycles</th>
+                <th className="px-5 py-3.5 min-w-[220px]">Customer Profile</th>
+                <th className="px-5 py-3.5 min-w-[340px]">Ordered Asset Streams & Expiry Lifecycles</th>
               </tr>
             </thead>
             <tbody className={`divide-y divide-slate-100 dark:divide-slate-800/60 text-xs transition-all duration-150 ${isTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>

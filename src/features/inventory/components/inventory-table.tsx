@@ -360,11 +360,11 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                     <table className="w-full text-left text-xs">
                       <thead className="bg-slate-50/30 dark:bg-[#0b0f19]/80 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
                         <tr>
-                          <th className="px-4 py-2">Member Reference</th>
-                          <th className="px-4 py-2">Designation</th>
-                          <th className="px-4 py-2">Credentials mapped</th>
-                          <th className="px-4 py-2">Lifecycle Target</th>
-                          <th className="px-4 py-2 text-right">Pool Controls</th>
+                          <th className="px-4 py-2 min-w-[130px]">Member Reference</th>
+                          <th className="px-4 py-2 min-w-[120px]">Designation</th>
+                          <th className="px-4 py-2 min-w-[150px]">Credentials mapped</th>
+                          <th className="px-4 py-2 min-w-[120px]">Lifecycle Target</th>
+                          <th className="px-4 py-2 text-right min-w-[120px]">Pool Controls</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
@@ -528,12 +528,12 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50/80 dark:bg-[#0b0f19]/80 border-b border-slate-100 dark:border-slate-800">
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Asset Variant</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Designation</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Credentials</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pricing Matrix</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lifecycle Target</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Pool Router</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[140px]">Asset Variant</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Designation</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[150px]">Credentials</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Pricing Matrix</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[130px]">Lifecycle Target</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right min-w-[120px]">Pool Router</th>
                 </tr>
               </thead>
               <tbody className={`divide-y divide-slate-50 dark:divide-slate-800/60 transition-all duration-150 ${isSoloTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>

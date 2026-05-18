@@ -177,11 +177,11 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/80 dark:bg-[#0b0f19]/80 border-b border-slate-200/60 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                <th className="px-5 py-3">Order Details</th>
-                <th className="px-5 py-3">Customer Shard</th>
-                <th className="px-5 py-3">Revenue Value</th>
-                <th className="px-5 py-3">Logistics Statuses</th>
-                <th className="px-5 py-3 text-right">Fulfillment Control</th>
+                <th className="px-5 py-3 min-w-[160px]">Order Details</th>
+                <th className="px-5 py-3 min-w-[160px]">Customer Shard</th>
+                <th className="px-5 py-3 min-w-[140px]">Revenue Value</th>
+                <th className="px-5 py-3 min-w-[150px]">Logistics Statuses</th>
+                <th className="px-5 py-3 text-right min-w-[160px]">Fulfillment Control</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
