@@ -24,7 +24,7 @@ export default function VerifyMfaPage() {
       const { data: factors, error: factorsErr } = await supabase.auth.mfa.listFactors();
       if (factorsErr) throw factorsErr;
 
-      const totpFactor = factors.totp.find(f => f.status === 'verified');
+      const totpFactor = factors.totp.find((f: any) => f.status === 'verified');
       if (!totpFactor) {
         throw new Error("No verified 2FA factor found. Please contact support.");
       }
