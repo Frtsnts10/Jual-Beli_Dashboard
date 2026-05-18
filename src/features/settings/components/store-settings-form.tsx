@@ -34,11 +34,20 @@ export function StoreSettingsForm({
   const [logoPreview, setLogoPreview] = useState(initialLogo);
   const [currency, setCurrency] = useState(initialCurrency);
   const [activeTheme, setActiveTheme] = useState("system");
+  const [lang, setLang] = useState("id");
 
   React.useEffect(() => {
     const t = localStorage.getItem("theme") || "system";
     setActiveTheme(t);
+    const savedLang = localStorage.getItem("dashboard-language") || "id";
+    setLang(savedLang);
   }, []);
+
+  const handleLanguageChange = (val: string) => {
+    setLang(val);
+    localStorage.setItem("dashboard-language", val);
+    window.dispatchEvent(new Event("dashboard-language-changed"));
+  };
 
   const handleThemeChange = (t: string) => {
     setActiveTheme(t);
@@ -193,6 +202,26 @@ export function StoreSettingsForm({
                   {c.code} ({c.symbol}) — {c.name}
                 </option>
               ))}
+            </select>
+          </div>
+
+          {/* Language selection dropdown */}
+          <div className="space-y-1.5">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <Globe className="w-3 h-3 text-indigo-500" /> Language Preferences (Bahasa)
+            </label>
+            <select
+              value={lang}
+              onChange={(e) => handleLanguageChange(e.target.value)}
+              className="w-full h-9 px-3.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+            >
+              <option value="id">🇮🇩 Bahasa Indonesia</option>
+              <option value="en">🇺🇸 English</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+              <option value="ja">🇯🇵 日本語</option>
+              <option value="zh">🇨🇳 中文</option>
             </select>
           </div>
 

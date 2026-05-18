@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles, ShieldCheck, Check, Zap, CheckCircle2 } from "lucide-react";
 import { createCheckoutSessionAction } from "../server/subscription-actions";
 
@@ -160,6 +160,371 @@ const translations = {
     },
     connecting: "Connecting Secure Vector...",
     simulateStripe: "Simulate Stripe Gateway"
+  },
+  es: {
+    title: "Gestión de Facturación y Cuotas",
+    description: "Revise los límites de cuota de la base de datos y active rutas de telemetría premium.",
+    paymentSuccessTitle: "¡Pago Autorizado Exitosamente!",
+    paymentSuccessDesc: "Las transacciones simuladas han activado los límites estándar de PCI-DSS. El estado se actualizó a Shop Dashboard Pro.",
+    statusTitle: "Estado de Telemetría del Plan",
+    statusActive: "Activo",
+    statusInactive: "Inactivo",
+    matrixLevel: "Nivel de Matriz",
+    activeVector: "Vector de facturación activo: De por vida (Acceso infinito)",
+    billingEnd: "Finalización del vector de facturación: ",
+    slaTelemetry: "Telemetría Activa SLA",
+    slaDesc: "Ganchos de PostgreSQL sincronizados",
+    provisionTitle: "Escalas de Aprovisionamiento de Recursos",
+    provisionDesc: "Mejore su shard para omitir los límites de API instantáneamente",
+    
+    monthly: "Mensual",
+    yearly: "Anual",
+    lifetime: "De por vida",
+    save30: "Ahorra 30%",
+    bestValue: "Mejor Valor",
+    
+    baseTier: "Nivel Base",
+    defaultActive: "Activo por Defecto",
+    standardCoreTitle: "Núcleo Estándar",
+    standardCoreDesc: "Configuración esencial de registro de datos para entornos de prueba básicos.",
+    monthForever: " / mes para siempre",
+    freeFeatures: [
+      "Hasta 3 fragmentos de tienda activos",
+      "Flujo de ingesta básico de SKU",
+      "Rejillas de telemetría avanzadas (bloqueadas)",
+      "Sincronización Live Stripe SLA (bloqueada)"
+    ],
+    activeCoreBound: "Límite de Núcleo Activo",
+    includedInPackage: "Incluido en su paquete",
+    
+    premiumEnterprise: "Premium Corporativo",
+    proTitle: "Shop Dashboard Pro",
+    proDesc: "Vectores a escala ilimitados que soportan operaciones en vivo multi-inquilino absolutas.",
+    workspaceMonth: " / mes de espacio de trabajo",
+    workspaceYear: " / año de espacio de trabajo",
+    oneTimeLifetime: " / pago único de por vida",
+    ctaMonthly: "Mejorar Shard Mensual",
+    ctaYearly: "Mejorar Shard Anual",
+    ctaLifetime: "Obtener Acceso de Por Vida",
+    proFeatures: {
+      monthly: [
+        "Fragmentos de Tienda Ilimitados",
+        "Telemetría avanzada de @tanstack/react-table",
+        "Integración automática de Stripe SLA",
+        "Soporte prioritario de atención al cliente"
+      ],
+      yearly: [
+        "Fragmentos de Tienda Ilimitados",
+        "Telemetría avanzada de @tanstack/react-table",
+        "Integración automática de Stripe SLA",
+        "Soporte prioritario de atención al cliente",
+        "Arreglo prioritario de webhooks de desarrollo",
+        "Auditoría anual de cumplimiento PCI-DSS"
+      ],
+      lifetime: [
+        "Fragmentos de Tienda Ilimitados",
+        "Telemetría avanzada de @tanstack/react-table",
+        "Integración automática de Stripe SLA",
+        "Soporte prioritario de atención al cliente",
+        "Licencia de por vida - Propia para siempre",
+        "Sin cargos recurrentes adicionales",
+        "Todas las futuras actualizaciones premium"
+      ]
+    },
+    connecting: "Conectando Vector Seguro...",
+    simulateStripe: "Simular Stripe Gateway"
+  },
+  fr: {
+    title: "Gestion de Facturation & Quotas",
+    description: "Consultez les limites de quotas et déclenchez la télémétrie premium.",
+    paymentSuccessTitle: "Paiement Autorisé avec Succès !",
+    paymentSuccessDesc: "Les simulations ont activé les limites standard PCI-DSS. Le plan a été mis à niveau vers Shop Dashboard Pro.",
+    statusTitle: "Statut Télémétrique du Plan",
+    statusActive: "Actif",
+    statusInactive: "Inactif",
+    matrixLevel: "Niveau de la Matrice",
+    activeVector: "Vecteur de facturation actif : À vie (Accès illimité)",
+    billingEnd: "Fin du vecteur de facturation : ",
+    slaTelemetry: "Télémétrie SLA Active",
+    slaDesc: "Crochets PostgreSQL synchronisés",
+    provisionTitle: "Provisionnement de Ressources",
+    provisionDesc: "Améliorez votre shard actif pour contourner instantanément les limites API",
+    
+    monthly: "Mensuel",
+    yearly: "Annuel",
+    lifetime: "À vie",
+    save30: "Économisez 30%",
+    bestValue: "Meilleure Offre",
+    
+    baseTier: "Offre de Base",
+    defaultActive: "Actif par Défaut",
+    standardCoreTitle: "Noyau Standard",
+    standardCoreDesc: "Configuration essentielle pour l'enregistrement de données simples.",
+    monthForever: " / mois pour toujours",
+    freeFeatures: [
+      "Jusqu'à 3 fragments de boutique actifs",
+      "Flux d'intégration SKU de base",
+      "Grilles de télémétrie avancées (verrouillées)",
+      "Synchronisation Live Stripe SLA (verrouillée)"
+    ],
+    activeCoreBound: "Noyau Actif Restreint",
+    includedInPackage: "Inclus dans votre offre",
+    
+    premiumEnterprise: "Premium Entreprise",
+    proTitle: "Shop Dashboard Pro",
+    proDesc: "Vecteurs d'échelle illimités pour soutenir les opérations multi-locataires.",
+    workspaceMonth: " / mois par espace",
+    workspaceYear: " / an par espace",
+    oneTimeLifetime: " / paiement unique à vie",
+    ctaMonthly: "Améliorer Shard Mensuel",
+    ctaYearly: "Améliorer Shard Annuel",
+    ctaLifetime: "Obtenir l'Accès à Vie",
+    proFeatures: {
+      monthly: [
+        "Boutiques Shards Illimitées",
+        "Télémétrie @tanstack/react-table avancée",
+        "Liaison Stripe SLA automatique instantanée",
+        "Support client prioritaires SLA"
+      ],
+      yearly: [
+        "Boutiques Shards Illimitées",
+        "Télémétrie @tanstack/react-table avancée",
+        "Liaison Stripe SLA automatique instantanée",
+        "Support client prioritaires SLA",
+        "Webhooks développeurs dédiés prioritaires",
+        "Audits annuels de conformité PCI-DSS"
+      ],
+      lifetime: [
+        "Boutiques Shards Illimitées",
+        "Télémétrie @tanstack/react-table avancée",
+        "Liaison Stripe SLA automatique instantanée",
+        "Support client prioritaires SLA",
+        "Licence à vie - Possédez-la pour toujours",
+        "Aucun coût d'abonnement récurrent",
+        "Toutes les mises à jour premium incluses"
+      ]
+    },
+    connecting: "Connexion au Vecteur Sécurisé...",
+    simulateStripe: "Simuler Stripe Gateway"
+  },
+  de: {
+    title: "Abrechnung & Kontingentverwaltung",
+    description: "Überprüfen Sie die Kontingente und aktivieren Sie die Premium-Telemetrie.",
+    paymentSuccessTitle: "Zahlung erfolgreich autorisiert!",
+    paymentSuccessDesc: "Die simulierte Zahlung hat die standardmäßigen PCI-DSS-Grenzen aktiviert. Status auf Shop Dashboard Pro aktualisiert.",
+    statusTitle: "Plan-Telemetriestatus",
+    statusActive: "Aktiv",
+    statusInactive: "Inaktiv",
+    matrixLevel: "Matrix-Ebene",
+    activeVector: "Aktiver Abrechnungsvektor: Lebenslang (Unbegrenzter Zugriff)",
+    billingEnd: "Ende des Abrechnungszeitraums: ",
+    slaTelemetry: "SLA Aktive Telemetrie",
+    slaDesc: "PostgreSQL-Hooks synchronisiert",
+    provisionTitle: "Ressourcenskalierung bereitstellen",
+    provisionDesc: "Aktualisieren Sie Ihren Shard, um API-Limits sofort zu umgehen",
+    
+    monthly: "Monatlich",
+    yearly: "Jährlich",
+    lifetime: "Lebenslang",
+    save30: "Sparen Sie 30%",
+    bestValue: "Bester Wert",
+    
+    baseTier: "Basis-Stufe",
+    defaultActive: "Standardmäßig Aktiv",
+    standardCoreTitle: "Standard-Kern",
+    standardCoreDesc: "Grundlegende Datenprotokollierung für einfache Konzepterprobungen.",
+    monthForever: " / Monat für immer",
+    freeFeatures: [
+      "Bis zu 3 aktive Store-Shards",
+      "Basis-SKU-Aufnahmestrom",
+      "Erweiterte Telemetriegitter (gesperrt)",
+      "Live Stripe SLA-Synchronisierung (gesperrt)"
+    ],
+    activeCoreBound: "Aktive Kernbindung",
+    includedInPackage: "In Ihrem Paket enthalten",
+    
+    premiumEnterprise: "Premium Unternehmen",
+    proTitle: "Shop Dashboard Pro",
+    proDesc: "Unbegrenzte Skalierungsvektoren für absolute Multi-Mandanten-Live-Vorgänge.",
+    workspaceMonth: " / Workspace Monat",
+    workspaceYear: " / Workspace Jahr",
+    oneTimeLifetime: " / Einmalig Lebenslang",
+    ctaMonthly: "Monatliches Shard Upgrade",
+    ctaYearly: "Jährliches Shard Upgrade",
+    ctaLifetime: "Lebenslangen Zugriff erwerben",
+    proFeatures: {
+      monthly: [
+        "Unbegrenzte Store-Shards",
+        "Fortgeschrittene @tanstack/react-table Telemetrie",
+        "Sofortige automatische Stripe SLA-Anbindung",
+        "Priorisierter Kundensupport-Schreibtisch"
+      ],
+      yearly: [
+        "Unbegrenzte Store-Shards",
+        "Fortgeschrittene @tanstack/react-table Telemetrie",
+        "Sofortige automatische Stripe SLA-Anbindung",
+        "Priorisierter Kundensupport-Schreibtisch",
+        "Priorisierte Entwickler-Webhook-Arrays",
+        "Jährliche PCI-DSS-Compliance-Audits"
+      ],
+      lifetime: [
+        "Unbegrenzte Store-Shards",
+        "Fortgeschrittene @tanstack/react-table Telemetrie",
+        "Sofortige automatische Stripe SLA-Anbindung",
+        "Priorisierter Kundensupport-Schreibtisch",
+        "Lebenslange Lizenz - Für immer besitzen",
+        "Keine wiederkehrenden Abonnementkosten",
+        "Alle zukünftigen Premium-Updates inklusive"
+      ]
+    },
+    connecting: "Verbindung zum Sicherheitsvektor...",
+    simulateStripe: "Stripe Gateway simulieren"
+  },
+  ja: {
+    title: "請求と制限管理",
+    description: "現在のデータベース制限を確認し、プレミアムテレメトリを有効にします。",
+    paymentSuccessTitle: "決済承認が正常に完了しました！",
+    paymentSuccessDesc: "シミュレーション決済によりPCI-DSS規格が有効化されました。プランはShop Dashboard Proに正常更新されました。",
+    statusTitle: "プランテレメトリステータス",
+    statusActive: "アクティブ",
+    statusInactive: "非アクティブ",
+    matrixLevel: "マトリックスレベル",
+    activeVector: "請求ステータス: ライフタイム（無制限アクセス）",
+    billingEnd: "次回更新日: ",
+    slaTelemetry: "SLA アクティブテレメトリ",
+    slaDesc: "PostgreSQLフックが同期されました",
+    provisionTitle: "リソーススケールの提供",
+    provisionDesc: "API制限を即座に解除するためにアクティブなシャードをアップグレード",
+    
+    monthly: "月払い",
+    yearly: "年払い",
+    lifetime: "ライフタイム",
+    save30: "30%割引",
+    bestValue: "最高値",
+    
+    baseTier: "基本プラン",
+    defaultActive: "標準で有効",
+    standardCoreTitle: "標準コア",
+    standardCoreDesc: "シンプルな検証用ワークスペースに必要な基本ログ機能。",
+    monthForever: " / 永久無料",
+    freeFeatures: [
+      "最大3つのアクティブストアシャード",
+      "基本的なSKUインジェストストリーム",
+      "高度なテレメトリグリッド（ロック中）",
+      "Live Stripe SLA同期（ロック中）"
+    ],
+    activeCoreBound: "標準プランバインド中",
+    includedInPackage: "パッケージに含まれています",
+    
+    premiumEnterprise: "プレミアムエンタープライズ",
+    proTitle: "Shop Dashboard Pro",
+    proDesc: "完全なマルチテナント運用をサポートする無限スケール。",
+    workspaceMonth: " / ワークスペース・月",
+    workspaceYear: " / ワークスペース・年",
+    oneTimeLifetime: " / ライフタイム一括払い",
+    ctaMonthly: "月間シャードアップグレード",
+    ctaYearly: "年間シャードアップグレード",
+    ctaLifetime: "永続ライセンスの購入",
+    proFeatures: {
+      monthly: [
+        "無制限のストアシャード数",
+        "高度な @tanstack/react-table グリッド機能",
+        "即座の Stripe SLA 自動連携",
+        "優先サポートデスク対応"
+      ],
+      yearly: [
+        "無制限のストアシャード数",
+        "高度な @tanstack/react-table グリッド機能",
+        "即座の Stripe SLA 自動連携",
+        "優先サポートデスク対応",
+        "開発者向け優先Webhook配列",
+        "年次 PCI-DSS コンプライアンス監査"
+      ],
+      lifetime: [
+        "無制限のストアシャード数",
+        "高度な @tanstack/react-table グリッド機能",
+        "即座の Stripe SLA 自動連携",
+        "優先サポートデスク対応",
+        "無期限ライセンス - 永久所有",
+        "月額サブスク費用ゼロ",
+        "将来のすべてのプレミアム機能更新に対応"
+      ]
+    },
+    connecting: "セキュリティベクターに接続中...",
+    simulateStripe: "Stripeゲートウェイのシミュレーション"
+  },
+  zh: {
+    title: "账单与配额管理",
+    description: "查看当前数据库配额界限并触发高级遥测路径。",
+    paymentSuccessTitle: "支付授权成功！",
+    paymentSuccessDesc: "模拟支付已激活标准 PCI-DSS 边界。服务方案已升级为 Shop Dashboard Pro。",
+    statusTitle: "方案遥测状态",
+    statusActive: "已激活",
+    statusInactive: "未激活",
+    matrixLevel: "矩阵级别",
+    activeVector: "当前计费模式: 终身无限访问",
+    billingEnd: "计费周期截止时间: ",
+    slaTelemetry: "SLA 实时遥测",
+    slaDesc: "PostgreSQL 钩子已同步",
+    provisionTitle: "资源规模分配",
+    provisionDesc: "立即升级您的活动分片以跳过 API 流量限制",
+    
+    monthly: "按月计费",
+    yearly: "按年计费",
+    lifetime: "终身版",
+    save30: "节省 30%",
+    bestValue: "最佳性价比",
+    
+    baseTier: "基础层",
+    defaultActive: "默认激活",
+    standardCoreTitle: "标准核心",
+    standardCoreDesc: "简单概念验证空间的基本数据记录设置。",
+    monthForever: " / 每月永久免费",
+    freeFeatures: [
+      "最多 3 个活动商店分片",
+      "基本 SKU 摄入流",
+      "高级遥测网格（已锁定）",
+      "实时 Stripe SLA 同步（已锁定）"
+    ],
+    activeCoreBound: "标准核心绑定",
+    includedInPackage: "已包含在您的方案中",
+    
+    premiumEnterprise: "企业专业版",
+    proTitle: "Shop Dashboard Pro",
+    proDesc: "支持多租户实时业务运转的无限扩容方案。",
+    workspaceMonth: " / 空间·月",
+    workspaceYear: " / 空间·年",
+    oneTimeLifetime: " / 终身一次性付清",
+    ctaMonthly: "升级月度分片",
+    ctaYearly: "升级年度分片",
+    ctaLifetime: "获得终身访问权限",
+    proFeatures: {
+      monthly: [
+        "无限制的商店分片",
+        "高级 @tanstack/react-table 遥测网格",
+        "即时 Stripe SLA 自动绑定",
+        "优先客户服务 SLA 响应"
+      ],
+      yearly: [
+        "无限制的商店分片",
+        "高级 @tanstack/react-table 遥测网格",
+        "即时 Stripe SLA 自动绑定",
+        "优先客户服务 SLA 响应",
+        "优先专用开发者 Webhook 数组",
+        "年度 PCI-DSS 合规性审计"
+      ],
+      lifetime: [
+        "无限制的商店分片",
+        "高级 @tanstack/react-table 遥测网格",
+        "即时 Stripe SLA 自动绑定",
+        "优先客户服务 SLA 响应",
+        "终身版授权 - 永久拥有",
+        "无后续重复扣费成本",
+        "包含所有未来的高级更新"
+      ]
+    },
+    connecting: "正在连接安全通道...",
+    simulateStripe: "模拟 Stripe 支付网关"
   }
 };
 
@@ -172,11 +537,31 @@ export function SubscriptionClientPage({
   currentPeriodEnd,
   currency
 }: SubscriptionClientPageProps) {
-  const [lang, setLang] = useState<"id" | "en">("id");
+  const [lang, setLang] = useState<keyof typeof translations>("id");
   const [isPending, setIsPending] = useState(false);
   const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly" | "lifetime">("monthly");
 
-  const t = translations[lang];
+  // Load language settings dynamically from localStorage on client mount
+  useEffect(() => {
+    const savedLang = (localStorage.getItem("dashboard-language") || "id") as keyof typeof translations;
+    if (translations[savedLang]) {
+      setLang(savedLang);
+    }
+
+    const handleLangChange = () => {
+      const updatedLang = (localStorage.getItem("dashboard-language") || "id") as keyof typeof translations;
+      if (translations[updatedLang]) {
+        setLang(updatedLang);
+      }
+    };
+
+    window.addEventListener("dashboard-language-changed", handleLangChange);
+    return () => {
+      window.removeEventListener("dashboard-language-changed", handleLangChange);
+    };
+  }, []);
+
+  const t = translations[lang] || translations.id;
 
   const handleUpgrade = async () => {
     setIsPending(true);
@@ -236,35 +621,11 @@ export function SubscriptionClientPage({
 
   return (
     <div className="space-y-8 font-sans pb-12 animate-in fade-in duration-300">
-      {/* Header with i18n switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+      {/* Page Header (No local switcher - clean settings bind) */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 dark:border-slate-800/80 pb-5 transition-colors">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">{t.title}</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t.description}</p>
-        </div>
-
-        {/* Premium Flag Toggle Switcher */}
-        <div className="flex items-center gap-1 p-0.5 bg-slate-100 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/80 rounded-sm shadow-xs self-start sm:self-center transition-colors">
-          <button
-            onClick={() => setLang("id")}
-            className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xs transition-all cursor-pointer flex items-center gap-1.5 ${
-              lang === "id"
-                ? "bg-indigo-600 text-white shadow-xs scale-102 font-black"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
-          >
-            <span>🇮🇩</span> <span>ID</span>
-          </button>
-          <button
-            onClick={() => setLang("en")}
-            className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xs transition-all cursor-pointer flex items-center gap-1.5 ${
-              lang === "en"
-                ? "bg-indigo-600 text-white shadow-xs scale-102 font-black"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
-          >
-            <span>🇺🇸</span> <span>EN</span>
-          </button>
         </div>
       </div>
 
