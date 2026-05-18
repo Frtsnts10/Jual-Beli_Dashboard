@@ -4,7 +4,7 @@ import { createAdminSupabase } from "@/lib/supabase/server";
 
 export interface NotificationItem {
   id: string;
-  type: "inventory" | "customer";
+  type: "inventory" | "customer" | "order";
   title: string;
   message: string;
   targetDate: string;
@@ -23,6 +23,23 @@ export async function getNotificationsAction(storeId: string): Promise<Notificat
     adminSupabase.from("inventory").select("*").eq("store_id", storeId),
     adminSupabase.from("customers").select("*").eq("store_id", storeId),
   ]);
+
+  // Gracefully fetch pending orders to avoid breaking the dashboard if table is missing
+  let pendingOrders: any[] = [];
+  try {
+    const { data, error } = await adminSupabase
+      .from("orders")
+      .select("*")
+      .eq("store_id", storeId)
+      .eq("fulfillment_status", "pending")
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      pendingOrders = data;
+    }
+  } catch (err) {
+    console.warn("Orders table might not be initialized yet:", err);
+  }
 
   const items: NotificationItem[] = [];
   const now = Date.now();
@@ -87,6 +104,32 @@ export async function getNotificationsAction(storeId: string): Promise<Notificat
     });
   }
 
-  // Sort: most urgent first
-  return items.sort((a, b) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime());
+  // 3. Process Pending Orders for Fulfillment
+  pendingOrders.forEach((order) => {
+    const itemCount = Array.isArray(order.items) ? order.items.length : 1;
+    const itemNames = Array.isArray(order.items)
+      ? order.items.map((i: any) => i.name).join(", ")
+      : "digital subscription";
+
+    items.push({
+      id: `order-${order.id}`,
+      type: "order",
+      title: "Order Fulfillment Pending",
+      message: `Client "${order.customer_name}" purchased "${itemNames}" (${itemCount} item${itemCount > 1 ? 's' : ''}). Credentials require allocation.`,
+      targetDate: new Date(order.created_at).toISOString().split("T")[0],
+      isUrgent: true,
+      actionPayload: {
+        customerName: order.customer_name,
+        productName: itemNames,
+      },
+    });
+  });
+
+  // Sort: most urgent / pending orders first
+  return items.sort((a, b) => {
+    // Put pending orders always at the top of the stack
+    if (a.type === "order" && b.type !== "order") return -1;
+    if (a.type !== "order" && b.type === "order") return 1;
+    return new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime();
+  });
 }

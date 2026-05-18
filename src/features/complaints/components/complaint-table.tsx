@@ -12,7 +12,7 @@ interface ComplaintTableProps {
   currency?: string;
 }
 
-export function ComplaintTable({ storeId, complaints, currency = "USD" }: ComplaintTableProps) {
+export function ComplaintTable({ storeId, complaints, currency = "IDR" }: ComplaintTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [satisfactionId, setSatisfactionId] = useState<string | null>(null);
 

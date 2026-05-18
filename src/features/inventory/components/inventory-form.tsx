@@ -11,7 +11,7 @@ interface InventoryFormProps {
   onSuccess?: () => void;
 }
 
-export function InventoryForm({ storeId, currency = "USD", onSuccess }: InventoryFormProps) {
+export function InventoryForm({ storeId, currency = "IDR", onSuccess }: InventoryFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

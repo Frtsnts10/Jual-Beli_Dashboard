@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { InventoryItem, deleteInventoryItemAction, updateItemGroupingAction, updateInventoryItemAction, importInventoryCsvAction } from "../actions/inventory-actions";
 import { InventoryForm } from "./inventory-form";
-import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus, Package } from "lucide-react";
+import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus, Package, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
 
@@ -11,6 +11,7 @@ interface InventoryTableProps {
   storeId: string;
   items: InventoryItem[];
   currency?: string;
+  isPremium?: boolean;
 }
 
 function CopyableCredential({
@@ -58,7 +59,7 @@ function CopyableCredential({
   );
 }
 
-export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTableProps) {
+export function InventoryTable({ storeId, items, currency = "IDR", isPremium = false }: InventoryTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
@@ -141,6 +142,11 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isPremium) {
+      toast.error("Bulk CSV Import is locked under the Standard plan. Upgrade to Shop Dashboard Pro to activate catalog uploads!");
+      e.target.value = "";
+      return;
+    }
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -226,7 +232,18 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
           </span>
           <button
             type="button"
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => {
+              if (!isPremium && items.length >= 3) {
+                toast.error("Standard Tier Quota Exceeded! Please upgrade to Pro to add more items.", {
+                  action: {
+                    label: "Upgrade",
+                    onClick: () => window.location.href = `/${storeId}/subscription`
+                  }
+                });
+              } else {
+                setIsCreateModalOpen(true);
+              }
+            }}
             className="h-[38px] px-5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-sm text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" />
@@ -234,6 +251,27 @@ export function InventoryTable({ storeId, items, currency = "USD" }: InventoryTa
           </button>
         </div>
       </div>
+
+      {/* Premium Inventory Quota Cap Banner */}
+      {!isPremium && items.length >= 3 && (
+        <div className="p-4 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 border border-indigo-500/20 dark:border-indigo-900/40 rounded-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-indigo-950 dark:text-indigo-300 shadow-sm animate-in fade-in duration-300">
+          <div className="space-y-1">
+            <p className="text-xs font-extrabold flex items-center gap-1.5 uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
+              Standard Shard Quota Exceeded (3/3 items allocated)
+            </p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+              Standard tier workspaces are capped at 3 active digital products. Upgrade to Pro Matrix Level to ingest unlimited SKUs, run bulk CSV imports, and activate automated SLA credentials sync.
+            </p>
+          </div>
+          <a
+            href={`/${storeId}/subscription`}
+            className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-[11px] font-black uppercase tracking-wider rounded-sm shadow-sm transition-all"
+          >
+            Upgrade to Pro
+          </a>
+        </div>
+      )}
 
       {/* Dynamic Creation Modal Embed */}
       {isCreateModalOpen && (
@@ -674,7 +712,7 @@ function EditInventoryModal({
   item,
   onClose,
   storeId,
-  currency = "USD",
+  currency = "IDR",
 }: {
   item: InventoryItem;
   onClose: () => void;

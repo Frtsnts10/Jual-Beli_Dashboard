@@ -5,6 +5,9 @@ import { StoreSwitcher } from "@/features/stores/components/store-switcher";
 import { DashboardNav } from "@/features/dashboard/components/dashboard-nav";
 import { UserButton } from "@/features/auth/components/user-button";
 import { NotificationBell } from "@/features/notifications/components/notification-bell";
+import { getSubscriptionStatus } from "@/features/subscription/server/subscription-actions";
+import Link from "next/link";
+import { Sparkles } from "lucide-react";
 
 export default async function TenantStoreLayout({
   children,
@@ -24,12 +27,16 @@ export default async function TenantStoreLayout({
   const profileId = user.id;
   const adminSupabase = await createAdminSupabase();
 
-  const { data: stores } = await adminSupabase
-    .from("stores")
-    .select("*")
-    .eq("owner_id", profileId)
-    .order("created_at", { ascending: true });
+  const [storesRes, subscription] = await Promise.all([
+    adminSupabase
+      .from("stores")
+      .select("*")
+      .eq("owner_id", profileId)
+      .order("created_at", { ascending: true }),
+    getSubscriptionStatus(storeId)
+  ]);
 
+  const stores = storesRes.data;
   const currentStore = stores?.find((s) => s.id === storeId);
 
   if (!currentStore) {
@@ -50,6 +57,23 @@ export default async function TenantStoreLayout({
           </span>
         </div>
         <div className="flex items-center gap-3">
+          {/* Dynamic Tier Status Badge */}
+          {subscription.isSubscribed ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 border border-indigo-500/20 dark:border-indigo-900/40 rounded-sm text-[10px] font-black uppercase tracking-widest text-indigo-700 dark:text-indigo-400 shadow-sm animate-pulse-slow">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
+              Pro Member
+            </span>
+          ) : (
+            <Link 
+              href={`/${storeId}/subscription`} 
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 rounded-sm text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 transition-all active:scale-95 group shadow-sm"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              <span>Standard</span>
+              <span className="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold group-hover:underline">Upgrade</span>
+            </Link>
+          )}
+
           <NotificationBell storeId={storeId} />
           <UserButton />
         </div>

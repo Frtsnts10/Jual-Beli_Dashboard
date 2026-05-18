@@ -13,7 +13,7 @@ export async function signInAction(prevState: any, formData: FormData) {
   }
 
   const supabase = await createServerSupabase();
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
@@ -22,8 +22,18 @@ export async function signInAction(prevState: any, formData: FormData) {
     return { error: error.message };
   }
 
+  // Check if MFA is required (Assurance Level check)
+  if (data.user && data.session) {
+    const { data: aal, error: aalErr } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    
+    // If nextLevel is aal2, it means the user HAS a verified factor but is currently at aal1
+    if (!aalErr && aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+      return { requiresMfa: true };
+    }
+  }
+
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  return { success: true };
 }
 
 export async function signUpAction(prevState: any, formData: FormData) {

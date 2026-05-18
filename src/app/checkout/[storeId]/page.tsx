@@ -6,10 +6,15 @@ import { CheckCircle2, ShieldCheck, CreditCard, Lock, ArrowLeft, Sparkles } from
 
 export default async function SimulatedStripeCheckoutPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ storeId: string }>;
+  searchParams: Promise<{ interval?: string }>;
 }) {
   const { storeId } = await params;
+  const resolvedSearchParams = await searchParams;
+  const interval = resolvedSearchParams?.interval || "monthly";
+
   const supabase = await createServerSupabase();
   const { data: store } = await supabase.from("stores").select("name, owner_id").eq("id", storeId).single();
 
@@ -17,21 +22,63 @@ export default async function SimulatedStripeCheckoutPage({
     redirect("/dashboard");
   }
 
+  const billingInfo = {
+    monthly: {
+      price: "$49.00",
+      description: "Billed per active calendar cycle",
+      mode: "Monthly",
+      days: 30,
+      planName: "Shop Dashboard Pro (Monthly)",
+    },
+    yearly: {
+      price: "$399.00",
+      description: "Billed per year (Save 30%)",
+      mode: "Yearly",
+      days: 365,
+      planName: "Shop Dashboard Pro (Yearly)",
+    },
+    lifetime: {
+      price: "$999.00",
+      description: "Paid once, own forever",
+      mode: "Lifetime / One-Time",
+      days: null,
+      planName: "Shop Dashboard Pro (Lifetime)",
+    }
+  }[interval as "monthly" | "yearly" | "lifetime"] || {
+    price: "$49.00",
+    description: "Billed per active calendar cycle",
+    mode: "Monthly",
+    days: 30,
+    planName: "Shop Dashboard Pro (Monthly)",
+  };
+
   // Define Server Action to activate subscription mapping directly inside database bindings
   async function fulfillStripePaymentAction() {
     "use server";
     const adminSupabase = await createAdminSupabase();
     
-    // Upsert subscription segment cleanly
+    const expiryDate = billingInfo.days 
+      ? new Date(Date.now() + billingInfo.days * 86400000).toISOString()
+      : null;
+
+    // 1. Upsert subscription segment cleanly
     await adminSupabase.from("subscriptions").upsert({
       store_id: storeId,
       profile_id: store?.owner_id,
       plan: "pro",
-      plan_name: "Shop Dashboard Pro",
+      plan_name: billingInfo.planName,
       status: "active",
       stripe_subscription_id: `sub_simulated_${Date.now()}`,
-      current_period_end: new Date(Date.now() + 30 * 86400000).toISOString(),
+      current_period_end: expiryDate,
     });
+
+    // 2. Set is_premium in user profile to enable immediate global Pro Dashboard updates
+    if (store?.owner_id) {
+      await adminSupabase
+        .from("profiles")
+        .update({ is_premium: true })
+        .eq("id", store.owner_id);
+    }
 
     redirect(`/${storeId}/subscription?payment_success=true`);
   }
@@ -56,7 +103,7 @@ export default async function SimulatedStripeCheckoutPage({
             <span className="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold tracking-wider uppercase">
               Subscription Fulfillment Hook
             </span>
-            <h1 className="text-3xl font-black text-white tracking-tight mt-3">Shop Dashboard Pro</h1>
+            <h1 className="text-3xl font-black text-white tracking-tight mt-3">{billingInfo.planName}</h1>
             <p className="text-xs text-slate-300 mt-1">
               Target active store pointer mapping: <strong className="text-white">{store.name}</strong>
             </p>
@@ -65,15 +112,15 @@ export default async function SimulatedStripeCheckoutPage({
           <div className="p-4 rounded-sm bg-white/5 border border-white/10 space-y-3">
             <div className="flex justify-between items-center text-sm">
               <span className="text-slate-300">Base subscription line item</span>
-              <span className="font-mono font-bold text-white">$49.00</span>
+              <span className="font-mono font-bold text-white">{billingInfo.price}</span>
             </div>
             <div className="flex justify-between items-center text-xs text-slate-400 pb-3 border-b border-white/10">
-              <span>Billed per active calendar cycle</span>
-              <span>Monthly</span>
+              <span>{billingInfo.description}</span>
+              <span>{billingInfo.mode}</span>
             </div>
             <div className="flex justify-between items-center text-base font-black text-white pt-1">
               <span>Total due today</span>
-              <span className="font-mono text-emerald-400">$49.00</span>
+              <span className="font-mono text-emerald-400">{billingInfo.price}</span>
             </div>
           </div>
 
@@ -182,7 +229,7 @@ export default async function SimulatedStripeCheckoutPage({
                   className="w-full py-3.5 bg-[#0a2540] hover:bg-[#0f3457] active:scale-95 text-white rounded-sm text-xs font-extrabold shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-indigo-400 group-hover:rotate-12 transition-transform" />
-                  <span>Authorize Subscription Fulfill ($49.00)</span>
+                  <span>Authorize Subscription Fulfill ({billingInfo.price})</span>
                 </button>
               </div>
 

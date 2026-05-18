@@ -8,9 +8,7 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
     const fullName = formData.get("fullName") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const avatarUrl = formData.get("avatarUrl") as string;
     const enable2fa = formData.get("enable2fa") === "true";
-    const restDataRaw = formData.get("restData") as string;
 
     const supabase = await createServerSupabase();
     const { data: userRes, error: userErr } = await supabase.auth.getUser();
@@ -21,21 +19,9 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
     const updates: any = {
       data: {
         full_name: fullName || undefined,
-        avatar_url: avatarUrl || undefined,
         two_factor_enabled: enable2fa,
       },
     };
-
-    // Parse restData JSON structure safely
-    let parsedRestData = {};
-    if (restDataRaw) {
-      try {
-        parsedRestData = JSON.parse(restDataRaw);
-        updates.data.rest_data = parsedRestData;
-      } catch (e) {
-        return { error: "Custom rest data attributes must be valid JSON strings" };
-      }
-    }
 
     if (email && email !== userRes.user.email) {
       updates.email = email;
@@ -58,7 +44,6 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
       .update({
         full_name: fullName || userRes.user.user_metadata?.full_name,
         email: email || userRes.user.email,
-        avatar_url: avatarUrl || userRes.user.user_metadata?.avatar_url,
       })
       .eq("id", userRes.user.id);
 

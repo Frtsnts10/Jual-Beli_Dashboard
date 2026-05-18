@@ -26,11 +26,15 @@ export function SubscriptionStatus({ isSubscribed, plan, status, currentPeriodEn
           {plan} Matrix Level
           {isSubscribed && <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />}
         </h3>
-        {currentPeriodEnd && (
+        {currentPeriodEnd ? (
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Billing active vector end string: <span className="font-mono font-medium">{new Date(currentPeriodEnd).toLocaleDateString()}</span>
           </p>
-        )}
+        ) : isSubscribed ? (
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Active Billing Vector: <span className="font-mono font-bold text-amber-600 dark:text-amber-400">Lifetime (Infinite Access)</span>
+          </p>
+        ) : null}
       </div>
 
       <div className="flex items-center gap-3">

@@ -10,11 +10,21 @@ export async function getSubscriptionStatus(storeId: string) {
   const email = userRes.user?.email || "";
 
   // Support pre-authorized accounts whitelist bypass to map core administrative users to premium tier natively
-  const isPreAuthorizedPro = 
-    email.includes("test") || 
-    email.includes("filbert") || 
-    email.includes("admin") || 
-    process.env.PREAUTHORIZED_PRO_EMAILS?.includes(email);
+  let isPreAuthorizedPro = 
+    !!(process.env.PREAUTHORIZED_PRO_EMAILS?.includes(email));
+
+  // Check the profiles table for database-controlled is_premium toggle
+  if (userRes.user?.id) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_premium")
+      .eq("id", userRes.user.id)
+      .single();
+
+    if (profile?.is_premium) {
+      isPreAuthorizedPro = true;
+    }
+  }
 
   const { data } = await supabase
     .from("subscriptions")
@@ -50,10 +60,10 @@ export async function getSubscriptionStatus(storeId: string) {
   };
 }
 
-export async function createCheckoutSessionAction(storeId: string, returnUrl: string) {
+export async function createCheckoutSessionAction(storeId: string, returnUrl: string, interval: string = "monthly") {
   try {
     // Route cleanly to dedicated Stripe Checkout Simulation Vector
-    return { url: `/checkout/${storeId}` };
+    return { url: `/checkout/${storeId}?interval=${interval}` };
   } catch (error: any) {
     return { error: error.message || "Failed to instantiate Stripe session vector" };
   }

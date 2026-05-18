@@ -4,26 +4,113 @@ import React, { useTransition, useState } from "react";
 import { User, Mail, Lock, Shield, Image as ImageIcon, CheckCircle, Loader2, Sparkles, AlertCircle } from "lucide-react";
 import { updateProfileAction } from "../actions/update-profile-action";
 
+import { createClient } from "@/lib/supabase/client";
+
 export function EditProfileForm({
   initialName,
   initialEmail,
-  initialAvatar,
   initial2fa,
-  initialRestData = "{}",
 }: {
   initialName: string;
   initialEmail: string;
-  initialAvatar: string;
   initial2fa: boolean;
-  initialRestData?: string;
 }) {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [enable2fa, setEnable2fa] = useState(initial2fa);
-  const [avatarUrl, setAvatarUrl] = useState(initialAvatar);
-  const [restData, setRestData] = useState(initialRestData);
+  
+  // MFA Setup State
+  const [mfaStep, setMfaStep] = useState<'idle' | 'enrolling' | 'verifying'>('idle');
+  const [mfaData, setMfaData] = useState<{ qrCode?: string; secret?: string; factorId?: string } | null>(null);
+  const [otpCode, setOtpCode] = useState("");
+  const [isMfaPending, setIsMfaPending] = useState(false);
+
+  const supabase = createClient();
+
+  const handleStart2fa = async () => {
+    setIsMfaPending(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase.auth.mfa.enroll({
+        factorType: "totp",
+        issuer: "Shop Dashboard",
+        friendlyName: initialEmail
+      });
+
+      if (error) throw error;
+
+      setMfaData({
+        qrCode: data.totp.qr_code,
+        secret: data.totp.secret,
+        factorId: data.id
+      });
+      setMfaStep('verifying');
+    } catch (err: any) {
+      setError(err.message || "Failed to initiate 2FA enrollment");
+    } finally {
+      setIsMfaPending(false);
+    }
+  };
+
+  const handleVerify2fa = async () => {
+    if (!mfaData?.factorId || otpCode.length !== 6) return;
+    
+    setIsMfaPending(true);
+    setError(null);
+    try {
+      const { data: challenge, error: challengeErr } = await supabase.auth.mfa.challenge({
+        factorId: mfaData.factorId
+      });
+
+      if (challengeErr) throw challengeErr;
+
+      const { error: verifyErr } = await supabase.auth.mfa.verify({
+        factorId: mfaData.factorId,
+        challengeId: challenge.id,
+        code: otpCode
+      });
+
+      if (verifyErr) throw verifyErr;
+
+      setEnable2fa(true);
+      setMfaStep('idle');
+      setMessage("2FA (Google Authenticator) successfully synchronized and activated.");
+    } catch (err: any) {
+      setError(err.message || "Invalid verification code. Please try again.");
+    } finally {
+      setIsMfaPending(false);
+    }
+  };
+
+  const handleRevoke2fa = async () => {
+    setIsMfaPending(true);
+    setError(null);
+    try {
+      const { data: factors, error: listErr } = await supabase.auth.mfa.listFactors();
+      if (listErr) throw listErr;
+
+      const totpFactor = factors.totp.find(f => f.status === 'verified');
+      if (!totpFactor) {
+        setEnable2fa(false);
+        return;
+      }
+
+      const { error: unenrollErr } = await supabase.auth.mfa.unenroll({
+        factorId: totpFactor.id
+      });
+
+      if (unenrollErr) throw unenrollErr;
+
+      setEnable2fa(false);
+      setMessage("2FA (Google Authenticator) has been revoked and disabled.");
+    } catch (err: any) {
+      setError(err.message || "Failed to revoke 2FA");
+    } finally {
+      setIsMfaPending(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,11 +130,6 @@ export function EditProfileForm({
     });
   };
 
-  const generateRandomAvatar = () => {
-    const seed = Math.random().toString(36).substring(7);
-    setAvatarUrl(`https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`);
-  };
-
   return (
     <div className="h-full p-6 bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-sm shadow-sm font-sans flex flex-col justify-between transition-colors">
       <div className="space-y-6">
@@ -60,12 +142,12 @@ export function EditProfileForm({
           </p>
         </div>
 
-        {message && (
+        {(message || (enable2fa && !initial2fa) || (!enable2fa && initial2fa)) && (
           <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-sm flex items-start gap-2 text-xs text-emerald-800 dark:text-emerald-300 animate-bounce-once">
             <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <p className="font-bold">Execution Confirmed</p>
-              <p>{message}</p>
+              <p>{message || "2FA Status Change Pending Save"}</p>
             </div>
           </div>
         )}
@@ -121,7 +203,7 @@ export function EditProfileForm({
 
         <div>
           <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-            Override Password Payload
+            Reset Account Password
           </label>
           <div className="relative">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -130,85 +212,111 @@ export function EditProfileForm({
             <input
               type="password"
               name="password"
-              placeholder="Leave array completely empty to retain active secret payload"
+              placeholder="Enter new password to update Supabase authentication"
               className="w-full h-[34px] pl-9 pr-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-mono text-slate-800 dark:text-slate-100 placeholder:text-slate-400/80 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:border-indigo-500 transition-colors"
             />
           </div>
         </div>
 
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-            Avatar Render URL String
-          </label>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                <ImageIcon className="w-3.5 h-3.5" />
-              </span>
-              <input
-                type="url"
-                name="avatarUrl"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                className="w-full h-[34px] pl-9 pr-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-mono text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:border-indigo-500 transition-colors"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={generateRandomAvatar}
-              className="h-[34px] px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-sm font-bold text-[11px] shrink-0 transition-colors flex items-center gap-1"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-indigo-500" /> Randomize
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-            Supplementary Context Data JSON Matrix (Rest Attributes)
-          </label>
-          <textarea
-            name="restData"
-            rows={2}
-            value={restData}
-            onChange={(e) => setRestData(e.target.value)}
-            placeholder='{"role": "Super Admin", "region": "US-East"}'
-            className="w-full p-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-mono text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:border-indigo-500 transition-colors"
-          />
-        </div>
-
         {/* 2FA Integration Switch */}
-        <div className="p-3.5 bg-slate-50/50 dark:bg-[#0b0f19]/50 border border-slate-100 dark:border-slate-800 rounded-sm flex items-center justify-between gap-4">
-          <div className="space-y-0.5">
-            <span className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-              Two-Factor Factor Synchronization (2FA)
-            </span>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
-              Enforce cryptographic hardware hooks across incoming user sessions natively.
-            </p>
+        <div className="p-3.5 bg-slate-50/50 dark:bg-[#0b0f19]/50 border border-slate-100 dark:border-slate-800 rounded-sm space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <span className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                Two-Factor Synchronization (Google Authenticator)
+              </span>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                {enable2fa 
+                  ? "Multi-factor authentication is currently active for this workspace shard." 
+                  : "Enforce multi-factor authentication (MFA) via Google Authenticator for secure access."}
+              </p>
+            </div>
+            {!enable2fa && mfaStep === 'idle' && (
+              <button
+                type="button"
+                onClick={handleStart2fa}
+                disabled={isMfaPending}
+                className="h-[34px] px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-sm shadow-sm transition-all flex items-center gap-1.5"
+              >
+                {isMfaPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Shield className="w-3.5 h-3.5" />}
+                Setup 2FA
+              </button>
+            )}
+            {enable2fa && (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-[9px] font-black uppercase tracking-wider">
+                  <CheckCircle className="w-3 h-3" /> Active
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRevoke2fa}
+                  disabled={isMfaPending}
+                  className="text-[11px] text-rose-500 hover:text-rose-600 font-bold underline underline-offset-2 transition-colors disabled:opacity-50"
+                >
+                  {isMfaPending ? "Revoking..." : "Revoke 2FA"}
+                </button>
+              </div>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={() => setEnable2fa(!enable2fa)}
-            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-              enable2fa ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"
-            }`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition duration-200 ease-in-out ${
-                enable2fa ? "translate-x-4" : "translate-x-0"
-              }`}
-            />
-          </button>
+
+          {mfaStep === 'verifying' && mfaData && (
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4 animate-in slide-in-from-top-2 duration-300">
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                {mfaData.qrCode ? (
+                  <div className="p-2 bg-white rounded-sm border border-slate-200">
+                    <img src={mfaData.qrCode} alt="MFA QR Code" className="w-32 h-32" />
+                  </div>
+                ) : (
+                  <div className="w-32 h-32 bg-slate-100 dark:bg-slate-900 flex items-center justify-center rounded-sm text-[10px] text-slate-400 text-center p-2">
+                    QR Code Incompatible
+                  </div>
+                )}
+                <div className="flex-1 space-y-3">
+                  <p className="text-[10px] text-slate-500 leading-relaxed">
+                    1. Scan the QR code using the <span className="font-bold">Google Authenticator</span> app.<br/>
+                    2. Enter the 6-digit verification code below to confirm synchronization.
+                  </p>
+                  <div className="space-y-1.5">
+                    <label className="block text-[9px] font-bold text-slate-400 uppercase">Verification Code</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        maxLength={6}
+                        placeholder="000000"
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                        className="w-full h-[34px] px-3 bg-white dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-sm font-mono tracking-[0.3em] text-center focus:outline-none focus:border-indigo-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleVerify2fa}
+                        disabled={isMfaPending || otpCode.length !== 6}
+                        className="h-[34px] px-6 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-sm transition-all"
+                      >
+                        {isMfaPending ? "Verifying..." : "Confirm Activation"}
+                      </button>
+                    </div>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => setMfaStep('idle')}
+                    className="text-[10px] text-slate-400 hover:text-rose-500 font-bold underline underline-offset-2"
+                  >
+                    Cancel Setup
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end pt-2">
           <button
             type="submit"
-            disabled={isPending}
-            className="h-[34px] px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-95 disabled:opacity-50 text-white text-xs font-bold rounded-sm shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+            disabled={isPending || mfaStep !== 'idle'}
+            className="h-[38px] px-6 bg-indigo-600 hover:bg-indigo-700 active:scale-95 disabled:opacity-50 text-white text-[13px] font-bold rounded-sm shadow-md transition-all flex items-center gap-2 cursor-pointer"
           >
-            {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+            {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
             <span>{isPending ? "Syncing Identity Layer..." : "Apply Authentication Updates"}</span>
           </button>
         </div>

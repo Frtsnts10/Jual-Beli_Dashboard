@@ -13,7 +13,7 @@ export default async function TenantSettingsPage({
   const supabase = await createServerSupabase();
   const { data: store } = await supabase
     .from("stores")
-    .select("name, logo_url, currency")
+    .select("name, logo_url, currency, email, instagram, whatsapp")
     .eq("id", storeId)
     .single();
 
@@ -45,9 +45,7 @@ export default async function TenantSettingsPage({
           <EditProfileForm
             initialName={initialName}
             initialEmail={initialEmail}
-            initialAvatar={initialAvatar}
             initial2fa={initial2fa}
-            initialRestData={initialRestData}
           />
         </div>
 
@@ -58,7 +56,10 @@ export default async function TenantSettingsPage({
               storeId={storeId} 
               initialName={store.name} 
               initialLogo={store.logo_url || ""} 
-              initialCurrency={store.currency || "USD"} 
+              initialCurrency={store.currency || "IDR"} 
+              initialEmail={store.email || ""}
+              initialInstagram={store.instagram || ""}
+              initialWhatsapp={store.whatsapp || ""}
               hideDangerPanel
             />
           </div>

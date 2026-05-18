@@ -3,11 +3,28 @@
 import React, { useState, useEffect } from "react";
 import { Bell, AlertTriangle, Clock, Send } from "lucide-react";
 import { getNotificationsAction, NotificationItem } from "../actions/get-notifications";
+import { useRouter } from "next/navigation";
 
 export function NotificationBell({ storeId }: { storeId: string }) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const getTargetHref = (type: string) => {
+    if (type === "order") return `/${storeId}/orders`;
+    if (type === "customer") return `/${storeId}/customers`;
+    if (type === "inventory") return `/${storeId}/inventory`;
+    return "#";
+  };
+
+  const handleItemClick = (type: string) => {
+    setIsOpen(false);
+    const href = getTargetHref(type);
+    if (href !== "#") {
+      router.push(href);
+    }
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -65,7 +82,13 @@ export function NotificationBell({ storeId }: { storeId: string }) {
                 </div>
               ) : (
                 items.map((item) => (
-                  <div key={item.id} className={`p-3 transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-800/30 ${item.isUrgent ? "border-l-2 border-rose-500" : "border-l-2 border-amber-500"}`}>
+                  <div
+                    key={item.id}
+                    onClick={() => handleItemClick(item.type)}
+                    className={`p-3 transition-all hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer ${
+                      item.isUrgent ? "border-l-2 border-rose-500" : "border-l-2 border-amber-500"
+                    }`}
+                  >
                     <div className="flex items-start justify-between gap-2">
                       <span className={`font-bold text-[11px] ${item.isUrgent ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400"} flex items-center gap-1`}>
                         {item.isUrgent ? <AlertTriangle className="w-3 h-3 shrink-0" /> : <Clock className="w-3 h-3 shrink-0" />}
@@ -83,6 +106,7 @@ export function NotificationBell({ storeId }: { storeId: string }) {
                         <span className="text-slate-400 italic">n8n Gateway Sync Ready</span>
                         <a
                           href={item.actionPayload?.phone ? `https://wa.me/${item.actionPayload.phone.replace(/\D/g, '')}` : "#"}
+                          onClick={(e) => e.stopPropagation()}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400 hover:underline"

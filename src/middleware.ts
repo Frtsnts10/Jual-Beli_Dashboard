@@ -57,8 +57,14 @@ export async function middleware(request: NextRequest) {
   // Parse user context securely natively via Supabase token validation
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Redirect root path directly to internal dashboard or sign-in gateway
+  if (request.nextUrl.pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = user ? "/dashboard" : "/sign-in";
+    return NextResponse.redirect(url);
+  }
+
   const isPublicRoute = 
-    request.nextUrl.pathname === "/" ||
     request.nextUrl.pathname.startsWith("/sign-in") ||
     request.nextUrl.pathname.startsWith("/sign-up") ||
     request.nextUrl.pathname.startsWith("/api/");

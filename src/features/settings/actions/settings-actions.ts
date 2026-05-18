@@ -8,6 +8,9 @@ export async function updateStoreSettingsAction(storeId: string, formData: FormD
   const name = formData.get("name") as string;
   const logo_url = formData.get("logo_url") as string;
   const currency = formData.get("currency") as string;
+  const email = formData.get("email") as string;
+  const instagram = formData.get("instagram") as string;
+  const whatsapp = formData.get("whatsapp") as string;
 
   if (!name) return { error: "Store name required" };
 
@@ -20,7 +23,10 @@ export async function updateStoreSettingsAction(storeId: string, formData: FormD
       name, 
       slug,
       ...(logo_url !== null && { logo_url }),
-      ...(currency && { currency })
+      ...(currency && { currency }),
+      email,
+      instagram,
+      whatsapp
     })
     .eq("id", storeId);
 

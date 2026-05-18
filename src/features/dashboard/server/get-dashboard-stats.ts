@@ -12,7 +12,7 @@ export async function getDashboardStats(storeId: string) {
     supabase.from("complaints").select("status, satisfaction_outcome").eq("store_id", storeId),
   ]);
 
-  const currency = storeRes.data?.currency || "USD";
+  const currency = storeRes.data?.currency || "IDR";
   const inventory = inventoryRes.data || [];
   const customers = customersRes.data || [];
   const complaints = complaintsRes.data || [];

@@ -9,10 +9,22 @@ interface StoreSettingsFormProps {
   initialName: string;
   initialLogo?: string;
   initialCurrency?: string;
+  initialEmail?: string;
+  initialInstagram?: string;
+  initialWhatsapp?: string;
   hideDangerPanel?: boolean;
 }
 
-export function StoreSettingsForm({ storeId, initialName, initialLogo = "", initialCurrency = "USD", hideDangerPanel = false }: StoreSettingsFormProps) {
+export function StoreSettingsForm({ 
+  storeId, 
+  initialName, 
+  initialLogo = "", 
+  initialCurrency = "IDR", 
+  initialEmail = "",
+  initialInstagram = "",
+  initialWhatsapp = "",
+  hideDangerPanel = false 
+}: StoreSettingsFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -182,6 +194,48 @@ export function StoreSettingsForm({ storeId, initialName, initialLogo = "", init
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Store Email input */}
+          <div className="space-y-1.5">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              Store Email Address
+            </label>
+            <input
+              name="email"
+              type="email"
+              defaultValue={initialEmail}
+              className="w-full h-9 px-3.5 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              placeholder="support@yourdomain.com"
+            />
+          </div>
+
+          {/* WhatsApp Support Number input */}
+          <div className="space-y-1.5">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              WhatsApp Support Number (e.g. 6281...)
+            </label>
+            <input
+              name="whatsapp"
+              type="text"
+              defaultValue={initialWhatsapp}
+              className="w-full h-9 px-3.5 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              placeholder="e.g. 6281234567890"
+            />
+          </div>
+
+          {/* Instagram Handle input */}
+          <div className="space-y-1.5 sm:col-span-2">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              Instagram Profile Handle
+            </label>
+            <input
+              name="instagram"
+              type="text"
+              defaultValue={initialInstagram}
+              className="w-full h-9 px-3.5 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              placeholder="e.g. obsidian.store"
+            />
           </div>
         </div>
 

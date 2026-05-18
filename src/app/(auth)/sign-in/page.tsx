@@ -3,18 +3,25 @@
 import React, { useActionState } from "react";
 import Link from "next/link";
 import { signInAction } from "@/features/auth/actions/auth-actions";
+import { useRouter } from "next/navigation";
 
 export default function NativeSignInPage() {
   const [state, formAction, isPending] = useActionState(signInAction, null);
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (state?.requiresMfa) {
+      router.push("/verify-mfa");
+    } else if (state?.success) {
+      router.push("/dashboard");
+    }
+  }, [state, router]);
 
   return (
-    <div className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-3xl border border-white/40 p-8 shadow-2xl shadow-indigo-500/5 transition-all">
+    <div className="w-full bg-white/5 dark:bg-[#0d1322]/40 backdrop-blur-2xl rounded-[32px] border border-white/10 p-8 shadow-2xl transition-all">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white font-bold text-xl mb-4 shadow-lg shadow-indigo-500/25">
-          Ω
-        </div>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Welcome Back</h2>
-        <p className="text-xs text-slate-500 mt-1">Sign in to your centralized dashboard console</p>
+        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Welcome Back</h2>
+        <p className="text-[11px] text-slate-500 dark:text-indigo-200/40 mt-1 uppercase tracking-widest font-bold">Terminal Access Gate</p>
       </div>
 
       <form action={formAction} className="space-y-4">

@@ -39,7 +39,7 @@ export function AddStoreModal({ isOpen, onClose, profileId }: AddStoreModalProps
 
   return (
     /* Premium Ultra-Light Glass Backdrop Tint keeping text cleanly visible */
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/15 backdrop-blur-[2px] animate-in fade-in duration-300 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-500 p-4">
       {/* Sleek Gleaming Container with rich top accent glow */}
       <div className="relative w-full max-w-md p-7 bg-white/95 dark:bg-[#0d1322]/95 backdrop-blur-2xl border border-white/80 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
         {/* Subtle premium ambient top header gradient bar */}
