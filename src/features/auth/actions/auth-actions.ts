@@ -5,35 +5,44 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function signInAction(prevState: any, formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+  try {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
-  if (!email || !password) {
-    return { error: "Email and password are required" };
-  }
-
-  const supabase = await createServerSupabase();
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  // Check if MFA is required (Assurance Level check)
-  if (data.user && data.session) {
-    const { data: aal, error: aalErr } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    
-    // If nextLevel is aal2, it means the user HAS a verified factor but is currently at aal1
-    if (!aalErr && aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
-      return { requiresMfa: true };
+    if (!email || !password) {
+      return { error: "Email and password are required" };
     }
-  }
 
-  revalidatePath("/", "layout");
-  return { success: true };
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    // Check if MFA is required (Assurance Level check)
+    if (data.user && data.session) {
+      const { data: aal, error: aalErr } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      
+      // If nextLevel is aal2, it means the user HAS a verified factor but is currently at aal1
+      if (!aalErr && aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+        return { requiresMfa: true };
+      }
+    }
+
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (err: any) {
+    console.error("Signin unhandled exception error:", err);
+    return { 
+      error: err.message === "fetch failed" || err.message?.includes("fetch")
+        ? "Connection to database failed. Please verify that your Supabase project is active (not paused) and that your environment variables are configured correctly."
+        : err.message || "An unexpected error occurred during signin"
+    };
+  }
 }
 
 export async function signUpAction(prevState: any, formData: FormData) {
