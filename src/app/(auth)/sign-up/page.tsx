@@ -24,6 +24,12 @@ export default function NativeSignUpPage() {
           </div>
         )}
 
+        {state?.success && state?.message && (
+          <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400">
+            {state.message}
+          </div>
+        )}
+
         <div>
           <label className="block text-xs font-medium text-slate-300 mb-1.5">Full Name</label>
           <input

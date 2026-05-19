@@ -37,43 +37,65 @@ export async function signInAction(prevState: any, formData: FormData) {
 }
 
 export async function signUpAction(prevState: any, formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const fullName = (formData.get("fullName") as string) || "Store Owner";
+  try {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const fullName = (formData.get("fullName") as string) || "Store Owner";
 
-  if (!email || !password) {
-    return { error: "Email and password are required" };
-  }
+    if (!email || !password) {
+      return { error: "Email and password are required" };
+    }
 
-  const supabase = await createServerSupabase();
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
       },
-    },
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  // Instantly auto-provision target profile row inside Supabase profiles table mapping unique ID vectors securely via Admin pipeline
-  if (data.user) {
-    const adminSupabase = await createAdminSupabase();
-    await adminSupabase.from("profiles").upsert({
-      id: data.user.id,
-      clerk_id: data.user.id, // Keep backward structural compatibility column values populated
-      email: data.user.email,
-      full_name: fullName,
-      avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`,
     });
-  }
 
-  revalidatePath("/", "layout");
-  redirect("/dashboard");
+    if (error) {
+      return { error: error.message };
+    }
+
+    // Instantly auto-provision target profile row inside Supabase profiles table mapping unique ID vectors securely via Admin pipeline
+    if (data.user) {
+      const adminSupabase = await createAdminSupabase();
+      const { error: upsertError } = await adminSupabase.from("profiles").upsert({
+        id: data.user.id,
+        clerk_id: data.user.id, // Keep backward structural compatibility column values populated
+        email: data.user.email,
+        full_name: fullName,
+        avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`,
+      });
+
+      if (upsertError) {
+        console.error("Profiles database sync failed:", upsertError);
+        return { error: `Database sync failed: ${upsertError.message}` };
+      }
+    }
+
+    // If email confirmation is enabled, session will be null and user must confirm email
+    if (data.user && !data.session) {
+      return { 
+        success: true, 
+        message: "Verification email sent! Please check your inbox and verify your email before logging in." 
+      };
+    }
+
+    revalidatePath("/", "layout");
+    redirect("/dashboard");
+  } catch (err: any) {
+    // Next.js redirect utilizes a thrown error, so let it bubble up
+    if (err.message === "NEXT_REDIRECT" || err.digest?.startsWith("NEXT_REDIRECT")) {
+      throw err;
+    }
+    console.error("Signup unhandled exception error:", err);
+    return { error: err.message || "An unexpected error occurred during signup" };
+  }
 }
 
 export async function signOutAction() {

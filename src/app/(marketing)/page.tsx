@@ -65,20 +65,20 @@ export default function MarketingPage() {
           </div>
 
           {/* Premium UI Mockup Showcase */}
-          <div className="mt-16 max-w-5xl mx-auto relative rounded-3xl p-3 bg-slate-900/5 backdrop-blur-xl border border-slate-900/10 shadow-2xl animate-in zoom-in-95 duration-1000">
-            <div className="bg-white rounded-2xl overflow-hidden shadow-inner border border-slate-100">
+          <div className="mt-16 max-w-5xl mx-auto relative rounded-2xl sm:rounded-3xl p-1.5 sm:p-3 bg-slate-900/5 backdrop-blur-xl border border-slate-900/10 shadow-2xl animate-in zoom-in-95 duration-1000">
+            <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-inner border border-slate-100">
               <div className="h-12 bg-slate-50 border-b border-slate-100 flex items-center px-4 gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-400" />
                 <div className="w-3 h-3 rounded-full bg-amber-400" />
                 <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                <div className="ml-4 px-3 py-1 bg-white border border-slate-200/60 rounded-md text-[11px] text-slate-400 font-mono w-64 truncate text-left">
+                <div className="ml-4 px-3 py-1 bg-white border border-slate-200/60 rounded-md text-[11px] text-slate-400 font-mono w-40 sm:w-64 truncate text-left">
                   shopdashboard.premium/dashboard
                 </div>
               </div>
-              <div className="p-8 text-left bg-gradient-to-br from-slate-50/50 to-white">
-                <div className="flex items-center justify-between mb-8">
+              <div className="p-4 sm:p-8 text-left bg-gradient-to-br from-slate-50/50 to-white">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 font-bold">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 font-bold shrink-0">
                       🏪
                     </div>
                     <div>
@@ -86,14 +86,14 @@ export default function MarketingPage() {
                       <p className="text-[11px] text-slate-400">Multi-tenant active sandbox</p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex">
                     <span className="px-2.5 py-1 bg-emerald-50 text-emerald-600 font-bold text-[10px] rounded-full border border-emerald-100 uppercase tracking-wider">
                       ● Active Store
                     </span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                   <div className="p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
                     <p className="text-[10px] font-bold text-slate-400 uppercase">Live SKU Count</p>
                     <p className="text-2xl font-black text-slate-800 mt-1">1,482</p>
@@ -108,8 +108,8 @@ export default function MarketingPage() {
                   </div>
                 </div>
 
-                <div className="h-28 rounded-xl bg-gradient-to-r from-indigo-50/50 via-violet-50/50 to-pink-50/50 border border-indigo-100/40 flex items-center justify-center border-dashed">
-                  <p className="text-xs font-medium text-indigo-400">Interactive live widgets rendered securely inside tenant dashboard boundaries</p>
+                <div className="min-h-24 py-6 px-4 rounded-xl bg-gradient-to-r from-indigo-50/50 via-violet-50/50 to-pink-50/50 border border-indigo-100/40 flex items-center justify-center border-dashed">
+                  <p className="text-xs font-medium text-indigo-400 text-center">Interactive live widgets rendered securely inside tenant dashboard boundaries</p>
                 </div>
               </div>
             </div>
