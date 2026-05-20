@@ -56,7 +56,8 @@ export async function signUpAction(prevState: any, formData: FormData) {
     }
 
     const { headers } = await import("next/headers");
-    const origin = headers().get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const headersList = await headers();
+    const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     const supabase = await createServerSupabase();
     const { data, error } = await supabase.auth.signUp({
