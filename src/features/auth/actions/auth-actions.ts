@@ -57,7 +57,17 @@ export async function signUpAction(prevState: any, formData: FormData) {
 
     const { headers } = await import("next/headers");
     const headersList = await headers();
-    const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    
+    // Attempt to derive the correct base URL from standard Next.js and Vercel environments
+    const host = headersList.get("x-forwarded-host") || headersList.get("host");
+    const protocol = headersList.get("x-forwarded-proto") || "https";
+    const derivedOrigin = host ? `${protocol}://${host}` : null;
+    
+    const origin = headersList.get("origin") || 
+      derivedOrigin || 
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) || 
+      process.env.NEXT_PUBLIC_APP_URL || 
+      "http://localhost:3000";
 
     const supabase = await createServerSupabase();
     const { data, error } = await supabase.auth.signUp({
