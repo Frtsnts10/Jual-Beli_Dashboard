@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server";
 import { CheckCircle2, ShieldCheck, CreditCard, Lock, ArrowLeft, Sparkles } from "lucide-react";
 
-export default async function SimulatedStripeCheckoutPage({
+export default async function SimulatedXenditCheckoutPage({
   params,
   searchParams,
 }: {
@@ -73,7 +73,7 @@ export default async function SimulatedStripeCheckoutPage({
   };
 
   // Define Server Action to activate subscription mapping directly inside database bindings
-  async function fulfillStripePaymentAction() {
+  async function fulfillXenditPaymentAction() {
     "use server";
     const adminSupabase = await createAdminSupabase();
     
@@ -88,7 +88,7 @@ export default async function SimulatedStripeCheckoutPage({
       plan: "pro",
       plan_name: billingInfo.planName,
       status: "active",
-      stripe_subscription_id: `sub_simulated_${Date.now()}`,
+      xendit_subscription_id: `sub_simulated_${Date.now()}`,
       current_period_end: expiryDate,
     });
 
@@ -104,14 +104,14 @@ export default async function SimulatedStripeCheckoutPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#0a2540] text-slate-100 font-sans flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-[#043c7b] text-slate-100 font-sans flex flex-col justify-between selection:bg-[#00c5df] selection:text-white">
       {/* Top micro bar */}
       <header className="border-b border-white/10 px-6 py-4 flex items-center justify-between max-w-6xl w-full mx-auto">
         <Link href={`/${storeId}/subscription`} className="flex items-center gap-2 text-xs font-bold text-indigo-300 hover:text-white transition-colors">
           <ArrowLeft className="w-4 h-4" /> Return to Shard Console
         </Link>
         <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
-          <Lock className="w-3.5 h-3.5 text-emerald-400" /> <span>STRIPE TEST GATEWAY SIMULATOR</span>
+          <Lock className="w-3.5 h-3.5 text-emerald-400" /> <span>XENDIT TEST GATEWAY SIMULATOR</span>
         </div>
       </header>
 
@@ -159,7 +159,7 @@ export default async function SimulatedStripeCheckoutPage({
           <div className="flex items-center gap-3 pt-4 border-t border-white/10 text-xs text-slate-400">
             <ShieldCheck className="w-8 h-8 text-indigo-400 shrink-0" />
             <p>
-              Simulating direct PCI-DSS compliant Stripe vector. Sandbox accounts securely capture fulfillment arrays cleanly.
+              Simulating direct PCI-DSS compliant Xendit vector. Sandbox accounts securely capture fulfillment arrays cleanly.
             </p>
           </div>
         </div>
@@ -173,7 +173,7 @@ export default async function SimulatedStripeCheckoutPage({
                   S
                 </div>
                 <div>
-                  <h3 className="text-sm font-extrabold text-slate-900">Stripe Payment Gateway</h3>
+                  <h3 className="text-sm font-extrabold text-slate-900">Xendit Payment Gateway</h3>
                   <p className="text-[10px] text-slate-500">Secured sandbox test terminal</p>
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default async function SimulatedStripeCheckoutPage({
               </div>
             </div>
 
-            <form action={fulfillStripePaymentAction} className="space-y-4">
+            <form action={fulfillXenditPaymentAction} className="space-y-4">
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                   Cardholder Identity
@@ -246,7 +246,7 @@ export default async function SimulatedStripeCheckoutPage({
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-[#0a2540] hover:bg-[#0f3457] active:scale-95 text-white rounded-sm text-xs font-extrabold shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                  className="w-full py-3.5 bg-[#043c7b] hover:bg-[#062649] active:scale-95 text-white rounded-sm text-xs font-extrabold shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-indigo-400 group-hover:rotate-12 transition-transform" />
                   <span>Authorize Subscription Fulfill ({billingInfo.price})</span>
@@ -263,7 +263,7 @@ export default async function SimulatedStripeCheckoutPage({
 
       {/* Footer credits */}
       <footer className="text-center py-6 text-[11px] text-slate-500 border-t border-white/5">
-        Shop Dashboard Multi-Tenant Commerce Architecture Engine • Secured Stripe Simulation Vector
+        Shop Dashboard Multi-Tenant Commerce Architecture Engine • Secured Xendit Simulation Vector
       </footer>
     </div>
   );

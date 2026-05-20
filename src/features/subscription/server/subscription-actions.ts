@@ -1,8 +1,6 @@
 "use server";
 
 import { createServerSupabase } from "@/lib/supabase/server";
-import { stripe, STRIPE_PREMIUM_PLAN_PRICE_ID } from "@/lib/stripe";
-import { revalidatePath } from "next/cache";
 
 export async function getSubscriptionStatus(storeId: string) {
   const supabase = await createServerSupabase();
@@ -62,9 +60,12 @@ export async function getSubscriptionStatus(storeId: string) {
 
 export async function createCheckoutSessionAction(storeId: string, returnUrl: string, interval: string = "monthly") {
   try {
-    // Route cleanly to dedicated Stripe Checkout Simulation Vector
+    // Route cleanly to dedicated Xendit Checkout Simulation Vector
     return { url: `/checkout/${storeId}?interval=${interval}` };
-  } catch (error: any) {
-    return { error: error.message || "Failed to instantiate Stripe session vector" };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { error: error.message || "Failed to instantiate Xendit session vector" };
+    }
+    return { error: "Failed to instantiate Xendit session vector" };
   }
 }
