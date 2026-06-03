@@ -1,22 +1,24 @@
 import React from "react";
-import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server";
+import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
 
 export default async function DashboardRootLayout({ children }: { children: React.ReactNode }) {
   try {
-    const supabase = await createServerSupabase();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getAuthenticatedUser();
 
     if (user) {
-      const adminSupabase = await createAdminSupabase();
-      await adminSupabase
-        .from("profiles")
-        .upsert({
-          id: user.id,
-          clerk_id: user.id,
+      // Upsert profile in Firestore
+      const profileRef = adminDb.collection("profiles").doc(user.uid);
+      const profileDoc = await profileRef.get();
+      if (!profileDoc.exists) {
+        await profileRef.set({
+          id: user.uid,
           email: user.email || "owner@premium-console.dev",
-          full_name: user.user_metadata?.full_name || "Verified Store Owner",
-          avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.email || user.id)}`,
+          full_name: user.name || "Verified Store Owner",
+          avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.email || user.uid)}`,
+          is_premium: false,
+          created_at: new Date().toISOString(),
         });
+      }
     }
   } catch {
     // Graceful startup flow

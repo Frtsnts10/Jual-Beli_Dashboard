@@ -1,5 +1,5 @@
 import React from "react";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
 import { redirect } from "next/navigation";
 import { StoreSettingsForm, DangerZonePanel } from "@/features/settings/components/store-settings-form";
 import { EditProfileForm } from "@/features/auth/components/edit-profile-form";
@@ -11,28 +11,17 @@ export default async function TenantSettingsPage({
   params: Promise<{ storeId: string }>;
 }) {
   const { storeId } = await params;
-  const supabase = await createServerSupabase();
-  const { data: store } = await supabase
-    .from("stores")
-    .select("name, logo_url, currency, email, instagram, whatsapp")
-    .eq("id", storeId)
-    .single();
+  const storeDoc = await adminDb.collection("stores").doc(storeId).get();
 
-  if (!store) {
+  if (!storeDoc.exists) {
     redirect("/dashboard");
   }
 
-  const { data: userRes } = await supabase.auth.getUser();
-  const user = userRes.user;
+  const store = storeDoc.data()!;
+  const user = await getAuthenticatedUser();
 
-  // Retrieve live enrolled MFA factors list from Supabase Auth Server
-  const { data: factors } = await supabase.auth.mfa.listFactors();
-
-  const initialName = user?.user_metadata?.full_name || "Workspace Admin";
+  const initialName = user?.name || "Workspace Admin";
   const initialEmail = user?.email || "";
-  const initialAvatar = user?.user_metadata?.avatar_url || "";
-  const initial2fa = factors?.totp?.some((f: any) => f.status === "verified") === true;
-  const initialRestData = JSON.stringify(user?.user_metadata?.rest_data || {});
 
   return (
     <div className="space-y-6 font-sans max-w-full pb-12">
@@ -44,7 +33,7 @@ export default async function TenantSettingsPage({
           <EditProfileForm
             initialName={initialName}
             initialEmail={initialEmail}
-            initial2fa={initial2fa}
+            initial2fa={false}
           />
         </div>
 

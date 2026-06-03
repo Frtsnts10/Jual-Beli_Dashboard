@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server";
+import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
 import { CheckCircle2, ShieldCheck, CreditCard, Lock, ArrowLeft, Sparkles } from "lucide-react";
 
 export default async function SimulatedXenditCheckoutPage({
@@ -15,13 +15,13 @@ export default async function SimulatedXenditCheckoutPage({
   const resolvedSearchParams = await searchParams;
   const interval = resolvedSearchParams?.interval || "monthly";
 
-  const supabase = await createServerSupabase();
-  const { data: store } = await supabase.from("stores").select("name, owner_id, currency").eq("id", storeId).single();
+  const storeDoc = await adminDb.collection("stores").doc(storeId).get();
 
-  if (!store) {
+  if (!storeDoc.exists) {
     redirect("/dashboard");
   }
 
+  const store = storeDoc.data()!;
   const currency = store?.currency || "IDR";
 
   const formatPrice = (usdAmount: number) => {
@@ -61,7 +61,7 @@ export default async function SimulatedXenditCheckoutPage({
       price: formatPrice(99),
       description: currency.toUpperCase() === "IDR" ? "Bayar sekali, miliki selamanya" : "Paid once, own forever",
       mode: currency.toUpperCase() === "IDR" ? "Lifetime / Sekali Bayar" : "Lifetime / One-Time",
-      days: null,
+      days: null as number | null,
       planName: currency.toUpperCase() === "IDR" ? "Shop Dashboard Pro (Lifetime)" : "Shop Dashboard Pro (Lifetime)",
     }
   }[interval as "monthly" | "yearly" | "lifetime"] || {
@@ -72,17 +72,17 @@ export default async function SimulatedXenditCheckoutPage({
     planName: currency.toUpperCase() === "IDR" ? "Shop Dashboard Pro (Bulanan)" : "Shop Dashboard Pro (Monthly)",
   };
 
-  // Define Server Action to activate subscription mapping directly inside database bindings
+  // Server Action to activate subscription
   async function fulfillXenditPaymentAction() {
     "use server";
-    const adminSupabase = await createAdminSupabase();
     
     const expiryDate = billingInfo.days 
       ? new Date(Date.now() + billingInfo.days * 86400000).toISOString()
       : null;
 
-    // 1. Upsert subscription segment cleanly
-    await adminSupabase.from("subscriptions").upsert({
+    // 1. Upsert subscription
+    const subsRef = adminDb.collection("subscriptions").doc(storeId);
+    await subsRef.set({
       store_id: storeId,
       profile_id: store?.owner_id,
       plan: "pro",
@@ -90,14 +90,11 @@ export default async function SimulatedXenditCheckoutPage({
       status: "active",
       xendit_subscription_id: `sub_simulated_${Date.now()}`,
       current_period_end: expiryDate,
-    });
+    }, { merge: true });
 
-    // 2. Set is_premium in user profile to enable immediate global Pro Dashboard updates
+    // 2. Set is_premium in user profile
     if (store?.owner_id) {
-      await adminSupabase
-        .from("profiles")
-        .update({ is_premium: true })
-        .eq("id", store.owner_id);
+      await adminDb.collection("profiles").doc(store.owner_id).update({ is_premium: true });
     }
 
     redirect(`/${storeId}/subscription?payment_success=true`);
@@ -149,7 +146,7 @@ export default async function SimulatedXenditCheckoutPage({
               <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" /> Immediate unlimited shard deployment
             </li>
             <li className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" /> Synchronized PostgreSQL SLA triggers
+              <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" /> Synchronized Firestore SLA triggers
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" /> Automated n8n lifecycle hooks

@@ -1,6 +1,6 @@
 "use server";
 
-import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server";
+import { adminDb } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 
 export interface InventoryItem {
@@ -24,17 +24,12 @@ export interface InventoryItem {
 }
 
 export async function getInventoryAction(storeId: string): Promise<InventoryItem[]> {
-  const adminSupabase = await createAdminSupabase();
-  const { data, error } = await adminSupabase
-    .from("inventory")
-    .select("*")
-    .eq("store_id", storeId)
-    .order("created_at", { ascending: false });
+  const snap = await adminDb.collection("inventory")
+    .where("store_id", "==", storeId)
+    .orderBy("created_at", "desc")
+    .get();
 
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data || [];
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
 }
 
 export async function createInventoryItemAction(storeId: string, formData: FormData) {
@@ -57,7 +52,6 @@ export async function createInventoryItemAction(storeId: string, formData: FormD
   const multiProfileTriggers = ["netflix", "disney", "prime", "hulu", "hbo", "google", "youtube", "canva", "spotify"];
   const isMultiProfile = multiProfileTriggers.some((t) => name.toLowerCase().includes(t));
 
-  // Automatically group streaming sub-profiles belonging to the same root email address into a shared account pool
   if (isMultiProfile && !group_name) {
     const baseAlias = name.split(" ")[0];
     if (email) {
@@ -69,60 +63,56 @@ export async function createInventoryItemAction(storeId: string, formData: FormD
     }
   }
 
-  const adminSupabase = await createAdminSupabase();
-  const { data, error } = await adminSupabase
-    .from("inventory")
-    .insert([
-      {
-        store_id: storeId,
-        name,
-        profile_tier,
-        profile_name,
-        email,
-        password,
-        pin,
-        base_price,
-        selling_price,
-        price: selling_price, // map fallback metric
-        stock,
-        date_buy,
-        date_expired,
-        category,
-        group_name,
-      },
-    ])
-    .select()
-    .single();
+  try {
+    const docRef = adminDb.collection("inventory").doc();
+    const data = {
+      id: docRef.id,
+      store_id: storeId,
+      name,
+      profile_tier,
+      profile_name,
+      email,
+      password,
+      pin,
+      base_price,
+      selling_price,
+      price: selling_price,
+      stock,
+      date_buy,
+      date_expired,
+      category,
+      group_name,
+      created_at: new Date().toISOString(),
+    };
+    await docRef.set(data);
 
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${storeId}/inventory`);
-  revalidatePath(`/${storeId}/dashboard`);
-  return { data };
+    revalidatePath(`/${storeId}/inventory`);
+    revalidatePath(`/${storeId}/dashboard`);
+    return { data };
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }
 
 export async function updateItemGroupingAction(storeId: string, itemId: string, nextGroup: string | null) {
-  const adminSupabase = await createAdminSupabase();
-  const { error } = await adminSupabase
-    .from("inventory")
-    .update({ group_name: nextGroup || null })
-    .eq("id", itemId);
-
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${storeId}/inventory`);
-  return { success: true };
+  try {
+    await adminDb.collection("inventory").doc(itemId).update({ group_name: nextGroup || null });
+    revalidatePath(`/${storeId}/inventory`);
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }
 
 export async function deleteInventoryItemAction(storeId: string, id: string) {
-  const adminSupabase = await createAdminSupabase();
-  const { error } = await adminSupabase.from("inventory").delete().eq("id", id);
-
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${storeId}/inventory`);
-  revalidatePath(`/${storeId}/dashboard`);
-  return { success: true };
+  try {
+    await adminDb.collection("inventory").doc(id).delete();
+    revalidatePath(`/${storeId}/inventory`);
+    revalidatePath(`/${storeId}/dashboard`);
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }
 
 export async function updateInventoryItemAction(storeId: string, itemId: string, formData: FormData) {
@@ -141,10 +131,8 @@ export async function updateInventoryItemAction(storeId: string, itemId: string,
 
   if (!name) return { error: "Product Name is required" };
 
-  const adminSupabase = await createAdminSupabase();
-  const { data, error } = await adminSupabase
-    .from("inventory")
-    .update({
+  try {
+    await adminDb.collection("inventory").doc(itemId).update({
       name,
       profile_tier,
       profile_name,
@@ -158,35 +146,25 @@ export async function updateInventoryItemAction(storeId: string, itemId: string,
       date_buy,
       date_expired,
       group_name,
-    })
-    .eq("id", itemId)
-    .select()
-    .single();
+    });
 
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${storeId}/inventory`);
-  revalidatePath(`/${storeId}/dashboard`);
-  return { data };
+    revalidatePath(`/${storeId}/inventory`);
+    revalidatePath(`/${storeId}/dashboard`);
+    return { data: { id: itemId } };
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }
 
 export async function importInventoryCsvAction(storeId: string, rows: any[]) {
-  const adminSupabase = await createAdminSupabase();
   const multiProfileTriggers = ["netflix", "disney", "prime", "hulu", "hbo", "google", "youtube", "canva", "spotify"];
+  const batch = adminDb.batch();
 
   const inserts = rows.map((row) => {
     const name = row.name || "Unnamed Asset";
     const profile_tier = row.profile_tier || null;
-    const profile_name = row.profile_name || null;
     const email = row.email || null;
-    const password = row.password || null;
-    const pin = row.pin || null;
-    const base_price = parseFloat(row.base_price) || 0;
-    const selling_price = parseFloat(row.selling_price) || 0;
-    const stock = parseInt(row.stock, 10) || 1;
-    const date_buy = row.date_buy || null;
     const date_expired = row.date_expired || null;
-    const category = row.category || null;
     let group_name = row.group_name || null;
 
     const isMultiProfile = multiProfileTriggers.some((t) => name.toLowerCase().includes(t));
@@ -201,31 +179,38 @@ export async function importInventoryCsvAction(storeId: string, rows: any[]) {
       }
     }
 
-    return {
+    const docRef = adminDb.collection("inventory").doc();
+    const data = {
+      id: docRef.id,
       store_id: storeId,
       name,
       profile_tier,
-      profile_name,
+      profile_name: row.profile_name || null,
       email,
-      password,
-      pin,
-      base_price,
-      selling_price,
-      price: selling_price,
-      stock,
-      date_buy,
+      password: row.password || null,
+      pin: row.pin || null,
+      base_price: parseFloat(row.base_price) || 0,
+      selling_price: parseFloat(row.selling_price) || 0,
+      price: parseFloat(row.selling_price) || 0,
+      stock: parseInt(row.stock, 10) || 1,
+      date_buy: row.date_buy || null,
       date_expired,
-      category,
+      category: row.category || null,
       group_name,
+      created_at: new Date().toISOString(),
     };
+    batch.set(docRef, data);
+    return data;
   });
 
   if (inserts.length === 0) return { error: "No valid rows found to import" };
 
-  const { error } = await adminSupabase.from("inventory").insert(inserts);
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${storeId}/inventory`);
-  revalidatePath(`/${storeId}/dashboard`);
-  return { success: true, count: inserts.length };
+  try {
+    await batch.commit();
+    revalidatePath(`/${storeId}/inventory`);
+    revalidatePath(`/${storeId}/dashboard`);
+    return { success: true, count: inserts.length };
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }

@@ -1,25 +1,16 @@
 "use server";
 
 import { xendit } from "@/lib/xendit";
-import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server";
+import { adminDb, getAuthenticatedUser } from "@/lib/firebase/server";
 import { redirect } from "next/navigation";
 
 export async function createCheckoutSession(priceId: string, _storeCount: number) {
-  const supabase = await createServerSupabase();
-  const adminSupabase = await createAdminSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error("Unauthorized");
 
-  const { data: profile } = await supabase.from("profiles").select("id, email").eq("id", user.id).single();
-  if (!profile) throw new Error("Profile not found");
-
-  // Get or create Xendit customer
-  let { data: sub } = await supabase.from("subscriptions").select("xendit_customer_id").eq("profile_id", profile.id).single();
-  if (!sub) {
-    const customer = await xendit.customers.create({ email: profile.email, metadata: { profile_id: profile.id } });
-    await adminSupabase.from("subscriptions").insert({ profile_id: profile.id, xendit_customer_id: customer.id, plan: "free", status: "active" });
-    sub = { xendit_customer_id: customer.id };
-  }
+  const profileDoc = await adminDb.collection("profiles").doc(user.uid).get();
+  if (!profileDoc.exists) throw new Error("Profile not found");
+  const profile = profileDoc.data()!;
 
   const invoice = await xendit.invoice.create({
     external_id: `inv_${Date.now()}`,
@@ -34,18 +25,9 @@ export async function createCheckoutSession(priceId: string, _storeCount: number
 }
 
 export async function createBillingPortalSession() {
-  const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error("Unauthorized");
 
-  const { data: profile } = await supabase.from("profiles").select("id").eq("id", user.id).single();
-  if (!profile) throw new Error("Profile not found");
-
-  const { data: sub } = await supabase.from("subscriptions").select("xendit_customer_id").eq("profile_id", profile.id).single();
-  if (!sub?.xendit_customer_id) throw new Error("No customer");
-
-  // Mocking Xendit Subscription Management Portal redirect
   const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/subscription`;
-
   redirect(portalUrl);
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { getInventoryAction } from "@/features/inventory/actions/inventory-actions";
 import { InventoryTable } from "@/features/inventory/components/inventory-table";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { adminDb } from "@/lib/firebase/server";
 import { getSubscriptionStatus } from "@/features/subscription/server/subscription-actions";
 
 export default async function TenantInventoryPage({
@@ -10,14 +10,13 @@ export default async function TenantInventoryPage({
   params: Promise<{ storeId: string }>;
 }) {
   const { storeId } = await params;
-  const supabase = await createServerSupabase();
-  const [storeRes, items, subscription] = await Promise.all([
-    supabase.from("stores").select("currency").eq("id", storeId).single(),
+  const [storeDoc, items, subscription] = await Promise.all([
+    adminDb.collection("stores").doc(storeId).get(),
     getInventoryAction(storeId),
     getSubscriptionStatus(storeId),
   ]);
 
-  const currency = storeRes.data?.currency || "IDR";
+  const currency = storeDoc.data()?.currency || "IDR";
 
   return (
     <div className="space-y-6 font-sans transition-colors">

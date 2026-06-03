@@ -1,39 +1,40 @@
 import React from "react";
 import { redirect } from "next/navigation";
-import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server";
+import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
 import { StoreSwitcher } from "@/features/stores/components/store-switcher";
 import { UserButton } from "@/features/auth/components/user-button";
 
 export default async function DashboardRootPage() {
-  const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
 
   if (!user) {
     redirect("/sign-in");
   }
 
-  // Ensure database sync is confirmed for foreign-key validation mapping
-  const profileId = user.id;
-  const adminSupabase = await createAdminSupabase();
+  const profileId = user.uid;
 
-  // Ensure current profile row exists natively to satisfy Foreign Key dependencies on child table inserts
-  await adminSupabase.from("profiles").upsert({
-    id: user.id,
-    clerk_id: user.id,
-    email: user.email || "owner@premium-console.dev",
-    full_name: user.user_metadata?.full_name || "Verified Store Owner",
-    avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.email || user.id)}`,
-  });
+  // Ensure current profile row exists
+  const profileRef = adminDb.collection("profiles").doc(profileId);
+  const profileDoc = await profileRef.get();
+  if (!profileDoc.exists) {
+    await profileRef.set({
+      id: profileId,
+      email: user.email || "owner@premium-console.dev",
+      full_name: user.name || "Verified Store Owner",
+      avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.email || profileId)}`,
+      is_premium: false,
+      created_at: new Date().toISOString(),
+    });
+  }
 
-  const { data: stores } = await adminSupabase
-    .from("stores")
-    .select("id")
-    .eq("owner_id", profileId)
-    .order("created_at", { ascending: true })
-    .limit(1);
+  const storesSnap = await adminDb.collection("stores")
+    .where("owner_id", "==", profileId)
+    .orderBy("created_at", "asc")
+    .limit(1)
+    .get();
 
-  if (stores && stores.length > 0) {
-    redirect(`/${stores[0].id}/dashboard`);
+  if (!storesSnap.empty) {
+    redirect(`/${storesSnap.docs[0].id}/dashboard`);
   }
 
   // If zero stores exist, present explicit provision workflow layout

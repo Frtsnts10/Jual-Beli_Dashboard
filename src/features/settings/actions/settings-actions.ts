@@ -1,6 +1,6 @@
 "use server";
 
-import { createAdminSupabase } from "@/lib/supabase/server";
+import { adminDb } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -16,33 +16,27 @@ export async function updateStoreSettingsAction(storeId: string, formData: FormD
 
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
-  const supabase = await createAdminSupabase();
-  const { error } = await supabase
-    .from("stores")
-    .update({ 
-      name, 
-      slug,
-      ...(logo_url !== null && { logo_url }),
-      ...(currency && { currency }),
-      email,
-      instagram,
-      whatsapp
-    })
-    .eq("id", storeId);
+  try {
+    const updateData: Record<string, any> = { name, slug, email, instagram, whatsapp };
+    if (logo_url !== null) updateData.logo_url = logo_url;
+    if (currency) updateData.currency = currency;
 
-  if (error) return { error: error.message };
+    await adminDb.collection("stores").doc(storeId).update(updateData);
 
-  revalidatePath(`/${storeId}/dashboard`);
-  revalidatePath(`/${storeId}/settings`);
-  return { success: true };
+    revalidatePath(`/${storeId}/dashboard`);
+    revalidatePath(`/${storeId}/settings`);
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }
 
 export async function deleteStoreAction(storeId: string) {
-  const supabase = await createAdminSupabase();
-  const { error } = await supabase.from("stores").delete().eq("id", storeId);
-
-  if (error) return { error: error.message };
-
-  revalidatePath("/");
-  redirect("/dashboard");
+  try {
+    await adminDb.collection("stores").doc(storeId).delete();
+    revalidatePath("/");
+    redirect("/dashboard");
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }

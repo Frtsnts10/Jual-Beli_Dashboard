@@ -1,6 +1,6 @@
 "use server";
 
-import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server";
+import { adminDb, getAuthenticatedUser } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 
 export interface Complaint {
@@ -16,17 +16,12 @@ export interface Complaint {
 }
 
 export async function getComplaintsAction(storeId: string): Promise<Complaint[]> {
-  const adminSupabase = await createAdminSupabase();
-  const { data, error } = await adminSupabase
-    .from("complaints")
-    .select("*")
-    .eq("store_id", storeId)
-    .order("created_at", { ascending: false });
+  const snap = await adminDb.collection("complaints")
+    .where("store_id", "==", storeId)
+    .orderBy("created_at", "desc")
+    .get();
 
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data || [];
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Complaint));
 }
 
 export async function createComplaintAction(storeId: string, formData: FormData) {
@@ -39,54 +34,57 @@ export async function createComplaintAction(storeId: string, formData: FormData)
     return { error: "Customer, title, and description required" };
   }
 
-  const adminSupabase = await createAdminSupabase();
-  const { data, error } = await adminSupabase
-    .from("complaints")
-    .insert([{ store_id: storeId, customer_name, title, description, priority, status: "pending" }])
-    .select()
-    .single();
+  try {
+    const docRef = adminDb.collection("complaints").doc();
+    const data = {
+      id: docRef.id,
+      store_id: storeId,
+      customer_name,
+      title,
+      description,
+      priority,
+      status: "pending",
+      satisfaction_outcome: null,
+      created_at: new Date().toISOString(),
+    };
+    await docRef.set(data);
 
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${storeId}/complaints`);
-  return { data };
+    revalidatePath(`/${storeId}/complaints`);
+    return { data };
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }
 
 export async function updateComplaintStatusAction(storeId: string, id: string, nextStatus: Complaint["status"]) {
-  const adminSupabase = await createAdminSupabase();
-  const { error } = await adminSupabase
-    .from("complaints")
-    .update({ status: nextStatus })
-    .eq("id", id);
-
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${storeId}/complaints`);
-  return { success: true };
+  try {
+    await adminDb.collection("complaints").doc(id).update({ status: nextStatus });
+    revalidatePath(`/${storeId}/complaints`);
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }
 
 export async function applyComplaintSatisfactionAction(storeId: string, id: string, outcome: string) {
-  const adminSupabase = await createAdminSupabase();
-  const { error } = await adminSupabase
-    .from("complaints")
-    .update({ 
+  try {
+    await adminDb.collection("complaints").doc(id).update({
       satisfaction_outcome: outcome,
-      status: "resolved" // Auto advance status upon granting satisfaction mitigation
-    })
-    .eq("id", id);
-
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${storeId}/complaints`);
-  return { success: true };
+      status: "resolved",
+    });
+    revalidatePath(`/${storeId}/complaints`);
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }
 
 export async function deleteComplaintAction(storeId: string, id: string) {
-  const adminSupabase = await createAdminSupabase();
-  const { error } = await adminSupabase.from("complaints").delete().eq("id", id);
-
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${storeId}/complaints`);
-  return { success: true };
+  try {
+    await adminDb.collection("complaints").doc(id).delete();
+    revalidatePath(`/${storeId}/complaints`);
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message };
+  }
 }

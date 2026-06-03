@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
-import { Shield, Loader2, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
+import React, { useState } from "react";
+import { Shield, Loader2, ArrowLeft, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
 export default function VerifyMfaPage() {
   const [otpCode, setOtpCode] = useState("");
@@ -19,34 +18,10 @@ export default function VerifyMfaPage() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      // 1. Get the factors
-      const { data: factors, error: factorsErr } = await supabase.auth.mfa.listFactors();
-      if (factorsErr) throw factorsErr;
-
-      const totpFactor = factors.totp.find((f: any) => f.status === 'verified');
-      if (!totpFactor) {
-        throw new Error("No verified 2FA factor found. Please contact support.");
-      }
-
-      // 2. Create challenge
-      const { data: challenge, error: challengeErr } = await supabase.auth.mfa.challenge({
-        factorId: totpFactor.id
-      });
-      if (challengeErr) throw challengeErr;
-
-      // 3. Verify
-      const { error: verifyErr } = await supabase.auth.mfa.verify({
-        factorId: totpFactor.id,
-        challengeId: challenge.id,
-        code: otpCode
-      });
-
-      if (verifyErr) throw verifyErr;
-
-      // Success! Redirect to dashboard
-      router.push("/dashboard");
-      router.refresh();
+      // Firebase Auth MFA verification would go here.
+      // For now, this is a placeholder since Firebase MFA requires
+      // specific multi-factor enrollment via the Firebase Client SDK.
+      setError("MFA verification is not yet configured for Firebase Auth. Please contact support.");
     } catch (err: any) {
       setError(err.message || "Invalid verification code. Please try again.");
     } finally {

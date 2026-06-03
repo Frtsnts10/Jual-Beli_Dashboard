@@ -1,15 +1,8 @@
 import React from "react";
 import { redirect } from "next/navigation";
-import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server";
-import { StoreSwitcher } from "@/features/stores/components/store-switcher";
+import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
 import { DashboardNav } from "@/features/dashboard/components/dashboard-nav";
-import { MobileNavTrigger } from "@/features/dashboard/components/mobile-nav-trigger";
-import { UserButton } from "@/features/auth/components/user-button";
-import { NotificationBell } from "@/features/notifications/components/notification-bell";
 import { getSubscriptionStatus } from "@/features/subscription/server/subscription-actions";
-import Link from "next/link";
-import { Sparkles } from "lucide-react";
-
 import { DashboardHeader } from "@/features/dashboard/components/dashboard-header";
 
 export default async function TenantStoreLayout({
@@ -20,42 +13,37 @@ export default async function TenantStoreLayout({
   params: Promise<{ storeId: string }>;
 }) {
   const { storeId } = await params;
-  const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
 
   if (!user) {
     redirect("/sign-in");
   }
 
-  const profileId = user.id;
-  const adminSupabase = await createAdminSupabase();
+  const profileId = user.uid;
 
-  const [storesRes, subscription] = await Promise.all([
-    adminSupabase
-      .from("stores")
-      .select("*")
-      .eq("owner_id", profileId)
-      .order("created_at", { ascending: true }),
+  const [storesSnap, subscription] = await Promise.all([
+    adminDb.collection("stores")
+      .where("owner_id", "==", profileId)
+      .orderBy("created_at", { descending: false })
+      .get(),
     getSubscriptionStatus(storeId)
   ]);
 
-  const stores = storesRes.data;
-  const currentStore = stores?.find((s) => s.id === storeId);
+  const stores = storesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const currentStore = stores.find((s: any) => s.id === storeId);
 
   if (!currentStore) {
     redirect("/dashboard");
   }
-
-  const displayStores = stores || [];
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-slate-50 dark:bg-[#090d16] font-sans transition-colors">
       <DashboardHeader 
         storeId={storeId}
         profileId={profileId}
-        currentStoreSlug={currentStore.slug}
+        currentStoreSlug={(currentStore as any).slug}
         isSubscribed={subscription.isSubscribed}
-        stores={displayStores}
+        stores={stores}
       />
 
       {/* Main Framework Viewport */}

@@ -1,21 +1,60 @@
 "use client";
 
-import React, { useActionState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { signInAction } from "@/features/auth/actions/auth-actions";
 import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase/client";
 
 export default function NativeSignInPage() {
-  const [state, formAction, isPending] = useActionState(signInAction, null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
-  React.useEffect(() => {
-    if (state?.requiresMfa) {
-      router.push("/verify-mfa");
-    } else if (state?.success) {
-      router.push("/dashboard");
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsPending(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email || !password) {
+      setError("Email and password are required");
+      setIsPending(false);
+      return;
     }
-  }, [state, router]);
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await userCredential.user.getIdToken();
+
+      // Create server-side session cookie
+      const res = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create session");
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch (err: any) {
+      const msg = err.code === "auth/invalid-credential" 
+        ? "Invalid email or password." 
+        : err.code === "auth/too-many-requests"
+        ? "Too many failed attempts. Please try again later."
+        : err.message || "An unexpected error occurred.";
+      setError(msg);
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <div className="w-full bg-[#0d1322]/40 backdrop-blur-2xl rounded-[32px] border border-white/10 p-8 shadow-2xl transition-all">
@@ -24,10 +63,10 @@ export default function NativeSignInPage() {
         <p className="text-[11px] text-indigo-300 mt-1 uppercase tracking-widest font-bold">Terminal Access Gate</p>
       </div>
 
-      <form action={formAction} className="space-y-4">
-        {state?.error && (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
           <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400">
-            {state.error}
+            {error}
           </div>
         )}
 

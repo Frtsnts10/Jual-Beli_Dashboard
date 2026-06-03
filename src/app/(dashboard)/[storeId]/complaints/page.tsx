@@ -1,7 +1,7 @@
 import React from "react";
 import { getComplaintsAction } from "@/features/complaints/actions/complaint-actions";
 import { ComplaintTable } from "@/features/complaints/components/complaint-table";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { adminDb } from "@/lib/firebase/server";
 import { getSubscriptionStatus } from "@/features/subscription/server/subscription-actions";
 import { PremiumLockOverlay } from "@/features/subscription/components/premium-lock-overlay";
 
@@ -11,14 +11,13 @@ export default async function TenantComplaintsPage({
   params: Promise<{ storeId: string }>;
 }) {
   const { storeId } = await params;
-  const supabase = await createServerSupabase();
-  const [storeRes, complaints, subscription] = await Promise.all([
-    supabase.from("stores").select("currency").eq("id", storeId).single(),
+  const [storeDoc, complaints, subscription] = await Promise.all([
+    adminDb.collection("stores").doc(storeId).get(),
     getComplaintsAction(storeId),
     getSubscriptionStatus(storeId),
   ]);
 
-  const currency = storeRes.data?.currency || "IDR";
+  const currency = storeDoc.data()?.currency || "IDR";
 
   return (
     <div className="space-y-6 font-sans transition-colors">
@@ -33,7 +32,7 @@ export default async function TenantComplaintsPage({
         <PremiumLockOverlay 
           storeId={storeId}
           featureName="SLA Dispute Desk"
-          description="Automated PostgreSQL incident hooks are locked under the Standard plan. Upgrade to Shop Dashboard Pro to ingest real-time disputes automatically from user storefronts, configure webhook listeners, and trigger one-click SLA refunds."
+          description="Automated incident hooks are locked under the Standard plan. Upgrade to Shop Dashboard Pro to ingest real-time disputes automatically from user storefronts, configure webhook listeners, and trigger one-click SLA refunds."
         />
       ) : (
         <>

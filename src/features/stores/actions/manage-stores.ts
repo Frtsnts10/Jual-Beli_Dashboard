@@ -1,6 +1,6 @@
 "use server";
 
-import { createServerSupabase, createAdminSupabase } from "@/lib/supabase/server";
+import { adminDb, getAuthenticatedUser } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 
 export interface Store {
@@ -12,17 +12,11 @@ export interface Store {
 }
 
 export async function getProfileByUserId(userId: string) {
-  const supabase = await createServerSupabase();
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", userId)
-    .single();
-
-  if (error) {
+  const doc = await adminDb.collection("profiles").doc(userId).get();
+  if (!doc.exists) {
     throw new Error("Profile not found");
   }
-  return data;
+  return { id: doc.id, ...doc.data() };
 }
 
 export async function createStoreAction(profileId: string, formData: FormData) {
@@ -31,48 +25,55 @@ export async function createStoreAction(profileId: string, formData: FormData) {
 
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
-  // Use primary administrative execution envelope to seamlessly write records bypassing restrictive client RLS boundary rules
-  const adminSupabase = await createAdminSupabase();
-
   try {
     // Resolve current mapped store count
-    const { count } = await adminSupabase
-      .from("stores")
-      .select("*", { count: "exact", head: true })
-      .eq("owner_id", profileId);
+    const storesSnap = await adminDb.collection("stores")
+      .where("owner_id", "==", profileId)
+      .get();
+    const count = storesSnap.size;
 
     // Check store count and plan
-    const { data: sub } = await adminSupabase
-      .from("subscriptions")
-      .select("plan")
-      .eq("profile_id", profileId)
-      .single();
+    const subsSnap = await adminDb.collection("subscriptions")
+      .where("profile_id", "==", profileId)
+      .limit(1)
+      .get();
+    const sub = subsSnap.empty ? null : subsSnap.docs[0].data();
 
     const maxStores = sub?.plan === "pro" ? Infinity : sub?.plan === "starter" ? 5 : 3;
-    if (count !== null && count >= maxStores) {
+    if (count >= maxStores) {
       throw new Error(`Upgrade your plan to add more stores.`);
     }
 
-    // Ensure the parent profile row exists natively to satisfy the stores.owner_id foreign key constraint
-    await adminSupabase.from("profiles").upsert({
-      id: profileId,
-      clerk_id: profileId,
-      email: "owner@premium-console.dev",
-      full_name: "Verified Store Owner",
-    });
-
-    const { data, error } = await adminSupabase
-      .from("stores")
-      .insert([{ owner_id: profileId, name, slug }])
-      .select()
-      .single();
-
-    if (error) {
-      return { error: error.message };
+    // Ensure the parent profile row exists
+    const profileRef = adminDb.collection("profiles").doc(profileId);
+    const profileDoc = await profileRef.get();
+    if (!profileDoc.exists) {
+      await profileRef.set({
+        id: profileId,
+        email: "owner@premium-console.dev",
+        full_name: "Verified Store Owner",
+        is_premium: false,
+        created_at: new Date().toISOString(),
+      });
     }
 
+    const storeRef = adminDb.collection("stores").doc();
+    const storeData = {
+      id: storeRef.id,
+      owner_id: profileId,
+      name,
+      slug,
+      logo_url: null,
+      currency: "IDR",
+      email: "support@yourdomain.com",
+      instagram: "",
+      whatsapp: "",
+      created_at: new Date().toISOString(),
+    };
+    await storeRef.set(storeData);
+
     revalidatePath("/", "layout");
-    return { data };
+    return { data: storeData };
   } catch (err: any) {
     return { error: err.message || "Failed to provision workspace partition." };
   }

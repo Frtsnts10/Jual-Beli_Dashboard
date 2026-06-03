@@ -1,7 +1,7 @@
 import React from "react";
 import { getSubscriptionStatus } from "@/features/subscription/server/subscription-actions";
 import { SubscriptionClientPage } from "@/features/subscription/components/subscription-client-page";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { adminDb } from "@/lib/firebase/server";
 
 export default async function TenantSubscriptionPage({
   params,
@@ -14,13 +14,12 @@ export default async function TenantSubscriptionPage({
   const resolvedSearchParams = await searchParams;
   const isPaymentSuccess = resolvedSearchParams?.payment_success === "true";
 
-  const supabase = await createServerSupabase();
-  const [storeRes, status] = await Promise.all([
-    supabase.from("stores").select("currency").eq("id", storeId).single(),
+  const [storeDoc, status] = await Promise.all([
+    adminDb.collection("stores").doc(storeId).get(),
     getSubscriptionStatus(storeId),
   ]);
 
-  const currency = storeRes.data?.currency || "IDR";
+  const currency = storeDoc.data()?.currency || "IDR";
 
   return (
     <SubscriptionClientPage
