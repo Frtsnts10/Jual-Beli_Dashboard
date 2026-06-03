@@ -24,7 +24,7 @@ export default async function TenantStoreLayout({
   const [storesSnap, subscription] = await Promise.all([
     adminDb.collection("stores")
       .where("owner_id", "==", profileId)
-      .orderBy("created_at", { descending: false })
+      .orderBy("created_at", "asc")
       .get(),
     getSubscriptionStatus(storeId)
   ]);

@@ -33,7 +33,6 @@ export default async function TenantSettingsPage({
           <EditProfileForm
             initialName={initialName}
             initialEmail={initialEmail}
-            initial2fa={false}
           />
         </div>
 

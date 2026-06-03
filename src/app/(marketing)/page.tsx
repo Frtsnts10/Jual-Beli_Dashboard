@@ -135,7 +135,7 @@ export default function MarketingPage() {
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Partitioned Data Flow</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  Switch store contexts immediately via highly optimized query wrappers backed by Supabase Server Actions. Zero cross-tenant data leakage.
+                  Switch store contexts immediately via highly optimized query wrappers backed by Firestore Server Actions. Zero cross-tenant data leakage.
                 </p>
               </div>
 
