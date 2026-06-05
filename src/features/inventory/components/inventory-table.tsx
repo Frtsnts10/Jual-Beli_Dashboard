@@ -6,7 +6,8 @@ import { InventoryForm } from "./inventory-form";
 import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus, Package, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select, SelectItem, Button } from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
+import { parseDate } from "@internationalized/date";
 
 interface InventoryTableProps {
   storeId: string;
@@ -405,30 +406,38 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                                 Exp: {member.date_expired || "Rolling"}
                               </td>
                               <td className="px-4 py-2.5 text-right space-x-1">
-                                <button
-                                  onClick={() => handleGroupChange(member.id, member.group_name)}
-                                  disabled={isUpdating}
-                                  className="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 hover:text-indigo-600 dark:hover:text-indigo-300 text-slate-600 dark:text-slate-400 rounded-sm text-[9px] font-bold transition-all disabled:opacity-50 inline-flex items-center gap-1"
+                                <Button
+                                  variant="light"
+                                  size="sm"
+                                  onPress={() => handleGroupChange(member.id, member.group_name)}
+                                  isDisabled={isUpdating}
+                                  className="h-6 px-2 min-w-0 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-slate-600 dark:text-slate-400 font-bold text-[9px] data-[hover=true]:text-indigo-600 dark:data-[hover=true]:text-indigo-300"
                                   title="Change family pool group target"
                                 >
                                   {isUpdating ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <RefreshCw className="w-2.5 h-2.5" />}
                                   Re-Assign
-                                </button>
-                                <button
-                                  onClick={() => setEditingItem(member)}
-                                  disabled={isDeleting || isUpdating}
-                                  className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-sm transition-colors disabled:opacity-50"
+                                </Button>
+                                <Button
+                                  isIconOnly
+                                  variant="light"
+                                  size="sm"
+                                  onPress={() => setEditingItem(member)}
+                                  isDisabled={isDeleting || isUpdating}
+                                  className="h-6 w-6 min-w-0 text-slate-400 data-[hover=true]:text-indigo-600 dark:data-[hover=true]:text-indigo-400 data-[hover=true]:bg-indigo-50 dark:data-[hover=true]:bg-indigo-950/40"
                                   title="Edit item profile parameters"
                                 >
                                   <Edit className="w-3 h-3" />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(member.id)}
-                                  disabled={isDeleting}
-                                  className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-sm transition-colors disabled:opacity-50"
+                                </Button>
+                                <Button
+                                  isIconOnly
+                                  variant="light"
+                                  size="sm"
+                                  onPress={() => handleDelete(member.id)}
+                                  isDisabled={isDeleting}
+                                  className="h-6 w-6 min-w-0 text-slate-400 data-[hover=true]:text-red-600 dark:data-[hover=true]:text-red-400 data-[hover=true]:bg-red-50 dark:data-[hover=true]:bg-red-950/40"
                                 >
                                   {isDeleting ? <Loader2 className="w-3 h-3 animate-spin text-red-600" /> : <Trash2 className="w-3 h-3" />}
-                                </button>
+                                </Button>
                               </td>
                             </tr>
                           );
@@ -456,36 +465,38 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
               of <strong className="text-slate-700 dark:text-slate-200">{groupedEntries.length}</strong> master groups
             </span>
             <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => handleFamilyPageChange(Math.max(1, currentFamilyPage - 1))}
-                disabled={currentFamilyPage === 1}
-                className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              <Button
+                variant="bordered"
+                radius="sm"
+                onPress={() => handleFamilyPageChange(Math.max(1, currentFamilyPage - 1))}
+                isDisabled={currentFamilyPage === 1}
+                className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               >
                 Prev
-              </button>
+              </Button>
               {Array.from({ length: totalFamilyPages }, (_, i) => i + 1).map((page) => (
-                <button
+                <Button
                   key={page}
-                  type="button"
-                  onClick={() => handleFamilyPageChange(page)}
-                  className={`w-7 h-7 font-bold rounded-sm transition-all flex items-center justify-center ${
-                    currentFamilyPage === page
-                      ? "bg-indigo-600 text-white shadow-xs"
-                      : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                  variant={currentFamilyPage === page ? "solid" : "bordered"}
+                  color={currentFamilyPage === page ? "primary" : "default"}
+                  radius="sm"
+                  onPress={() => handleFamilyPageChange(page)}
+                  className={`h-[26px] min-w-[26px] px-0 font-bold ${
+                    currentFamilyPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
                   }`}
                 >
                   {page}
-                </button>
+                </Button>
               ))}
-              <button
-                type="button"
-                onClick={() => handleFamilyPageChange(Math.min(totalFamilyPages, currentFamilyPage + 1))}
-                disabled={currentFamilyPage === totalFamilyPages}
-                className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              <Button
+                variant="bordered"
+                radius="sm"
+                onPress={() => handleFamilyPageChange(Math.min(totalFamilyPages, currentFamilyPage + 1))}
+                isDisabled={currentFamilyPage === totalFamilyPages}
+                className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               >
                 Next
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -614,30 +625,38 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                       </td>
 
                       <td className="px-5 py-3.5 text-right space-x-1.5">
-                        <button
-                          onClick={() => handleGroupChange(item.id, "")}
-                          disabled={isUpdating}
-                          className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-[10px] rounded-sm transition-all disabled:opacity-50 inline-flex items-center gap-1"
+                        <Button
+                          variant="light"
+                          size="sm"
+                          onPress={() => handleGroupChange(item.id, "")}
+                          isDisabled={isUpdating}
+                          className="h-7 px-2.5 min-w-0 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-[10px]"
                           title="Assign item to shared Family Pool container"
                         >
                           {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : <UserPlus className="w-3 h-3" />}
                           Route to Pool
-                        </button>
-                        <button
-                          onClick={() => setEditingItem(item)}
-                          disabled={isDeleting || isUpdating}
-                          className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-sm transition-colors disabled:opacity-50"
+                        </Button>
+                        <Button
+                          isIconOnly
+                          variant="light"
+                          size="sm"
+                          onPress={() => setEditingItem(item)}
+                          isDisabled={isDeleting || isUpdating}
+                          className="h-7 w-7 min-w-0 text-slate-400 data-[hover=true]:text-indigo-600 dark:data-[hover=true]:text-indigo-400 data-[hover=true]:bg-indigo-50 dark:data-[hover=true]:bg-indigo-950/40"
                           title="Edit item profile parameters"
                         >
                           <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          disabled={isDeleting}
-                          className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-sm transition-colors disabled:opacity-50"
+                        </Button>
+                        <Button
+                          isIconOnly
+                          variant="light"
+                          size="sm"
+                          onPress={() => handleDelete(item.id)}
+                          isDisabled={isDeleting}
+                          className="h-7 w-7 min-w-0 text-slate-400 data-[hover=true]:text-red-600 dark:data-[hover=true]:text-red-400 data-[hover=true]:bg-red-50 dark:data-[hover=true]:bg-red-950/40"
                         >
                           {isDeleting ? <Loader2 className="w-4 h-4 animate-spin text-red-600" /> : <Trash2 className="w-4 h-4" />}
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   );
@@ -663,36 +682,38 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                 of <strong className="text-slate-700 dark:text-slate-200">{ungroupedItems.length}</strong> solo rows
               </span>
               <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => handleSoloPageChange(Math.max(1, currentSoloPage - 1))}
-                  disabled={currentSoloPage === 1}
-                  className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                <Button
+                  variant="bordered"
+                  radius="sm"
+                  onPress={() => handleSoloPageChange(Math.max(1, currentSoloPage - 1))}
+                  isDisabled={currentSoloPage === 1}
+                  className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
                 >
                   Prev
-                </button>
+                </Button>
                 {Array.from({ length: totalSoloPages }, (_, i) => i + 1).map((page) => (
-                  <button
+                  <Button
                     key={page}
-                    type="button"
-                    onClick={() => handleSoloPageChange(page)}
-                    className={`w-7 h-7 font-bold rounded-sm transition-all flex items-center justify-center ${
-                      currentSoloPage === page
-                        ? "bg-indigo-600 text-white shadow-xs"
-                        : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    variant={currentSoloPage === page ? "solid" : "bordered"}
+                    color={currentSoloPage === page ? "primary" : "default"}
+                    radius="sm"
+                    onPress={() => handleSoloPageChange(page)}
+                    className={`h-[26px] min-w-[26px] px-0 font-bold ${
+                      currentSoloPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
                     }`}
                   >
                     {page}
-                  </button>
+                  </Button>
                 ))}
-                <button
-                  type="button"
-                  onClick={() => handleSoloPageChange(Math.min(totalSoloPages, currentSoloPage + 1))}
-                  disabled={currentSoloPage === totalSoloPages}
-                  className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                <Button
+                  variant="bordered"
+                  radius="sm"
+                  onPress={() => handleSoloPageChange(Math.min(totalSoloPages, currentSoloPage + 1))}
+                  isDisabled={currentSoloPage === totalSoloPages}
+                  className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
                 >
                   Next
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -845,7 +866,7 @@ function EditInventoryModal({
                   label="Product Name"
                   isRequired
                   value={name}
-                  onValueChange={handleNameChange}
+                  onChange={handleNameChange}
                   variant="faded"
                   radius="sm"
                   classNames={{
@@ -988,28 +1009,28 @@ function EditInventoryModal({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <Input
-                  type="date"
+                <DatePicker
                   label="Date Buy"
-                  value={dateBuy}
-                  onValueChange={setDateBuy}
+                  value={dateBuy ? (parseDate(dateBuy) as any) : null}
+                  onChange={(val) => setDateBuy(val ? val.toString() : "")}
                   variant="faded"
                   radius="sm"
                   classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    base: "h-[34px]",
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
                     input: "text-xs text-slate-800 dark:text-slate-100"
                   }}
                 />
-                <Input
-                  type="date"
+                <DatePicker
                   label="Date Expired"
-                  value={dateExpired}
-                  onValueChange={setDateExpired}
+                  value={dateExpired ? (parseDate(dateExpired) as any) : null}
+                  onChange={(val) => setDateExpired(val ? val.toString() : "")}
                   variant="faded"
                   radius="sm"
                   classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    base: "h-[34px]",
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
                     input: "text-xs text-slate-800 dark:text-slate-100"
                   }}

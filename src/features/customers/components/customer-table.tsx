@@ -6,7 +6,8 @@ import { CustomerForm } from "./customer-form";
 import { Trash2, Loader2, User, ShoppingBag, Plus, Calendar, Clock, Download, Upload, Ban, CalendarPlus, UserMinus } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
-import { Modal, ModalContent, ModalBody, Button, Input, Select, SelectItem } from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
+import { parseDate } from "@internationalized/date";
 
 interface CustomerTableProps {
   storeId: string;
@@ -376,27 +377,30 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
 
                                   {/* Custom Actions Array for this particular ordered asset segment */}
                                   <div className="flex items-center gap-1 border-l pl-2 ml-1 border-slate-200/50 dark:border-slate-800/50">
-                                    <button
-                                      type="button"
-                                      onClick={() => setStreamActionTarget({ customerId: c.id, productIndex: idx, productName: p.name, mode: "extend" })}
-                                      disabled={processingStream === `${c.id}-${idx}`}
-                                      className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm transition-colors"
+                                    <Button
+                                      isIconOnly
+                                      variant="light"
+                                      onPress={() => setStreamActionTarget({ customerId: c.id, productIndex: idx, productName: p.name, mode: "extend" })}
+                                      isDisabled={processingStream === `${c.id}-${idx}`}
+                                      className="w-7 h-7 min-w-0 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                                       title="Extend stream duration coverage"
                                     >
                                       <CalendarPlus className="w-3.5 h-3.5" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => setStreamActionTarget({ customerId: c.id, productIndex: idx, productName: p.name, mode: "ban" })}
-                                      disabled={processingStream === `${c.id}-${idx}`}
-                                      className="p-1 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm transition-colors"
+                                    </Button>
+                                    <Button
+                                      isIconOnly
+                                      variant="light"
+                                      onPress={() => setStreamActionTarget({ customerId: c.id, productIndex: idx, productName: p.name, mode: "ban" })}
+                                      isDisabled={processingStream === `${c.id}-${idx}`}
+                                      className="w-7 h-7 min-w-0 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                                       title="Ban / terminate stream partition"
                                     >
                                       <Ban className="w-3.5 h-3.5" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={async () => {
+                                    </Button>
+                                    <Button
+                                      isIconOnly
+                                      variant="light"
+                                      onPress={async () => {
                                         if (!confirm(`Are you absolutely sure you want to remove/kick ${p.name} from this profile? Connected inventory items will be unlinked and back available in stock.`)) return;
                                         setProcessingStream(`${c.id}-${idx}`);
                                         const res = await removeCustomerProductAction(storeId, c.id, idx);
@@ -404,12 +408,13 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                         if (res?.error) toast.error(res.error);
                                         else toast.success(`Stream ${p.name} disassociated successfully`);
                                       }}
-                                      disabled={processingStream === `${c.id}-${idx}`}
-                                      className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm transition-colors"
+                                      isDisabled={processingStream === `${c.id}-${idx}`}
+                                      isLoading={processingStream === `${c.id}-${idx}`}
+                                      className="w-7 h-7 min-w-0 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                                       title="Remove/kick stream from profile"
                                     >
-                                      {processingStream === `${c.id}-${idx}` ? <Loader2 className="w-3.5 h-3.5 animate-spin text-red-600" /> : <UserMinus className="w-3.5 h-3.5" />}
-                                    </button>
+                                      {processingStream !== `${c.id}-${idx}` && <UserMinus className="w-3.5 h-3.5" />}
+                                    </Button>
                                   </div>
                                 </div>
                               </div>
@@ -436,13 +441,15 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                           <div className="p-3 bg-slate-50 dark:bg-[#0b0f19] rounded-sm border border-slate-200 dark:border-slate-800 space-y-2.5 transition-colors">
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">Assign Additional Product Variant</span>
-                              <button
-                                type="button"
-                                onClick={() => setActiveFormId(null)}
-                                className="text-[10px] text-slate-400 hover:text-slate-600 font-bold"
+                              <Button
+                                isIconOnly
+                                variant="light"
+                                size="sm"
+                                onPress={() => setActiveFormId(null)}
+                                className="text-[10px] min-w-0 h-6 text-slate-400 hover:text-slate-600 font-bold"
                               >
                                 Cancel
-                              </button>
+                              </Button>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-end">
@@ -510,36 +517,41 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 <SelectItem key="90">90 Days</SelectItem>
                                 <SelectItem key="365">365 Days</SelectItem>
                               </Select>
-                              <Input
-                                type="date"
+                              <DatePicker
+                                name="date_start"
                                 label="Date Start"
                                 labelPlacement="outside"
-                                value={appendDateStart}
-                                onValueChange={(val) => {
-                                  setAppendDateStart(val);
-                                  const startObj = new Date(val);
-                                  if (!isNaN(startObj.getTime())) {
-                                    const endObj = new Date(startObj.getTime() + Number(appendDuration) * 86400000);
-                                    setAppendDateEnd(endObj.toISOString().split("T")[0]);
+                                value={appendDateStart ? (parseDate(appendDateStart) as any) : null}
+                                onChange={(val) => {
+                                  const strVal = val ? val.toString() : "";
+                                  setAppendDateStart(strVal);
+                                  if (strVal) {
+                                    const startObj = new Date(strVal);
+                                    if (!isNaN(startObj.getTime())) {
+                                      const endObj = new Date(startObj.getTime() + Number(appendDuration) * 86400000);
+                                      setAppendDateEnd(endObj.toISOString().split("T")[0]);
+                                    }
                                   }
                                 }}
                                 variant="faded"
                                 radius="sm"
                                 classNames={{
+                                  base: "h-[26px]",
                                   inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
                                   label: "text-[9px] font-bold text-slate-400 uppercase",
                                   input: "text-[11px] text-slate-800 dark:text-slate-200"
                                 }}
                               />
-                              <Input
-                                type="date"
+                              <DatePicker
+                                name="date_end"
                                 label="Date End"
                                 labelPlacement="outside"
-                                value={appendDateEnd}
-                                onValueChange={setAppendDateEnd}
+                                value={appendDateEnd ? (parseDate(appendDateEnd) as any) : null}
+                                onChange={(val) => setAppendDateEnd(val ? val.toString() : "")}
                                 variant="faded"
                                 radius="sm"
                                 classNames={{
+                                  base: "h-[26px]",
                                   inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
                                   label: "text-[9px] font-bold text-slate-400 uppercase",
                                   input: "text-[11px] font-bold text-emerald-700 dark:text-emerald-400"
@@ -587,36 +599,38 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               of <strong className="text-slate-700 dark:text-slate-200">{customers.length}</strong> entries
             </span>
             <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              <Button
+                variant="bordered"
+                radius="sm"
+                onPress={() => handlePageChange(Math.max(1, currentPage - 1))}
+                isDisabled={currentPage === 1}
+                className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               >
                 Prev
-              </button>
+              </Button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
+                <Button
                   key={page}
-                  type="button"
-                  onClick={() => handlePageChange(page)}
-                  className={`w-7 h-7 font-bold rounded-sm transition-all flex items-center justify-center ${
-                    currentPage === page
-                      ? "bg-indigo-600 text-white shadow-xs"
-                      : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                  variant={currentPage === page ? "solid" : "bordered"}
+                  color={currentPage === page ? "primary" : "default"}
+                  radius="sm"
+                  onPress={() => handlePageChange(page)}
+                  className={`h-[26px] min-w-[26px] px-0 font-bold ${
+                    currentPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
                   }`}
                 >
                   {page}
-                </button>
+                </Button>
               ))}
-              <button
-                type="button"
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="px-2.5 py-1 font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              <Button
+                variant="bordered"
+                radius="sm"
+                onPress={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                isDisabled={currentPage === totalPages}
+                className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               >
                 Next
-              </button>
+              </Button>
             </div>
           </div>
         )}

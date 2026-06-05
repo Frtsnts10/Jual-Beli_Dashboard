@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { PlusCircle, Users } from "lucide-react";
 import { createInventoryItemAction } from "../actions/inventory-actions";
 import { getTierConfigForProduct } from "@/config/product-tiers";
-import { Input, Select, SelectItem, Button } from "@heroui/react";
+import { Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
 
 interface InventoryFormProps {
   storeId: string;
@@ -285,26 +285,26 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
 
       {/* Row 5: Lifecycles */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
-        <Input
-          type="date"
+        <DatePicker
           name="date_buy"
           label="Date Buy"
           variant="faded"
           radius="sm"
           classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            base: "h-[34px]",
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
             label: "text-[10px] font-bold text-slate-400 uppercase",
             input: "text-xs text-slate-800 dark:text-slate-100"
           }}
         />
-        <Input
-          type="date"
+        <DatePicker
           name="date_expired"
           label="Date Expired"
           variant="faded"
           radius="sm"
           classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            base: "h-[34px]",
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
             label: "text-[10px] font-bold text-slate-400 uppercase",
             input: "text-xs text-slate-800 dark:text-slate-100"
           }}

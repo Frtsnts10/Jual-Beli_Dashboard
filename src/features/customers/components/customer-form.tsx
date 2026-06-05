@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { UserPlus, ShoppingBag, Clock, ChevronDown } from "lucide-react";
-import { Input, Select, SelectItem, Button } from "@heroui/react";
+import { Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
+import { parseDate } from "@internationalized/date";
 import { createCustomerAction } from "../actions/customer-actions";
 import { getTierConfigForProduct } from "@/config/product-tiers";
 import { COUNTRY_CODES } from "@/config/countries";
@@ -299,40 +300,42 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
 
           {/* Date Start Picker */}
           <div className="flex flex-col">
-            <Input
+            <DatePicker
               name="date_start"
-              type="date"
               label="Date Start"
               labelPlacement="outside"
-              value={dateStart}
-              onValueChange={setDateStart}
+              value={dateStart ? (parseDate(dateStart) as any) : null}
+              onChange={(val) => setDateStart(val ? val.toString() : "")}
               variant="faded"
               radius="sm"
               classNames={{
-                inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                base: "h-[34px]",
+                inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
                 label: "text-[9px] font-bold text-slate-400 uppercase",
                 input: "text-xs font-medium text-slate-800 dark:text-slate-100"
               }}
             />
+            <input type="hidden" name="date_start" value={dateStart} />
           </div>
 
           {/* Auto-summed / Configurable Date End Picker */}
           <div className="flex flex-col">
-            <Input
+            <DatePicker
               name="date_end"
-              type="date"
               label="Date End (Auto-Sums)"
               labelPlacement="outside"
-              value={dateEnd}
-              onValueChange={setDateEnd}
+              value={dateEnd ? (parseDate(dateEnd) as any) : null}
+              onChange={(val) => setDateEnd(val ? val.toString() : "")}
               variant="faded"
               radius="sm"
               classNames={{
-                inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                base: "h-[34px]",
+                inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
                 label: "text-[9px] font-bold text-slate-400 uppercase",
                 input: "text-xs font-bold text-emerald-700 dark:text-emerald-400"
               }}
             />
+            <input type="hidden" name="date_end" value={dateEnd} />
           </div>
         </div>
       </div>
