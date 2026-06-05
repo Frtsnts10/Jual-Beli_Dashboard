@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { UserPlus, ShoppingBag, Clock, ChevronDown } from "lucide-react";
+import { Input, Select, SelectItem, Button } from "@heroui/react";
 import { createCustomerAction } from "../actions/customer-actions";
 import { getTierConfigForProduct } from "@/config/product-tiers";
 import { COUNTRY_CODES } from "@/config/countries";
@@ -106,28 +107,36 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
 
       {/* Primary Bio Fields */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <Input
+          name="name"
+          label="Customer Full Name"
+          isRequired
+          placeholder="e.g. Alex Rivera"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[52px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+          }}
+        />
+        <Input
+          name="email"
+          type="email"
+          label="Email Connection"
+          placeholder="alex@domain.com"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[52px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs text-slate-800 dark:text-slate-100"
+          }}
+        />
         <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Customer Full Name</label>
-          <input
-            name="name"
-            type="text"
-            required
-            placeholder="e.g. Alex Rivera"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email Connection</label>
-          <input
-            name="email"
-            type="email"
-            placeholder="alex@domain.com"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Phone Number</label>
-          <div className="flex items-center w-full h-[34px] bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-colors relative">
+          <div className="flex flex-col gap-0.5">
+            <label className="text-[10px] font-bold text-slate-400 uppercase">Phone Number</label>
+            <div className="flex items-center w-full h-[34px] bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-colors relative">
             {/* Custom Popover Trigger */}
             <button
               type="button"
@@ -183,6 +192,7 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
               value={phoneNumber ? `${countryCode} ${phoneNumber.trim()}` : ""}
             />
           </div>
+          </div>
         </div>
       </div>
 
@@ -199,105 +209,144 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 p-3 bg-slate-50/70 dark:bg-[#0b0f19]/70 rounded-sm border border-slate-200/50 dark:border-slate-800/50 transition-colors">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 p-3 bg-slate-50/70 dark:bg-[#0b0f19]/70 rounded-sm border border-slate-200/50 dark:border-slate-800/50 transition-colors items-end">
           {/* Active Inventory Product Selector */}
-          <div>
-            <label className="block text-[9px] font-bold text-slate-400 uppercase mb-1">Product Designation</label>
+          <div className="flex flex-col">
             {distinctProducts.length > 0 ? (
-              <select
+              <Select
                 name="product_name"
-                value={selectedProduct}
+                label="Product Designation"
+                labelPlacement="outside"
+                selectedKeys={[selectedProduct]}
                 onChange={(e) => handleProductSelection(e.target.value)}
-                className="w-full h-[34px] px-2.5 py-1.5 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                variant="faded"
+                radius="sm"
+                classNames={{
+                  trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
+                  label: "text-[9px] font-bold text-slate-400 uppercase",
+                  value: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                }}
               >
-                <option value="">-- Select Active Inventory Asset --</option>
                 {distinctProducts.map((prodName) => (
-                  <option key={prodName} value={prodName}>
-                    {prodName}
-                  </option>
+                  <SelectItem key={prodName}>{prodName}</SelectItem>
                 ))}
-              </select>
+              </Select>
             ) : (
-              <input
+              <Input
                 name="product_name"
-                type="text"
+                label="Product Designation"
+                labelPlacement="outside"
                 value={selectedProduct}
-                onChange={(e) => handleProductSelection(e.target.value)}
+                onValueChange={(val) => handleProductSelection(val)}
                 placeholder="e.g. Netflix Premium"
-                className="w-full h-[34px] px-2.5 py-1.5 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                variant="faded"
+                radius="sm"
+                classNames={{
+                  inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                  label: "text-[9px] font-bold text-slate-400 uppercase",
+                  input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                }}
               />
             )}
           </div>
 
           {/* Variant Tier Mapping */}
-          <div className="flex flex-col justify-end w-full">
-            <label className="block text-[9px] font-bold text-slate-400 uppercase mb-1">Variant Access</label>
-            <select
+          <div className="flex flex-col">
+            <Select
               name="product_variant"
-              value={productVariant}
+              label="Variant Access"
+              labelPlacement="outside"
+              selectedKeys={[productVariant]}
               onChange={(e) => setProductVariant(e.target.value)}
-              className="w-full h-[34px] px-2.5 py-1.5 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              variant="faded"
+              radius="sm"
+              classNames={{
+                trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
+                label: "text-[9px] font-bold text-slate-400 uppercase",
+                value: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+              }}
             >
               {tierOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
+                <SelectItem key={opt}>{opt}</SelectItem>
               ))}
-            </select>
+            </Select>
           </div>
 
           {/* Preset Duration Cycles Selector */}
-          <div>
-            <label className="block text-[9px] font-bold text-slate-400 uppercase mb-1">Coverage Cycle</label>
-            <select
+          <div className="flex flex-col">
+            <Select
               name="duration_days"
-              value={durationDays}
+              label="Coverage Cycle"
+              labelPlacement="outside"
+              selectedKeys={[durationDays.toString()]}
               onChange={(e) => setDurationDays(Number(e.target.value))}
-              className="w-full h-[34px] px-2.5 py-1.5 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-indigo-900 dark:text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              variant="faded"
+              radius="sm"
+              classNames={{
+                trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
+                label: "text-[9px] font-bold text-slate-400 uppercase",
+                value: "text-xs font-bold text-indigo-900 dark:text-indigo-300"
+              }}
             >
-              <option value={1}>1 Day Pass (24h)</option>
-              <option value={7}>7 Days Access (1wk)</option>
-              <option value={28}>28 Days Standard</option>
-              <option value={30}>30 Days Premium Sub</option>
-              <option value={90}>90 Days Quarterly</option>
-              <option value={365}>365 Days Annual</option>
-            </select>
+              <SelectItem key="1">1 Day Pass (24h)</SelectItem>
+              <SelectItem key="7">7 Days Access (1wk)</SelectItem>
+              <SelectItem key="28">28 Days Standard</SelectItem>
+              <SelectItem key="30">30 Days Premium Sub</SelectItem>
+              <SelectItem key="90">90 Days Quarterly</SelectItem>
+              <SelectItem key="365">365 Days Annual</SelectItem>
+            </Select>
           </div>
 
           {/* Date Start Picker */}
-          <div>
-            <label className="block text-[9px] font-bold text-slate-400 uppercase mb-1">Date Start</label>
-            <input
+          <div className="flex flex-col">
+            <Input
               name="date_start"
               type="date"
+              label="Date Start"
+              labelPlacement="outside"
               value={dateStart}
-              onChange={(e) => setDateStart(e.target.value)}
-              className="w-full h-[34px] px-2.5 py-1.5 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              onValueChange={setDateStart}
+              variant="faded"
+              radius="sm"
+              classNames={{
+                inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                label: "text-[9px] font-bold text-slate-400 uppercase",
+                input: "text-xs font-medium text-slate-800 dark:text-slate-100"
+              }}
             />
           </div>
 
           {/* Auto-summed / Configurable Date End Picker */}
-          <div>
-            <label className="block text-[9px] font-bold text-slate-400 uppercase mb-1">Date End (Auto-Sums)</label>
-            <input
+          <div className="flex flex-col">
+            <Input
               name="date_end"
               type="date"
+              label="Date End (Auto-Sums)"
+              labelPlacement="outside"
               value={dateEnd}
-              onChange={(e) => setDateEnd(e.target.value)}
-              className="w-full h-[34px] px-2.5 py-1.5 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-emerald-700 dark:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              onValueChange={setDateEnd}
+              variant="faded"
+              radius="sm"
+              classNames={{
+                inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                label: "text-[9px] font-bold text-slate-400 uppercase",
+                input: "text-xs font-bold text-emerald-700 dark:text-emerald-400"
+              }}
             />
           </div>
         </div>
       </div>
 
       <div className="flex justify-end pt-1">
-        <button
+        <Button
           type="submit"
-          disabled={isPending}
-          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 disabled:opacity-50 text-white text-xs font-bold rounded-sm shadow-md transition-all"
+          isLoading={isPending}
+          color="primary"
+          radius="sm"
+          className="px-5 font-bold shadow-md h-[40px] text-xs"
         >
           {isPending ? "Connecting Shard..." : "Create Profile & Bind Order"}
-        </button>
+        </Button>
       </div>
     </form>
   );

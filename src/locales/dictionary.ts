@@ -95,6 +95,7 @@ export const dictionaries = {
       slaDesc: "Kait PostgreSQL tersinkronisasi",
       provisionTitle: "Skala Sumber Daya Penyediaan",
       provisionDesc: "Tingkatkan shard aktif Anda untuk melewati batas API secara instan",
+      weekly: "Mingguan",
       monthly: "Bulanan",
       yearly: "Tahunan",
       lifetime: "Seumur Hidup",
@@ -116,13 +117,21 @@ export const dictionaries = {
       premiumEnterprise: "Perusahaan Premium",
       proTitle: "Shop Dashboard Pro",
       proDesc: "Vektor skala tak terbatas yang mendukung operasi batas langsung multi-penyewa absolut.",
+      workspaceWeek: " / ruang kerja minggu",
       workspaceMonth: " / bulan ruang kerja",
       workspaceYear: " / tahun ruang kerja",
       oneTimeLifetime: " / seumur hidup sekali bayar",
+      ctaWeekly: "Tingkatkan Mingguan",
       ctaMonthly: "Tingkatkan Shard Bulanan",
       ctaYearly: "Tingkatkan Shard Tahunan",
       ctaLifetime: "Dapatkan Akses Seumur Hidup",
       proFeatures: {
+        weekly: [
+          "Toko Shard Tanpa Batas",
+          "Kisi telemetri @tanstack/react-table canggih",
+          "Pengikatan otomatis Stripe SLA instan",
+          "Tindakan siklus SLA Meja Pelanggan Prioritas"
+        ],
         monthly: [
           "Toko Shard Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
@@ -247,6 +256,7 @@ export const dictionaries = {
       slaDesc: "PostgreSQL hooks synchronized",
       provisionTitle: "Provision Resource Scales",
       provisionDesc: "Upgrade your active shard to bypass API limits instantly",
+      weekly: "Weekly",
       monthly: "Monthly",
       yearly: "Yearly",
       lifetime: "Lifetime",
@@ -268,13 +278,21 @@ export const dictionaries = {
       premiumEnterprise: "Premium Enterprise",
       proTitle: "Shop Dashboard Pro",
       proDesc: "Unlimited scale vectors supporting absolute multitenant live boundary operations.",
+      workspaceWeek: " / workspace week",
       workspaceMonth: " / workspace month",
       workspaceYear: " / workspace year",
       oneTimeLifetime: " / one-time lifetime",
+      ctaWeekly: "Upgrade Weekly Shard",
       ctaMonthly: "Upgrade Monthly Shard",
       ctaYearly: "Upgrade Yearly Shard",
       ctaLifetime: "Acquire Lifetime Access",
       proFeatures: {
+        weekly: [
+          "Unlimited Store Shards",
+          "Advanced @tanstack/react-table telemetry grids",
+          "Instant Stripe SLA automatic bindings",
+          "Priority Customer Desk SLA cycle actions"
+        ],
         monthly: [
           "Unlimited Store Shards",
           "Advanced @tanstack/react-table telemetry grids",
@@ -399,6 +417,7 @@ export const dictionaries = {
       slaDesc: "Ganchos de PostgreSQL sincronizados",
       provisionTitle: "Escalas de Aprovisionamiento de Recursos",
       provisionDesc: "Mejore su shard para omitir los límites de API instantáneamente",
+      weekly: "Semanal",
       monthly: "Mensual",
       yearly: "Anual",
       lifetime: "De por vida",
@@ -420,13 +439,21 @@ export const dictionaries = {
       premiumEnterprise: "Premium Corporativo",
       proTitle: "Shop Dashboard Pro",
       proDesc: "Vectores a escala ilimitados que soportan operaciones en vivo multi-inquilino absolutas.",
+      workspaceWeek: " / espacio semana",
       workspaceMonth: " / mes de espacio de trabajo",
       workspaceYear: " / año de espacio de trabajo",
       oneTimeLifetime: " / pago único de por vida",
+      ctaWeekly: "Mejorar Shard Semanal",
       ctaMonthly: "Mejorar Shard Mensual",
       ctaYearly: "Mejorar Shard Anual",
       ctaLifetime: "Obtener Acceso de Por Vida",
       proFeatures: {
+        weekly: [
+          "Fragmentos de Tienda Ilimitados",
+          "Telemetría avanzada de @tanstack/react-table",
+          "Integración automática de Stripe SLA",
+          "Soporte prioritario de atención al cliente"
+        ],
         monthly: [
           "Fragmentos de Tienda Ilimitados",
           "Telemetría avanzada de @tanstack/react-table",
@@ -551,6 +578,7 @@ export const dictionaries = {
       slaDesc: "Crochets PostgreSQL synchronisés",
       provisionTitle: "Provisionnement de Ressources",
       provisionDesc: "Améliorez votre shard actif pour contourner instantanément les limites API",
+      weekly: "Hebdomadaire",
       monthly: "Mensuel",
       yearly: "Annuel",
       lifetime: "À vie",
@@ -572,13 +600,21 @@ export const dictionaries = {
       premiumEnterprise: "Premium Entreprise",
       proTitle: "Shop Dashboard Pro",
       proDesc: "Vecteurs d'échelle illimités pour soutenir les opérations multi-locataires.",
+      workspaceWeek: " / semaine",
       workspaceMonth: " / mois par espace",
       workspaceYear: " / an par espace",
       oneTimeLifetime: " / paiement unique à vie",
+      ctaWeekly: "Améliorer Shard Hebdomadaire",
       ctaMonthly: "Amélier Shard Mensuel",
       ctaYearly: "Amélier Shard Annuel",
       ctaLifetime: "Obtenir l'Accès à Vie",
       proFeatures: {
+        weekly: [
+          "Boutiques Shards Illimitées",
+          "Télémétrie @tanstack/react-table avancée",
+          "Liaison Stripe SLA automatique instantanée",
+          "Support client prioritaires SLA"
+        ],
         monthly: [
           "Boutiques Shards Illimitées",
           "Télémétrie @tanstack/react-table avancée",
@@ -703,6 +739,7 @@ export const dictionaries = {
       slaDesc: "PostgreSQL-Hooks synchronisiert",
       provisionTitle: "Ressourcenskalierung bereitstellen",
       provisionDesc: "Aktualisieren Sie Ihren Shard, um API-Limits sofort zu umgehen",
+      weekly: "Wöchentlich",
       monthly: "Monatlich",
       yearly: "Jährlich",
       lifetime: "Lebenslang",
@@ -724,13 +761,21 @@ export const dictionaries = {
       premiumEnterprise: "Premium Unternehmen",
       proTitle: "Shop Dashboard Pro",
       proDesc: "Unbegrenzte Skalierungsvektoren für absolute Multi-Mandanten-Live-Vorgänge.",
+      workspaceWeek: " / Woche",
       workspaceMonth: " / Workspace Monat",
       workspaceYear: " / Workspace Jahr",
       oneTimeLifetime: " / Einmalig Lebenslang",
+      ctaWeekly: "Wöchentliches Shard Upgrade",
       ctaMonthly: "Monatliches Shard Upgrade",
       ctaYearly: "Jährliches Shard Upgrade",
       ctaLifetime: "Lebenslangen Zugriff erwerben",
       proFeatures: {
+        weekly: [
+          "Unbegrenzte Store-Shards",
+          "Fortgeschrittene @tanstack/react-table Telemetrie",
+          "Sofortige automatische Stripe SLA-Anbindung",
+          "Priorisierter Kundensupport-Schreibtisch"
+        ],
         monthly: [
           "Unbegrenzte Store-Shards",
           "Fortgeschrittene @tanstack/react-table Telemetrie",
@@ -855,6 +900,7 @@ export const dictionaries = {
       slaDesc: "PostgreSQLフックが同期されました",
       provisionTitle: "リソーススケールの提供",
       provisionDesc: "API制限を即座に解除するためにアクティブなシャードをアップグレード",
+      weekly: "週払い",
       monthly: "月払い",
       yearly: "年払い",
       lifetime: "ライフタイム",
@@ -876,13 +922,21 @@ export const dictionaries = {
       premiumEnterprise: "プレミアムエンタープライズ",
       proTitle: "Shop Dashboard Pro",
       proDesc: "完全なマルチテナント運用をサポートする無限スケール。",
+      workspaceWeek: " / 週",
       workspaceMonth: " / ワークスペース・月",
       workspaceYear: " / ワークスペース・年",
       oneTimeLifetime: " / ライフタイム一括払い",
+      ctaWeekly: "週間シャードアップグレード",
       ctaMonthly: "月間シャードアップグレード",
       ctaYearly: "年間シャードアップグレード",
       ctaLifetime: "永続ライセンスの購入",
       proFeatures: {
+        weekly: [
+          "無制限のストアシャード数",
+          "高度な @tanstack/react-table グリッド機能",
+          "即座の Stripe SLA 自動連携",
+          "優先サポートデスク対応"
+        ],
         monthly: [
           "無制限のストアシャード数",
           "高度な @tanstack/react-table グリッド機能",
@@ -1007,6 +1061,7 @@ export const dictionaries = {
       slaDesc: "PostgreSQL 钩子已同步",
       provisionTitle: "资源规模分配",
       provisionDesc: "立即升级您的活动分片以跳过 API 流量限制",
+      weekly: "按周计费",
       monthly: "按月计费",
       yearly: "按年计费",
       lifetime: "终身版",
@@ -1028,13 +1083,21 @@ export const dictionaries = {
       premiumEnterprise: "企业专业版",
       proTitle: "Shop Dashboard Pro",
       proDesc: "支持多租户实时业务运转的无限扩容方案。",
+      workspaceWeek: " / 每周",
       workspaceMonth: " / 空间·月",
       workspaceYear: " / 空间·年",
       oneTimeLifetime: " / 终身一次性付清",
+      ctaWeekly: "升级周付分片",
       ctaMonthly: "升级月度分片",
       ctaYearly: "升级年度分片",
       ctaLifetime: "获得终身访问权限",
       proFeatures: {
+        weekly: [
+          "无限制的商店分片",
+          "高级 @tanstack/react-table 遥测网格",
+          "即时 Stripe SLA 自动绑定",
+          "优先客户服务 SLA 响应"
+        ],
         monthly: [
           "无限制的商店分片",
           "高级 @tanstack/react-table 遥测网格",

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { PlusCircle, Users } from "lucide-react";
 import { createInventoryItemAction } from "../actions/inventory-actions";
 import { getTierConfigForProduct } from "@/config/product-tiers";
+import { Input, Select, SelectItem, Button } from "@heroui/react";
 
 interface InventoryFormProps {
   storeId: string;
@@ -110,57 +111,74 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
 
       {/* Row 1: Asset Core */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Product Name</label>
-          <input
-            name="name"
-            type="text"
-            required
-            value={productName}
-            onChange={handleNameChange}
-            placeholder="e.g. YouTube Premium Family"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
-        <div className="flex flex-col justify-end w-full">
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Profile Tier Variant</label>
-          <select
-            name="profile_tier"
-            value={tierVariant}
-            onChange={(e) => setTierVariant(e.target.value)}
-            className="w-full h-[34px] px-2.5 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          >
-            {tierOptions.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Profile Designation</label>
-          <input
-            name="profile_name"
-            type="text"
-            placeholder="e.g. Member Slot Alpha"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
+        <Input
+          name="name"
+          label="Product Name"
+          isRequired
+          value={productName}
+          onValueChange={(val) => {
+            setProductName(val);
+            const cfg = getTierConfigForProduct(val);
+            setTierVariant(cfg.defaultTier);
+            setTierOptions(cfg.options);
+          }}
+          placeholder="e.g. YouTube Premium Family"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+          }}
+        />
+        <Select
+          name="profile_tier"
+          label="Profile Tier Variant"
+          selectedKeys={[tierVariant]}
+          onChange={(e) => setTierVariant(e.target.value)}
+          variant="faded"
+          radius="sm"
+          classNames={{
+            trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            value: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+          }}
+        >
+          {tierOptions.map((opt) => (
+            <SelectItem key={opt}>{opt}</SelectItem>
+          ))}
+        </Select>
+        <Input
+          name="profile_name"
+          label="Profile Designation"
+          placeholder="e.g. Member Slot Alpha"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+          }}
+        />
       </div>
 
       {/* Row 2: Grouping & Pool Configuration */}
       <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
-        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 flex items-center gap-1">
-          <Users className="w-3 h-3 text-indigo-500" /> Family Pool Group Designation (Optional)
-        </label>
-        <div className="flex flex-col sm:flex-row gap-2.5">
-          <input
-            name="group_name"
-            type="text"
-            placeholder="Leave blank for auto-assignment based on name/duration parameters (Max 5/6 members)"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
+        <Input
+          name="group_name"
+          label={
+            <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase">
+              <Users className="w-3 h-3 text-indigo-500" /> Family Pool Group Designation (Optional)
+            </div>
+          }
+          placeholder="Leave blank for auto-assignment based on name/duration parameters (Max 5/6 members)"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+          }}
+        />
         <p className="text-[10px] text-slate-400 mt-1">
           💡 For family assets (Google, YouTube, Canva), omission triggers smart bucket filling matching active unconstrained groups automatically.
         </p>
@@ -168,103 +186,141 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
 
       {/* Row 3: Credentials */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Account Email</label>
-          <input
-            name="email"
-            type="email"
-            placeholder="account@streaming.com"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Password</label>
-          <input
-            name="password"
-            type="text"
-            placeholder="••••••••"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-mono text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Profile PIN</label>
-          <input
-            name="pin"
-            type="text"
-            placeholder="e.g. 1234"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-mono text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
+        <Input
+          type="email"
+          name="email"
+          label="Account Email"
+          placeholder="account@streaming.com"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs text-slate-800 dark:text-slate-100"
+          }}
+        />
+        <Input
+          type="text"
+          name="password"
+          label="Password"
+          placeholder="••••••••"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs font-mono text-slate-800 dark:text-slate-100"
+          }}
+        />
+        <Input
+          type="text"
+          name="pin"
+          label="Profile PIN"
+          placeholder="e.g. 1234"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs font-mono text-slate-800 dark:text-slate-100"
+          }}
+        />
       </div>
 
       {/* Row 4: Pricing & Quota */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
         <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Base Price ({currency})</label>
-          <input
+          <Input
             type="text"
             inputMode="decimal"
+            label={`Base Price (${currency})`}
             value={basePriceStr}
-            onChange={(e) => setBasePriceStr(e.target.value)}
+            onValueChange={setBasePriceStr}
             onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)}
             placeholder={basePlaceholder}
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+            variant="faded"
+            radius="sm"
+            classNames={{
+              inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+              label: "text-[10px] font-bold text-slate-400 uppercase",
+              input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+            }}
           />
           <input type="hidden" name="base_price" value={parsePriceFloat(basePriceStr)} />
         </div>
         <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Selling Price ({currency})</label>
-          <input
+          <Input
             type="text"
             inputMode="decimal"
-            required
+            label={`Selling Price (${currency})`}
+            isRequired
             value={sellingPriceStr}
-            onChange={(e) => setSellingPriceStr(e.target.value)}
+            onValueChange={setSellingPriceStr}
             onBlur={() => handlePriceBlur(setSellingPriceStr, sellingPriceStr)}
             placeholder={sellingPlaceholder}
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-indigo-900 dark:text-indigo-300 bg-indigo-50/30 dark:bg-indigo-950/20 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+            variant="faded"
+            radius="sm"
+            classNames={{
+              inputWrapper: "bg-indigo-50/30 dark:bg-indigo-950/20 border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+              label: "text-[10px] font-bold text-slate-400 uppercase",
+              input: "text-xs font-bold text-indigo-900 dark:text-indigo-300"
+            }}
           />
           <input type="hidden" name="selling_price" value={parsePriceFloat(sellingPriceStr)} />
         </div>
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Available Profiles (Stock)</label>
-          <input
-            name="stock"
-            type="number"
-            defaultValue="1"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
+        <Input
+          name="stock"
+          type="number"
+          label="Available Profiles (Stock)"
+          defaultValue="1"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+          }}
+        />
       </div>
 
       {/* Row 5: Lifecycles */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Date Buy</label>
-          <input
-            name="date_buy"
-            type="date"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Date Expired</label>
-          <input
-            name="date_expired"
-            type="date"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
+        <Input
+          type="date"
+          name="date_buy"
+          label="Date Buy"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs text-slate-800 dark:text-slate-100"
+          }}
+        />
+        <Input
+          type="date"
+          name="date_expired"
+          label="Date Expired"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs text-slate-800 dark:text-slate-100"
+          }}
+        />
       </div>
 
       <div className="flex justify-end pt-2">
-        <button
+        <Button
           type="submit"
-          disabled={isPending}
-          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 disabled:opacity-50 text-white text-xs font-bold rounded-sm shadow-md transition-all"
+          isLoading={isPending}
+          color="primary"
+          radius="sm"
+          className="text-xs font-bold shadow-md"
         >
           {isPending ? "Mapping Variant Payload..." : "Add Digital Inventory Row"}
-        </button>
+        </Button>
       </div>
     </form>
   );

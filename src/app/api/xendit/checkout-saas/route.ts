@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     const invoice = await Invoice.createInvoice({
       data: {
         externalId: `saas-${decodedToken.uid}-${Date.now()}`,
-        amount: plan === 'pro-yearly' ? 3990000 : 490000,
+        amount: plan === 'pro-yearly' ? 3990000 : plan === 'pro-weekly' ? 149000 : 490000,
         description: `Obsidian SaaS Subscription - ${plan}`,
         customer: {
           email: decodedToken.email,

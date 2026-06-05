@@ -6,6 +6,7 @@ import { CustomerForm } from "./customer-form";
 import { Trash2, Loader2, User, ShoppingBag, Plus, Calendar, Clock, Download, Upload, Ban, CalendarPlus, UserMinus } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
+import { Modal, ModalContent, ModalBody, Button, Input, Select, SelectItem } from "@heroui/react";
 
 interface CustomerTableProps {
   storeId: string;
@@ -193,41 +194,33 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-sm border border-indigo-100/40 dark:border-indigo-900/40">
             {customers.length} Client Shards
           </span>
-          <button
-            type="button"
-            onClick={() => setIsCreateModalOpen(true)}
-            className="h-[38px] px-5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-sm text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
+          <Button
+            onPress={() => setIsCreateModalOpen(true)}
+            color="primary"
+            radius="sm"
+            className="h-[38px] px-5 text-xs font-bold shadow-md"
+            startContent={<Plus className="w-4 h-4" />}
           >
-            <Plus className="w-4 h-4" />
-            <span>Register Customer</span>
-          </button>
+            Register Customer
+          </Button>
         </div>
       </div>
 
       {/* Dynamic Creation Modal Embed */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div 
-            className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-sm shadow-2xl relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => setIsCreateModalOpen(false)}
-              className="absolute top-4 right-4 z-10 w-7 h-7 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-sm flex items-center justify-center transition-colors text-base font-bold"
-            >
-              ×
-            </button>
-            <div className="pt-2">
-              <CustomerForm 
-                storeId={storeId} 
-                inventoryItems={inventoryItems} 
-                onSuccess={() => setIsCreateModalOpen(false)} 
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal isOpen={isCreateModalOpen} onOpenChange={(open) => setIsCreateModalOpen(open)} size="4xl" scrollBehavior="inside" classNames={{
+        base: "bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-sm shadow-2xl",
+        body: "p-0"
+      }}>
+        <ModalContent>
+          <ModalBody>
+            <CustomerForm 
+              storeId={storeId} 
+              inventoryItems={inventoryItems} 
+              onSuccess={() => setIsCreateModalOpen(false)} 
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
 
       {/* Table Main Component */}
       <div className="space-y-4">
@@ -241,28 +234,37 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={exportCustomersCsv}
-              className="h-[34px] px-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            <Button
+              onPress={exportCustomersCsv}
+              variant="bordered"
+              radius="sm"
+              className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+              startContent={<Download className="w-3.5 h-3.5" />}
             >
-              <Download className="w-3.5 h-3.5" /> CSV Export
-            </button>
-            <button
-              onClick={exportDatabaseDump}
-              className="h-[34px] px-3.5 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200/50 dark:border-indigo-800/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+              CSV Export
+            </Button>
+            <Button
+              onPress={exportDatabaseDump}
+              variant="flat"
+              radius="sm"
+              className="h-[34px] text-xs font-bold bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50"
+              startContent={<Plus className="w-3.5 h-3.5" />}
             >
-              <Plus className="w-3.5 h-3.5" /> JSON Dump
-            </button>
-            <label className="h-[34px] px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+              JSON Dump
+            </Button>
+            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all gap-1.5 cursor-pointer">
               <Upload className="w-3.5 h-3.5" /> Import
               <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
             </label>
-            <button
-              onClick={downloadCustomerTemplate}
-              className="h-[34px] px-3.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            <Button
+              onPress={downloadCustomerTemplate}
+              variant="flat"
+              radius="sm"
+              className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+              startContent={<Download className="w-3.5 h-3.5" />}
             >
-              <Download className="w-3.5 h-3.5" /> Template
-            </button>
+              Template
+            </Button>
           </div>
         </div>
 
@@ -293,14 +295,17 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                           </div>
                           <p className="font-extrabold text-slate-900 dark:text-slate-100 text-sm truncate">{c.name}</p>
                         </div>
-                        <button
-                          onClick={() => handleDelete(c.id)}
-                          disabled={isDeleting}
-                          className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-sm transition-colors disabled:opacity-50 shrink-0"
+                        <Button
+                          isIconOnly
+                          variant="light"
+                          onPress={() => handleDelete(c.id)}
+                          isDisabled={isDeleting}
+                          isLoading={isDeleting}
+                          className="w-7 h-7 min-w-0 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
                           title="Erase Customer Container"
                         >
-                          {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin text-red-600" /> : <Trash2 className="w-3.5 h-3.5" />}
-                        </button>
+                          {!isDeleting && <Trash2 className="w-3.5 h-3.5" />}
+                        </Button>
                       </div>
                       <div className="space-y-0.5 pl-9">
                         <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate">{c.email || "No Email"}</p>
@@ -418,13 +423,15 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                       {/* Inline Appender Trigger Section */}
                       <div className="mt-3 pt-2 border-t border-slate-100/80 dark:border-slate-800/80">
                         {!isFormActive ? (
-                          <button
-                            type="button"
-                            onClick={() => setActiveFormId(c.id)}
-                            className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                          <Button
+                            onPress={() => setActiveFormId(c.id)}
+                            variant="light"
+                            radius="sm"
+                            className="h-[28px] text-[11px] font-bold text-indigo-600 dark:text-indigo-400"
+                            startContent={<Plus className="w-3.5 h-3.5" />}
                           >
-                            <Plus className="w-3.5 h-3.5" /> Append Streaming Product Order
-                          </button>
+                            Append Streaming Product Order
+                          </Button>
                         ) : (
                           <div className="p-3 bg-slate-50 dark:bg-[#0b0f19] rounded-sm border border-slate-200 dark:border-slate-800 space-y-2.5 transition-colors">
                             <div className="flex items-center justify-between">
@@ -438,30 +445,46 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                               </button>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
-                              <input
+                            <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-end">
+                              <Input
                                 type="text"
-                                placeholder="Product (e.g. Netflix)"
+                                label="Product"
+                                labelPlacement="outside"
+                                placeholder="e.g. Netflix"
                                 value={appendName}
-                                onChange={(e) => handleAppendNameChange(e.target.value)}
-                                className="px-2 py-1 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-[11px] font-bold text-slate-800 dark:text-slate-200 focus:outline-none"
+                                onValueChange={handleAppendNameChange}
+                                variant="faded"
+                                radius="sm"
+                                classNames={{
+                                  inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
+                                  label: "text-[9px] font-bold text-slate-400 uppercase",
+                                  input: "text-[11px] font-bold text-slate-800 dark:text-slate-200"
+                                }}
                               />
-                              <div className="flex flex-col justify-end w-full">
-                                <select
+                              <div className="flex flex-col w-full">
+                                <Select
                                   aria-label="Append Variant"
-                                  value={appendVariant}
+                                  label="Variant"
+                                  labelPlacement="outside"
+                                  selectedKeys={[appendVariant]}
                                   onChange={(e) => setAppendVariant(e.target.value)}
-                                  className="w-full h-[26px] px-1.5 py-0 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-[11px] font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                                  variant="faded"
+                                  radius="sm"
+                                  classNames={{
+                                    trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
+                                    label: "text-[9px] font-bold text-slate-400 uppercase",
+                                    value: "text-[11px] font-medium text-slate-800 dark:text-slate-200"
+                                  }}
                                 >
                                   {appendVariantOptions.map((opt) => (
-                                    <option key={opt} value={opt}>
-                                      {opt}
-                                    </option>
+                                    <SelectItem key={opt}>{opt}</SelectItem>
                                   ))}
-                                </select>
+                                </Select>
                               </div>
-                              <select
-                                value={appendDuration}
+                              <Select
+                                label="Duration"
+                                labelPlacement="outside"
+                                selectedKeys={[appendDuration]}
                                 onChange={(e) => {
                                   setAppendDuration(e.target.value);
                                   if (appendDateStart) {
@@ -472,46 +495,70 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                     }
                                   }
                                 }}
-                                className="px-2 py-1 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-[11px] font-bold text-indigo-900 dark:text-indigo-300 focus:outline-none"
+                                variant="faded"
+                                radius="sm"
+                                classNames={{
+                                  trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
+                                  label: "text-[9px] font-bold text-slate-400 uppercase",
+                                  value: "text-[11px] font-bold text-indigo-900 dark:text-indigo-300"
+                                }}
                               >
-                                <option value="1">1 Day</option>
-                                <option value="7">7 Days</option>
-                                <option value="28">28 Days</option>
-                                <option value="30">30 Days</option>
-                                <option value="90">90 Days</option>
-                                <option value="365">365 Days</option>
-                              </select>
-                              <input
+                                <SelectItem key="1">1 Day</SelectItem>
+                                <SelectItem key="7">7 Days</SelectItem>
+                                <SelectItem key="28">28 Days</SelectItem>
+                                <SelectItem key="30">30 Days</SelectItem>
+                                <SelectItem key="90">90 Days</SelectItem>
+                                <SelectItem key="365">365 Days</SelectItem>
+                              </Select>
+                              <Input
                                 type="date"
-                                title="Date Start"
+                                label="Date Start"
+                                labelPlacement="outside"
                                 value={appendDateStart}
-                                onChange={(e) => {
-                                  setAppendDateStart(e.target.value);
-                                  const startObj = new Date(e.target.value);
+                                onValueChange={(val) => {
+                                  setAppendDateStart(val);
+                                  const startObj = new Date(val);
                                   if (!isNaN(startObj.getTime())) {
                                     const endObj = new Date(startObj.getTime() + Number(appendDuration) * 86400000);
                                     setAppendDateEnd(endObj.toISOString().split("T")[0]);
                                   }
                                 }}
-                                className="px-2 py-1 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none"
+                                variant="faded"
+                                radius="sm"
+                                classNames={{
+                                  inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
+                                  label: "text-[9px] font-bold text-slate-400 uppercase",
+                                  input: "text-[11px] text-slate-800 dark:text-slate-200"
+                                }}
                               />
-                              <input
+                              <Input
                                 type="date"
-                                title="Date End"
+                                label="Date End"
+                                labelPlacement="outside"
                                 value={appendDateEnd}
-                                onChange={(e) => setAppendDateEnd(e.target.value)}
-                                className="px-2 py-1 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm text-[11px] font-bold text-emerald-700 dark:text-emerald-400 focus:outline-none"
+                                onValueChange={setAppendDateEnd}
+                                variant="faded"
+                                radius="sm"
+                                classNames={{
+                                  inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
+                                  label: "text-[9px] font-bold text-slate-400 uppercase",
+                                  input: "text-[11px] font-bold text-emerald-700 dark:text-emerald-400"
+                                }}
                               />
                             </div>
 
-                            <button
-                              type="button"
-                              onClick={() => handleAppendSubmit(c.id)}
-                              disabled={isAppending || !appendName}
-                              className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold text-[10px] rounded-sm shadow-sm transition-all"
-                            >
-                              {isAppending ? "Summing Dates..." : "Confirm Mapped Order"}
-                            </button>
+                            <div className="flex gap-2">
+                              <Button
+                                onPress={() => handleAppendSubmit(c.id)}
+                                isDisabled={isAppending || !appendName}
+                                isLoading={isAppending}
+                                color="primary"
+                                radius="sm"
+                                className="h-[26px] px-3 font-bold text-[10px] shadow-sm"
+                              >
+                                {isAppending ? "Summing Dates..." : "Confirm Mapped Order"}
+                              </Button>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -638,54 +685,82 @@ function StreamActionModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-100">
-      <div className="w-full max-w-md bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-2xl overflow-hidden flex flex-col">
-        <div className={`px-5 py-3.5 border-b flex items-center justify-between ${
-          target.mode === "extend" ? "bg-indigo-50 dark:bg-indigo-950/50 border-indigo-100 dark:border-indigo-900/40" : "bg-red-50 dark:bg-red-950/50 border-red-100 dark:border-red-900/40"
-        }`}>
-          <h3 className={`text-xs font-bold uppercase tracking-wider ${
-            target.mode === "extend" ? "text-indigo-800 dark:text-indigo-300" : "text-red-800 dark:text-red-300"
-          }`}>
-            {target.mode === "extend" ? "Extend Coverage Lifecycle" : "Ban / Terminate Asset Stream"}
-          </h3>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600 font-bold text-xs">✕</button>
-        </div>
+    <Modal isOpen={true} onOpenChange={(open) => !open && onClose()} size="sm" classNames={{
+      base: "bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-2xl",
+      header: target.mode === "extend" ? "bg-indigo-50 dark:bg-indigo-950/50 border-b border-indigo-100 dark:border-indigo-900/40" : "bg-red-50 dark:bg-red-950/50 border-b border-red-100 dark:border-red-900/40",
+      body: "p-5 space-y-4",
+      footer: "pt-2 border-t border-slate-100 dark:border-slate-800"
+    }}>
+      <ModalContent>
+        {(onClose) => (
+          <form onSubmit={handleSubmit} className="flex flex-col h-full">
+            <ModalHeader className="flex flex-col gap-1">
+              <h3 className={`text-xs font-bold uppercase tracking-wider ${
+                target.mode === "extend" ? "text-indigo-800 dark:text-indigo-300" : "text-red-800 dark:text-red-300"
+              }`}>
+                {target.mode === "extend" ? "Extend Coverage Lifecycle" : "Ban / Terminate Asset Stream"}
+              </h3>
+            </ModalHeader>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Target Stream Asset</label>
-            <input type="text" readOnly value={target.productName} className="w-full h-[32px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none" />
-          </div>
+            <ModalBody>
+              <Input
+                label="Target Stream Asset"
+                isReadOnly
+                value={target.productName}
+                variant="faded"
+                radius="sm"
+                classNames={{
+                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 h-[34px]",
+                  label: "text-[10px] font-bold text-slate-400 uppercase",
+                  input: "text-xs font-bold text-slate-700 dark:text-slate-300"
+                }}
+              />
 
-          {target.mode === "extend" ? (
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Additional Duration (Days)</label>
-              <input type="number" required autoFocus min="1" value={days} onChange={(e) => setDays(e.target.value)} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:border-indigo-500 transition-colors" />
-              <div className="flex gap-1.5 mt-2">
-                {["7", "14", "30", "90"].map((d) => (
-                  <button key={d} type="button" onClick={() => setDays(d)} className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 text-[10px] font-bold text-slate-600 dark:text-slate-400 rounded-sm transition-colors">
-                    +{d}d
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Termination / Ban Reason</label>
-              <textarea required autoFocus rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Terms of Service breach" className="w-full p-2.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:border-red-500 transition-colors" />
-            </div>
-          )}
+              {target.mode === "extend" ? (
+                <div>
+                  <Input
+                    type="number"
+                    label="Additional Duration (Days)"
+                    isRequired
+                    autoFocus
+                    min={1}
+                    value={days}
+                    onValueChange={setDays}
+                    variant="faded"
+                    radius="sm"
+                    classNames={{
+                      inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                      label: "text-[10px] font-bold text-slate-400 uppercase",
+                      input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                    }}
+                  />
+                  <div className="flex gap-1.5 mt-2">
+                    {["7", "14", "30", "90"].map((d) => (
+                      <Button key={d} onPress={() => setDays(d)} variant="flat" size="sm" className="h-[20px] min-w-0 px-2 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-sm">
+                        +{d}d
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Termination / Ban Reason</label>
+                  <textarea required autoFocus rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Terms of Service breach" className="w-full p-2.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:border-red-500 transition-colors" />
+                </div>
+              )}
+            </ModalBody>
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <button type="button" onClick={onClose} className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold rounded-sm">Cancel</button>
-            <button type="submit" disabled={isPending} className={`px-4 py-1.5 text-white text-xs font-bold rounded-sm shadow-sm disabled:opacity-50 ${
-              target.mode === "extend" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-red-600 hover:bg-red-700"
-            }`}>
-              {isPending ? "Broadcasting..." : target.mode === "extend" ? "Confirm Extension" : "Enforce Ban"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+            <ModalFooter>
+              <Button variant="light" onPress={onClose} radius="sm" className="text-xs font-bold text-slate-600 dark:text-slate-400 h-[28px] min-h-0">
+                Cancel
+              </Button>
+              <Button type="submit" isLoading={isPending} color={target.mode === "extend" ? "primary" : "danger"} radius="sm" className="text-xs font-bold shadow-sm h-[28px] min-h-0">
+                {isPending ? "Broadcasting..." : target.mode === "extend" ? "Confirm Extension" : "Enforce Ban"}
+              </Button>
+            </ModalFooter>
+          </form>
+        )}
+      </ModalContent>
+    </Modal>
   );
 }

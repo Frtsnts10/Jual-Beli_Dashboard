@@ -26,7 +26,7 @@ export function SubscriptionClientPage({
 }: SubscriptionClientPageProps) {
   const { t } = useI18n();
   const [isPending, setIsPending] = useState(false);
-  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly" | "lifetime">("monthly");
+  const [billingInterval, setBillingInterval] = useState<"weekly" | "monthly" | "yearly" | "lifetime">("monthly");
 
   const handleUpgrade = async () => {
     setIsPending(true);
@@ -59,6 +59,13 @@ export function SubscriptionClientPage({
   };
 
   const pricingData = {
+    weekly: {
+      price: formatPrice(9),
+      suffix: t.subscription.workspaceWeek,
+      cta: t.subscription.ctaWeekly,
+      badge: "Starter Premium",
+      features: t.subscription.proFeatures.weekly
+    },
     monthly: {
       price: formatPrice(29),
       suffix: t.subscription.workspaceMonth,
@@ -158,6 +165,16 @@ export function SubscriptionClientPage({
           {/* Dynamic Pills Interval Selector Toggle */}
           <div className="flex justify-center mb-10">
             <div className="bg-slate-100 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800/80 p-1.5 rounded-xl flex gap-1 shadow-sm relative transition-all">
+              <button
+                onClick={() => setBillingInterval("weekly")}
+                className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                  billingInterval === "weekly"
+                    ? "bg-indigo-600 text-white shadow-sm scale-102"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                }`}
+              >
+                {t.subscription.weekly}
+              </button>
               <button
                 onClick={() => setBillingInterval("monthly")}
                 className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer ${

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { createComplaintAction } from "../actions/complaint-actions";
+import { Input, Select, SelectItem, Textarea, Button } from "@heroui/react";
 
 interface ComplaintFormProps {
   storeId: string;
@@ -46,59 +47,75 @@ export function ComplaintForm({ storeId }: ComplaintFormProps) {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Impacted Customer</label>
-          <input
-            name="customer_name"
-            type="text"
-            required
-            placeholder="John Smith"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Incident Title</label>
-          <input
-            name="title"
-            type="text"
-            required
-            placeholder="Package damage vectors detected"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Severity Priority</label>
-          <select
-            name="priority"
-            defaultValue="medium"
-            className="w-full h-[34px] px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          >
-            <option value="low">Low Severity</option>
-            <option value="medium">Medium Matrix</option>
-            <option value="high">Critical Telemetry Outage</option>
-          </select>
-        </div>
+        <Input
+          name="customer_name"
+          label="Impacted Customer"
+          isRequired
+          placeholder="John Smith"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+          }}
+        />
+        <Input
+          name="title"
+          label="Incident Title"
+          isRequired
+          placeholder="Package damage vectors detected"
+          variant="faded"
+          radius="sm"
+          classNames={{
+            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+          }}
+        />
+        <Select
+          name="priority"
+          label="Severity Priority"
+          defaultSelectedKeys={["medium"]}
+          variant="faded"
+          radius="sm"
+          classNames={{
+            trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
+            label: "text-[10px] font-bold text-slate-400 uppercase",
+            value: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+          }}
+        >
+          <SelectItem key="low">Low Severity</SelectItem>
+          <SelectItem key="medium">Medium Matrix</SelectItem>
+          <SelectItem key="high">Critical Telemetry Outage</SelectItem>
+        </Select>
       </div>
 
-      <div>
-        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Diagnostic Log Overview</label>
-        <textarea
-          name="description"
-          required
-          rows={3}
-          placeholder="Detailing physical stress conditions or unfulfilled client vectors..."
-          className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none transition-colors"
-        />
-      </div>
+      <Textarea
+        name="description"
+        label="Diagnostic Log Overview"
+        isRequired
+        minRows={3}
+        placeholder="Detailing physical stress conditions or unfulfilled client vectors..."
+        variant="faded"
+        radius="sm"
+        classNames={{
+          inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
+          label: "text-[10px] font-bold text-slate-400 uppercase",
+          input: "text-xs text-slate-800 dark:text-slate-100"
+        }}
+      />
 
       <div className="flex justify-end">
-        <button
+        <Button
           type="submit"
-          disabled={isPending}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 disabled:opacity-50 text-white text-xs font-bold rounded-sm shadow-sm transition-all"
+          isLoading={isPending}
+          color="primary"
+          radius="sm"
+          className="text-xs font-bold shadow-sm"
         >
           {isPending ? "Transmitting..." : "Append Support Event"}
-        </button>
+        </Button>
       </div>
     </form>
   );

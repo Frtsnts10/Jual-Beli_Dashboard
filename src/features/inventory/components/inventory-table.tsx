@@ -6,6 +6,7 @@ import { InventoryForm } from "./inventory-form";
 import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus, Package, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select, SelectItem, Button } from "@heroui/react";
 
 interface InventoryTableProps {
   storeId: string;
@@ -230,9 +231,8 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-sm border border-indigo-100/40 dark:border-indigo-900/40">
             {items.length} Total Inventory Shards
           </span>
-          <button
-            type="button"
-            onClick={() => {
+          <Button
+            onPress={() => {
               if (!isPremium && items.length >= 3) {
                 toast.error("Standard Tier Quota Exceeded! Please upgrade to Pro to add more items.", {
                   action: {
@@ -244,11 +244,13 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                 setIsCreateModalOpen(true);
               }
             }}
-            className="h-[38px] px-5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-sm text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
+            color="primary"
+            radius="sm"
+            className="h-[38px] px-5 text-xs font-bold shadow-md"
+            startContent={<Plus className="w-4 h-4" />}
           >
-            <Plus className="w-4 h-4" />
-            <span>Add Digital Inventory Row</span>
-          </button>
+            Add Digital Inventory Row
+          </Button>
         </div>
       </div>
 
@@ -274,29 +276,20 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
       )}
 
       {/* Dynamic Creation Modal Embed */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div 
-            className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-sm shadow-2xl relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => setIsCreateModalOpen(false)}
-              className="absolute top-4 right-4 z-10 w-7 h-7 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-sm flex items-center justify-center transition-colors text-base font-bold"
-            >
-              ×
-            </button>
-            <div className="pt-2">
-              <InventoryForm 
-                storeId={storeId} 
-                currency={currency} 
-                onSuccess={() => setIsCreateModalOpen(false)} 
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal isOpen={isCreateModalOpen} onOpenChange={(open) => setIsCreateModalOpen(open)} size="4xl" scrollBehavior="inside" classNames={{
+        base: "bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-sm shadow-2xl",
+        body: "p-0"
+      }}>
+        <ModalContent>
+          <ModalBody>
+            <InventoryForm 
+              storeId={storeId} 
+              currency={currency} 
+              onSuccess={() => setIsCreateModalOpen(false)} 
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
 
       {/* SECTION 1: Family Pools Hub (Grouped View) */}
       <div className="space-y-4">
@@ -310,22 +303,28 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => exportData(items.filter(i => !!i.group_name), "family_inventory_export.csv")}
-              className="h-[34px] px-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            <Button
+              onPress={() => exportData(items.filter(i => !!i.group_name), "family_inventory_export.csv")}
+              variant="bordered"
+              radius="sm"
+              className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+              startContent={<Download className="w-3.5 h-3.5" />}
             >
-              <Download className="w-3.5 h-3.5" /> Export
-            </button>
-            <label className="h-[34px] px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+              Export
+            </Button>
+            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all gap-1.5 cursor-pointer">
               <Upload className="w-3.5 h-3.5" /> Import
               <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
             </label>
-            <button
-              onClick={downloadProductTemplate}
-              className="h-[34px] px-3.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            <Button
+              onPress={downloadProductTemplate}
+              variant="flat"
+              radius="sm"
+              className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+              startContent={<Download className="w-3.5 h-3.5" />}
             >
-              <Download className="w-3.5 h-3.5" /> Template
-            </button>
+              Template
+            </Button>
           </div>
         </div>
 
@@ -504,22 +503,28 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => exportData(ungroupedItems, "solo_inventory_export.csv")}
-              className="h-[34px] px-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            <Button
+              onPress={() => exportData(ungroupedItems, "solo_inventory_export.csv")}
+              variant="bordered"
+              radius="sm"
+              className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+              startContent={<Download className="w-3.5 h-3.5" />}
             >
-              <Download className="w-3.5 h-3.5" /> Export
-            </button>
-            <label className="h-[34px] px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+              Export
+            </Button>
+            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all gap-1.5 cursor-pointer">
               <Upload className="w-3.5 h-3.5" /> Import
               <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
             </label>
-            <button
-              onClick={downloadProductTemplate}
-              className="h-[34px] px-3.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-sm text-xs font-bold transition-all flex items-center gap-1.5"
+            <Button
+              onPress={downloadProductTemplate}
+              variant="flat"
+              radius="sm"
+              className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+              startContent={<Download className="w-3.5 h-3.5" />}
             >
-              <Download className="w-3.5 h-3.5" /> Template
-            </button>
+              Template
+            </Button>
           </div>
         </div>
 
@@ -819,97 +824,209 @@ function EditInventoryModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-100">
-      <div className="w-full max-w-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="px-6 py-4 bg-slate-50 dark:bg-[#0b0f19] border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-            Edit Asset Variant Profile
-          </h3>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
-        </div>
+    <Modal isOpen={true} onOpenChange={(open) => !open && onClose()} size="2xl" scrollBehavior="inside" classNames={{
+      base: "bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-2xl",
+      header: "bg-slate-50 dark:bg-[#0b0f19] border-b border-slate-100 dark:border-slate-800",
+      body: "p-6 space-y-4"
+    }}>
+      <ModalContent>
+        {(onClose) => (
+          <form onSubmit={handleSubmit} className="flex flex-col h-full">
+            <ModalHeader className="flex flex-col gap-1">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                Edit Asset Variant Profile
+              </h3>
+            </ModalHeader>
+            <ModalBody>
+              {error && <div className="p-2 text-xs bg-red-50 text-red-600 rounded font-bold">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4">
-          {error && <div className="p-2 text-xs bg-red-50 text-red-600 rounded font-bold">{error}</div>}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Input
+                  label="Product Name"
+                  isRequired
+                  value={name}
+                  onValueChange={handleNameChange}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                  }}
+                />
+                <Select
+                  label="Tier Variant"
+                  selectedKeys={[profileTier]}
+                  onChange={(e) => setProfileTier(e.target.value)}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    value: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+                  }}
+                >
+                  {tierOptions.map((opt) => (
+                    <SelectItem key={opt}>{opt}</SelectItem>
+                  ))}
+                </Select>
+                <Input
+                  label="Designation"
+                  value={profileName}
+                  onValueChange={setProfileName}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+                  }}
+                />
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Product Name</label>
-              <input type="text" required value={name} onChange={handleNameChange} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none transition-colors" />
-            </div>
-            <div className="flex flex-col justify-end w-full">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tier Variant</label>
-              <select
-                value={profileTier}
-                onChange={(e) => setProfileTier(e.target.value)}
-                className="w-full h-[34px] px-2.5 py-1 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-              >
-                {tierOptions.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Designation</label>
-              <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none transition-colors" />
-            </div>
-          </div>
+              <Input
+                label="Family Pool String"
+                placeholder="Leave empty for Independent Asset status"
+                value={groupName}
+                onValueChange={setGroupName}
+                variant="faded"
+                radius="sm"
+                classNames={{
+                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                  label: "text-[10px] font-bold text-slate-400 uppercase",
+                  input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+                }}
+              />
 
-          <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Family Pool String</label>
-            <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Leave empty for Independent Asset status" className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none transition-colors" />
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <Input
+                  type="email"
+                  label="Email"
+                  value={email}
+                  onValueChange={setEmail}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    input: "text-xs text-slate-800 dark:text-slate-100"
+                  }}
+                />
+                <Input
+                  type="text"
+                  label="Password"
+                  value={password}
+                  onValueChange={setPassword}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    input: "text-xs font-mono text-slate-800 dark:text-slate-100"
+                  }}
+                />
+                <Input
+                  type="text"
+                  label="PIN"
+                  value={pin}
+                  onValueChange={setPin}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    input: "text-xs font-mono text-slate-800 dark:text-slate-100"
+                  }}
+                />
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Password</label>
-              <input type="text" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-mono text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">PIN</label>
-              <input type="text" value={pin} onChange={(e) => setPin(e.target.value)} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-mono text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none transition-colors" />
-            </div>
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  label={`Base Price (${currency})`}
+                  value={basePriceStr}
+                  onValueChange={setBasePriceStr}
+                  onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                  }}
+                />
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  label={`Selling Price (${currency})`}
+                  isRequired
+                  value={sellingPriceStr}
+                  onValueChange={setSellingPriceStr}
+                  onBlur={() => handlePriceBlur(setSellingPriceStr, sellingPriceStr)}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    inputWrapper: "bg-indigo-50/30 dark:bg-indigo-950/20 border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    input: "text-xs font-bold text-indigo-900 dark:text-indigo-300"
+                  }}
+                />
+                <Input
+                  type="number"
+                  label="Stock"
+                  value={stock}
+                  onValueChange={setStock}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+                  }}
+                />
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Base Price ({currency})</label>
-              <input type="text" inputMode="decimal" value={basePriceStr} onChange={(e) => setBasePriceStr(e.target.value)} onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Selling Price ({currency})</label>
-              <input type="text" inputMode="decimal" required value={sellingPriceStr} onChange={(e) => setSellingPriceStr(e.target.value)} onBlur={() => handlePriceBlur(setSellingPriceStr, sellingPriceStr)} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-indigo-900 dark:text-indigo-300 bg-indigo-50/30 dark:bg-indigo-950/20 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Stock</label>
-              <input type="number" value={stock} onChange={(e) => setStock(e.target.value)} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none transition-colors" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Date Buy</label>
-              <input type="date" value={dateBuy} onChange={(e) => setDateBuy(e.target.value)} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Date Expired</label>
-              <input type="date" value={dateExpired} onChange={(e) => setDateExpired(e.target.value)} className="w-full h-[34px] px-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none transition-colors" />
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-sm">Cancel</button>
-            <button type="submit" disabled={isPending} className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold rounded-sm shadow-md">
-              {isPending ? "Broadcasting Updates..." : "Save Variant Profile"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <Input
+                  type="date"
+                  label="Date Buy"
+                  value={dateBuy}
+                  onValueChange={setDateBuy}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    input: "text-xs text-slate-800 dark:text-slate-100"
+                  }}
+                />
+                <Input
+                  type="date"
+                  label="Date Expired"
+                  value={dateExpired}
+                  onValueChange={setDateExpired}
+                  variant="faded"
+                  radius="sm"
+                  classNames={{
+                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+                    label: "text-[10px] font-bold text-slate-400 uppercase",
+                    input: "text-xs text-slate-800 dark:text-slate-100"
+                  }}
+                />
+              </div>
+            </ModalBody>
+            <ModalFooter className="border-t border-slate-100 dark:border-slate-800">
+              <Button variant="light" onPress={onClose} radius="sm" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Cancel
+              </Button>
+              <Button type="submit" isLoading={isPending} color="primary" radius="sm" className="text-xs font-bold shadow-md">
+                {isPending ? "Broadcasting Updates..." : "Save Variant Profile"}
+              </Button>
+            </ModalFooter>
+          </form>
+        )}
+      </ModalContent>
+    </Modal>
   );
 }

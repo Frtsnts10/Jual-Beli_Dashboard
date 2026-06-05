@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Menu } from "lucide-react";
+import { Button } from "@heroui/react";
 
 export function MobileNavTrigger() {
   const triggerToggle = () => {
@@ -9,13 +10,15 @@ export function MobileNavTrigger() {
   };
 
   return (
-    <button
-      onClick={triggerToggle}
-      type="button"
+    <Button
+      isIconOnly
+      onPress={triggerToggle}
+      variant="light"
       aria-label="Open navigation menu"
-      className="md:hidden p-2 rounded-sm text-slate-500 dark:text-slate-400 hover:bg-slate-150 dark:hover:bg-slate-800/80 transition-all active:scale-95 flex items-center justify-center cursor-pointer -ml-1 mr-1"
+      className="md:hidden text-slate-500 dark:text-slate-400"
+      radius="sm"
     >
       <Menu className="w-5 h-5" />
-    </button>
+    </Button>
   );
 }

@@ -10,6 +10,7 @@ export function useI18n() {
     // Read initial language on mount
     const savedLang = (localStorage.getItem("dashboard-language") || "id") as Language;
     if (dictionaries[savedLang]) {
+      // eslint-disable-next-line
       setLang(savedLang);
     }
 

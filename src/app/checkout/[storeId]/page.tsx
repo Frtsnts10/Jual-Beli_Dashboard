@@ -43,6 +43,13 @@ export default async function SimulatedXenditCheckoutPage({
   };
 
   const billingInfo = {
+    weekly: {
+      price: formatPrice(9),
+      description: currency.toUpperCase() === "IDR" ? "Ditagih per minggu kalender aktif" : "Billed per active calendar week",
+      mode: currency.toUpperCase() === "IDR" ? "Mingguan" : "Weekly",
+      days: 7,
+      planName: currency.toUpperCase() === "IDR" ? "Shop Dashboard Pro (Mingguan)" : "Shop Dashboard Pro (Weekly)",
+    },
     monthly: {
       price: formatPrice(29),
       description: currency.toUpperCase() === "IDR" ? "Ditagih per siklus kalender aktif" : "Billed per active calendar cycle",
@@ -64,7 +71,7 @@ export default async function SimulatedXenditCheckoutPage({
       days: null as number | null,
       planName: currency.toUpperCase() === "IDR" ? "Shop Dashboard Pro (Lifetime)" : "Shop Dashboard Pro (Lifetime)",
     }
-  }[interval as "monthly" | "yearly" | "lifetime"] || {
+  }[interval as "weekly" | "monthly" | "yearly" | "lifetime"] || {
     price: formatPrice(29),
     description: currency.toUpperCase() === "IDR" ? "Ditagih per siklus kalender aktif" : "Billed per active calendar cycle",
     mode: currency.toUpperCase() === "IDR" ? "Bulanan" : "Monthly",

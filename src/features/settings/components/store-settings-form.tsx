@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
+import { Input, Select, SelectItem, Button } from "@heroui/react";
 import { Save, AlertOctagon, Image as ImageIcon, Globe, Upload, Sun, Moon, Monitor } from "lucide-react";
 import { updateStoreSettingsAction, deleteStoreAction } from "../actions/settings-actions";
 import { useI18n } from "@/hooks/use-i18n";
@@ -34,27 +35,14 @@ export function StoreSettingsForm({
   // Client preview and storage states
   const [logoPreview, setLogoPreview] = useState(initialLogo);
   const [currency, setCurrency] = useState(initialCurrency);
-  const [activeTheme, setActiveTheme] = useState("system");
-  
   const { t, changeLanguage, lang } = useI18n();
 
   useEffect(() => {
-    const theme = localStorage.getItem("theme") || "system";
-    setActiveTheme(theme);
+    // Only language effects if needed
   }, []);
 
   const handleLanguageChange = (val: string) => {
     changeLanguage(val as Language);
-  };
-
-  const handleThemeChange = (themeName: string) => {
-    setActiveTheme(themeName);
-    localStorage.setItem("theme", themeName);
-    if (themeName === "dark" || (themeName === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,7 +124,7 @@ export function StoreSettingsForm({
     <div className="h-full flex flex-col justify-between space-y-6 font-sans">
       <form
         onSubmit={handleSubmit}
-        className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-xl border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
+        className="h-full flex flex-col p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-xl border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
       >
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{t.settings.tenantTitle}</h3>
@@ -160,12 +148,15 @@ export function StoreSettingsForm({
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               {t.settings.labelWorkspaceName}
             </label>
-            <input
+            <Input
               name="name"
-              type="text"
-              required
+              isRequired
               defaultValue={initialName}
-              className="w-full h-9 px-3.5 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              radius="sm"
+              classNames={{
+                inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
+                input: "text-xs font-bold text-slate-800 dark:text-slate-100",
+              }}
             />
           </div>
 
@@ -173,47 +164,59 @@ export function StoreSettingsForm({
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
               <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelGlobalCurrency}
             </label>
-            <select
-              value={currency}
+            <Select
+              selectedKeys={[currency]}
               onChange={(e) => setCurrency(e.target.value)}
-              className="w-full h-9 px-3.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              radius="sm"
+              classNames={{
+                trigger: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] shadow-none min-h-[36px] h-9",
+                value: "text-xs font-bold text-slate-800 dark:text-slate-100",
+              }}
             >
               {currencies.map((c) => (
-                <option key={c.code} value={c.code}>
+                <SelectItem key={c.code}>
                   {c.code} ({c.symbol}) — {c.name}
-                </option>
+                </SelectItem>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div className="space-y-1.5">
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
               <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelLanguage}
             </label>
-            <select
-              value={lang}
+            <Select
+              selectedKeys={[lang]}
               onChange={(e) => handleLanguageChange(e.target.value)}
-              className="w-full h-9 px-3.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors cursor-pointer"
+              radius="sm"
+              classNames={{
+                trigger: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] shadow-none min-h-[36px] h-9",
+                value: "text-xs font-bold text-slate-800 dark:text-slate-100",
+              }}
             >
-              <option value="id">🇮🇩 Bahasa Indonesia</option>
-              <option value="en">🇺🇸 English</option>
-              <option value="es">🇪🇸 Español</option>
-              <option value="fr">🇫🇷 Français</option>
-              <option value="de">🇩🇪 Deutsch</option>
-              <option value="ja">🇯🇵 日本語</option>
-              <option value="zh">🇨🇳 中文</option>
-            </select>
+              <SelectItem key="id">🇮🇩 Bahasa Indonesia</SelectItem>
+              <SelectItem key="en">🇺🇸 English</SelectItem>
+              <SelectItem key="es">🇪🇸 Español</SelectItem>
+              <SelectItem key="fr">🇫🇷 Français</SelectItem>
+              <SelectItem key="de">🇩🇪 Deutsch</SelectItem>
+              <SelectItem key="ja">🇯🇵 日本語</SelectItem>
+              <SelectItem key="zh">🇨🇳 中文</SelectItem>
+            </Select>
           </div>
 
           <div className="space-y-1.5">
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               {t.settings.labelStoreEmail}
             </label>
-            <input
+            <Input
               name="email"
               type="email"
               defaultValue={initialEmail}
-              className="w-full h-9 px-3.5 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              radius="sm"
+              classNames={{
+                inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
+                input: "text-xs font-bold text-slate-800 dark:text-slate-100",
+              }}
             />
           </div>
 
@@ -221,23 +224,29 @@ export function StoreSettingsForm({
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               {t.settings.labelWhatsapp}
             </label>
-            <input
+            <Input
               name="whatsapp"
-              type="text"
               defaultValue={initialWhatsapp}
-              className="w-full h-9 px-3.5 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              radius="sm"
+              classNames={{
+                inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
+                input: "text-xs font-bold text-slate-800 dark:text-slate-100",
+              }}
             />
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
+          <div className="space-y-1.5">
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               {t.settings.labelInstagram}
             </label>
-            <input
+            <Input
               name="instagram"
-              type="text"
               defaultValue={initialInstagram}
-              className="w-full h-9 px-3.5 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              radius="sm"
+              classNames={{
+                inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
+                input: "text-xs font-bold text-slate-800 dark:text-slate-100",
+              }}
             />
           </div>
         </div>
@@ -264,65 +273,19 @@ export function StoreSettingsForm({
           </div>
         </div>
 
-        <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
-          <button
+        <div className="mt-auto flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
+          <Button
             type="submit"
-            disabled={isPending}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-sm transition-all cursor-pointer"
+            isLoading={isPending}
+            color="primary"
+            radius="sm"
+            startContent={!isPending && <Save className="w-3.5 h-3.5" />}
+            className="text-xs font-bold shadow-sm px-4 h-9"
           >
-            <Save className="w-3.5 h-3.5" />
             {isPending ? t.settings.btnSavingSettings : t.settings.btnSaveSettings}
-          </button>
+          </Button>
         </div>
       </form>
-
-      <div className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-xl border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-3 transition-colors">
-        <div>
-          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-            <Monitor className="w-4 h-4 text-indigo-500" /> {t.settings.appearanceTitle}
-          </h3>
-          <p className="text-xs text-slate-500 mt-0.5">{t.settings.appearanceSubtitle}</p>
-        </div>
-
-        <div className="inline-flex p-1 bg-slate-100 dark:bg-[#0b0f19] rounded-xl border border-slate-200/80 dark:border-slate-800 gap-1 text-xs font-bold">
-          <button
-            type="button"
-            onClick={() => handleThemeChange("system")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-              activeTheme === "system"
-                ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
-            }`}
-          >
-            <Monitor className="w-3.5 h-3.5" />
-            <span>{t.settings.themeSystem}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleThemeChange("light")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-              activeTheme === "light"
-                ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
-            }`}
-          >
-            <Sun className="w-3.5 h-3.5" />
-            <span>{t.settings.themeLight}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleThemeChange("dark")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-              activeTheme === "dark"
-                ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
-            }`}
-          >
-            <Moon className="w-3.5 h-3.5" />
-            <span>{t.settings.themeDark}</span>
-          </button>
-        </div>
-      </div>
 
       {!hideDangerPanel && (
         <DangerZonePanel storeId={storeId} />
@@ -355,15 +318,95 @@ export function DangerZonePanel({ storeId }: { storeId: string }) {
         {t.settings.dangerDesc}
       </p>
       <div>
-        <button
+        <Button
           type="button"
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 active:scale-95 disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-sm transition-all cursor-pointer"
+          onPress={handleDelete}
+          isLoading={isDeleting}
+          color="danger"
+          radius="sm"
+          className="text-xs font-bold shadow-sm px-4 h-9"
         >
           {isDeleting ? t.settings.btnPurging : t.settings.btnPurge}
-        </button>
+        </Button>
       </div>
     </div>
   );
 }
+
+export function AppearanceSettingsPanel() {
+  const [activeTheme, setActiveTheme] = useState("system");
+  const { t } = useI18n();
+
+  useEffect(() => {
+    const theme = localStorage.getItem("theme") || "system";
+    // eslint-disable-next-line
+    setActiveTheme(theme);
+  }, []);
+
+  const handleThemeChange = (themeName: string) => {
+    setActiveTheme(themeName);
+    localStorage.setItem("theme", themeName);
+    if (themeName === "dark" || (themeName === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
+  return (
+    <div className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-xl border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-3 transition-colors">
+      <div>
+        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+          <Monitor className="w-4 h-4 text-indigo-500" /> {t.settings.appearanceTitle}
+        </h3>
+        <p className="text-xs text-slate-500 mt-0.5">{t.settings.appearanceSubtitle}</p>
+      </div>
+
+      <div className="inline-flex p-1 bg-slate-100 dark:bg-[#0b0f19] rounded-xl border border-slate-200/80 dark:border-slate-800 gap-1 text-xs font-bold w-full">
+        <Button
+          type="button"
+          onPress={() => handleThemeChange("system")}
+          radius="sm"
+          variant={activeTheme === "system" ? "solid" : "light"}
+          className={`flex-1 flex items-center justify-center gap-1.5 h-8 ${
+            activeTheme === "system"
+              ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm"
+              : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
+          }`}
+        >
+          <Monitor className="w-3.5 h-3.5" />
+          <span>{t.settings.themeSystem}</span>
+        </Button>
+        <Button
+          type="button"
+          onPress={() => handleThemeChange("light")}
+          radius="sm"
+          variant={activeTheme === "light" ? "solid" : "light"}
+          className={`flex-1 flex items-center justify-center gap-1.5 h-8 ${
+            activeTheme === "light"
+              ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm"
+              : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
+          }`}
+        >
+          <Sun className="w-3.5 h-3.5" />
+          <span>{t.settings.themeLight}</span>
+        </Button>
+        <Button
+          type="button"
+          onPress={() => handleThemeChange("dark")}
+          radius="sm"
+          variant={activeTheme === "dark" ? "solid" : "light"}
+          className={`flex-1 flex items-center justify-center gap-1.5 h-8 ${
+            activeTheme === "dark"
+              ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm"
+              : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
+          }`}
+        >
+          <Moon className="w-3.5 h-3.5" />
+          <span>{t.settings.themeDark}</span>
+        </Button>
+      </div>
+    </div>
+  );
+}
+

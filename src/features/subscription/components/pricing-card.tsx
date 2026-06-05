@@ -12,7 +12,7 @@ interface PricingCardProps {
 
 export function PricingCard({ storeId, isSubscribed, currency = "USD" }: PricingCardProps) {
   const [isPending, setIsPending] = useState(false);
-  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly" | "lifetime">("monthly");
+  const [billingInterval, setBillingInterval] = useState<"weekly" | "monthly" | "yearly" | "lifetime">("monthly");
 
   const handleUpgrade = async () => {
     setIsPending(true);
@@ -45,6 +45,17 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
   };
 
   const pricingData = {
+    weekly: {
+      price: formatPrice(9),
+      suffix: currency.toUpperCase() === "IDR" ? " / workspace minggu" : " / workspace week",
+      cta: "Upgrade Weekly Shard",
+      badge: "Starter Premium",
+      features: [
+        "Unlimited Store Shards",
+        "Advanced @tanstack/react-table telemetry grids",
+        "Instant Stripe SLA automatic bindings",
+      ]
+    },
     monthly: {
       price: formatPrice(29),
       suffix: currency.toUpperCase() === "IDR" ? " / workspace bulan" : " / workspace month",
@@ -95,6 +106,16 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
       {/* Dynamic Pills Interval Selector Toggle */}
       <div className="flex justify-center mb-10">
         <div className="bg-slate-100 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800/80 p-1 rounded-sm flex gap-1 shadow-sm relative transition-all">
+          <button
+            onClick={() => setBillingInterval("weekly")}
+            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
+              billingInterval === "weekly"
+                ? "bg-indigo-600 text-white shadow-sm scale-102"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
+          >
+            Weekly
+          </button>
           <button
             onClick={() => setBillingInterval("monthly")}
             className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-sm transition-all cursor-pointer ${

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Shield, Loader2, ArrowLeft, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Input, Button } from "@heroui/react";
 
 export default function VerifyMfaPage() {
   const [otpCode, setOtpCode] = useState("");
@@ -54,40 +55,37 @@ export default function VerifyMfaPage() {
             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">
               6-Digit Secure Code
             </label>
-            <input
+            <Input
               type="text"
               maxLength={6}
               autoFocus
               placeholder="000 000"
               value={otpCode}
-              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-              className="w-full h-14 bg-black/40 border border-white/5 rounded-2xl text-2xl font-mono tracking-[0.5em] text-center text-white placeholder:text-white/5 focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all"
+              onValueChange={(val) => setOtpCode(val.replace(/\D/g, ""))}
+              classNames={{
+                inputWrapper: "h-14 bg-black/40 border border-white/5 rounded-2xl hover:border-emerald-500/50 data-[focus=true]:border-emerald-500/50",
+                input: "text-2xl font-mono tracking-[0.5em] text-center text-white placeholder:text-white/5"
+              }}
             />
           </div>
 
-          <button
+          <Button
             type="submit"
-            disabled={isPending || otpCode.length !== 6}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-30 disabled:grayscale"
+            isDisabled={otpCode.length !== 6}
+            isLoading={isPending}
+            className="w-full h-14 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20"
           >
-            {isPending ? (
-              <div className="flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Verifying Secure Layer...</span>
-              </div>
-            ) : (
-              "Confirm Identity"
-            )}
-          </button>
+            {isPending ? "Verifying Secure Layer..." : "Confirm Identity"}
+          </Button>
 
-          <button
-            type="button"
-            onClick={() => router.push("/sign-in")}
+          <Button
+            variant="light"
+            onPress={() => router.push("/sign-in")}
             className="w-full text-[11px] text-slate-500 hover:text-white transition-colors flex items-center justify-center gap-2 font-bold"
           >
             <ArrowLeft className="w-3 h-3" />
             Back to Sign In
-          </button>
+          </Button>
         </form>
       </div>
     </div>

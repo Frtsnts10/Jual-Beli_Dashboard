@@ -1,7 +1,7 @@
 import React from "react";
 import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
 import { redirect } from "next/navigation";
-import { StoreSettingsForm, DangerZonePanel } from "@/features/settings/components/store-settings-form";
+import { StoreSettingsForm, DangerZonePanel, AppearanceSettingsPanel } from "@/features/settings/components/store-settings-form";
 import { EditProfileForm } from "@/features/auth/components/edit-profile-form";
 import { SettingsHeader } from "@/features/settings/components/settings-header";
 
@@ -28,16 +28,18 @@ export default async function TenantSettingsPage({
       <SettingsHeader />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch animate-in fade-in duration-300">
-        {/* Left Column: Principal Authentication & Profile Desk */}
-        <div className="h-full">
+        {/* Left Column: Principal Authentication, Profile Desk, Appearance, and Danger Zone */}
+        <div className="flex flex-col gap-6 h-full">
           <EditProfileForm
             initialName={initialName}
             initialEmail={initialEmail}
           />
+          <AppearanceSettingsPanel />
+          <DangerZonePanel storeId={storeId} />
         </div>
 
-        {/* Right Column: Tenant Domain Configurations & Danger Area Stacked */}
-        <div className="flex flex-col justify-between gap-6 h-full">
+        {/* Right Column: Tenant Domain Configurations */}
+        <div className="flex flex-col gap-6 h-full">
           <div className="flex-1">
             <StoreSettingsForm 
               storeId={storeId} 
@@ -49,10 +51,6 @@ export default async function TenantSettingsPage({
               initialWhatsapp={store.whatsapp || ""}
               hideDangerPanel
             />
-          </div>
-
-          <div className="shrink-0">
-            <DangerZonePanel storeId={storeId} />
           </div>
         </div>
       </div>

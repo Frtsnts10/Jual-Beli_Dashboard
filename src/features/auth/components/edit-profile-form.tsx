@@ -4,6 +4,7 @@ import React, { useTransition, useState } from "react";
 import { User, Mail, Shield, CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import { updateProfileAction } from "../actions/update-profile-action";
 import { useI18n } from "@/hooks/use-i18n";
+import { Input, Button } from "@heroui/react";
 
 export function EditProfileForm({
   initialName,
@@ -69,52 +70,48 @@ export function EditProfileForm({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                {t.profile.labelFullName}
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <User className="w-3.5 h-3.5" />
-                </span>
-                <input
-                  type="text"
-                  name="fullName"
-                  defaultValue={initialName}
-                  required
-                  className="w-full h-[34px] pl-9 pr-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:border-indigo-500 transition-colors"
-                />
-              </div>
-            </div>
+              <Input
+                name="fullName"
+                label={t.profile.labelFullName}
+                defaultValue={initialName}
+                isRequired
+                startContent={<User className="w-3.5 h-3.5 text-slate-400" />}
+                variant="faded"
+                radius="sm"
+                classNames={{
+                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
+                  label: "text-[10px] font-bold text-slate-400 uppercase tracking-wider",
+                  input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                }}
+              />
 
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                {t.profile.labelAuthEmail}
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <Mail className="w-3.5 h-3.5" />
-                </span>
-                <input
-                  type="email"
-                  name="email"
-                  defaultValue={initialEmail}
-                  required
-                  className="w-full h-[34px] pl-9 pr-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:border-indigo-500 transition-colors"
-                />
-              </div>
-            </div>
+              <Input
+                type="email"
+                name="email"
+                label={t.profile.labelAuthEmail}
+                defaultValue={initialEmail}
+                isRequired
+                startContent={<Mail className="w-3.5 h-3.5 text-slate-400" />}
+                variant="faded"
+                radius="sm"
+                classNames={{
+                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
+                  label: "text-[10px] font-bold text-slate-400 uppercase tracking-wider",
+                  input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                }}
+              />
           </div>
 
           <div className="flex justify-end pt-2">
-            <button
+            <Button
               type="submit"
-              disabled={isPending}
-              className="h-[38px] px-6 bg-indigo-600 hover:bg-indigo-700 active:scale-95 disabled:opacity-50 text-white text-[13px] font-bold rounded-sm shadow-md transition-all flex items-center gap-2 cursor-pointer"
+              isLoading={isPending}
+              color="primary"
+              radius="sm"
+              className="text-[13px] font-bold shadow-md px-6 h-[38px]"
             >
-              {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>{isPending ? t.profile.btnApplyingProfile : t.profile.btnApplyProfile}</span>
-            </button>
+              {isPending ? t.profile.btnApplyingProfile : t.profile.btnApplyProfile}
+            </Button>
           </div>
         </form>
       </div>

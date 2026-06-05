@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Input, Button } from "@heroui/react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 
@@ -71,34 +72,46 @@ export default function NativeSignInPage() {
         )}
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1.5">Email Address</label>
-          <input
+          <Input
             type="email"
             name="email"
-            required
+            label="Email Address"
+            isRequired
             placeholder="admin@premium-storefronts.com"
-            className="w-full h-11 px-4 bg-black/40 border border-white/10 rounded-xl text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+            variant="faded"
+            classNames={{
+              inputWrapper: "bg-black/40 border-white/10 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 data-[focus=true]:bg-black/60",
+              input: "text-white placeholder:text-slate-500",
+              label: "text-slate-300"
+            }}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
-          <input
+          <Input
             type="password"
             name="password"
-            required
+            label="Password"
+            isRequired
             placeholder="••••••••••••"
-            className="w-full h-11 px-4 bg-black/40 border border-white/10 rounded-xl text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+            variant="faded"
+            classNames={{
+              inputWrapper: "bg-black/40 border-white/10 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 data-[focus=true]:bg-black/60",
+              input: "text-white placeholder:text-slate-500",
+              label: "text-slate-300"
+            }}
           />
         </div>
 
-        <button
+        <Button
           type="submit"
-          disabled={isPending}
-          className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold text-sm shadow-md shadow-indigo-500/10 hover:shadow-lg hover:shadow-indigo-500/20 hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer"
+          isLoading={isPending}
+          className="w-full mt-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold shadow-md shadow-indigo-500/10 hover:shadow-lg hover:shadow-indigo-500/20"
+          size="lg"
+          radius="md"
         >
           {isPending ? "Authenticating..." : "Sign In"}
-        </button>
+        </Button>
       </form>
 
       <div className="mt-6 pt-6 border-t border-white/10 text-center">

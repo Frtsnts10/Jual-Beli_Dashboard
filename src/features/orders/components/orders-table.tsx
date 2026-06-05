@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Input, Select, SelectItem, Button } from "@heroui/react";
 
 interface OrdersTableProps {
   storeId: string;
@@ -136,38 +137,54 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 flex-1 max-w-4xl">
-          <input
+          <Input
             type="text"
             placeholder="Search by customer or order ID..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-3 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-medium text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-[#121929] focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all placeholder-slate-400 dark:placeholder-slate-500 sm:col-span-2"
+            onValueChange={setSearchTerm}
+            variant="faded"
+            radius="sm"
+            className="sm:col-span-2"
+            classNames={{
+              inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+              input: "text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500"
+            }}
           />
 
-          <select
+          <Select
             aria-label="Payment Status Filter"
-            value={paymentFilter}
+            selectedKeys={[paymentFilter]}
             onChange={(e) => setPaymentFilter(e.target.value)}
-            className="px-2 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-700 dark:text-slate-300 focus:bg-white focus:outline-none"
+            variant="faded"
+            radius="sm"
+            classNames={{
+              trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
+              value: "text-xs font-bold text-slate-700 dark:text-slate-300"
+            }}
           >
-            <option value="all">Payment: All</option>
-            <option value="pending">Pending</option>
-            <option value="paid">Paid</option>
-            <option value="failed">Failed</option>
-            <option value="refunded">Refunded</option>
-          </select>
+            <SelectItem key="all">Payment: All</SelectItem>
+            <SelectItem key="pending">Pending</SelectItem>
+            <SelectItem key="paid">Paid</SelectItem>
+            <SelectItem key="failed">Failed</SelectItem>
+            <SelectItem key="refunded">Refunded</SelectItem>
+          </Select>
 
-          <select
+          <Select
             aria-label="Fulfillment Status Filter"
-            value={fulfillmentFilter}
+            selectedKeys={[fulfillmentFilter]}
             onChange={(e) => setFulfillmentFilter(e.target.value)}
-            className="px-2 py-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs font-bold text-slate-700 dark:text-slate-300 focus:bg-white focus:outline-none"
+            variant="faded"
+            radius="sm"
+            classNames={{
+              trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
+              value: "text-xs font-bold text-slate-700 dark:text-slate-300"
+            }}
           >
-            <option value="all">Fulfill: All</option>
-            <option value="pending">Pending</option>
-            <option value="fulfilled">Fulfilled</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+            <SelectItem key="all">Fulfill: All</SelectItem>
+            <SelectItem key="pending">Pending</SelectItem>
+            <SelectItem key="fulfilled">Fulfilled</SelectItem>
+            <SelectItem key="cancelled">Cancelled</SelectItem>
+          </Select>
         </div>
       </div>
 
@@ -260,17 +277,16 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                       {/* Fulfillment Control Column */}
                       <td className="px-5 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => setExpandedOrderId(isExpanded ? null : o.id)}
-                            className={`h-[32px] px-3.5 rounded-sm text-xs font-bold border transition-all flex items-center gap-1.5 active:scale-95 ${
-                              isExpanded 
-                                ? "bg-indigo-50 dark:bg-indigo-950 border-indigo-200/60 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400"
-                                : "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                            }`}
+                          <Button
+                            onPress={() => setExpandedOrderId(isExpanded ? null : o.id)}
+                            variant={isExpanded ? "flat" : "bordered"}
+                            color={isExpanded ? "primary" : "default"}
+                            radius="sm"
+                            className="h-[32px] px-3.5 text-xs font-bold shadow-sm"
+                            startContent={<Eye className="w-3.5 h-3.5" />}
                           >
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>{isExpanded ? "Collapse Shards" : "Inspect Fulfillment"}</span>
-                          </button>
+                            {isExpanded ? "Collapse Shards" : "Inspect Fulfillment"}
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -286,22 +302,27 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                               </h4>
                               <div className="flex items-center gap-2">
                                 <span className="text-[10px] text-slate-500">Quick Change Order Status:</span>
-                                <select
+                                <Select
                                   aria-label="Change Order Status Quick Actions"
-                                  value=""
+                                  placeholder="-- Actions --"
                                   onChange={(e) => {
                                     if (e.target.value === "") return;
                                     const [p, f] = e.target.value.split("_");
                                     handleUpdateStatus(o.id, p, f);
                                   }}
-                                  disabled={isUpdating}
-                                  className="px-2 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold rounded-sm text-slate-700 dark:text-slate-300 focus:outline-none"
+                                  isDisabled={isUpdating}
+                                  variant="faded"
+                                  radius="sm"
+                                  className="w-[180px]"
+                                  classNames={{
+                                    trigger: "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-[28px] min-h-0",
+                                    value: "text-[10px] font-bold text-slate-700 dark:text-slate-300"
+                                  }}
                                 >
-                                  <option value="">-- Actions --</option>
-                                  <option value="paid_fulfilled">Mark Paid & Fulfilled</option>
-                                  <option value="paid_pending">Mark Paid & Pending</option>
-                                  <option value="refunded_cancelled">Cancel & Refund Order</option>
-                                </select>
+                                  <SelectItem key="paid_fulfilled">Mark Paid & Fulfilled</SelectItem>
+                                  <SelectItem key="paid_pending">Mark Paid & Pending</SelectItem>
+                                  <SelectItem key="refunded_cancelled">Cancel & Refund Order</SelectItem>
+                                </Select>
                                 {isUpdating && <Loader2 className="w-3 h-3 animate-spin text-indigo-500" />}
                               </div>
                             </div>
@@ -387,35 +408,37 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                         <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2.5 text-left">
                                           {matchingUnassignedSlots.length > 0 ? (
                                             <>
-                                              <div className="flex-1 flex flex-col">
+                                              <div className="flex-1 flex flex-col min-w-[200px]">
                                                 <label className="text-[9px] font-bold text-slate-400 uppercase mb-0.5">Select Digital Warehouse Shard Slot</label>
-                                                <select
+                                                <Select
                                                   aria-label="Select Digital Warehouse Shard Slot for Fulfillment"
-                                                  value={selectedSlots[slotKey] || ""}
+                                                  selectedKeys={selectedSlots[slotKey] ? [selectedSlots[slotKey]] : []}
                                                   onChange={(e) => setSelectedSlots(prev => ({ ...prev, [slotKey]: e.target.value }))}
-                                                  className="w-full h-[32px] px-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-[11px] font-medium text-slate-800 dark:text-slate-200 focus:outline-none"
+                                                  variant="faded"
+                                                  radius="sm"
+                                                  classNames={{
+                                                    trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[32px] min-h-0",
+                                                    value: "text-[11px] font-medium text-slate-800 dark:text-slate-200"
+                                                  }}
                                                 >
-                                                  <option value="">-- Choose Slot Account ({matchingUnassignedSlots.length} available) --</option>
                                                   {matchingUnassignedSlots.map((slot) => (
-                                                    <option key={slot.id} value={slot.id}>
+                                                    <SelectItem key={slot.id} textValue={`${slot.email || slot.id.slice(0, 8)} ${slot.password ? `(${slot.password.slice(0, 3)}...)` : ""}`}>
                                                       {slot.email || slot.id.slice(0, 8)} {slot.password ? `(${slot.password.slice(0, 3)}...)` : ""}
-                                                    </option>
+                                                    </SelectItem>
                                                   ))}
-                                                </select>
+                                                </Select>
                                               </div>
                                               
-                                              <button
-                                                type="button"
-                                                onClick={() => handleFulfillSlot(o.id, o.customer_id, o.customer_name, o.customer_email, item, idx)}
-                                                disabled={fulfillingId === slotKey || !selectedSlots[slotKey]}
-                                                className="h-[32px] px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-sm text-xs font-bold transition-all shrink-0 self-end shadow-sm active:scale-95 flex items-center justify-center gap-1"
+                                              <Button
+                                                onPress={() => handleFulfillSlot(o.id, o.customer_id, o.customer_name, o.customer_email, item, idx)}
+                                                isDisabled={!selectedSlots[slotKey]}
+                                                isLoading={fulfillingId === slotKey}
+                                                color="primary"
+                                                radius="sm"
+                                                className="h-[32px] px-4 text-xs font-bold shadow-sm shrink-0 self-end"
                                               >
-                                                {fulfillingId === slotKey ? (
-                                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                                ) : (
-                                                  "Allocate & Fulfill"
-                                                )}
-                                              </button>
+                                                Allocate & Fulfill
+                                              </Button>
                                             </>
                                           ) : (
                                             <div className="w-full p-2.5 rounded-sm bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 flex items-start gap-2">
