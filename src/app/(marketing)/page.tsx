@@ -40,18 +40,18 @@ export default function MarketingPage() {
 
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold mb-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
             <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Next-Generation Multi-Tenant Commerce Shell</span>
+            <span>Next-Generation Digital Subscription OS</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight max-w-5xl mx-auto leading-[1.1] mb-8 animate-in fade-in slide-in-from-bottom-3 duration-700">
-            Manage Multiple Premium Stores with{" "}
+            Manage Digital Subscriptions with{" "}
             <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 bg-clip-text text-transparent">
               Supreme Agility.
             </span>
           </h1>
 
           <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            Unify your inventory streams, dispatch resolving mechanisms for critical VIP complaints, and command analytics across partitioned storefront instances effortlessly.
+            Unify your credential streams, automate family pool partitioning, and seamlessly distribute premium slots for Netflix, Spotify, ChatGPT, and more.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-5 duration-1000">
@@ -95,16 +95,16 @@ export default function MarketingPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                   <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase">Live SKU Count</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">Active Subscriptions</p>
                     <p className="text-2xl font-black text-slate-800 mt-1">1,482</p>
                   </div>
                   <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase">VIP Loyalty Pool</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">Available Slots</p>
                     <p className="text-2xl font-black text-indigo-600 mt-1">849</p>
                   </div>
                   <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase">Open Incidents</p>
-                    <p className="text-2xl font-black text-amber-600 mt-1">0 Pending</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">Expiring Soon</p>
+                    <p className="text-2xl font-black text-amber-600 mt-1">12 Slots</p>
                   </div>
                 </div>
 
@@ -133,9 +133,9 @@ export default function MarketingPage() {
                 <div className="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <Layers className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Partitioned Data Flow</h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">Smart Tier Partitioning</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  Switch store contexts immediately via highly optimized query wrappers backed by Firestore Server Actions. Zero cross-tenant data leakage.
+                  Automatically split and assign credentials (e.g., 1 User, Private Upgrade, Family Slot) dynamically based on the streaming platform or digital product.
                 </p>
               </div>
 
@@ -143,9 +143,9 @@ export default function MarketingPage() {
                 <div className="w-12 h-12 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Complaints SLA Desk</h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">Secure Credential Vault</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  Categorize user feedback seamlessly. Interactive custom badging automatically handles status pipelines between Investigating and Fully Resolved.
+                  Safely store master emails, passwords, and 4-digit PINs. Equipped with instant-copy UI interfaces for rapid customer fulfillment via WhatsApp or chat.
                 </p>
               </div>
 
@@ -153,9 +153,9 @@ export default function MarketingPage() {
                 <div className="w-12 h-12 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Blazing CRUD Speed</h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">Expiry & Stock Alerts</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  Fully native responsive database tables with built-in instant optimistic transitions. No external heavyweight API layer required.
+                  Real-time stock counts for available profile slots and automatic, color-coded alerts for upcoming master subscription renewals.
                 </p>
               </div>
             </div>
@@ -192,15 +192,15 @@ export default function MarketingPage() {
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span>Basic Inventory Management</span>
+                    <span>Store up to 100 Credentials</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span>Standard Customer Tracking</span>
+                    <span>Basic Stock & Expiry Tracking</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span>Basic Complaints Desk</span>
+                    <span>Copy-to-Clipboard Features</span>
                   </div>
                 </div>
                 <Link href="/dashboard" className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-center text-sm transition-colors">
@@ -219,7 +219,7 @@ export default function MarketingPage() {
                     Pro Member
                   </div>
                   <h3 className="text-4xl font-black text-white">$29<span className="text-lg text-slate-400 font-medium">/mo</span></h3>
-                  <p className="text-sm text-indigo-200 mt-2">Unlimited power for multi-tenant empires.</p>
+                  <p className="text-sm text-indigo-200 mt-2">Unlimited power for digital empires.</p>
                 </div>
                 <div className="flex-1 space-y-4 mb-8 relative z-10">
                   <div className="flex items-center gap-3 text-sm text-slate-300">
@@ -228,15 +228,15 @@ export default function MarketingPage() {
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-300">
                     <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
-                    <span>Advanced Global Preferences</span>
+                    <span>Unlimited Credential Storage</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-300">
                     <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
-                    <span>Automated WhatsApp API Bots (n8n)</span>
+                    <span>Automated WhatsApp Delivery (n8n)</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-300">
                     <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
-                    <span>Priority SLA Support Desk</span>
+                    <span>Smart Family Pool Automation</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-300">
                     <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
