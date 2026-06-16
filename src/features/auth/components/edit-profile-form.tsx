@@ -95,43 +95,49 @@ export function EditProfileForm({
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
             <Shield className="w-4 h-4 text-indigo-500" /> {t.profile.profileTitle}
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5 mb-5">
             {t.profile.profileSubtitle}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                {t.profile.labelFullName}
+              </label>
               <Input
                 name="fullName"
-                label={t.profile.labelFullName}
                 defaultValue={initialName}
                 isRequired
                 startContent={<User className="w-3.5 h-3.5 text-slate-400" />}
                 variant="faded"
                 radius="lg"
                 classNames={{
-                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
-                  label: "text-[10px] font-bold text-slate-400 uppercase tracking-wider",
+                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
                   input: "text-xs font-bold text-slate-800 dark:text-slate-100"
                 }}
               />
+            </div>
 
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                {t.profile.labelAuthEmail}
+              </label>
               <Input
                 type="email"
                 name="email"
-                label={t.profile.labelAuthEmail}
                 defaultValue={initialEmail}
                 isRequired
                 startContent={<Mail className="w-3.5 h-3.5 text-slate-400" />}
                 variant="faded"
                 radius="lg"
                 classNames={{
-                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
-                  label: "text-[10px] font-bold text-slate-400 uppercase tracking-wider",
+                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
                   input: "text-xs font-bold text-slate-800 dark:text-slate-100"
                 }}
               />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 pt-1">
@@ -150,107 +156,108 @@ export function EditProfileForm({
               For testing purposes, you can switch your role. Staff members will route edits through the Data Approval Workflow (Drafting System).
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
-            {/* Password Reset and Submit Button */}
-            <div className="flex flex-col justify-between space-y-4">
-              <div className="space-y-3">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  name="currentPassword"
-                  label="Current Password"
-                  placeholder="Required to set new password"
-                  value={currentPassword}
-                  onValueChange={setCurrentPassword}
-                  startContent={<Key className="w-3.5 h-3.5 text-slate-400" />}
-                  endContent={
-                    <button className="focus:outline-none" type="button" onClick={() => setShowPassword(!showPassword)}>
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4 text-slate-400 pointer-events-none" />
-                      ) : (
-                        <Eye className="w-4 h-4 text-slate-400 pointer-events-none" />
-                      )}
-                    </button>
-                  }
-                  variant="faded"
-                  radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
-                    label: "text-[10px] font-bold text-slate-400 uppercase tracking-wider",
-                    input: "text-xs font-bold text-slate-800 dark:text-slate-100"
-                  }}
-                />
+          <div className="grid grid-cols-1 gap-4 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
+            {/* Password fields */}
+            <div className="space-y-3">
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Current Password
+              </label>
+              <Input
+                type={showPassword ? "text" : "password"}
+                name="currentPassword"
+                placeholder="Required to set new password"
+                value={currentPassword}
+                onValueChange={setCurrentPassword}
+                startContent={<Key className="w-3.5 h-3.5 text-slate-400" />}
+                endContent={
+                  <button className="focus:outline-none" type="button" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4 text-slate-400 pointer-events-none" />
+                    ) : (
+                      <Eye className="w-4 h-4 text-slate-400 pointer-events-none" />
+                    )}
+                  </button>
+                }
+                variant="faded"
+                radius="lg"
+                classNames={{
+                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
+                  input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                }}
+              />
+            </div>
 
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  name="newPassword"
-                  label="New Password"
-                  placeholder="Leave blank to keep current"
-                  value={newPassword}
-                  onValueChange={setNewPassword}
-                  startContent={<Lock className="w-3.5 h-3.5 text-slate-400" />}
-                  variant="faded"
-                  radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
-                    label: "text-[10px] font-bold text-slate-400 uppercase tracking-wider",
-                    input: "text-xs font-bold text-slate-800 dark:text-slate-100"
-                  }}
-                />
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                New Password
+              </label>
+              <Input
+                type={showPassword ? "text" : "password"}
+                name="newPassword"
+                placeholder="Leave blank to keep current"
+                value={newPassword}
+                onValueChange={setNewPassword}
+                startContent={<Lock className="w-3.5 h-3.5 text-slate-400" />}
+                variant="faded"
+                radius="lg"
+                classNames={{
+                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
+                  input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                }}
+              />
+            </div>
 
-                {newPassword && (
-                  <div className="space-y-1.5 px-1">
-                    <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-wider">
-                      <span className="text-slate-500">Strength</span>
-                      <span className={strength < 50 ? "text-rose-500" : strength < 75 ? "text-amber-500" : "text-emerald-500"}>
-                        {strength < 50 ? "Weak" : strength < 75 ? "Good" : "Strong"}
-                      </span>
-                    </div>
-                    <div className="h-1 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full transition-all duration-300 ${strength < 50 ? "bg-rose-500" : strength < 75 ? "bg-amber-500" : "bg-emerald-500"}`}
-                        style={{ width: `${strength}%` }}
-                      />
-                    </div>
+              {newPassword && (
+                <div className="space-y-1.5 px-1">
+                  <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-wider">
+                    <span className="text-slate-500">Strength</span>
+                    <span className={strength < 50 ? "text-rose-500" : strength < 75 ? "text-amber-500" : "text-emerald-500"}>
+                      {strength < 50 ? "Weak" : strength < 75 ? "Good" : "Strong"}
+                    </span>
                   </div>
-                )}
+                  <div className="h-1 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-300 ${strength < 50 ? "bg-rose-500" : strength < 75 ? "bg-amber-500" : "bg-emerald-500"}`}
+                      style={{ width: `${strength}%` }}
+                    />
+                  </div>
+                </div>
+              )}
 
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  label="Confirm Password"
-                  placeholder="Re-type new password"
-                  value={confirmPassword}
-                  onValueChange={setConfirmPassword}
-                  startContent={<CheckCircle className="w-3.5 h-3.5 text-slate-400" />}
-                  isInvalid={confirmPassword.length > 0 && !passwordsMatch}
-                  errorMessage={confirmPassword.length > 0 && !passwordsMatch ? "Passwords do not match" : undefined}
-                  variant="faded"
-                  radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
-                    label: "text-[10px] font-bold text-slate-400 uppercase tracking-wider",
-                    input: "text-xs font-bold text-slate-800 dark:text-slate-100"
-                  }}
-                />
-              </div>
-
-              <div className="flex">
-                <Button
-                  type="submit"
-                  isLoading={isPending}
-                  color="primary"
-                  radius="lg"
-                  className="w-full text-[13px] font-bold shadow-md h-[42px]"
-                >
-                  {isPending ? t.profile.btnApplyingProfile : t.profile.btnApplyProfile}
-                </Button>
-              </div>
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Confirm Password
+              </label>
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Re-type new password"
+                value={confirmPassword}
+                onValueChange={setConfirmPassword}
+                startContent={<CheckCircle className="w-3.5 h-3.5 text-slate-400" />}
+                isInvalid={confirmPassword.length > 0 && !passwordsMatch}
+                errorMessage={confirmPassword.length > 0 && !passwordsMatch ? "Passwords do not match" : undefined}
+                variant="faded"
+                radius="lg"
+                classNames={{
+                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
+                  input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                }}
+              />
+            </div>
             </div>
 
-            {/* 2FA Enrollment */}
-            <div className="h-full">
-              <MfaEnrollment />
-            </div>
+            <Button
+              type="submit"
+              isLoading={isPending}
+              color="primary"
+              radius="lg"
+              className="w-full text-[13px] font-bold shadow-md h-[42px]"
+            >
+              {isPending ? t.profile.btnApplyingProfile : t.profile.btnApplyProfile}
+            </Button>
           </div>
+
         </form>
       </div>
     </div>

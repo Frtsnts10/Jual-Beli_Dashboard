@@ -30,10 +30,9 @@ export async function getOrdersAction(storeId: string): Promise<Order[]> {
   try {
     const snap = await adminDb.collection("orders")
       .where("store_id", "==", storeId)
-      .orderBy("created_at", "desc")
       .get();
 
-    return snap.docs.map(doc => {
+    const orders = snap.docs.map(doc => {
       const d = doc.data();
       return {
         id: doc.id,
@@ -42,6 +41,8 @@ export async function getOrdersAction(storeId: string): Promise<Order[]> {
         total_amount: Number(d.total_amount || 0),
       } as Order;
     });
+    
+    return orders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   } catch (err: any) {
     console.warn("Orders collection may not exist yet:", err.message);
     return [];

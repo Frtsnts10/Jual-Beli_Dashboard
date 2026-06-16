@@ -17,7 +17,6 @@ interface DashboardHeaderProps {
   plan?: string;
   tier?: string;
   stores: any[];
-  stores: any[];
 }
 
 export function DashboardHeader({

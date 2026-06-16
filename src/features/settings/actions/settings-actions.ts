@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase/server";
+import { adminDb, getAuthenticatedUser } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 

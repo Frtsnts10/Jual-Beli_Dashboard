@@ -16,6 +16,8 @@ export interface Customer {
   id: string;
   store_id: string;
   name: string;
+  first_name?: string | null;
+  last_name?: string | null;
   email: string | null;
   phone: string | null;
   purchased_products: PurchasedProduct[];
@@ -89,6 +91,26 @@ export async function createCustomerAction(storeId: string, formData: FormData) 
     revalidatePath(`/${storeId}/customers`);
     revalidatePath(`/${storeId}/dashboard`);
     return { data };
+  } catch (err: any) {
+    return { error: err.message };
+  }
+}
+
+export async function updateCustomerAction(storeId: string, id: string, data: { first_name: string; last_name: string; email: string | null; phone: string | null }) {
+  if (!data.first_name) return { error: "First name required" };
+
+  try {
+    const fullName = `${data.first_name} ${data.last_name}`.trim();
+    await adminDb.collection("customers").doc(id).update({
+      name: fullName,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      email: data.email,
+      phone: data.phone,
+    });
+    revalidatePath(`/${storeId}/customers`);
+    revalidatePath(`/${storeId}/dashboard`);
+    return { success: true };
   } catch (err: any) {
     return { error: err.message };
   }

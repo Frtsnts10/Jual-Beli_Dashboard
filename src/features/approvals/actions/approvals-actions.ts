@@ -8,10 +8,10 @@ export async function getPendingDraftsAction(storeId: string): Promise<DraftRequ
   const snap = await adminDb.collection("draft_requests")
     .where("store_id", "==", storeId)
     .where("status", "==", "PENDING")
-    .orderBy("created_at", "desc")
     .get();
 
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as DraftRequest));
+  const drafts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as DraftRequest));
+  return drafts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 }
 
 export async function approveDraftAction(storeId: string, draftId: string) {

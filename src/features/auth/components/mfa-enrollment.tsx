@@ -12,6 +12,12 @@ import {
 import { Smartphone, CheckCircle2, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 
+declare global {
+  interface Window {
+    recaptchaVerifier: any;
+  }
+}
+
 export function MfaEnrollment() {
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -68,7 +74,11 @@ export function MfaEnrollment() {
       toast.success("Verification code sent!");
     } catch (error: any) {
       console.error(error);
-      toast.error(error.message || "Failed to send verification code");
+      if (error.code === "auth/requires-recent-login" || error.message?.includes("requires-recent-login")) {
+        toast.error("For your security, please log out and back in to enable 2FA.", { duration: 6000 });
+      } else {
+        toast.error(error.message || "Failed to send verification code");
+      }
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
         window.recaptchaVerifier = undefined;

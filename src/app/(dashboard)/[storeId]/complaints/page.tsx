@@ -21,7 +21,7 @@ export default async function TenantComplaintsPage({
   const [storeDoc, complaints, subscription] = await Promise.all([
     adminDb.collection("stores").doc(storeId).get(),
     getComplaintsAction(storeId),
-    getSubscriptionStatus(storeId),
+    getSubscriptionStatus(),
   ]);
 
   const currency = storeDoc.data()?.currency || "IDR";

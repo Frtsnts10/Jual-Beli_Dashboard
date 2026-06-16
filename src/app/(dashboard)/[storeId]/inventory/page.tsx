@@ -22,7 +22,7 @@ export default async function TenantInventoryPage({
   const [storeDoc, items, subscription, digitalAccountsRes] = await Promise.all([
     adminDb.collection("stores").doc(storeId).get(),
     getInventoryAction(storeId),
-    getSubscriptionStatus(storeId),
+    getSubscriptionStatus(),
     getDigitalAccountsAction(storeId)
   ]);
 

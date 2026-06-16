@@ -72,7 +72,7 @@ export function NotificationBell({ storeId }: { storeId: string }) {
               </span>
             </div>
 
-            <div className="max-h-80 overflow-y-auto divide-y divide-slate-50 dark:divide-slate-800/40">
+            <div className="max-h-[360px] overflow-y-auto divide-y divide-slate-50 dark:divide-slate-800/40 overscroll-contain">
               {loading && items.length === 0 ? (
                 <div className="p-6 text-center text-xs text-slate-400 italic">Scanning database vectors...</div>
               ) : items.length === 0 ? (
@@ -85,11 +85,10 @@ export function NotificationBell({ storeId }: { storeId: string }) {
                   <div
                     key={item.id}
                     onClick={() => handleItemClick(item.type)}
-                    className={`p-3 transition-all hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer ${
-                      item.isUrgent ? "border-l-2 border-rose-500" : "border-l-2 border-amber-500"
-                    }`}
+                    className="relative p-3 transition-all hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer"
                   >
-                    <div className="flex items-start justify-between gap-2">
+                    <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${item.isUrgent ? "bg-rose-500" : "bg-amber-500"}`} />
+                    <div className="flex items-start justify-between gap-2 pl-1">
                       <span className={`font-bold text-[11px] ${item.isUrgent ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400"} flex items-center gap-1`}>
                         {item.isUrgent ? <AlertTriangle className="w-3 h-3 shrink-0" /> : <Clock className="w-3 h-3 shrink-0" />}
                         {item.title}
@@ -98,11 +97,11 @@ export function NotificationBell({ storeId }: { storeId: string }) {
                         {item.targetDate}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1 leading-relaxed pl-1">
                       {item.message}
                     </p>
                     {item.type === "customer" && (
-                      <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px]">
+                      <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] pl-1">
                         <span className="text-slate-400 italic">n8n Gateway Sync Ready</span>
                         <a
                           href={item.actionPayload?.phone ? `https://wa.me/${item.actionPayload.phone.replace(/\D/g, '')}` : "#"}

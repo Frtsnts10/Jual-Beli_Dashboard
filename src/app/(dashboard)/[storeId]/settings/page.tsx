@@ -2,15 +2,16 @@ import React from "react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Settings",
+  title: "Store Settings",
 };
-
 
 import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
 import { redirect } from "next/navigation";
-import { StoreProfileForm, StorePreferencesForm, DangerZonePanel, AppearanceSettingsPanel, IntegrationsForm } from "@/features/settings/components/store-settings-form";
-import { EditProfileForm } from "@/features/auth/components/edit-profile-form";
-import { SettingsHeader } from "@/features/settings/components/settings-header";
+import { StoreProfileForm } from "@/features/settings/components/store-settings-form";
+import { StorePreferencesForm } from "@/features/settings/components/store-preferences-form";
+import { DangerZonePanel } from "@/features/settings/components/danger-zone-panel";
+import { StoreCredentialsPanel } from "@/features/settings/components/store-credentials-panel";
+import { IntegrationsForm } from "@/features/settings/components/integrations-form";
 
 export default async function TenantSettingsPage({
   params,
@@ -30,32 +31,15 @@ export default async function TenantSettingsPage({
     redirect("/auth");
   }
 
-  const profileDoc = await adminDb.collection("profiles").doc(user.uid).get();
-  const profile = profileDoc.data() || {};
-
-  const initialName = profile.full_name || user.name || "Workspace Admin";
-  const initialEmail = profile.email || user.email || "";
-  const initialRole = profile.role || "admin";
-
   return (
     <div className="space-y-6 font-sans max-w-full pb-12">
-      <SettingsHeader />
+      <div className="pb-6 border-b border-slate-200 dark:border-slate-800">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Store Settings</h1>
+        <p className="text-sm text-slate-500 mt-1">Manage your workspace identity, preferences, and integrations.</p>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch animate-in fade-in duration-300">
-        {/* Left Column: Principal Authentication, Profile Desk, Appearance, and Danger Zone */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch pt-2">
         <div className="flex flex-col gap-6 h-full">
-          <EditProfileForm
-            initialName={initialName}
-            initialEmail={initialEmail}
-            initialRole={initialRole}
-          />
-          <AppearanceSettingsPanel />
-          <DangerZonePanel storeId={storeId} />
-        </div>
-
-        {/* Right Column: Tenant Domain Configurations */}
-        <div className="flex flex-col gap-6 h-full">
-          {/* Tenant Identity Configurations */}
           <StoreProfileForm 
             storeId={storeId} 
             initialName={store.name} 
@@ -64,16 +48,19 @@ export default async function TenantSettingsPage({
             initialInstagram={store.instagram || ""}
             initialWhatsapp={store.whatsapp || ""}
           />
-          {/* Global Application Preferences */}
           <StorePreferencesForm 
             storeId={storeId} 
             initialCurrency={store.currency || "IDR"} 
           />
+        </div>
+        <div className="flex flex-col gap-6 h-full">
+          <StoreCredentialsPanel storeId={storeId} />
           <IntegrationsForm 
             storeId={storeId}
             initialMidtransServerKey={store.api_keys?.midtrans_server_key || ""}
             initialMidtransClientKey={store.api_keys?.midtrans_client_key || ""}
           />
+          <DangerZonePanel storeId={storeId} />
         </div>
       </div>
     </div>

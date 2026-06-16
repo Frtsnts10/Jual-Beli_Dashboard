@@ -11,7 +11,7 @@ export function useSubscription() {
     queryKey: ["subscription", storeId],
     queryFn: async () => {
       if (!storeId) return { isSubscribed: false, plan: "free", status: "inactive" };
-      return await getSubscriptionStatus(storeId);
+      return await getSubscriptionStatus();
     },
     enabled: !!storeId,
   });

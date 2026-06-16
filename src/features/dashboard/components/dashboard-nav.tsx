@@ -13,7 +13,8 @@ import {
   Settings, 
   X,
   GitPullRequest,
-  MonitorPlay
+  MonitorPlay,
+  UserCog
 } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
 
@@ -39,15 +40,19 @@ export function DashboardNav() {
 
   if (!storeId) return null;
 
-  const routes = [
+  const coreRoutes = [
     { name: t.sidebar.overview, href: `/${storeId}/dashboard`, icon: LayoutDashboard },
     { name: t.sidebar.orders, href: `/${storeId}/orders`, icon: ShoppingCart },
     { name: t.sidebar.inventory, href: `/${storeId}/inventory`, icon: Package },
     { name: (t.sidebar as any).approvals || "Approvals Desk", href: `/${storeId}/approvals`, icon: GitPullRequest },
     { name: t.sidebar.customers, href: `/${storeId}/customers`, icon: Users },
     { name: t.sidebar.complaints, href: `/${storeId}/complaints`, icon: MessageSquareWarning },
+  ];
+
+  const settingsRoutes = [
     { name: t.sidebar.billing, href: `/${storeId}/subscription`, icon: CreditCard },
-    { name: t.sidebar.settings, href: `/${storeId}/settings`, icon: Settings },
+    { name: "Store Settings", href: `/${storeId}/settings`, icon: Settings },
+    { name: "User Profile", href: `/${storeId}/profile`, icon: UserCog },
   ];
 
   return (
@@ -61,7 +66,42 @@ export function DashboardNav() {
             </p>
           </div>
           
-          {routes.map((route) => {
+          {coreRoutes.map((route) => {
+            const Icon = route.icon;
+            const isActive = pathname === route.href || (pathname?.startsWith(route.href) && route.href !== `/${storeId}/dashboard`);
+
+            return (
+              <Link
+                key={route.name}
+                href={route.href}
+                prefetch={false}
+                className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[11px] font-bold transition-all duration-200 ${
+                  isActive
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-200/20 dark:shadow-none animate-in zoom-in-95 duration-150"
+                    : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-indigo-600 dark:hover:text-indigo-400"
+                }`}
+              >
+                <Icon 
+                  className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
+                    isActive ? "text-white" : "text-slate-400 group-hover:text-indigo-500 dark:text-slate-500"
+                  }`} 
+                  strokeWidth={isActive ? 3 : 2.5}
+                />
+                <span className="truncate">{route.name}</span>
+                {isActive && (
+                  <div className="ml-auto w-1 h-1 rounded-full bg-white opacity-60" />
+                )}
+              </Link>
+            );
+          })}
+
+          <div className="mt-8 mb-4 px-3">
+            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
+              Settings & Identity
+            </p>
+          </div>
+
+          {settingsRoutes.map((route) => {
             const Icon = route.icon;
             const isActive = pathname === route.href || (pathname?.startsWith(route.href) && route.href !== `/${storeId}/dashboard`);
 
@@ -139,7 +179,7 @@ export function DashboardNav() {
                 </p>
               </div>
 
-              {routes.map((route) => {
+              {[...coreRoutes, ...settingsRoutes].map((route) => {
                 const Icon = route.icon;
                 const isActive = pathname === route.href || (pathname?.startsWith(route.href) && route.href !== `/${storeId}/dashboard`);
 
