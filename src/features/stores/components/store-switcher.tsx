@@ -10,10 +10,10 @@ import { AddStoreModal } from "./add-store-modal";
 interface StoreSwitcherProps {
   stores: Store[];
   profileId: string;
-  tier?: string;
+  maxStores?: number;
 }
 
-export function StoreSwitcher({ stores, profileId, tier }: StoreSwitcherProps) {
+export function StoreSwitcher({ stores, profileId, maxStores = 3 }: StoreSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const params = useParams();
@@ -21,7 +21,6 @@ export function StoreSwitcher({ stores, profileId, tier }: StoreSwitcherProps) {
   const currentStoreId = params?.storeId as string;
 
   const selectedStore = stores.find((s) => s.id === currentStoreId) || stores[0];
-  const maxStores = (tier === "pro" || tier === "plus") ? Infinity : 3;
   const isLimitReached = stores.length >= maxStores;
 
   const handleSelect = (store: Store) => {

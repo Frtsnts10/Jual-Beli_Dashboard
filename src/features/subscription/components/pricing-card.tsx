@@ -51,7 +51,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
       cta: "Upgrade Weekly Shard",
       badge: "Starter Premium",
       features: [
-        "Unlimited Store Shards",
+        "Up to 5 Active Store Shards",
         "Advanced @tanstack/react-table telemetry grids",
         "Instant Midtrans SLA automatic bindings",
       ]
@@ -62,7 +62,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
       cta: "Upgrade Monthly Shard",
       badge: "Standard Premium",
       features: [
-        "Unlimited Store Shards",
+        "Up to 8 Active Store Shards",
         "Advanced @tanstack/react-table telemetry grids",
         "Instant Midtrans SLA automatic bindings",
         "Priority Customer Desk SLA cycle actions"
@@ -74,7 +74,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
       cta: "Upgrade Yearly Shard",
       badge: "Premium Saver (Save 30%)",
       features: [
-        "Unlimited Store Shards",
+        "Up to 15 Active Store Shards",
         "Advanced @tanstack/react-table telemetry grids",
         "Instant Midtrans SLA automatic bindings",
         "Priority Customer Desk SLA cycle actions",
@@ -88,7 +88,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
       cta: "Acquire Lifetime Access",
       badge: "Best Value (Lifetime)",
       features: [
-        "Unlimited Store Shards",
+        "Unlimited Active Store Shards",
         "Advanced @tanstack/react-table telemetry grids",
         "Instant Midtrans SLA automatic bindings",
         "Priority Customer Desk SLA cycle actions",

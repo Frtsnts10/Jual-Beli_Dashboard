@@ -62,7 +62,12 @@ export default async function TenantStoreLayout({
     redirect("/dashboard");
   }
 
-  const maxStores = (subscription.tier === "pro" || subscription.tier === "plus") ? Infinity : 3;
+  const maxStores = 
+    subscription.interval === "lifetime" ? Infinity :
+    subscription.interval === "yearly" ? 15 :
+    subscription.interval === "monthly" ? 8 :
+    subscription.interval === "weekly" ? 5 :
+    3;
 
   // If the user tries to access a store beyond their limit, kick them back to the first store
   if (currentStoreIndex >= maxStores && stores.length > 0) {
@@ -79,6 +84,7 @@ export default async function TenantStoreLayout({
         plan={subscription.plan}
         tier={subscription.tier}
         stores={stores}
+        maxStores={maxStores}
       />
 
       {/* Main Framework Viewport */}

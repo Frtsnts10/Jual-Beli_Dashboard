@@ -1,22 +1,38 @@
 import * as admin from 'firebase-admin';
 import { cookies } from 'next/headers';
 
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      }),
-    });
-  } catch (error) {
-    console.error('Firebase Admin initialization error', error);
+function getAdminApp(): admin.app.App {
+  if (admin.apps.length > 0) {
+    return admin.apps[0]!;
   }
+  return admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
 }
 
-export const adminDb = admin.firestore();
-export const adminAuth = admin.auth();
+export const adminDb: admin.firestore.Firestore = new Proxy(
+  {} as admin.firestore.Firestore,
+  {
+    get(_target, prop) {
+      const db = getAdminApp().firestore();
+      return (db as any)[prop];
+    },
+  }
+);
+
+export const adminAuth: admin.auth.Auth = new Proxy(
+  {} as admin.auth.Auth,
+  {
+    get(_target, prop) {
+      const auth = getAdminApp().auth();
+      return (auth as any)[prop];
+    },
+  }
+);
 
 /**
  * Verifies the session cookie and returns the decoded user or null.

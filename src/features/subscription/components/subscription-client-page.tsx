@@ -234,7 +234,7 @@ export function SubscriptionClientPage({
             </div>
           </div>
 
-          <div className="flex justify-center mb-8">
+          {/* <div className="flex justify-center mb-8">
             <button
               onClick={() => {
                 setBillingInterval("monthly");
@@ -245,7 +245,7 @@ export function SubscriptionClientPage({
             >
               {isPending ? "Connecting..." : "Simulate Test Payment (Rp1)"}
             </button>
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Free tier card */}

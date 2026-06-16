@@ -32,16 +32,18 @@ export async function createStoreAction(profileId: string, formData: FormData) {
       .get();
     const count = storesSnap.size;
 
-    // Check store count and plan
-    const subsSnap = await adminDb.collection("subscriptions")
-      .where("profile_id", "==", profileId)
-      .limit(1)
-      .get();
-    const sub = subsSnap.empty ? null : subsSnap.docs[0].data();
+    const { getSubscriptionStatus } = await import("@/features/subscription/server/subscription-actions");
+    const subscription = await getSubscriptionStatus();
+    
+    const maxStores = 
+      subscription.interval === "lifetime" ? Infinity :
+      subscription.interval === "yearly" ? 15 :
+      subscription.interval === "monthly" ? 8 :
+      subscription.interval === "weekly" ? 5 :
+      3;
 
-    const maxStores = (sub?.plan === "pro" || sub?.plan === "plus") ? Infinity : 3;
     if (count >= maxStores) {
-      throw new Error(`Upgrade your plan to add more stores.`);
+      throw new Error(`Upgrade your plan to add more stores. Maximum ${maxStores} allowed.`);
     }
 
     // Ensure the parent profile row exists

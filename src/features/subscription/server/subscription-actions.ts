@@ -32,6 +32,7 @@ export async function getSubscriptionStatus() {
       plan: "Shop Dashboard Pro",
       tier: "pro",
       status: "Pre-Authorized Master Account",
+      interval: "lifetime",
       currentPeriodEnd: null,
     };
   }
@@ -42,6 +43,7 @@ export async function getSubscriptionStatus() {
       plan: "free",
       tier: "free",
       status: "inactive",
+      interval: "none",
       currentPeriodEnd: null,
     };
   }
@@ -54,6 +56,7 @@ export async function getSubscriptionStatus() {
     plan: data.plan_name,
     tier: data.plan || "pro", // Fallback to pro if missing
     status: data.status,
+    interval: data.interval || "monthly",
     currentPeriodEnd: data.current_period_end,
   };
 }

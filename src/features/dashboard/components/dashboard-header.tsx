@@ -17,6 +17,7 @@ interface DashboardHeaderProps {
   plan?: string;
   tier?: string;
   stores: any[];
+  maxStores: number;
 }
 
 export function DashboardHeader({
@@ -26,7 +27,8 @@ export function DashboardHeader({
   isSubscribed,
   plan,
   tier,
-  stores
+  stores,
+  maxStores
 }: DashboardHeaderProps) {
   const { t } = useI18n();
 
@@ -34,7 +36,7 @@ export function DashboardHeader({
     <header className="shrink-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#0b0f19] px-4 transition-all">
       <div className="flex items-center gap-2">
         <MobileNavTrigger />
-        <StoreSwitcher stores={stores} profileId={profileId} />
+        <StoreSwitcher stores={stores} profileId={profileId} maxStores={maxStores} />
         <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-[11px] font-bold text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           {t.topbar.activeShard}: {currentStoreSlug}
