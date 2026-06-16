@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Sparkles, Layers, ShieldCheck, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Sparkles, Layers, ShieldCheck, Zap, ArrowRight, CheckCircle2, MonitorPlay, Bot, LockKeyhole } from "lucide-react";
 
 export default function MarketingPage() {
   return (
@@ -157,6 +157,100 @@ export default function MarketingPage() {
                 <p className="text-sm text-slate-600 leading-relaxed">
                   Real-time stock counts for available profile slots and automatic, color-coded alerts for upcoming master subscription renewals.
                 </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Supported Platforms Showcase */}
+        <section className="py-24 bg-slate-900 px-6 overflow-hidden relative">
+          {/* Decorative background gradients */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+          <div className="absolute top-1/4 -right-64 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+          <div className="absolute bottom-1/4 -left-64 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center max-w-3xl mx-auto mb-20">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-6">
+                <Sparkles className="w-3.5 h-3.5" />
+                Intelligent Auto-Tiering Engine
+              </div>
+              <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-6">
+                Massive Out-of-the-Box Support
+              </h2>
+              <p className="text-slate-400 text-lg leading-relaxed">
+                Just type the product name. Our engine instantly detects the brand and generates the exact sub-tiers and profile slots you need to resell.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+              {/* Streaming Box */}
+              <div className="p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-indigo-500/30 transition-all backdrop-blur-sm group">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-6 border border-indigo-500/20 group-hover:scale-110 transition-transform">
+                  <MonitorPlay className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">Streaming & Media</h3>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {["Netflix", "Disney+", "HBO Max", "Prime Video", "Hulu", "Crunchyroll", "Spotify"].map(brand => (
+                    <span key={brand} className="px-2.5 py-1 rounded-md bg-white/5 text-slate-300 text-xs font-medium border border-white/5">
+                      {brand}
+                    </span>
+                  ))}
+                </div>
+                <div className="pt-6 border-t border-white/10">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Auto-Splits Into:</p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 1 User / 2 User Profiles</li>
+                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Semi-Private Slots</li>
+                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Private Account Upgrades</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Productivity Box */}
+              <div className="p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all backdrop-blur-sm group">
+                <div className="w-12 h-12 rounded-xl bg-violet-500/20 text-violet-400 flex items-center justify-center mb-6 border border-violet-500/20 group-hover:scale-110 transition-transform">
+                  <Bot className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">AI & Productivity</h3>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {["ChatGPT Plus", "Canva Pro", "Grammarly", "Microsoft 365", "Google One", "Zoom", "CapCut"].map(brand => (
+                    <span key={brand} className="px-2.5 py-1 rounded-md bg-white/5 text-slate-300 text-xs font-medium border border-white/5">
+                      {brand}
+                    </span>
+                  ))}
+                </div>
+                <div className="pt-6 border-t border-white/10">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Auto-Splits Into:</p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Team Member Invites</li>
+                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Admin Access Seats</li>
+                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Premium Shared Workspaces</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* VPN Box */}
+              <div className="p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all backdrop-blur-sm group">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6 border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                  <LockKeyhole className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">VPN & Security</h3>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {["NordVPN", "ExpressVPN", "Surfshark", "CyberGhost", "PIA"].map(brand => (
+                    <span key={brand} className="px-2.5 py-1 rounded-md bg-white/5 text-slate-300 text-xs font-medium border border-white/5">
+                      {brand}
+                    </span>
+                  ))}
+                </div>
+                <div className="pt-6 border-t border-white/10">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Auto-Splits Into:</p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Individual Device Slots</li>
+                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 5-Device Family Pools</li>
+                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Dedicated Private IPs</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
