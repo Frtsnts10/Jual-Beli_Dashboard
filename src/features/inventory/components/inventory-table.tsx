@@ -361,16 +361,16 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                       <td className="px-5 py-3.5 space-y-1.5">
                         {item.email ? (
                           <div className="block">
-                            <CopyableCredential value={item.email} labelPlacement="outside" label="Email" />
+                            <CopyableCredential value={item.email} label="Email" />
                           </div>
                         ) : null}
                         {item.password ? (
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-[10px] text-slate-400 select-none">🔑</span>
-                            <CopyableCredential value={item.password} labelPlacement="outside" label="Password" isPassword />
+                            <CopyableCredential value={item.password} label="Password" isPassword />
                             {item.pin && (
                               <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px]">
-                                PIN: <CopyableCredential value={item.pin} labelPlacement="outside" label="PIN" isTiny />
+                                PIN: <CopyableCredential value={item.pin} label="PIN" isTiny />
                               </span>
                             )}
                           </div>
