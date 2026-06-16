@@ -12,6 +12,8 @@ export interface Complaint {
   status: "pending" | "investigating" | "resolved";
   priority: "low" | "medium" | "high";
   satisfaction_outcome?: string | null;
+  refund_amount?: number | null;
+  refund_status?: "none" | "processing" | "completed" | "failed";
   created_at: string;
 }
 
@@ -45,6 +47,8 @@ export async function createComplaintAction(storeId: string, formData: FormData)
       priority,
       status: "pending",
       satisfaction_outcome: null,
+      refund_amount: null,
+      refund_status: "none",
       created_at: new Date().toISOString(),
     };
     await docRef.set(data);
@@ -72,6 +76,25 @@ export async function applyComplaintSatisfactionAction(storeId: string, id: stri
       satisfaction_outcome: outcome,
       status: "resolved",
     });
+    revalidatePath(`/${storeId}/complaints`);
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message };
+  }
+}
+
+export async function processComplaintRefundAction(storeId: string, id: string, amount: number) {
+  try {
+    // In a real app, you would integrate Stripe/PayPal API here
+    // e.g., const refund = await stripe.refunds.create({ charge: 'ch_123', amount: amount * 100 });
+    
+    await adminDb.collection("complaints").doc(id).update({
+      satisfaction_outcome: `Refund Granted: $${amount}`,
+      status: "resolved",
+      refund_amount: amount,
+      refund_status: "completed",
+    });
+    
     revalidatePath(`/${storeId}/complaints`);
     return { success: true };
   } catch (err: any) {

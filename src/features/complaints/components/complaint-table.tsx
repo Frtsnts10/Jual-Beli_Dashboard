@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
-import { Complaint, deleteComplaintAction, applyComplaintSatisfactionAction } from "../actions/complaint-actions";
+import { Complaint, deleteComplaintAction, applyComplaintSatisfactionAction, processComplaintRefundAction } from "../actions/complaint-actions";
 import { Trash2, Loader2, AlertTriangle, CheckCircle, RefreshCw, Gift, ShieldAlert, User } from "lucide-react";
 import { ComplaintStatusBadge } from "./complaint-status-badge";
 import { toast } from "sonner";
@@ -15,6 +15,8 @@ interface ComplaintTableProps {
 export function ComplaintTable({ storeId, complaints, currency = "IDR" }: ComplaintTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [satisfactionId, setSatisfactionId] = useState<string | null>(null);
+  const [refundingId, setRefundingId] = useState<string | null>(null);
+  const [refundAmount, setRefundAmount] = useState<string>("");
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
@@ -28,6 +30,20 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
     await applyComplaintSatisfactionAction(storeId, id, outcome);
     setSatisfactionId(null);
     toast.success(`Customer satisfaction guaranteed: ${outcome}`);
+  };
+
+  const handleProcessRefund = async (id: string) => {
+    if (!refundAmount || isNaN(Number(refundAmount))) {
+      toast.error("Please enter a valid refund amount");
+      return;
+    }
+    
+    setSatisfactionId(id);
+    await processComplaintRefundAction(storeId, id, Number(refundAmount));
+    setSatisfactionId(null);
+    setRefundingId(null);
+    setRefundAmount("");
+    toast.success(`Refund processed securely for $${refundAmount}`);
   };
 
   // Grouping complaints by User to match user requests perfectly
@@ -107,14 +123,42 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                           <span className="text-[10px] font-bold text-slate-400 uppercase">Apply Satisfaction Goodwill:</span>
                           
                           {/* Satisfaction Trigger Tokens */}
-                          <button
-                            type="button"
-                            onClick={() => handleSatisfaction(c.id, `Refund Granted (${currency})`)}
-                            disabled={isSatisfying}
-                            className="px-2.5 py-1 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/40 rounded-lg text-[10px] font-black transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
-                          >
-                            <RefreshCw className="w-2.5 h-2.5" /> Issue Refund
-                          </button>
+                          {refundingId === c.id ? (
+                            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
+                              <input
+                                type="number"
+                                placeholder={`Amount in ${currency}`}
+                                value={refundAmount}
+                                onChange={(e) => setRefundAmount(e.target.value)}
+                                className="px-2 py-1 text-[10px] w-24 bg-white dark:bg-[#0b0f19] border border-red-200 dark:border-red-900/40 rounded-lg text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-red-500"
+                                autoFocus
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleProcessRefund(c.id)}
+                                disabled={isSatisfying}
+                                className="px-2 py-1 bg-red-600 hover:bg-red-500 text-white rounded-lg text-[10px] font-bold transition-colors disabled:opacity-50"
+                              >
+                                {isSatisfying ? "..." : "Confirm"}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setRefundingId(null)}
+                                className="px-2 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-[10px] font-bold transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setRefundingId(c.id)}
+                              disabled={isSatisfying}
+                              className="px-2.5 py-1 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/40 rounded-lg text-[10px] font-black transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
+                            >
+                              <RefreshCw className="w-2.5 h-2.5" /> Issue Refund
+                            </button>
+                          )}
 
                           <button
                             type="button"
