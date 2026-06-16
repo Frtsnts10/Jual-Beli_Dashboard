@@ -37,6 +37,35 @@ export async function updateStoreSettingsAction(storeId: string, formData: FormD
   }
 }
 
+export async function updateStoreApiKeysAction(storeId: string, formData: FormData) {
+  const midtransServerKey = formData.get("midtrans_server_key") as string;
+  const midtransClientKey = formData.get("midtrans_client_key") as string;
+
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const storeRef = adminDb.collection("stores").doc(storeId);
+    const doc = await storeRef.get();
+    if (!doc.exists) throw new Error("Workspace not found");
+
+    if (doc.data()?.owner_id !== user.uid) {
+      throw new Error("Only the owner can modify API configurations");
+    }
+
+    const updates: any = {};
+    updates["api_keys.midtrans_server_key"] = midtransServerKey || "";
+    updates["api_keys.midtrans_client_key"] = midtransClientKey || "";
+
+    await storeRef.update(updates);
+
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || "Failed to save API keys configuration." };
+  }
+}
+
 export async function deleteStoreAction(storeId: string) {
   try {
     await adminDb.collection("stores").doc(storeId).delete();

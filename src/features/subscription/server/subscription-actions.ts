@@ -109,7 +109,9 @@ export async function createCheckoutSessionAction(
         "email": user.email || "customer@example.com",
       },
       "callbacks": {
-        "finish": `${returnUrl}?payment_success=true`
+        "finish": `${returnUrl}?payment_success=true`,
+        "error": `${returnUrl}?payment_success=false`,
+        "unfinish": `${returnUrl}?payment_success=false`
       },
       "custom_field1": user.uid,
       "custom_field2": interval,

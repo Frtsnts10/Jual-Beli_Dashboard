@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
 import { redirect } from "next/navigation";
-import { StoreProfileForm, StorePreferencesForm, DangerZonePanel, AppearanceSettingsPanel } from "@/features/settings/components/store-settings-form";
+import { StoreProfileForm, StorePreferencesForm, DangerZonePanel, AppearanceSettingsPanel, IntegrationsForm } from "@/features/settings/components/store-settings-form";
 import { EditProfileForm } from "@/features/auth/components/edit-profile-form";
 import { SettingsHeader } from "@/features/settings/components/settings-header";
 
@@ -68,6 +68,11 @@ export default async function TenantSettingsPage({
           <StorePreferencesForm 
             storeId={storeId} 
             initialCurrency={store.currency || "IDR"} 
+          />
+          <IntegrationsForm 
+            storeId={storeId}
+            initialMidtransServerKey={store.api_keys?.midtrans_server_key || ""}
+            initialMidtransClientKey={store.api_keys?.midtrans_client_key || ""}
           />
         </div>
       </div>

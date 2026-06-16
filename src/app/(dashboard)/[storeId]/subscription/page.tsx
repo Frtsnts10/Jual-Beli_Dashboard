@@ -15,11 +15,16 @@ export default async function TenantSubscriptionPage({
   searchParams,
 }: {
   params: Promise<{ storeId: string }>;
-  searchParams: Promise<{ payment_success?: string }>;
+  searchParams: Promise<{ payment_success?: string; transaction_status?: string }>;
 }) {
   const { storeId } = await params;
   const resolvedSearchParams = await searchParams;
-  const isPaymentSuccess = resolvedSearchParams?.payment_success === "true";
+  const transactionStatus = resolvedSearchParams?.transaction_status;
+  
+  let isPaymentSuccess = resolvedSearchParams?.payment_success === "true";
+  if (transactionStatus && !["settlement", "capture"].includes(transactionStatus)) {
+    isPaymentSuccess = false;
+  }
 
   const [storeDoc, status] = await Promise.all([
     adminDb.collection("stores").doc(storeId).get(),

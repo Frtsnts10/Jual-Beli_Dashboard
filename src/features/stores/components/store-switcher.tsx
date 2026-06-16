@@ -50,20 +50,27 @@ export function StoreSwitcher({ stores, profileId, tier }: StoreSwitcherProps) {
               </div>
             </Button>
           </DropdownTrigger>
-          <DropdownMenu aria-label="Stores" disabledKeys={stores.map((s, i) => i >= maxStores ? s.id : "").filter(Boolean)}>
+          <DropdownMenu aria-label="Stores">
             <DropdownSection title="Stores" showDivider>
               {stores.map((store, i) => {
                 const isLocked = i >= maxStores;
                 return (
                   <DropdownItem
                     key={store.id}
-                    onPress={() => !isLocked && handleSelect(store)}
+                    onPress={() => {
+                      if (isLocked) {
+                        setIsOpen(false);
+                        router.push(`/${currentStoreId}/subscription`);
+                      } else {
+                        handleSelect(store);
+                      }
+                    }}
                     endContent={
                       isLocked ? <div className="text-[9px] uppercase tracking-wider font-bold text-slate-400">Locked</div> :
                       selectedStore?.id === store.id ? <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" /> : null
                     }
                     className={
-                      isLocked ? "opacity-50 cursor-not-allowed" :
+                      isLocked ? "opacity-70 text-slate-500" :
                       selectedStore?.id === store.id ? "bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400" : ""
                     }
                   >
@@ -76,10 +83,15 @@ export function StoreSwitcher({ stores, profileId, tier }: StoreSwitcherProps) {
               <DropdownItem
                 key="new-workspace"
                 onPress={() => {
-                  if (!isLimitReached) setIsModalOpen(true);
+                  if (isLimitReached) {
+                    setIsOpen(false);
+                    router.push(`/${currentStoreId}/subscription`);
+                  } else {
+                    setIsModalOpen(true);
+                  }
                 }}
                 startContent={<Plus className="w-3.5 h-3.5" />}
-                className={isLimitReached ? "opacity-50 text-slate-400 cursor-not-allowed" : "text-indigo-600 dark:text-indigo-400 font-bold"}
+                className={isLimitReached ? "opacity-70 text-slate-500" : "text-indigo-600 dark:text-indigo-400 font-bold"}
               >
                 {isLimitReached ? "Store Limit Reached" : "Add Store"}
               </DropdownItem>

@@ -91,7 +91,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-4 font-sans transition-colors"
+      className="p-6 space-y-8 font-sans transition-colors"
     >
       <div>
         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
@@ -104,10 +104,10 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
       </div>
 
       {/* Row 1: Asset Core */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6">
         <Input
           name="name"
-          label="Product Name"
+          labelPlacement="outside" label="Product Name"
           isRequired
           value={productName}
           onValueChange={(val) => {
@@ -117,26 +117,18 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
             setTierOptions(cfg.options);
           }}
           placeholder="e.g. YouTube Premium Family"
-          variant="faded"
+          variant="bordered"
           radius="lg"
-          classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            input: "text-xs font-bold text-slate-800 dark:text-slate-100"
-          }}
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
-        <Select
+        <Select placeholder="Select tier..."
           name="profile_tier"
-          label="Profile Tier Variant"
+          labelPlacement="outside" label="Profile Tier Variant"
           selectedKeys={[tierVariant]}
           onChange={(e) => setTierVariant(e.target.value)}
-          variant="faded"
+          variant="bordered"
           radius="lg"
-          classNames={{
-            trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            value: "text-xs font-semibold text-slate-800 dark:text-slate-100"
-          }}
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         >
           {tierOptions.map((opt) => (
             <SelectItem key={opt}>{opt}</SelectItem>
@@ -144,34 +136,27 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         </Select>
         <Input
           name="profile_name"
-          label="Profile Designation"
+          labelPlacement="outside" label="Profile Designation"
           placeholder="e.g. Member Slot Alpha"
-          variant="faded"
+          variant="bordered"
           radius="lg"
-          classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
-          }}
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
       </div>
 
       {/* Row 2: Grouping & Pool Configuration */}
-      <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
+      <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
         <Input
           name="group_name"
-          label={
+          labelPlacement="outside" label={
             <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase">
               <Users className="w-3 h-3 text-indigo-500" /> Family Pool Group Designation (Optional)
             </div>
           }
           placeholder="Leave blank for auto-assignment based on name/duration parameters (Max 5/6 members)"
-          variant="faded"
+          variant="bordered"
           radius="lg"
-          classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-            input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
-          }}
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <p className="text-[10px] text-slate-400 mt-1">
           💡 For family assets (Google, YouTube, Canva), omission triggers smart bucket filling matching active unconstrained groups automatically.
@@ -179,66 +164,50 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
       </div>
 
       {/* Row 3: Credentials */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
         <Input
           type="email"
           name="email"
-          label="Account Email"
+          labelPlacement="outside" label="Account Email"
           placeholder="account@streaming.com"
-          variant="faded"
+          variant="bordered"
           radius="lg"
-          classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            input: "text-xs text-slate-800 dark:text-slate-100"
-          }}
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <Input
           type="text"
           name="password"
-          label="Password"
+          labelPlacement="outside" label="Password"
           placeholder="••••••••"
-          variant="faded"
+          variant="bordered"
           radius="lg"
-          classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            input: "text-xs font-mono text-slate-800 dark:text-slate-100"
-          }}
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <Input
           type="text"
           name="pin"
-          label="Profile PIN"
+          labelPlacement="outside" label="Profile PIN"
           placeholder="e.g. 1234"
-          variant="faded"
+          variant="bordered"
           radius="lg"
-          classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            input: "text-xs font-mono text-slate-800 dark:text-slate-100"
-          }}
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
       </div>
 
       {/* Row 4: Pricing & Quota */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
         <div>
           <Input
             type="text"
             inputMode="decimal"
-            label={`Base Price (${currency})`}
+            labelPlacement="outside" label={`Base Price (${currency})`}
             value={basePriceStr}
             onValueChange={setBasePriceStr}
             onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)}
             placeholder={basePlaceholder}
-            variant="faded"
+            variant="bordered"
             radius="lg"
-            classNames={{
-              inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-              label: "text-[10px] font-bold text-slate-400 uppercase",
-              input: "text-xs font-bold text-slate-800 dark:text-slate-100"
-            }}
+            classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
           />
           <input type="hidden" name="base_price" value={parsePriceFloat(basePriceStr)} />
         </div>
@@ -246,62 +215,44 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           <Input
             type="text"
             inputMode="decimal"
-            label={`Selling Price (${currency})`}
+            labelPlacement="outside" label={`Selling Price (${currency})`}
             isRequired
             value={sellingPriceStr}
             onValueChange={setSellingPriceStr}
             onBlur={() => handlePriceBlur(setSellingPriceStr, sellingPriceStr)}
             placeholder={sellingPlaceholder}
-            variant="faded"
+            variant="bordered"
             radius="lg"
-            classNames={{
-              inputWrapper: "bg-indigo-50/30 dark:bg-indigo-950/20 border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-              label: "text-[10px] font-bold text-slate-400 uppercase",
-              input: "text-xs font-bold text-indigo-900 dark:text-indigo-300"
-            }}
+            classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
           />
           <input type="hidden" name="selling_price" value={parsePriceFloat(sellingPriceStr)} />
         </div>
         <Input
           name="stock"
           type="number"
-          label="Available Profiles (Stock)"
+          labelPlacement="outside" label="Available Profiles (Stock)"
           defaultValue="1"
-          variant="faded"
+          variant="bordered"
           radius="lg"
-          classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
-          }}
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
       </div>
 
       {/* Row 5: Lifecycles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
         <DatePicker
           name="date_buy"
-          label="Date Buy"
-          variant="faded"
+          labelPlacement="outside" label="Date Buy"
+          variant="bordered"
           radius="lg"
-          classNames={{
-            base: "h-[34px]",
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            input: "text-xs text-slate-800 dark:text-slate-100"
-          }}
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <DatePicker
           name="date_expired"
-          label="Date Expired"
-          variant="faded"
+          labelPlacement="outside" label="Date Expired"
+          variant="bordered"
           radius="lg"
-          classNames={{
-            base: "h-[34px]",
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            input: "text-xs text-slate-800 dark:text-slate-100"
-          }}
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
       </div>
 

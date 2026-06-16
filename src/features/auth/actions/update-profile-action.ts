@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb, getAuthenticatedUser } from "@/lib/firebase/server";
+import { adminDb, adminAuth, getAuthenticatedUser } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 
 export async function updateProfileAction(prevState: any, formData: FormData) {
@@ -8,6 +8,7 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
     const fullName = formData.get("fullName") as string;
     const email = formData.get("email") as string;
     const role = formData.get("role") as string;
+    const newPassword = formData.get("newPassword") as string;
 
     const user = await getAuthenticatedUser();
     if (!user) {
@@ -20,6 +21,16 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
       ...(email && { email }),
       ...(role && { role }),
     }, { merge: true });
+
+    // Update Auth Email if changed
+    if (email && email !== user.email) {
+      await adminAuth.updateUser(user.uid, { email });
+    }
+
+    // Update Auth Password if provided
+    if (newPassword && newPassword.length >= 6) {
+      await adminAuth.updateUser(user.uid, { password: newPassword });
+    }
 
     revalidatePath("/", "layout");
     return {

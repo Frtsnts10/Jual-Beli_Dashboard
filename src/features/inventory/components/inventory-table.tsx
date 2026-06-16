@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { InventoryItem, deleteInventoryItemAction, updateItemGroupingAction, updateInventoryItemAction, importInventoryCsvAction } from "../actions/inventory-actions";
 import { InventoryForm } from "./inventory-form";
-import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus, Package, Sparkles } from "lucide-react";
+import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus, Package, Sparkles, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
@@ -69,6 +69,8 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateConfirmOpen, setIsCreateConfirmOpen] = useState(false);
+  const [isEditConfirmOpen, setIsEditConfirmOpen] = useState(false);
   const [currentFamilyPage, setCurrentFamilyPage] = useState(1);
   const [currentSoloPage, setCurrentSoloPage] = useState(1);
   const [isFamilyTransitioning, setIsFamilyTransitioning] = useState(false);
@@ -199,43 +201,49 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
     reader.readAsText(file);
   };
 
-  // Extract unique group names to compile Family Pools
-  const groupedItems = items.reduce((acc, item) => {
-    if (item.group_name) {
-      if (!acc[item.group_name]) acc[item.group_name] = [];
-      acc[item.group_name].push(item);
-    }
-    return acc;
-  }, {} as Record<string, InventoryItem[]>);
-
-  // Independent items without designated group pools
-  const ungroupedItems = items.filter((item) => !item.group_name);
-
-  const itemsPerPage = 5;
-  const groupedEntries = Object.entries(groupedItems);
-  const totalFamilyPages = Math.ceil(groupedEntries.length / itemsPerPage);
-  const startFamilyIndex = (currentFamilyPage - 1) * itemsPerPage;
-  const paginatedFamilyGroups = groupedEntries.slice(startFamilyIndex, startFamilyIndex + itemsPerPage);
-
-  const totalSoloPages = Math.ceil(ungroupedItems.length / itemsPerPage);
-  const startSoloIndex = (currentSoloPage - 1) * itemsPerPage;
-  const paginatedSoloItems = ungroupedItems.slice(startSoloIndex, startSoloIndex + itemsPerPage);
-
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const handlePageChange = (p: number) => {
+    setIsTransitioning(true);
+    setCurrentPage(p);
+    setTimeout(() => setIsTransitioning(false), 150);
+  };
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = items.slice(startIndex, startIndex + itemsPerPage);
   return (
     <div className="space-y-8 font-sans">
       {/* Top Controller Header Block */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-        <div>
-          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Tenant Stock Management</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Map streaming inventory rows, configure credentials, and manage auto-allocated Family Shard partitions.
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <span className="h-10 flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
+          {items.length} Total Inventory Shards
+        </span>
+        
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            onPress={downloadProductTemplate}
+            variant="flat"
+            className="font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 h-10 px-4"
+            startContent={<FileText className="w-4 h-4" />}
+          >
+            Template
+          </Button>
 
-        <div className="flex items-center gap-3">
-          <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
-            {items.length} Total Inventory Shards
-          </span>
+          <label className="h-10 flex items-center justify-center px-4 font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-sm transition-all gap-2 cursor-pointer">
+            <Upload className="w-4 h-4" /> Import CSV
+            <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
+          </label>
+
+          <Button
+            onPress={() => exportData(items, "inventory_export.csv")}
+            variant="flat"
+            className="font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 h-10 px-4"
+            startContent={<Download className="w-4 h-4" />}
+          >
+            Export
+          </Button>
+
           <Button
             onPress={() => {
               if (!isPremium && items.length >= 3) {
@@ -250,8 +258,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
               }
             }}
             color="primary"
-            radius="lg"
-            className="h-[38px] px-5 text-xs font-bold shadow-md"
+            className="font-bold shadow-md h-10 px-4 ml-auto"
             startContent={<Plus className="w-4 h-4" />}
           >
             Add Digital Inventory Row
@@ -281,7 +288,10 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
       )}
 
       {/* Dynamic Creation Modal Embed */}
-      <Modal isOpen={isCreateModalOpen} onOpenChange={(open) => setIsCreateModalOpen(open)} size="4xl" scrollBehavior="inside" classNames={{
+      <Modal backdrop="blur" isOpen={isCreateModalOpen} onOpenChange={(open) => {
+        if (!open) setIsCreateConfirmOpen(true);
+        else setIsCreateModalOpen(true);
+      }} size="4xl" scrollBehavior="inside" classNames={{
         base: "bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-lg shadow-2xl",
         body: "p-0"
       }}>
@@ -296,271 +306,37 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
         </ModalContent>
       </Modal>
 
-      {/* SECTION 1: Family Pools Hub (Grouped View) */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              Family Pool Allocation Nodes (Shared Shard Grouping)
-            </h3>
-            <p className="text-[10px] text-slate-500 mt-0.5">Auto-allocated pool constraints map 5 or 6 member profiles natively per master partition.</p>
-          </div>
+      <ConfirmModal
+        isOpen={isCreateConfirmOpen}
+        onClose={() => setIsCreateConfirmOpen(false)}
+        onConfirm={() => {
+          setIsCreateConfirmOpen(false);
+          setIsCreateModalOpen(false);
+        }}
+        title="Discard New Variant"
+        description="Are you sure you want to close this form? Any unsaved data will be permanently lost."
+        confirmText="Discard"
+      />
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              onPress={() => exportData(items.filter(i => !!i.group_name), "family_inventory_export.csv")}
-              variant="bordered"
-              radius="lg"
-              className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-              startContent={<Download className="w-3.5 h-3.5" />}
-            >
-              Export
-            </Button>
-            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition-all gap-1.5 cursor-pointer">
-              <Upload className="w-3.5 h-3.5" /> Import
-              <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
-            </label>
-            <Button
-              onPress={downloadProductTemplate}
-              variant="flat"
-              radius="lg"
-              className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
-              startContent={<Download className="w-3.5 h-3.5" />}
-            >
-              Template
-            </Button>
-          </div>
-        </div>
-
-        {groupedEntries.length > 0 ? (
-          <div className={`grid grid-cols-1 gap-5 transition-all duration-150 ${isFamilyTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
-            {paginatedFamilyGroups.map(([groupName, groupMembers]) => {
-              const maxCapacity = groupName.toLowerCase().includes("netflix") ? 5 : 6;
-              const isFull = groupMembers.length >= maxCapacity;
-
-              return (
-                <div
-                  key={groupName}
-                  className="bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/80 dark:border-slate-800/80 shadow-sm overflow-hidden transition-all hover:border-indigo-200 dark:hover:border-slate-700"
-                >
-                  {/* Pool Card Header */}
-                  <div className="bg-gradient-to-r from-indigo-50/50 dark:from-indigo-950/20 to-slate-50 dark:to-[#0b0f19] px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-pulse" />
-                      <h4 className="text-xs font-black text-indigo-950 dark:text-indigo-300 tracking-tight">{groupName}</h4>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-black tracking-wider ${
-                        isFull ? "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400" : "bg-indigo-100 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-300"
-                      }`}>
-                        Occupancy: {groupMembers.length} / {maxCapacity} Profiles
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Nested Member Rows */}
-                  <div className="divide-y divide-slate-50 dark:divide-slate-800/50 overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-50/30 dark:bg-[#0b0f19]/80 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                        <tr>
-                          <th className="px-4 py-2 min-w-[130px]">Member Reference</th>
-                          <th className="px-4 py-2 min-w-[120px]">Designation</th>
-                          <th className="px-4 py-2 min-w-[150px]">Credentials mapped</th>
-                          <th className="px-4 py-2 min-w-[120px]">Lifecycle Target</th>
-                          <th className="px-4 py-2 text-right min-w-[120px]">Pool Controls</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                        {groupMembers.map((member) => {
-                          const isUpdating = updatingId === member.id;
-                          const isDeleting = deletingId === member.id;
-
-                          return (
-                            <tr key={member.id} className="hover:bg-slate-50/40 dark:hover:bg-slate-800/20">
-                              <td className="px-4 py-2.5 font-bold text-slate-900 dark:text-slate-100">
-                                {member.name}{" "}
-                                {member.profile_tier && (
-                                  <span className="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-normal ml-1">
-                                    {member.profile_tier}
-                                  </span>
-                                )}
-                              </td>
-                              <td className="px-4 py-2.5">
-                                <span className="bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 font-extrabold px-1.5 py-0.5 rounded text-[10px]">
-                                  {member.profile_name || "Slot Anonymous"}
-                                </span>
-                              </td>
-                              <td className="px-4 py-2.5 space-y-1">
-                                {member.email ? (
-                                  <div className="block">
-                                    <CopyableCredential value={member.email} label="Email" />
-                                  </div>
-                                ) : (
-                                  <span className="text-slate-400 block text-[10px] italic font-sans">No email</span>
-                                )}
-                                {member.password && (
-                                  <div className="flex items-center gap-1">
-                                    <span className="text-[9px] text-slate-400 select-none">🔑</span>
-                                    <CopyableCredential value={member.password} label="Password" isPassword />
-                                  </div>
-                                )}
-                              </td>
-                              <td className="px-4 py-2.5 text-[10px] text-slate-400">
-                                Exp: {member.date_expired || "Rolling"}
-                              </td>
-                              <td className="px-4 py-2.5 text-right space-x-1">
-                                <Button
-                                  variant="light"
-                                  size="sm"
-                                  onPress={() => handleGroupChange(member.id, member.group_name)}
-                                  isDisabled={isUpdating}
-                                  className="h-6 px-2 min-w-0 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-slate-600 dark:text-slate-400 font-bold text-[9px] data-[hover=true]:text-indigo-600 dark:data-[hover=true]:text-indigo-300"
-                                  title="Change family pool group target"
-                                >
-                                  {isUpdating ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <RefreshCw className="w-2.5 h-2.5" />}
-                                  Re-Assign
-                                </Button>
-                                <Button
-                                  isIconOnly
-                                  variant="light"
-                                  size="sm"
-                                  onPress={() => setEditingItem(member)}
-                                  isDisabled={isDeleting || isUpdating}
-                                  className="h-6 w-6 min-w-0 text-slate-400 data-[hover=true]:text-indigo-600 dark:data-[hover=true]:text-indigo-400 data-[hover=true]:bg-indigo-50 dark:data-[hover=true]:bg-indigo-950/40"
-                                  title="Edit item profile parameters"
-                                >
-                                  <Edit className="w-3 h-3" />
-                                </Button>
-                                <Button
-                                  isIconOnly
-                                  variant="light"
-                                  size="sm"
-                                  onPress={() => setDeleteConfirmId(member.id)}
-                                  isDisabled={isDeleting}
-                                  className="h-6 w-6 min-w-0 text-slate-400 data-[hover=true]:text-red-600 dark:data-[hover=true]:text-red-400 data-[hover=true]:bg-red-50 dark:data-[hover=true]:bg-red-950/40"
-                                >
-                                  {isDeleting ? <Loader2 className="w-3 h-3 animate-spin text-red-600" /> : <Trash2 className="w-3 h-3" />}
-                                </Button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="p-8 bg-slate-50/50 dark:bg-[#0b0f19]/50 rounded-lg border border-slate-200/60 dark:border-slate-800/80 text-center italic text-xs text-slate-400">
-            No family-based pool slots assigned. Create Google, YouTube, or Canva items to trigger bucket allocation logic.
-          </div>
-        )}
-
-        {totalFamilyPages > 1 && (
-          <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border border-slate-100 dark:border-slate-800 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-              Showing Family Pools <strong className="text-slate-700 dark:text-slate-200">{startFamilyIndex + 1}</strong> to{" "}
-              <strong className="text-slate-700 dark:text-slate-200">
-                {Math.min(startFamilyIndex + itemsPerPage, groupedEntries.length)}
-              </strong>{" "}
-              of <strong className="text-slate-700 dark:text-slate-200">{groupedEntries.length}</strong> master groups
-            </span>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="bordered"
-                radius="lg"
-                onPress={() => handleFamilyPageChange(Math.max(1, currentFamilyPage - 1))}
-                isDisabled={currentFamilyPage === 1}
-                className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-              >
-                Prev
-              </Button>
-              {Array.from({ length: totalFamilyPages }, (_, i) => i + 1).map((page) => (
-                <Button
-                  key={page}
-                  variant={currentFamilyPage === page ? "solid" : "bordered"}
-                  color={currentFamilyPage === page ? "primary" : "default"}
-                  radius="lg"
-                  onPress={() => handleFamilyPageChange(page)}
-                  className={`h-[26px] min-w-[26px] px-0 font-bold ${
-                    currentFamilyPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
-                  }`}
-                >
-                  {page}
-                </Button>
-              ))}
-              <Button
-                variant="bordered"
-                radius="lg"
-                onPress={() => handleFamilyPageChange(Math.min(totalFamilyPages, currentFamilyPage + 1))}
-                isDisabled={currentFamilyPage === totalFamilyPages}
-                className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* SECTION 2: Independent Resale Array (Solo items) */}
-      <div className="space-y-4 pt-8 border-t border-slate-200/60 dark:border-slate-800/60">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Package className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              Independent Resale Array (Solo Variants & Base Accounts)
-            </h3>
-            <p className="text-[10px] text-slate-500 mt-0.5">Individual streaming items operating outside strict family slot pooling constraints.</p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              onPress={() => exportData(ungroupedItems, "solo_inventory_export.csv")}
-              variant="bordered"
-              radius="lg"
-              className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-              startContent={<Download className="w-3.5 h-3.5" />}
-            >
-              Export
-            </Button>
-            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition-all gap-1.5 cursor-pointer">
-              <Upload className="w-3.5 h-3.5" /> Import
-              <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
-            </label>
-            <Button
-              onPress={downloadProductTemplate}
-              variant="flat"
-              radius="lg"
-              className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
-              startContent={<Download className="w-3.5 h-3.5" />}
-            >
-              Template
-            </Button>
-          </div>
-        </div>
-
+      {/* Unified Product Inventory Array */}
+      <div className="space-y-8 pt-4">
         <div className="bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50/80 dark:bg-[#0b0f19]/80 border-b border-slate-100 dark:border-slate-800">
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[140px]">Asset Variant</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Designation</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[150px]">Credentials</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[140px]">Product Asset</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Profile Designation</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[150px]">Delivery Credentials</th>
                   <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Pricing Matrix</th>
                   <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[130px]">Lifecycle Target</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right min-w-[120px]">Pool Router</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right min-w-[120px]">Controls</th>
                 </tr>
               </thead>
-              <tbody className={`divide-y divide-slate-50 dark:divide-slate-800/60 transition-all duration-150 ${isSoloTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
-                {paginatedSoloItems.map((item) => {
+              <tbody className={`divide-y divide-slate-50 dark:divide-slate-800/60 transition-all duration-150 ${isTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
+                {paginatedItems.map((item) => {
                   const isDeleting = deletingId === item.id;
                   const isUpdating = updatingId === item.id;
-
                   return (
                     <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                       <td className="px-5 py-3.5">
@@ -577,33 +353,30 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                           <span>Stock: {item.stock}</span>
                         </div>
                       </td>
-
                       <td className="px-5 py-3.5">
                         <span className="font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-[11px]">
                           {item.profile_name || "Unassigned"}
                         </span>
                       </td>
-
                       <td className="px-5 py-3.5 space-y-1.5">
                         {item.email ? (
                           <div className="block">
-                            <CopyableCredential value={item.email} label="Email" />
+                            <CopyableCredential value={item.email} labelPlacement="outside" label="Email" />
                           </div>
                         ) : null}
                         {item.password ? (
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-[10px] text-slate-400 select-none">🔑</span>
-                            <CopyableCredential value={item.password} label="Password" isPassword />
+                            <CopyableCredential value={item.password} labelPlacement="outside" label="Password" isPassword />
                             {item.pin && (
                               <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px]">
-                                PIN: <CopyableCredential value={item.pin} label="PIN" isTiny />
+                                PIN: <CopyableCredential value={item.pin} labelPlacement="outside" label="PIN" isTiny />
                               </span>
                             )}
                           </div>
                         ) : null}
                         {!item.email && !item.password && <span className="text-slate-300 italic text-[11px] font-sans">No credentials</span>}
                       </td>
-
                       <td className="px-5 py-3.5">
                         <div className="flex items-baseline gap-1.5">
                           <span className="text-sm font-black text-emerald-600">
@@ -616,7 +389,6 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                           )}
                         </div>
                       </td>
-
                       <td className="px-5 py-3.5 text-[11px] text-slate-500">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3 text-slate-400" />
@@ -627,19 +399,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                           <span className="text-red-500 font-medium">Exp: {item.date_expired || "N/A"}</span>
                         </div>
                       </td>
-
                       <td className="px-5 py-3.5 text-right space-x-1.5">
-                        <Button
-                          variant="light"
-                          size="sm"
-                          onPress={() => handleGroupChange(item.id, "")}
-                          isDisabled={isUpdating}
-                          className="h-7 px-2.5 min-w-0 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-[10px]"
-                          title="Assign item to shared Family Pool container"
-                        >
-                          {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : <UserPlus className="w-3 h-3" />}
-                          Route to Pool
-                        </Button>
                         <Button
                           isIconOnly
                           variant="light"
@@ -665,45 +425,44 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                     </tr>
                   );
                 })}
-                {ungroupedItems.length === 0 && (
+                {items.length === 0 && (
                   <tr>
                     <td colSpan={6} className="px-5 py-10 text-center text-slate-400 italic">
-                      Zero unassigned or solo items available in general digital memory.
+                      No products found. Add your first digital inventory row.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
-
-          {totalSoloPages > 1 && (
+          {totalPages > 1 && (
             <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                Showing Solo Items <strong className="text-slate-700 dark:text-slate-200">{startSoloIndex + 1}</strong> to{" "}
+                Showing <strong className="text-slate-700 dark:text-slate-200">{startIndex + 1}</strong> to{" "}
                 <strong className="text-slate-700 dark:text-slate-200">
-                  {Math.min(startSoloIndex + itemsPerPage, ungroupedItems.length)}
+                  {Math.min(startIndex + itemsPerPage, items.length)}
                 </strong>{" "}
-                of <strong className="text-slate-700 dark:text-slate-200">{ungroupedItems.length}</strong> solo rows
+                of <strong className="text-slate-700 dark:text-slate-200">{items.length}</strong> items
               </span>
               <div className="flex items-center gap-1">
                 <Button
                   variant="bordered"
                   radius="lg"
-                  onPress={() => handleSoloPageChange(Math.max(1, currentSoloPage - 1))}
-                  isDisabled={currentSoloPage === 1}
+                  onPress={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  isDisabled={currentPage === 1}
                   className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
                 >
                   Prev
                 </Button>
-                {Array.from({ length: totalSoloPages }, (_, i) => i + 1).map((page) => (
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
                     key={page}
-                    variant={currentSoloPage === page ? "solid" : "bordered"}
-                    color={currentSoloPage === page ? "primary" : "default"}
+                    variant={currentPage === page ? "solid" : "bordered"}
+                    color={currentPage === page ? "primary" : "default"}
                     radius="lg"
-                    onPress={() => handleSoloPageChange(page)}
+                    onPress={() => handlePageChange(page)}
                     className={`h-[26px] min-w-[26px] px-0 font-bold ${
-                      currentSoloPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+                      currentPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
                     }`}
                   >
                     {page}
@@ -712,8 +471,8 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                 <Button
                   variant="bordered"
                   radius="lg"
-                  onPress={() => handleSoloPageChange(Math.min(totalSoloPages, currentSoloPage + 1))}
-                  isDisabled={currentSoloPage === totalSoloPages}
+                  onPress={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  isDisabled={currentPage === totalPages}
                   className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
                 >
                   Next
@@ -723,9 +482,6 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           )}
         </div>
       </div>
-
-
-
       {editingItem && (
         <EditInventoryModal
           item={editingItem}
@@ -767,6 +523,7 @@ function EditInventoryModal({
   const initialCfg = getTierConfigForProduct(item.name || "");
   const [profileTier, setProfileTier] = useState(item.profile_tier || initialCfg.defaultTier);
   const [tierOptions, setTierOptions] = useState<string[]>(initialCfg.options);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -857,10 +614,14 @@ function EditInventoryModal({
   }
 
   return (
-    <Modal isOpen={true} onOpenChange={(open) => !open && onClose()} size="2xl" scrollBehavior="inside" classNames={{
+    <Modal backdrop="blur" isOpen={true} onOpenChange={(open) => {
+      if (!open) {
+        setIsConfirmOpen(true);
+      }
+    }} size="2xl" scrollBehavior="inside" classNames={{
       base: "bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-lg shadow-2xl",
       header: "bg-slate-50 dark:bg-[#0b0f19] border-b border-slate-100 dark:border-slate-800",
-      body: "p-6 space-y-4"
+      body: "p-6 space-y-8"
     }}>
       <ModalContent>
         {(onClose) => (
@@ -871,179 +632,129 @@ function EditInventoryModal({
               </h3>
             </ModalHeader>
             <ModalBody>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6">
                 <Input
-                  label="Product Name"
+                  labelPlacement="outside" label="Product Name"
                   isRequired
                   value={name}
                   onChange={handleNameChange}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    input: "text-xs font-bold text-slate-800 dark:text-slate-100"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
-                <Select
-                  label="Tier Variant"
+                <Select placeholder="Select tier..."
+                  labelPlacement="outside" label="Tier Variant"
                   selectedKeys={[profileTier]}
                   onChange={(e) => setProfileTier(e.target.value)}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    value: "text-xs font-semibold text-slate-800 dark:text-slate-100"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 >
                   {tierOptions.map((opt) => (
                     <SelectItem key={opt}>{opt}</SelectItem>
                   ))}
                 </Select>
                 <Input
-                  label="Designation"
+                  labelPlacement="outside" label="Designation"
                   value={profileName}
                   onValueChange={setProfileName}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
               </div>
 
               <Input
-                label="Family Pool String"
+                labelPlacement="outside" label="Family Pool String"
                 placeholder="Leave empty for Independent Asset status"
                 value={groupName}
                 onValueChange={setGroupName}
-                variant="faded"
+                variant="bordered"
                 radius="lg"
-                classNames={{
-                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-                  label: "text-[10px] font-bold text-slate-400 uppercase",
-                  input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
-                }}
+                classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <Input
                   type="email"
-                  label="Email"
+                  labelPlacement="outside" label="Email"
                   value={email}
                   onValueChange={setEmail}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    input: "text-xs text-slate-800 dark:text-slate-100"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   type="text"
-                  label="Password"
+                  labelPlacement="outside" label="Password"
                   value={password}
                   onValueChange={setPassword}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    input: "text-xs font-mono text-slate-800 dark:text-slate-100"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   type="text"
-                  label="PIN"
+                  labelPlacement="outside" label="PIN"
                   value={pin}
                   onValueChange={setPin}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    input: "text-xs font-mono text-slate-800 dark:text-slate-100"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <Input
                   type="text"
                   inputMode="decimal"
-                  label={`Base Price (${currency})`}
+                  labelPlacement="outside" label={`Base Price (${currency})`}
                   value={basePriceStr}
                   onValueChange={setBasePriceStr}
                   onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    input: "text-xs font-bold text-slate-800 dark:text-slate-100"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   type="text"
                   inputMode="decimal"
-                  label={`Selling Price (${currency})`}
+                  labelPlacement="outside" label={`Selling Price (${currency})`}
                   isRequired
                   value={sellingPriceStr}
                   onValueChange={setSellingPriceStr}
                   onBlur={() => handlePriceBlur(setSellingPriceStr, sellingPriceStr)}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-indigo-50/30 dark:bg-indigo-950/20 border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    input: "text-xs font-bold text-indigo-900 dark:text-indigo-300"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   type="number"
-                  label="Stock"
+                  labelPlacement="outside" label="Stock"
                   value={stock}
                   onValueChange={setStock}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <DatePicker
-                  label="Date Buy"
+                  labelPlacement="outside" label="Date Buy"
                   value={dateBuy ? (parseDate(dateBuy) as any) : null}
                   onChange={(val) => setDateBuy(val ? val.toString() : "")}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    base: "h-[34px]",
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    input: "text-xs text-slate-800 dark:text-slate-100"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <DatePicker
-                  label="Date Expired"
+                  labelPlacement="outside" label="Date Expired"
                   value={dateExpired ? (parseDate(dateExpired) as any) : null}
                   onChange={(val) => setDateExpired(val ? val.toString() : "")}
-                  variant="faded"
+                  variant="bordered"
                   radius="lg"
-                  classNames={{
-                    base: "h-[34px]",
-                    inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
-                    label: "text-[10px] font-bold text-slate-400 uppercase",
-                    input: "text-xs text-slate-800 dark:text-slate-100"
-                  }}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
               </div>
             </ModalBody>
@@ -1058,6 +769,15 @@ function EditInventoryModal({
           </form>
         )}
       </ModalContent>
+
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={onClose}
+        title="Discard Changes"
+        description="Are you sure you want to discard your edits? Any unsaved changes will be permanently lost."
+        confirmText="Discard"
+      />
     </Modal>
   );
 }

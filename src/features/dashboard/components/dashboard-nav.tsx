@@ -12,7 +12,8 @@ import {
   CreditCard, 
   Settings, 
   X,
-  GitPullRequest
+  GitPullRequest,
+  MonitorPlay
 } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
 
