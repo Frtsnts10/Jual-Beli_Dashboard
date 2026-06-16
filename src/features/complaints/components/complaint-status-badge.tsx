@@ -33,7 +33,7 @@ export function ComplaintStatusBadge({ storeId, complaint }: ComplaintStatusBadg
       onClick={cycleStatus}
       disabled={isUpdating}
       title="Click to cycle status matrix state"
-      className={`px-2.5 py-1 rounded-sm text-[10px] font-bold border transition-all inline-flex items-center gap-1.5 active:scale-95 disabled:opacity-50 ${badgeStyles[complaint.status]}`}
+      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all inline-flex items-center gap-1.5 active:scale-95 disabled:opacity-50 ${badgeStyles[complaint.status]}`}
     >
       {isUpdating && <Loader2 className="w-2.5 h-2.5 animate-spin" />}
       <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />

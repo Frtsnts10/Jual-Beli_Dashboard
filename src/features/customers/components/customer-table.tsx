@@ -192,13 +192,13 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-sm border border-indigo-100/40 dark:border-indigo-900/40">
+          <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
             {customers.length} Client Shards
           </span>
           <Button
             onPress={() => setIsCreateModalOpen(true)}
             color="primary"
-            radius="sm"
+            radius="lg"
             className="h-[38px] px-5 text-xs font-bold shadow-md"
             startContent={<Plus className="w-4 h-4" />}
           >
@@ -209,7 +209,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
 
       {/* Dynamic Creation Modal Embed */}
       <Modal isOpen={isCreateModalOpen} onOpenChange={(open) => setIsCreateModalOpen(open)} size="4xl" scrollBehavior="inside" classNames={{
-        base: "bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-sm shadow-2xl",
+        base: "bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-lg shadow-2xl",
         body: "p-0"
       }}>
         <ModalContent>
@@ -238,7 +238,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
             <Button
               onPress={exportCustomersCsv}
               variant="bordered"
-              radius="sm"
+              radius="lg"
               className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
@@ -247,20 +247,20 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
             <Button
               onPress={exportDatabaseDump}
               variant="flat"
-              radius="sm"
+              radius="lg"
               className="h-[34px] text-xs font-bold bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50"
               startContent={<Plus className="w-3.5 h-3.5" />}
             >
               JSON Dump
             </Button>
-            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all gap-1.5 cursor-pointer">
+            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition-all gap-1.5 cursor-pointer">
               <Upload className="w-3.5 h-3.5" /> Import
               <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
             </label>
             <Button
               onPress={downloadCustomerTemplate}
               variant="flat"
-              radius="sm"
+              radius="lg"
               className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
@@ -269,7 +269,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
+        <div className="bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -331,7 +331,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                             return (
                               <div
                                 key={idx}
-                                className={`p-2.5 rounded-sm border flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all ${
+                                className={`p-2.5 rounded-lg border flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all ${
                                   isExpired
                                     ? "bg-red-50/40 dark:bg-red-950/20 border-red-100 dark:border-red-900/30"
                                     : "bg-emerald-50/30 dark:bg-emerald-950/10 border-emerald-100/60 dark:border-emerald-900/30"
@@ -342,7 +342,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                   <div>
                                     <div className="flex items-center gap-1.5">
                                       <span className="font-bold text-slate-900 dark:text-slate-200 text-xs">{p.name}</span>
-                                      <span className="px-1.5 py-0.2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-sm text-[9px] uppercase font-bold">
+                                      <span className="px-1.5 py-0.2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-lg text-[9px] uppercase font-bold">
                                         {p.variant}
                                       </span>
                                     </div>
@@ -368,7 +368,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                     </span>
                                   </div>
                                   <span
-                                    className={`px-2 py-0.5 rounded-sm font-bold text-[9px] uppercase tracking-wider shrink-0 ${
+                                    className={`px-2 py-0.5 rounded-lg font-bold text-[9px] uppercase tracking-wider shrink-0 ${
                                       isExpired ? "bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400" : "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-400"
                                     }`}
                                   >
@@ -431,14 +431,14 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                           <Button
                             onPress={() => setActiveFormId(c.id)}
                             variant="light"
-                            radius="sm"
+                            radius="lg"
                             className="h-[28px] text-[11px] font-bold text-indigo-600 dark:text-indigo-400"
                             startContent={<Plus className="w-3.5 h-3.5" />}
                           >
                             Append Streaming Product Order
                           </Button>
                         ) : (
-                          <div className="p-3 bg-slate-50 dark:bg-[#0b0f19] rounded-sm border border-slate-200 dark:border-slate-800 space-y-2.5 transition-colors">
+                          <div className="p-3 bg-slate-50 dark:bg-[#0b0f19] rounded-lg border border-slate-200 dark:border-slate-800 space-y-2.5 transition-colors">
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">Assign Additional Product Variant</span>
                               <Button
@@ -461,7 +461,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 value={appendName}
                                 onValueChange={handleAppendNameChange}
                                 variant="faded"
-                                radius="sm"
+                                radius="lg"
                                 classNames={{
                                   inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
                                   label: "text-[9px] font-bold text-slate-400 uppercase",
@@ -476,7 +476,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                   selectedKeys={[appendVariant]}
                                   onChange={(e) => setAppendVariant(e.target.value)}
                                   variant="faded"
-                                  radius="sm"
+                                  radius="lg"
                                   classNames={{
                                     trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
                                     label: "text-[9px] font-bold text-slate-400 uppercase",
@@ -503,7 +503,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                   }
                                 }}
                                 variant="faded"
-                                radius="sm"
+                                radius="lg"
                                 classNames={{
                                   trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
                                   label: "text-[9px] font-bold text-slate-400 uppercase",
@@ -534,7 +534,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                   }
                                 }}
                                 variant="faded"
-                                radius="sm"
+                                radius="lg"
                                 classNames={{
                                   base: "h-[26px]",
                                   inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
@@ -549,7 +549,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 value={appendDateEnd ? (parseDate(appendDateEnd) as any) : null}
                                 onChange={(val) => setAppendDateEnd(val ? val.toString() : "")}
                                 variant="faded"
-                                radius="sm"
+                                radius="lg"
                                 classNames={{
                                   base: "h-[26px]",
                                   inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
@@ -565,7 +565,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 isDisabled={isAppending || !appendName}
                                 isLoading={isAppending}
                                 color="primary"
-                                radius="sm"
+                                radius="lg"
                                 className="h-[26px] px-3 font-bold text-[10px] shadow-sm"
                               >
                                 {isAppending ? "Summing Dates..." : "Confirm Mapped Order"}
@@ -601,7 +601,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
             <div className="flex items-center gap-1">
               <Button
                 variant="bordered"
-                radius="sm"
+                radius="lg"
                 onPress={() => handlePageChange(Math.max(1, currentPage - 1))}
                 isDisabled={currentPage === 1}
                 className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
@@ -613,7 +613,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                   key={page}
                   variant={currentPage === page ? "solid" : "bordered"}
                   color={currentPage === page ? "primary" : "default"}
-                  radius="sm"
+                  radius="lg"
                   onPress={() => handlePageChange(page)}
                   className={`h-[26px] min-w-[26px] px-0 font-bold ${
                     currentPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
@@ -624,7 +624,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               ))}
               <Button
                 variant="bordered"
-                radius="sm"
+                radius="lg"
                 onPress={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                 isDisabled={currentPage === totalPages}
                 className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
@@ -700,7 +700,7 @@ function StreamActionModal({
 
   return (
     <Modal isOpen={true} onOpenChange={(open) => !open && onClose()} size="sm" classNames={{
-      base: "bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-2xl",
+      base: "bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-lg shadow-2xl",
       header: target.mode === "extend" ? "bg-indigo-50 dark:bg-indigo-950/50 border-b border-indigo-100 dark:border-indigo-900/40" : "bg-red-50 dark:bg-red-950/50 border-b border-red-100 dark:border-red-900/40",
       body: "p-5 space-y-4",
       footer: "pt-2 border-t border-slate-100 dark:border-slate-800"
@@ -722,7 +722,7 @@ function StreamActionModal({
                 isReadOnly
                 value={target.productName}
                 variant="faded"
-                radius="sm"
+                radius="lg"
                 classNames={{
                   inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 h-[34px]",
                   label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -741,7 +741,7 @@ function StreamActionModal({
                     value={days}
                     onValueChange={setDays}
                     variant="faded"
-                    radius="sm"
+                    radius="lg"
                     classNames={{
                       inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
                       label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -750,7 +750,7 @@ function StreamActionModal({
                   />
                   <div className="flex gap-1.5 mt-2">
                     {["7", "14", "30", "90"].map((d) => (
-                      <Button key={d} onPress={() => setDays(d)} variant="flat" size="sm" className="h-[20px] min-w-0 px-2 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-sm">
+                      <Button key={d} onPress={() => setDays(d)} variant="flat" size="sm" className="h-[20px] min-w-0 px-2 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg">
                         +{d}d
                       </Button>
                     ))}
@@ -759,16 +759,16 @@ function StreamActionModal({
               ) : (
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Termination / Ban Reason</label>
-                  <textarea required autoFocus rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Terms of Service breach" className="w-full p-2.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:border-red-500 transition-colors" />
+                  <textarea required autoFocus rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Terms of Service breach" className="w-full p-2.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:bg-white dark:focus:bg-[#131b2e] focus:outline-none focus:border-red-500 transition-colors" />
                 </div>
               )}
             </ModalBody>
 
             <ModalFooter>
-              <Button variant="light" onPress={onClose} radius="sm" className="text-xs font-bold text-slate-600 dark:text-slate-400 h-[28px] min-h-0">
+              <Button variant="light" onPress={onClose} radius="lg" className="text-xs font-bold text-slate-600 dark:text-slate-400 h-[28px] min-h-0">
                 Cancel
               </Button>
-              <Button type="submit" isLoading={isPending} color={target.mode === "extend" ? "primary" : "danger"} radius="sm" className="text-xs font-bold shadow-sm h-[28px] min-h-0">
+              <Button type="submit" isLoading={isPending} color={target.mode === "extend" ? "primary" : "danger"} radius="lg" className="text-xs font-bold shadow-sm h-[28px] min-h-0">
                 {isPending ? "Broadcasting..." : target.mode === "extend" ? "Confirm Extension" : "Enforce Ban"}
               </Button>
             </ModalFooter>

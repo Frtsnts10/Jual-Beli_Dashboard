@@ -33,7 +33,7 @@ export function ComplaintForm({ storeId }: ComplaintFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-5 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-4 font-sans transition-colors"
+      className="p-5 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-4 font-sans transition-colors"
     >
       <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
         <AlertCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -41,7 +41,7 @@ export function ComplaintForm({ storeId }: ComplaintFormProps) {
       </h3>
 
       {error && (
-        <div className="p-2 text-xs text-red-600 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/40 rounded-sm">
+        <div className="p-2 text-xs text-red-600 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/40 rounded-lg">
           {error}
         </div>
       )}
@@ -53,7 +53,7 @@ export function ComplaintForm({ storeId }: ComplaintFormProps) {
           isRequired
           placeholder="John Smith"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
             label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -66,7 +66,7 @@ export function ComplaintForm({ storeId }: ComplaintFormProps) {
           isRequired
           placeholder="Package damage vectors detected"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
             label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -78,7 +78,7 @@ export function ComplaintForm({ storeId }: ComplaintFormProps) {
           label="Severity Priority"
           defaultSelectedKeys={["medium"]}
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
             label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -98,7 +98,7 @@ export function ComplaintForm({ storeId }: ComplaintFormProps) {
         minRows={3}
         placeholder="Detailing physical stress conditions or unfulfilled client vectors..."
         variant="faded"
-        radius="sm"
+        radius="lg"
         classNames={{
           inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
           label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -111,7 +111,7 @@ export function ComplaintForm({ storeId }: ComplaintFormProps) {
           type="submit"
           isLoading={isPending}
           color="primary"
-          radius="sm"
+          radius="lg"
           className="text-xs font-bold shadow-sm"
         >
           {isPending ? "Transmitting..." : "Append Support Event"}

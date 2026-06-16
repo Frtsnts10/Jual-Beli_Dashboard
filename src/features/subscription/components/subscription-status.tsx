@@ -12,11 +12,11 @@ interface SubscriptionStatusProps {
 
 export function SubscriptionStatus({ isSubscribed, plan, status, currentPeriodEnd }: SubscriptionStatusProps) {
   return (
-    <div className="p-6 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm font-sans flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-colors">
+    <div className="p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm font-sans flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-colors">
       <div>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Plan Telemetry Status</span>
-          <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide transition-colors ${
+          <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wide transition-colors ${
             isSubscribed ? "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-900/40" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
           }`}>
             {status}
@@ -38,7 +38,7 @@ export function SubscriptionStatus({ isSubscribed, plan, status, currentPeriodEn
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="p-3 bg-gradient-to-br from-indigo-50 dark:from-indigo-950/40 to-violet-50 dark:to-violet-950/20 text-indigo-600 dark:text-indigo-400 rounded-sm border border-indigo-100/40 dark:border-indigo-900/40 transition-colors">
+        <div className="p-3 bg-gradient-to-br from-indigo-50 dark:from-indigo-950/40 to-violet-50 dark:to-violet-950/20 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40 transition-colors">
           <Sparkles className="w-5 h-5" />
         </div>
         <div>

@@ -1,4 +1,11 @@
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Inventory",
+};
+
+
 import { getInventoryAction } from "@/features/inventory/actions/inventory-actions";
 import { InventoryTable } from "@/features/inventory/components/inventory-table";
 import { adminDb } from "@/lib/firebase/server";

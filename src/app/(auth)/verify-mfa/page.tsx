@@ -45,7 +45,7 @@ export default function VerifyMfaPage() {
 
         <form onSubmit={handleVerify} className="space-y-6">
           {error && (
-            <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-3 text-[11px] text-rose-400 animate-shake-soft">
+            <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-lg flex items-start gap-3 text-[11px] text-rose-400 animate-shake-soft">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <p>{error}</p>
             </div>
@@ -63,7 +63,7 @@ export default function VerifyMfaPage() {
               value={otpCode}
               onValueChange={(val) => setOtpCode(val.replace(/\D/g, ""))}
               classNames={{
-                inputWrapper: "h-14 bg-black/40 border border-white/5 rounded-2xl hover:border-emerald-500/50 data-[focus=true]:border-emerald-500/50",
+                inputWrapper: "h-14 bg-black/40 border border-white/5 rounded-lg hover:border-emerald-500/50 data-[focus=true]:border-emerald-500/50",
                 input: "text-2xl font-mono tracking-[0.5em] text-center text-white placeholder:text-white/5"
               }}
             />
@@ -73,7 +73,7 @@ export default function VerifyMfaPage() {
             type="submit"
             isDisabled={otpCode.length !== 6}
             isLoading={isPending}
-            className="w-full h-14 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20"
+            className="w-full h-14 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20"
           >
             {isPending ? "Verifying Secure Layer..." : "Confirm Identity"}
           </Button>

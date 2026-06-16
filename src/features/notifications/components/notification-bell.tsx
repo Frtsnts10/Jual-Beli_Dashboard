@@ -49,7 +49,7 @@ export function NotificationBell({ storeId }: { storeId: string }) {
           if (!isOpen) fetchNotifications();
         }}
         title="View Expiry & Extension Reminders"
-        className="relative flex items-center justify-center w-[34px] h-[34px] rounded-sm border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0d1322] hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-300 transition-all shadow-sm active:scale-95"
+        className="relative flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0d1322] hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-300 transition-all shadow-sm active:scale-95"
       >
         <Bell className="w-4 h-4" />
         {items.length > 0 && (
@@ -62,12 +62,12 @@ export function NotificationBell({ storeId }: { storeId: string }) {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 mt-2 w-[360px] md:w-[420px] max-w-[90vw] bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800 rounded-sm shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="absolute right-0 mt-2 w-[360px] md:w-[420px] max-w-[90vw] bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800 rounded-lg shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="p-3 bg-slate-50 dark:bg-[#0b0f19] border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
               <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 shrink-0 whitespace-nowrap">
                 <Bell className="w-3.5 h-3.5 text-indigo-500 shrink-0" /> Countdown Reminders Hub
               </span>
-              <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-sm bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
+              <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
                 {items.length} Pending
               </span>
             </div>

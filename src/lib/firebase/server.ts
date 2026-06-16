@@ -36,6 +36,25 @@ export async function getAuthenticatedUser() {
 }
 
 /**
+ * Gets the full user profile including role from Firestore.
+ */
+export async function getUserProfile() {
+  const user = await getAuthenticatedUser();
+  if (!user) return null;
+
+  const doc = await adminDb.collection("profiles").doc(user.uid).get();
+  if (!doc.exists) return { uid: user.uid, role: "admin", email: user.email, name: user.name };
+
+  const data = doc.data()!;
+  return {
+    uid: user.uid,
+    email: data.email || user.email,
+    name: data.full_name || user.name || "Workspace Admin",
+    role: data.role || "admin"
+  };
+}
+
+/**
  * Creates a session cookie from a Firebase ID token.
  * Call this from your sign-in API route after the client signs in.
  */

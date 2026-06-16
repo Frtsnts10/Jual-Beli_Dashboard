@@ -5,6 +5,7 @@ import { PlusCircle, Users } from "lucide-react";
 import { createInventoryItemAction } from "../actions/inventory-actions";
 import { getTierConfigForProduct } from "@/config/product-tiers";
 import { Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
+import { toast } from "sonner";
 
 interface InventoryFormProps {
   storeId: string;
@@ -14,7 +15,6 @@ interface InventoryFormProps {
 
 export function InventoryForm({ storeId, currency = "IDR", onSuccess }: InventoryFormProps) {
   const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const isIDR = currency.toUpperCase() === "IDR";
   const isNonDecimal = ["IDR", "JPY", "KRW", "VND"].includes(currency.toUpperCase());
@@ -69,7 +69,6 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsPending(true);
-    setError(null);
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -77,8 +76,9 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
 
     setIsPending(false);
     if (res?.error) {
-      setError(res.error);
+      toast.error(res.error);
     } else {
+      toast.success("Digital resale variant mapped successfully");
       form.reset();
       setBasePriceStr("");
       setSellingPriceStr("");
@@ -91,7 +91,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-6 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-4 font-sans transition-colors"
+      className="p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-4 font-sans transition-colors"
     >
       <div>
         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
@@ -102,12 +102,6 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           Map specific sub-accounts, streaming tiers, credentials, and auto-allocated family pool partitions.
         </p>
       </div>
-
-      {error && (
-        <div className="p-2.5 text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl font-medium">
-          {error}
-        </div>
-      )}
 
       {/* Row 1: Asset Core */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -124,7 +118,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           }}
           placeholder="e.g. YouTube Premium Family"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
             label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -137,7 +131,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           selectedKeys={[tierVariant]}
           onChange={(e) => setTierVariant(e.target.value)}
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
             label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -153,7 +147,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           label="Profile Designation"
           placeholder="e.g. Member Slot Alpha"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
             label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -173,7 +167,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           }
           placeholder="Leave blank for auto-assignment based on name/duration parameters (Max 5/6 members)"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
             input: "text-xs font-semibold text-slate-800 dark:text-slate-100"
@@ -192,7 +186,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           label="Account Email"
           placeholder="account@streaming.com"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
             label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -205,7 +199,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           label="Password"
           placeholder="••••••••"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
             label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -218,7 +212,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           label="Profile PIN"
           placeholder="e.g. 1234"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
             label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -239,7 +233,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
             onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)}
             placeholder={basePlaceholder}
             variant="faded"
-            radius="sm"
+            radius="lg"
             classNames={{
               inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
               label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -259,7 +253,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
             onBlur={() => handlePriceBlur(setSellingPriceStr, sellingPriceStr)}
             placeholder={sellingPlaceholder}
             variant="faded"
-            radius="sm"
+            radius="lg"
             classNames={{
               inputWrapper: "bg-indigo-50/30 dark:bg-indigo-950/20 border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
               label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -274,7 +268,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           label="Available Profiles (Stock)"
           defaultValue="1"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
             label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -289,7 +283,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           name="date_buy"
           label="Date Buy"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             base: "h-[34px]",
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
@@ -301,7 +295,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           name="date_expired"
           label="Date Expired"
           variant="faded"
-          radius="sm"
+          radius="lg"
           classNames={{
             base: "h-[34px]",
             inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
@@ -316,7 +310,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           type="submit"
           isLoading={isPending}
           color="primary"
-          radius="sm"
+          radius="lg"
           className="text-xs font-bold shadow-md"
         >
           {isPending ? "Mapping Variant Payload..." : "Add Digital Inventory Row"}

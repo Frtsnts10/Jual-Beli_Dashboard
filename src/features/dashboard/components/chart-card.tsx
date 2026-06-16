@@ -51,7 +51,7 @@ export function ChartCard({ data }: ChartCardProps) {
   };
 
   return (
-    <div className="p-7 bg-white dark:bg-[#080c14] rounded-2xl border border-slate-100 dark:border-white/5 shadow-2xl shadow-indigo-500/5 font-sans transition-all h-full flex flex-col group overflow-hidden relative">
+    <div className="p-7 bg-white dark:bg-[#080c14] rounded-lg border border-slate-100 dark:border-white/5 shadow-2xl shadow-indigo-500/5 font-sans transition-all h-full flex flex-col group overflow-hidden relative">
       {/* Background Decorative Glow */}
       <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/5 blur-[100px] pointer-events-none" />
       
@@ -76,7 +76,7 @@ export function ChartCard({ data }: ChartCardProps) {
             </div>
           </div>
 
-          <div className="flex p-1 bg-slate-100/50 dark:bg-white/5 rounded-xl border border-slate-200/50 dark:border-white/5">
+          <div className="flex p-1 bg-slate-100/50 dark:bg-white/5 rounded-lg border border-slate-200/50 dark:border-white/5">
             {(["daily", "monthly", "yearly"] as ViewMode[]).map((mode) => (
               <button
                 key={mode}

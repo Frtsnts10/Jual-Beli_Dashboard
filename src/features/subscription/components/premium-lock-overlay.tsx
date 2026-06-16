@@ -12,7 +12,7 @@ interface PremiumLockOverlayProps {
 
 export function PremiumLockOverlay({ storeId, featureName, description }: PremiumLockOverlayProps) {
   return (
-    <div className="relative overflow-hidden w-full min-h-[450px] bg-slate-50/50 dark:bg-[#0d1322]/40 border border-slate-200/60 dark:border-slate-800/80 rounded-sm p-8 flex flex-col items-center justify-center text-center shadow-inner font-sans transition-all">
+    <div className="relative overflow-hidden w-full min-h-[450px] bg-slate-50/50 dark:bg-[#0d1322]/40 border border-slate-200/60 dark:border-slate-800/80 rounded-lg p-8 flex flex-col items-center justify-center text-center shadow-inner font-sans transition-all">
       {/* Dynamic ambient spotlights in the background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-indigo-500/10 dark:bg-indigo-500/5 blur-3xl" />
@@ -60,7 +60,7 @@ export function PremiumLockOverlay({ storeId, featureName, description }: Premiu
         {/* Shiny Conversion Call-to-action */}
         <Link
           href={`/${storeId}/subscription`}
-          className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-xs font-black uppercase tracking-wider rounded-sm shadow-md hover:shadow-indigo-500/20 active:scale-95 transition-all"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-xs font-black uppercase tracking-wider rounded-lg shadow-md hover:shadow-indigo-500/20 active:scale-95 transition-all"
         >
           <span>Upgrade to Shop Dashboard Pro</span>
           <ArrowRight className="w-4 h-4" />

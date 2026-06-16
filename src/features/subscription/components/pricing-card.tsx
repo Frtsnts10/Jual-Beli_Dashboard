@@ -17,11 +17,11 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
   const handleUpgrade = async () => {
     setIsPending(true);
     const returnUrl = typeof window !== "undefined" ? window.location.href : "";
-    const res = await createCheckoutSessionAction(storeId, returnUrl, billingInterval);
+    const res = await createCheckoutSessionAction(storeId, returnUrl, billingInterval, "pro");
     if (res?.url) {
       window.location.href = res.url;
     } else {
-      alert("Failed to provision routing session. Ensure STRIPE keys are bound.");
+      alert(`Failed to provision routing session: ${res?.error || "Ensure MIDTRANS keys are bound."}`);
       setIsPending(false);
     }
   };
@@ -53,7 +53,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
       features: [
         "Unlimited Store Shards",
         "Advanced @tanstack/react-table telemetry grids",
-        "Instant Stripe SLA automatic bindings",
+        "Instant Midtrans SLA automatic bindings",
       ]
     },
     monthly: {
@@ -64,7 +64,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
       features: [
         "Unlimited Store Shards",
         "Advanced @tanstack/react-table telemetry grids",
-        "Instant Stripe SLA automatic bindings",
+        "Instant Midtrans SLA automatic bindings",
         "Priority Customer Desk SLA cycle actions"
       ]
     },
@@ -76,7 +76,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
       features: [
         "Unlimited Store Shards",
         "Advanced @tanstack/react-table telemetry grids",
-        "Instant Stripe SLA automatic bindings",
+        "Instant Midtrans SLA automatic bindings",
         "Priority Customer Desk SLA cycle actions",
         "Priority dedicated developer webhook arrays",
         "Annual PCI-DSS compliance audits sync"
@@ -90,7 +90,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
       features: [
         "Unlimited Store Shards",
         "Advanced @tanstack/react-table telemetry grids",
-        "Instant Stripe SLA automatic bindings",
+        "Instant Midtrans SLA automatic bindings",
         "Priority Customer Desk SLA cycle actions",
         "Lifetime license - Own it forever",
         "Zero recurring subscription costs",
@@ -105,10 +105,10 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
     <div className="max-w-4xl mx-auto font-sans transition-colors">
       {/* Dynamic Pills Interval Selector Toggle */}
       <div className="flex justify-center mb-10">
-        <div className="bg-slate-100 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800/80 p-1 rounded-sm flex gap-1 shadow-sm relative transition-all">
+        <div className="bg-slate-100 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800/80 p-1 rounded-lg flex gap-1 shadow-sm relative transition-all">
           <button
             onClick={() => setBillingInterval("weekly")}
-            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
+            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
               billingInterval === "weekly"
                 ? "bg-indigo-600 text-white shadow-sm scale-102"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
@@ -118,7 +118,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
           </button>
           <button
             onClick={() => setBillingInterval("monthly")}
-            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
+            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
               billingInterval === "monthly"
                 ? "bg-indigo-600 text-white shadow-sm scale-102"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
@@ -128,27 +128,27 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
           </button>
           <button
             onClick={() => setBillingInterval("yearly")}
-            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-sm transition-all relative cursor-pointer ${
+            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all relative cursor-pointer ${
               billingInterval === "yearly"
                 ? "bg-indigo-600 text-white shadow-sm scale-102"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
             }`}
           >
             Yearly
-            <span className="absolute -top-3.5 -right-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[7px] font-black uppercase px-1.5 py-0.5 rounded-sm shadow-md animate-pulse">
+            <span className="absolute -top-3.5 -right-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[7px] font-black uppercase px-1.5 py-0.5 rounded-lg shadow-md animate-pulse">
               Save 30%
             </span>
           </button>
           <button
             onClick={() => setBillingInterval("lifetime")}
-            className={`px-5 py-2 text-[10px] font-black uppercase tracking-wider rounded-sm transition-all relative cursor-pointer ${
+            className={`px-5 py-2 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all relative cursor-pointer ${
               billingInterval === "lifetime"
                 ? "bg-indigo-600 text-white shadow-sm scale-102"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
             }`}
           >
             Lifetime
-            <span className="absolute -top-3.5 -right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-[7px] font-black uppercase px-1.5 py-0.5 rounded-sm shadow-md animate-pulse">
+            <span className="absolute -top-3.5 -right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-[7px] font-black uppercase px-1.5 py-0.5 rounded-lg shadow-md animate-pulse">
               Best Value
             </span>
           </button>
@@ -157,11 +157,11 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Free tier card */}
-        <div className="p-6 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/80 dark:border-slate-800/80 shadow-sm flex flex-col justify-between opacity-90 relative transition-colors">
+        <div className="p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/80 dark:border-slate-800/80 shadow-sm flex flex-col justify-between opacity-90 relative transition-colors">
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Base Tier</span>
-              <span className="text-[10px] bg-slate-100 dark:bg-[#0b0f19] text-slate-600 dark:text-slate-400 px-2.5 py-0.5 rounded-sm font-bold transition-colors">
+              <span className="text-[10px] bg-slate-100 dark:bg-[#0b0f19] text-slate-600 dark:text-slate-400 px-2.5 py-0.5 rounded-lg font-bold transition-colors">
                 Default Active
               </span>
             </div>
@@ -190,14 +190,14 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
               </li>
               <li className="flex items-center gap-2.5 text-slate-300 dark:text-slate-700 line-through">
                 <Check className="w-4 h-4 shrink-0" />
-                <span>Live Stripe SLA Syncing</span>
+                <span>Live Midtrans SLA Syncing</span>
               </li>
             </ul>
           </div>
           <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800 transition-colors">
             <button
               disabled
-              className="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-xs font-bold rounded-sm text-center transition-colors"
+              className="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-xs font-bold rounded-lg text-center transition-colors"
             >
               {isSubscribed ? "Included in your package" : "Active Core Bound"}
             </button>
@@ -205,7 +205,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
         </div>
 
         {/* Enterprise tier card */}
-        <div className="p-6 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 rounded-sm border border-indigo-500/30 shadow-2xl flex flex-col justify-between relative overflow-hidden text-white transition-colors">
+        <div className="p-6 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 rounded-lg border border-indigo-500/30 shadow-2xl flex flex-col justify-between relative overflow-hidden text-white transition-colors">
           {/* Glow orb */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -214,7 +214,7 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
               <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
                 <Sparkles className="w-3.5 h-3.5" /> Premium Enterprise
               </span>
-              <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2.5 py-0.5 rounded-sm font-bold">
+              <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2.5 py-0.5 rounded-lg font-bold">
                 {currentPricing.badge}
               </span>
             </div>
@@ -239,9 +239,9 @@ export function PricingCard({ storeId, isSubscribed, currency = "USD" }: Pricing
             <button
               onClick={handleUpgrade}
               disabled={isPending}
-              className="w-full py-3 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 active:scale-95 text-white text-xs font-bold rounded-sm text-center shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 active:scale-95 text-white text-xs font-bold rounded-lg text-center shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
             >
-              {isPending ? "Connecting Secure Vector..." : isSubscribed ? "Simulate Stripe Gateway" : currentPricing.cta}
+              {isPending ? "Connecting Secure Vector..." : isSubscribed ? "Simulate Midtrans Gateway" : currentPricing.cta}
             </button>
           </div>
         </div>

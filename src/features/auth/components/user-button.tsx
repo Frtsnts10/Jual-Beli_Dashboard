@@ -14,9 +14,10 @@ export function UserButton() {
       <Dropdown placement="bottom-end" classNames={{ content: "bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800" }}>
         <DropdownTrigger>
           <Button
+            isIconOnly
             variant="bordered"
-            radius="sm"
-            className="h-[34px] border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0d1322] text-slate-700 dark:text-slate-300 font-bold px-2"
+            radius="lg"
+            className="w-[34px] h-[34px] min-w-[34px] p-0 border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0d1322] text-slate-700 dark:text-slate-300 font-bold"
           >
             <Avatar size="sm" name="Ω" className="w-5 h-5 text-[10px]" color="primary" />
           </Button>

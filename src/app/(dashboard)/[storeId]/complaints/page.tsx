@@ -1,4 +1,11 @@
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Complaints",
+};
+
+
 import { getComplaintsAction } from "@/features/complaints/actions/complaint-actions";
 import { ComplaintTable } from "@/features/complaints/components/complaint-table";
 import { adminDb } from "@/lib/firebase/server";
@@ -36,7 +43,7 @@ export default async function TenantComplaintsPage({
         />
       ) : (
         <>
-          <div className="p-4 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 rounded-sm">
+          <div className="p-4 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 rounded-lg">
             <h3 className="text-xs font-bold text-indigo-900 dark:text-indigo-300">Automated Customer Telemetry Feed</h3>
             <p className="text-[11px] text-indigo-700 dark:text-indigo-400 mt-0.5 leading-relaxed">
               Incidents flow automatically from client-facing portals. Actions such as sending OTPs, credential resynced, refunds, and duration extensions are natively managed on individual customer profiles inside the Customer desk module.

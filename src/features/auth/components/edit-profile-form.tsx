@@ -5,39 +5,38 @@ import { User, Mail, Shield, CheckCircle, Loader2, AlertCircle } from "lucide-re
 import { updateProfileAction } from "../actions/update-profile-action";
 import { useI18n } from "@/hooks/use-i18n";
 import { Input, Button } from "@heroui/react";
+import { toast } from "sonner";
 
 export function EditProfileForm({
   initialName,
   initialEmail,
+  initialRole = "admin",
 }: {
   initialName: string;
   initialEmail: string;
+  initialRole?: string;
 }) {
   const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const { t } = useI18n();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMessage(null);
-    setError(null);
 
     const formData = new FormData(e.currentTarget);
 
     startTransition(async () => {
       const res = await updateProfileAction(null, formData);
       if (res?.error) {
-        setError(res.error);
+        toast.error(res.error);
       } else if (res?.success) {
-        setMessage(res.message || "Properties synchronized cleanly");
+        toast.success(res.message || t.profile.profileSuccessTitle);
       }
     });
   };
 
   return (
-    <div className="h-full p-4 sm:p-6 bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-sm shadow-sm font-sans flex flex-col justify-between transition-colors">
+    <div className="h-full p-4 sm:p-6 bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-lg shadow-sm font-sans flex flex-col justify-between transition-colors">
       <div className="space-y-6">
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
@@ -48,26 +47,6 @@ export function EditProfileForm({
           </p>
         </div>
 
-        {message && (
-          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-sm flex items-start gap-2 text-xs text-emerald-800 dark:text-emerald-300 animate-bounce-once">
-            <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <div className="space-y-0.5">
-              <p className="font-bold">{t.profile.profileSuccessTitle}</p>
-              <p>{message}</p>
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="p-3 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 rounded-sm flex items-start gap-2 text-xs text-rose-800 dark:text-rose-300 animate-shake-soft">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-            <div className="space-y-0.5">
-              <p className="font-bold">{t.profile.profileErrorTitle}</p>
-              <p>{error}</p>
-            </div>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
@@ -77,7 +56,7 @@ export function EditProfileForm({
                 isRequired
                 startContent={<User className="w-3.5 h-3.5 text-slate-400" />}
                 variant="faded"
-                radius="sm"
+                radius="lg"
                 classNames={{
                   inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
                   label: "text-[10px] font-bold text-slate-400 uppercase tracking-wider",
@@ -93,7 +72,7 @@ export function EditProfileForm({
                 isRequired
                 startContent={<Mail className="w-3.5 h-3.5 text-slate-400" />}
                 variant="faded"
-                radius="sm"
+                radius="lg"
                 classNames={{
                   inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
                   label: "text-[10px] font-bold text-slate-400 uppercase tracking-wider",
@@ -102,12 +81,29 @@ export function EditProfileForm({
               />
           </div>
 
+          <div className="grid grid-cols-1 gap-4 pt-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              Workspace Role
+            </label>
+            <select
+              name="role"
+              defaultValue={initialRole}
+              className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg h-10 px-3 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-indigo-500"
+            >
+              <option value="admin">Administrator (Direct Write Access)</option>
+              <option value="staff">Staff Member (Draft / PR Approvals Only)</option>
+            </select>
+            <p className="text-[10px] text-slate-500">
+              For testing purposes, you can switch your role. Staff members will route edits through the Data Approval Workflow (Drafting System).
+            </p>
+          </div>
+
           <div className="flex justify-end pt-2">
             <Button
               type="submit"
               isLoading={isPending}
               color="primary"
-              radius="sm"
+              radius="lg"
               className="text-[13px] font-bold shadow-md px-6 h-[38px]"
             >
               {isPending ? t.profile.btnApplyingProfile : t.profile.btnApplyProfile}

@@ -1,4 +1,11 @@
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Orders",
+};
+
+
 import { getOrdersAction } from "@/features/orders/actions/order-actions";
 import { getInventoryAction } from "@/features/inventory/actions/inventory-actions";
 import { OrdersTable } from "@/features/orders/components/orders-table";

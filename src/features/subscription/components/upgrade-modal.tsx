@@ -23,7 +23,7 @@ export function UpgradeModal({ isOpen, onClose, storeId }: UpgradeModalProps) {
     if (res?.url) {
       window.location.href = res.url;
     } else {
-      alert("Failed to provision routing session. Ensure STRIPE configuration references are set.");
+      alert(`Failed to provision routing session: ${res?.error || "Ensure MIDTRANS configuration references are set."}`);
       setIsPending(false);
     }
   };
@@ -37,7 +37,7 @@ export function UpgradeModal({ isOpen, onClose, storeId }: UpgradeModalProps) {
           <>
             <ModalHeader className="flex flex-col gap-1 mt-2">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-indigo-500/20 text-indigo-400 rounded-xl">
+                <div className="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
@@ -58,7 +58,7 @@ export function UpgradeModal({ isOpen, onClose, storeId }: UpgradeModalProps) {
                 variant="light"
                 onPress={onClose}
                 className="text-xs font-bold text-slate-300 hover:text-white"
-                radius="sm"
+                radius="lg"
               >
                 Stay on Base Tier
               </Button>
@@ -66,7 +66,7 @@ export function UpgradeModal({ isOpen, onClose, storeId }: UpgradeModalProps) {
                 onPress={handleUpgrade}
                 isLoading={isPending}
                 className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-xs font-bold shadow-lg"
-                radius="sm"
+                radius="lg"
               >
                 {isPending ? "Routing vector..." : "Upgrade Now"}
               </Button>

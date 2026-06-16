@@ -18,6 +18,7 @@ export const dictionaries = {
       overview: "Ikhtisar",
       orders: "Antrean Pesanan",
       inventory: "Inventaris",
+      approvals: "Meja Persetujuan",
       customers: "Pelanggan",
       complaints: "Meja Keluhan",
       billing: "Paket Tagihan",
@@ -110,7 +111,7 @@ export const dictionaries = {
         "Hingga 3 Toko Shard Aktif",
         "Aliran penyerapan SKU dasar",
         "Kisi telemetri tingkat lanjut (terkunci)",
-        "Sinkronisasi Live Stripe SLA (terkunci)"
+        "Sinkronisasi Live Midtrans SLA (terkunci)"
       ],
       activeCoreBound: "Batas Core Aktif",
       includedInPackage: "Termasuk dalam paket Anda",
@@ -129,35 +130,37 @@ export const dictionaries = {
         weekly: [
           "Toko Shard Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
-          "Pengikatan otomatis Stripe SLA instan",
+          "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas"
         ],
         monthly: [
           "Toko Shard Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
-          "Pengikatan otomatis Stripe SLA instan",
+          "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas"
         ],
         yearly: [
-          "Toko Shard Tanni Batas",
+          "Toko Shard Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
-          "Pengikatan otomatis Stripe SLA instan",
+          "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas",
           "Susunan webhook pengembang khusus prioritas",
-          "Sinkronisasi audit kepatuhan PCI-DSS tahunan"
+          "Sinkronisasi audit kepatuhan PCI-DSS tahunan",
+          "Akses langsung dengan pengembang proyek ini"
         ],
         lifetime: [
           "Toko Shard Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
-          "Pengikatan otomatis Stripe SLA instan",
+          "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas",
           "Lisensi seumur hidup - Miliki selamanya",
           "Tanpa biaya langganan berulang",
-          "Semua pembaruan premium masa depan disertakan"
+          "Semua pembaruan premium masa depan disertakan",
+          "Akses langsung dengan pengembang proyek ini"
         ]
       },
       connecting: "Menghubungkan Vektor Aman...",
-      simulateStripe: "Simulasikan Stripe Gateway"
+      simulateMidtrans: "Simulasikan Midtrans Gateway"
     }
   },
   en: {
@@ -179,6 +182,7 @@ export const dictionaries = {
       overview: "Overview",
       orders: "Orders Queue",
       inventory: "Inventory",
+      approvals: "Approvals Desk",
       customers: "Customers",
       complaints: "Complaints Desk",
       billing: "Billing Plan",
@@ -271,7 +275,7 @@ export const dictionaries = {
         "Up to 3 Active Store Shards",
         "Basic SKU ingestion stream",
         "Advanced telemetry grids (locked)",
-        "Live Stripe SLA Syncing (locked)"
+        "Live Midtrans SLA Syncing (locked)"
       ],
       activeCoreBound: "Active Core Bound",
       includedInPackage: "Included in your package",
@@ -290,35 +294,37 @@ export const dictionaries = {
         weekly: [
           "Unlimited Store Shards",
           "Advanced @tanstack/react-table telemetry grids",
-          "Instant Stripe SLA automatic bindings",
+          "Instant Midtrans SLA automatic bindings",
           "Priority Customer Desk SLA cycle actions"
         ],
         monthly: [
           "Unlimited Store Shards",
           "Advanced @tanstack/react-table telemetry grids",
-          "Instant Stripe SLA automatic bindings",
+          "Instant Midtrans SLA automatic bindings",
           "Priority Customer Desk SLA cycle actions"
         ],
         yearly: [
           "Unlimited Store Shards",
           "Advanced @tanstack/react-table telemetry grids",
-          "Instant Stripe SLA automatic bindings",
+          "Instant Midtrans SLA automatic bindings",
           "Priority Customer Desk SLA cycle actions",
           "Priority dedicated developer webhook arrays",
-          "Annual PCI-DSS compliance audits sync"
+          "Annual PCI-DSS compliance audits sync",
+          "Direct access with developer of this project"
         ],
         lifetime: [
           "Unlimited Store Shards",
           "Advanced @tanstack/react-table telemetry grids",
-          "Instant Stripe SLA automatic bindings",
+          "Instant Midtrans SLA automatic bindings",
           "Priority Customer Desk SLA cycle actions",
           "Lifetime license - Own it forever",
           "Zero recurring subscription costs",
-          "All future premium updates included"
+          "All future premium updates included",
+          "Direct access with developer of this project"
         ]
       },
       connecting: "Connecting Secure Vector...",
-      simulateStripe: "Simulate Stripe Gateway"
+      simulateMidtrans: "Simulate Midtrans Gateway"
     }
   },
   es: {
@@ -432,7 +438,7 @@ export const dictionaries = {
         "Hasta 3 fragmentos de tienda activos",
         "Flujo de ingesta básico de SKU",
         "Rejillas de telemetría avanzadas (bloqueadas)",
-        "Sincronización Live Stripe SLA (bloqueada)"
+        "Sincronización Live Midtrans SLA (bloqueada)"
       ],
       activeCoreBound: "Límite de Núcleo Activo",
       includedInPackage: "Incluido en su paquete",
@@ -451,19 +457,19 @@ export const dictionaries = {
         weekly: [
           "Fragmentos de Tienda Ilimitados",
           "Telemetría avanzada de @tanstack/react-table",
-          "Integración automática de Stripe SLA",
+          "Integración automática de Midtrans SLA",
           "Soporte prioritario de atención al cliente"
         ],
         monthly: [
           "Fragmentos de Tienda Ilimitados",
           "Telemetría avanzada de @tanstack/react-table",
-          "Integración automática de Stripe SLA",
+          "Integración automática de Midtrans SLA",
           "Soporte prioritario de atención al cliente"
         ],
         yearly: [
           "Fragmentos de Tienda Ilimitados",
           "Telemetría avanzada de @tanstack/react-table",
-          "Integración automática de Stripe SLA",
+          "Integración automática de Midtrans SLA",
           "Soporte prioritario de atención al cliente",
           "Arreglo prioritario de webhooks de desarrollo",
           "Auditoría anual de cumplimiento PCI-DSS"
@@ -471,7 +477,7 @@ export const dictionaries = {
         lifetime: [
           "Fragmentos de Tienda Ilimitados",
           "Telemetría avanzada de @tanstack/react-table",
-          "Integración automática de Stripe SLA",
+          "Integración automática de Midtrans SLA",
           "Soporte prioritario de atención al cliente",
           "Licencia de por vida - Propia para siempre",
           "Sin cargos recurrentes adicionales",
@@ -479,7 +485,7 @@ export const dictionaries = {
         ]
       },
       connecting: "Conectando Vector Seguro...",
-      simulateStripe: "Simular Stripe Gateway"
+      simulateMidtrans: "Simular Midtrans Gateway"
     }
   },
   fr: {
@@ -593,7 +599,7 @@ export const dictionaries = {
         "Jusqu'à 3 fragments de boutique actifs",
         "Flux d'intégration SKU de base",
         "Grilles de télémétrie avancées (verrouillées)",
-        "Synchronisation Live Stripe SLA (verrouillée)"
+        "Synchronisation Live Midtrans SLA (verrouillée)"
       ],
       activeCoreBound: "Noyau Actif Restreint",
       includedInPackage: "Inclus dans votre offre",
@@ -612,19 +618,19 @@ export const dictionaries = {
         weekly: [
           "Boutiques Shards Illimitées",
           "Télémétrie @tanstack/react-table avancée",
-          "Liaison Stripe SLA automatique instantanée",
+          "Liaison Midtrans SLA automatique instantanée",
           "Support client prioritaires SLA"
         ],
         monthly: [
           "Boutiques Shards Illimitées",
           "Télémétrie @tanstack/react-table avancée",
-          "Liaison Stripe SLA automatique instantanée",
+          "Liaison Midtrans SLA automatique instantanée",
           "Support client prioritaires SLA"
         ],
         yearly: [
           "Boutiques Shards Illimitées",
           "Télémétrie @tanstack/react-table avancée",
-          "Liaison Stripe SLA automatique instantanée",
+          "Liaison Midtrans SLA automatique instantanée",
           "Support client prioritaires SLA",
           "Webhooks développeurs dédiés prioritaires",
           "Audits annuels de conformité PCI-DSS"
@@ -632,7 +638,7 @@ export const dictionaries = {
         lifetime: [
           "Boutiques Shards Illimitées",
           "Télémétrie @tanstack/react-table avancée",
-          "Liaison Stripe SLA automatique instantanée",
+          "Liaison Midtrans SLA automatique instantanée",
           "Support client prioritaires SLA",
           "Licence à vie - Possédez-la pour toujours",
           "Aucun coût d'abonnement récurrent",
@@ -640,7 +646,7 @@ export const dictionaries = {
         ]
       },
       connecting: "Connexion au Vecteur Sécurisé...",
-      simulateStripe: "Simuler Stripe Gateway"
+      simulateMidtrans: "Simuler Midtrans Gateway"
     }
   },
   de: {
@@ -754,7 +760,7 @@ export const dictionaries = {
         "Bis zu 3 aktive Store-Shards",
         "Basis-SKU-Aufnahmestrom",
         "Erweiterte Telemetriegitter (gesperrt)",
-        "Live Stripe SLA-Synchronisierung (gesperrt)"
+        "Live Midtrans SLA-Synchronisierung (gesperrt)"
       ],
       activeCoreBound: "Aktive Kernbindung",
       includedInPackage: "In Ihrem Paket enthalten",
@@ -773,19 +779,19 @@ export const dictionaries = {
         weekly: [
           "Unbegrenzte Store-Shards",
           "Fortgeschrittene @tanstack/react-table Telemetrie",
-          "Sofortige automatische Stripe SLA-Anbindung",
+          "Sofortige automatische Midtrans SLA-Anbindung",
           "Priorisierter Kundensupport-Schreibtisch"
         ],
         monthly: [
           "Unbegrenzte Store-Shards",
           "Fortgeschrittene @tanstack/react-table Telemetrie",
-          "Sofortige automatische Stripe SLA-Anbindung",
+          "Sofortige automatische Midtrans SLA-Anbindung",
           "Priorisierter Kundensupport-Schreibtisch"
         ],
         yearly: [
           "Unbegrenzte Store-Shards",
           "Fortgeschrittene @tanstack/react-table Telemetrie",
-          "Sofortige automatische Stripe SLA-Anbindung",
+          "Sofortige automatische Midtrans SLA-Anbindung",
           "Priorisierter Kundensupport-Schreibtisch",
           "Priorisierte Entwickler-Webhook-Arrays",
           "Jährliche PCI-DSS-Compliance-Audits"
@@ -793,7 +799,7 @@ export const dictionaries = {
         lifetime: [
           "Unbegrenzte Store-Shards",
           "Fortgeschrittene @tanstack/react-table Telemetrie",
-          "Sofortige automatische Stripe SLA-Anbindung",
+          "Sofortige automatische Midtrans SLA-Anbindung",
           "Priorisierter Kundensupport-Schreibtisch",
           "Lebenslange Lizenz - Für immer besitzen",
           "Keine wiederkehrenden Abonnementkosten",
@@ -801,7 +807,7 @@ export const dictionaries = {
         ]
       },
       connecting: "Verbindung zum Sicherheitsvektor...",
-      simulateStripe: "Stripe Gateway simulieren"
+      simulateMidtrans: "Midtrans Gateway simulieren"
     }
   },
   ja: {
@@ -915,7 +921,7 @@ export const dictionaries = {
         "最大3つのアクティブストアシャード",
         "基本的なSKUインジェストストリーム",
         "高度なテレメトリグリッド（ロック中）",
-        "Live Stripe SLA同期（ロック中）"
+        "Live Midtrans SLA同期（ロック中）"
       ],
       activeCoreBound: "標準プランバインド中",
       includedInPackage: "パッケージに含まれています",
@@ -934,19 +940,19 @@ export const dictionaries = {
         weekly: [
           "無制限のストアシャード数",
           "高度な @tanstack/react-table グリッド機能",
-          "即座の Stripe SLA 自動連携",
+          "即座の Midtrans SLA 自動連携",
           "優先サポートデスク対応"
         ],
         monthly: [
           "無制限のストアシャード数",
           "高度な @tanstack/react-table グリッド機能",
-          "即座の Stripe SLA 自動連携",
+          "即座の Midtrans SLA 自動連携",
           "優先サポートデスク対応"
         ],
         yearly: [
           "無制限のストアシャード数",
           "高度な @tanstack/react-table グリッド機能",
-          "即座の Stripe SLA 自動連携",
+          "即座の Midtrans SLA 自動連携",
           "優先サポートデスク対応",
           "開発者向け優先Webhook配列",
           "年次 PCI-DSS コンプライアンス監査"
@@ -954,7 +960,7 @@ export const dictionaries = {
         lifetime: [
           "無制限のストアシャード数",
           "高度な @tanstack/react-table グリッド機能",
-          "即座の Stripe SLA 自動連携",
+          "即座の Midtrans SLA 自動連携",
           "優先サポートデスク対応",
           "無期限ライセンス - 永久所有",
           "月額サブスク費用ゼロ",
@@ -962,7 +968,7 @@ export const dictionaries = {
         ]
       },
       connecting: "セキュリティベクターに接続中...",
-      simulateStripe: "Stripeゲートウェイのシミュレーション"
+      simulateMidtrans: "Midtransゲートウェイのシミュレーション"
     }
   },
   zh: {
@@ -1076,7 +1082,7 @@ export const dictionaries = {
         "最多 3 个活动商店分片",
         "基本 SKU 摄入流",
         "高级遥测网格（已锁定）",
-        "实时 Stripe SLA 同步（已锁定）"
+        "实时 Midtrans SLA 同步（已锁定）"
       ],
       activeCoreBound: "标准核心绑定",
       includedInPackage: "已包含在您的方案中",
@@ -1095,19 +1101,19 @@ export const dictionaries = {
         weekly: [
           "无限制的商店分片",
           "高级 @tanstack/react-table 遥测网格",
-          "即时 Stripe SLA 自动绑定",
+          "即时 Midtrans SLA 自动绑定",
           "优先客户服务 SLA 响应"
         ],
         monthly: [
           "无限制的商店分片",
           "高级 @tanstack/react-table 遥测网格",
-          "即时 Stripe SLA 自动绑定",
+          "即时 Midtrans SLA 自动绑定",
           "优先客户服务 SLA 响应"
         ],
         yearly: [
           "无限制的商店分片",
           "高级 @tanstack/react-table 遥测网格",
-          "即时 Stripe SLA 自动绑定",
+          "即时 Midtrans SLA 自动绑定",
           "优先客户服务 SLA 响应",
           "优先专用开发者 Webhook 数组",
           "年度 PCI-DSS 合规性审计"
@@ -1115,7 +1121,7 @@ export const dictionaries = {
         lifetime: [
           "无限制 the 商店分片",
           "高级 @tanstack/react-table 遥测网格",
-          "即时 Stripe SLA 自动绑定",
+          "即时 Midtrans SLA 自动绑定",
           "优先客户服务 SLA 响应",
           "终身版授权 - 永久拥有",
           "无后续重复扣费成本",
@@ -1123,7 +1129,7 @@ export const dictionaries = {
         ]
       },
       connecting: "正在连接安全通道...",
-      simulateStripe: "模拟 Stripe 支付网关"
+      simulateMidtrans: "模拟 Midtrans 支付网关"
     }
   }
 };

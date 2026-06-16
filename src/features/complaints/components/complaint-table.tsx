@@ -52,12 +52,12 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
         Object.entries(groupedComplaints).map(([userName, userComplaints]) => (
           <div
             key={userName}
-            className="bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/80 dark:border-slate-800/80 shadow-sm overflow-hidden transition-all hover:shadow-md"
+            className="bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/80 dark:border-slate-800/80 shadow-sm overflow-hidden transition-all hover:shadow-md"
           >
             {/* User Grouping Header Container */}
             <div className="bg-gradient-to-r from-slate-50 dark:from-[#0b0f19] to-slate-100/60 dark:to-[#0d1322]/60 px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-sm bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs border border-indigo-100 dark:border-indigo-900/50 shrink-0 shadow-inner">
+                <div className="w-9 h-9 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs border border-indigo-100 dark:border-indigo-900/50 shrink-0 shadow-inner">
                   <User className="w-4 h-4" />
                 </div>
                 <div>
@@ -68,7 +68,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 bg-white dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-sm text-[11px] font-bold text-slate-600 dark:text-slate-300 shadow-2xs transition-colors">
+                <span className="px-2.5 py-1 bg-white dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-300 shadow-2xs transition-colors">
                   Active SLA Logs:{" "}
                   <span className="text-indigo-600 dark:text-indigo-400 font-black">{userComplaints.length}</span>
                 </span>
@@ -86,19 +86,19 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                     {/* Left Column: Core context description */}
                     <div className="space-y-2.5 max-w-2xl flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-sm text-[9px] font-black uppercase tracking-wider border ${priorityStyles[c.priority]}`}>
+                        <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider border ${priorityStyles[c.priority]}`}>
                           {c.priority} Priority
                         </span>
                         <h5 className="text-xs font-black text-slate-900 dark:text-slate-100 tracking-tight">{c.title}</h5>
                       </div>
 
-                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal bg-slate-50/50 dark:bg-[#0b0f19]/50 p-3 rounded-sm border border-slate-100/80 dark:border-slate-800/80 transition-colors">
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal bg-slate-50/50 dark:bg-[#0b0f19]/50 p-3 rounded-lg border border-slate-100/80 dark:border-slate-800/80 transition-colors">
                         {c.description}
                       </p>
 
                       {/* Display outcome flag beautifully if satisfied */}
                       {c.satisfaction_outcome ? (
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 rounded-sm text-[11px] font-bold text-emerald-800 dark:text-emerald-400 animate-in fade-in transition-colors">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 rounded-lg text-[11px] font-bold text-emerald-800 dark:text-emerald-400 animate-in fade-in transition-colors">
                           <CheckCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                           <span>Satisfaction Mitigated: {c.satisfaction_outcome}</span>
                         </div>
@@ -111,7 +111,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                             type="button"
                             onClick={() => handleSatisfaction(c.id, `Refund Granted (${currency})`)}
                             disabled={isSatisfying}
-                            className="px-2.5 py-1 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/40 rounded-sm text-[10px] font-black transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
+                            className="px-2.5 py-1 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/40 rounded-lg text-[10px] font-black transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
                           >
                             <RefreshCw className="w-2.5 h-2.5" /> Issue Refund
                           </button>
@@ -120,7 +120,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                             type="button"
                             onClick={() => handleSatisfaction(c.id, "Extended Access (+7 Days)")}
                             disabled={isSatisfying}
-                            className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/40 rounded-sm text-[10px] font-bold transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
+                            className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/40 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
                           >
                             <Gift className="w-2.5 h-2.5" /> Free Plus 7 Days
                           </button>
@@ -129,7 +129,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                             type="button"
                             onClick={() => handleSatisfaction(c.id, "Priority Account Support Shard Assigned")}
                             disabled={isSatisfying}
-                            className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 rounded-sm text-[10px] font-bold transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
+                            className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
                           >
                             <ShieldAlert className="w-2.5 h-2.5" /> Route Premium Pool
                           </button>
@@ -153,7 +153,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                         <button
                           onClick={() => handleDelete(c.id)}
                           disabled={isDeleting}
-                          className="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-sm transition-colors disabled:opacity-50"
+                          className="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors disabled:opacity-50"
                           title="Erase Incident Matrix"
                         >
                           {isDeleting ? <Loader2 className="w-4 h-4 animate-spin text-red-600 dark:text-red-400" /> : <Trash2 className="w-4 h-4" />}
@@ -167,7 +167,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
           </div>
         ))
       ) : (
-        <div className="p-12 bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 text-center space-y-2 shadow-2xs transition-colors">
+        <div className="p-12 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 text-center space-y-2 shadow-2xs transition-colors">
           <p className="text-xs font-bold text-slate-400 italic uppercase tracking-wider">
             SLA Streams Highly Operational
           </p>

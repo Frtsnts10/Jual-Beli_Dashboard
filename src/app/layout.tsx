@@ -3,7 +3,10 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Shop Dashboard | Multi-Store Central Console",
+  title: {
+    template: "%s | Dashboard",
+    default: "Dashboard | Multi-Store Central Console",
+  },
   description: "Next-generation multi-tenant premium dashboard for managing multi-store inventory, real-time complaints, and VIP customers smoothly.",
 };
 

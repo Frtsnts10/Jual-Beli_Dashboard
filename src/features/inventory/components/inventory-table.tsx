@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 interface InventoryTableProps {
   storeId: string;
@@ -63,6 +64,7 @@ function CopyableCredential({
 
 export function InventoryTable({ storeId, items, currency = "IDR", isPremium = false }: InventoryTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -95,10 +97,12 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
     return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
   };
 
-  const handleDelete = async (id: string) => {
-    setDeletingId(id);
-    await deleteInventoryItemAction(storeId, id);
+  const confirmDelete = async () => {
+    if (!deleteConfirmId) return;
+    setDeletingId(deleteConfirmId);
+    await deleteInventoryItemAction(storeId, deleteConfirmId);
     setDeletingId(null);
+    setDeleteConfirmId(null);
     toast.success("Variant record purged from digital workspace memory");
   };
 
@@ -229,7 +233,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-sm border border-indigo-100/40 dark:border-indigo-900/40">
+          <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
             {items.length} Total Inventory Shards
           </span>
           <Button
@@ -246,7 +250,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
               }
             }}
             color="primary"
-            radius="sm"
+            radius="lg"
             className="h-[38px] px-5 text-xs font-bold shadow-md"
             startContent={<Plus className="w-4 h-4" />}
           >
@@ -257,7 +261,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
 
       {/* Premium Inventory Quota Cap Banner */}
       {!isPremium && items.length >= 3 && (
-        <div className="p-4 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 border border-indigo-500/20 dark:border-indigo-900/40 rounded-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-indigo-950 dark:text-indigo-300 shadow-sm animate-in fade-in duration-300">
+        <div className="p-4 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 border border-indigo-500/20 dark:border-indigo-900/40 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-indigo-950 dark:text-indigo-300 shadow-sm animate-in fade-in duration-300">
           <div className="space-y-1">
             <p className="text-xs font-extrabold flex items-center gap-1.5 uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
               <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
@@ -269,7 +273,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           </div>
           <a
             href={`/${storeId}/subscription`}
-            className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-[11px] font-black uppercase tracking-wider rounded-sm shadow-sm transition-all"
+            className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-[11px] font-black uppercase tracking-wider rounded-lg shadow-sm transition-all"
           >
             Upgrade to Pro
           </a>
@@ -278,7 +282,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
 
       {/* Dynamic Creation Modal Embed */}
       <Modal isOpen={isCreateModalOpen} onOpenChange={(open) => setIsCreateModalOpen(open)} size="4xl" scrollBehavior="inside" classNames={{
-        base: "bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-sm shadow-2xl",
+        base: "bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-lg shadow-2xl",
         body: "p-0"
       }}>
         <ModalContent>
@@ -307,20 +311,20 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             <Button
               onPress={() => exportData(items.filter(i => !!i.group_name), "family_inventory_export.csv")}
               variant="bordered"
-              radius="sm"
+              radius="lg"
               className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
               Export
             </Button>
-            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all gap-1.5 cursor-pointer">
+            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition-all gap-1.5 cursor-pointer">
               <Upload className="w-3.5 h-3.5" /> Import
               <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
             </label>
             <Button
               onPress={downloadProductTemplate}
               variant="flat"
-              radius="sm"
+              radius="lg"
               className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
@@ -338,7 +342,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
               return (
                 <div
                   key={groupName}
-                  className="bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/80 dark:border-slate-800/80 shadow-sm overflow-hidden transition-all hover:border-indigo-200 dark:hover:border-slate-700"
+                  className="bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/80 dark:border-slate-800/80 shadow-sm overflow-hidden transition-all hover:border-indigo-200 dark:hover:border-slate-700"
                 >
                   {/* Pool Card Header */}
                   <div className="bg-gradient-to-r from-indigo-50/50 dark:from-indigo-950/20 to-slate-50 dark:to-[#0b0f19] px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
@@ -347,7 +351,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                       <h4 className="text-xs font-black text-indigo-950 dark:text-indigo-300 tracking-tight">{groupName}</h4>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-0.5 rounded-sm text-[10px] font-black tracking-wider ${
+                      <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-black tracking-wider ${
                         isFull ? "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400" : "bg-indigo-100 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-300"
                       }`}>
                         Occupancy: {groupMembers.length} / {maxCapacity} Profiles
@@ -432,7 +436,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                                   isIconOnly
                                   variant="light"
                                   size="sm"
-                                  onPress={() => handleDelete(member.id)}
+                                  onPress={() => setDeleteConfirmId(member.id)}
                                   isDisabled={isDeleting}
                                   className="h-6 w-6 min-w-0 text-slate-400 data-[hover=true]:text-red-600 dark:data-[hover=true]:text-red-400 data-[hover=true]:bg-red-50 dark:data-[hover=true]:bg-red-950/40"
                                 >
@@ -450,13 +454,13 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             })}
           </div>
         ) : (
-          <div className="p-8 bg-slate-50/50 dark:bg-[#0b0f19]/50 rounded-sm border border-slate-200/60 dark:border-slate-800/80 text-center italic text-xs text-slate-400">
+          <div className="p-8 bg-slate-50/50 dark:bg-[#0b0f19]/50 rounded-lg border border-slate-200/60 dark:border-slate-800/80 text-center italic text-xs text-slate-400">
             No family-based pool slots assigned. Create Google, YouTube, or Canva items to trigger bucket allocation logic.
           </div>
         )}
 
         {totalFamilyPages > 1 && (
-          <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border border-slate-100 dark:border-slate-800 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
+          <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border border-slate-100 dark:border-slate-800 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
             <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
               Showing Family Pools <strong className="text-slate-700 dark:text-slate-200">{startFamilyIndex + 1}</strong> to{" "}
               <strong className="text-slate-700 dark:text-slate-200">
@@ -467,7 +471,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             <div className="flex items-center gap-1">
               <Button
                 variant="bordered"
-                radius="sm"
+                radius="lg"
                 onPress={() => handleFamilyPageChange(Math.max(1, currentFamilyPage - 1))}
                 isDisabled={currentFamilyPage === 1}
                 className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
@@ -479,7 +483,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                   key={page}
                   variant={currentFamilyPage === page ? "solid" : "bordered"}
                   color={currentFamilyPage === page ? "primary" : "default"}
-                  radius="sm"
+                  radius="lg"
                   onPress={() => handleFamilyPageChange(page)}
                   className={`h-[26px] min-w-[26px] px-0 font-bold ${
                     currentFamilyPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
@@ -490,7 +494,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
               ))}
               <Button
                 variant="bordered"
-                radius="sm"
+                radius="lg"
                 onPress={() => handleFamilyPageChange(Math.min(totalFamilyPages, currentFamilyPage + 1))}
                 isDisabled={currentFamilyPage === totalFamilyPages}
                 className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
@@ -517,20 +521,20 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             <Button
               onPress={() => exportData(ungroupedItems, "solo_inventory_export.csv")}
               variant="bordered"
-              radius="sm"
+              radius="lg"
               className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
               Export
             </Button>
-            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-sm text-xs font-bold transition-all gap-1.5 cursor-pointer">
+            <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition-all gap-1.5 cursor-pointer">
               <Upload className="w-3.5 h-3.5" /> Import
               <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
             </label>
             <Button
               onPress={downloadProductTemplate}
               variant="flat"
-              radius="sm"
+              radius="lg"
               className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
@@ -539,7 +543,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#0d1322] rounded-sm border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
+        <div className="bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
@@ -575,7 +579,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                       </td>
 
                       <td className="px-5 py-3.5">
-                        <span className="font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-sm text-[11px]">
+                        <span className="font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-[11px]">
                           {item.profile_name || "Unassigned"}
                         </span>
                       </td>
@@ -651,7 +655,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                           isIconOnly
                           variant="light"
                           size="sm"
-                          onPress={() => handleDelete(item.id)}
+                          onPress={() => setDeleteConfirmId(item.id)}
                           isDisabled={isDeleting}
                           className="h-7 w-7 min-w-0 text-slate-400 data-[hover=true]:text-red-600 dark:data-[hover=true]:text-red-400 data-[hover=true]:bg-red-50 dark:data-[hover=true]:bg-red-950/40"
                         >
@@ -684,7 +688,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
               <div className="flex items-center gap-1">
                 <Button
                   variant="bordered"
-                  radius="sm"
+                  radius="lg"
                   onPress={() => handleSoloPageChange(Math.max(1, currentSoloPage - 1))}
                   isDisabled={currentSoloPage === 1}
                   className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
@@ -696,7 +700,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                     key={page}
                     variant={currentSoloPage === page ? "solid" : "bordered"}
                     color={currentSoloPage === page ? "primary" : "default"}
-                    radius="sm"
+                    radius="lg"
                     onPress={() => handleSoloPageChange(page)}
                     className={`h-[26px] min-w-[26px] px-0 font-bold ${
                       currentSoloPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
@@ -707,7 +711,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                 ))}
                 <Button
                   variant="bordered"
-                  radius="sm"
+                  radius="lg"
                   onPress={() => handleSoloPageChange(Math.min(totalSoloPages, currentSoloPage + 1))}
                   isDisabled={currentSoloPage === totalSoloPages}
                   className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
@@ -730,6 +734,16 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           onClose={() => setEditingItem(null)}
         />
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Inventory Variant"
+        description="Are you sure you want to permanently delete this inventory asset? This action cannot be undone."
+        confirmText="Purge Variant"
+        danger
+      />
     </div>
   );
 }
@@ -746,7 +760,6 @@ function EditInventoryModal({
   currency?: string;
 }) {
   const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const isIDR = currency.toUpperCase() === "IDR";
 
@@ -817,7 +830,6 @@ function EditInventoryModal({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsPending(true);
-    setError(null);
 
     const formData = new FormData();
     formData.append("name", name);
@@ -837,7 +849,7 @@ function EditInventoryModal({
     setIsPending(false);
 
     if (res?.error) {
-      setError(res.error);
+      toast.error(res.error);
     } else {
       toast.success("Asset profile update broadcasted successfully");
       onClose();
@@ -846,7 +858,7 @@ function EditInventoryModal({
 
   return (
     <Modal isOpen={true} onOpenChange={(open) => !open && onClose()} size="2xl" scrollBehavior="inside" classNames={{
-      base: "bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-sm shadow-2xl",
+      base: "bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-lg shadow-2xl",
       header: "bg-slate-50 dark:bg-[#0b0f19] border-b border-slate-100 dark:border-slate-800",
       body: "p-6 space-y-4"
     }}>
@@ -859,8 +871,6 @@ function EditInventoryModal({
               </h3>
             </ModalHeader>
             <ModalBody>
-              {error && <div className="p-2 text-xs bg-red-50 text-red-600 rounded font-bold">{error}</div>}
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <Input
                   label="Product Name"
@@ -868,7 +878,7 @@ function EditInventoryModal({
                   value={name}
                   onChange={handleNameChange}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -880,7 +890,7 @@ function EditInventoryModal({
                   selectedKeys={[profileTier]}
                   onChange={(e) => setProfileTier(e.target.value)}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -896,7 +906,7 @@ function EditInventoryModal({
                   value={profileName}
                   onValueChange={setProfileName}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -911,7 +921,7 @@ function EditInventoryModal({
                 value={groupName}
                 onValueChange={setGroupName}
                 variant="faded"
-                radius="sm"
+                radius="lg"
                 classNames={{
                   inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
                   label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -926,7 +936,7 @@ function EditInventoryModal({
                   value={email}
                   onValueChange={setEmail}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -939,7 +949,7 @@ function EditInventoryModal({
                   value={password}
                   onValueChange={setPassword}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -952,7 +962,7 @@ function EditInventoryModal({
                   value={pin}
                   onValueChange={setPin}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -970,7 +980,7 @@ function EditInventoryModal({
                   onValueChange={setBasePriceStr}
                   onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -986,7 +996,7 @@ function EditInventoryModal({
                   onValueChange={setSellingPriceStr}
                   onBlur={() => handlePriceBlur(setSellingPriceStr, sellingPriceStr)}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     inputWrapper: "bg-indigo-50/30 dark:bg-indigo-950/20 border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -999,7 +1009,7 @@ function EditInventoryModal({
                   value={stock}
                   onValueChange={setStock}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
                     label: "text-[10px] font-bold text-slate-400 uppercase",
@@ -1014,7 +1024,7 @@ function EditInventoryModal({
                   value={dateBuy ? (parseDate(dateBuy) as any) : null}
                   onChange={(val) => setDateBuy(val ? val.toString() : "")}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     base: "h-[34px]",
                     inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
@@ -1027,7 +1037,7 @@ function EditInventoryModal({
                   value={dateExpired ? (parseDate(dateExpired) as any) : null}
                   onChange={(val) => setDateExpired(val ? val.toString() : "")}
                   variant="faded"
-                  radius="sm"
+                  radius="lg"
                   classNames={{
                     base: "h-[34px]",
                     inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
@@ -1038,10 +1048,10 @@ function EditInventoryModal({
               </div>
             </ModalBody>
             <ModalFooter className="border-t border-slate-100 dark:border-slate-800">
-              <Button variant="light" onPress={onClose} radius="sm" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              <Button variant="light" onPress={onClose} radius="lg" className="text-xs font-bold text-slate-700 dark:text-slate-300">
                 Cancel
               </Button>
-              <Button type="submit" isLoading={isPending} color="primary" radius="sm" className="text-xs font-bold shadow-md">
+              <Button type="submit" isLoading={isPending} color="primary" radius="lg" className="text-xs font-bold shadow-md">
                 {isPending ? "Broadcasting Updates..." : "Save Variant Profile"}
               </Button>
             </ModalFooter>

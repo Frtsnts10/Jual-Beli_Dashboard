@@ -7,6 +7,7 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
   try {
     const fullName = formData.get("fullName") as string;
     const email = formData.get("email") as string;
+    const role = formData.get("role") as string;
 
     const user = await getAuthenticatedUser();
     if (!user) {
@@ -14,10 +15,11 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
     }
 
     // Update Firestore profile
-    await adminDb.collection("profiles").doc(user.uid).update({
+    await adminDb.collection("profiles").doc(user.uid).set({
       full_name: fullName || user.name || "Workspace Admin",
       ...(email && { email }),
-    });
+      ...(role && { role }),
+    }, { merge: true });
 
     revalidatePath("/", "layout");
     return {

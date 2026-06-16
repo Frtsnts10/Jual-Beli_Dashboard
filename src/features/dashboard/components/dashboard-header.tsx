@@ -14,6 +14,9 @@ interface DashboardHeaderProps {
   profileId: string;
   currentStoreSlug: string;
   isSubscribed: boolean;
+  plan?: string;
+  tier?: string;
+  stores: any[];
   stores: any[];
 }
 
@@ -22,6 +25,8 @@ export function DashboardHeader({
   profileId,
   currentStoreSlug,
   isSubscribed,
+  plan,
+  tier,
   stores
 }: DashboardHeaderProps) {
   const { t } = useI18n();
@@ -40,7 +45,7 @@ export function DashboardHeader({
         {isSubscribed ? (
           <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 border border-indigo-500/20 dark:border-indigo-900/40 rounded-lg text-[10px] font-black uppercase tracking-widest text-indigo-700 dark:text-indigo-400 shadow-sm animate-pulse-slow">
             <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
-            {t.topbar.proMember}
+            {tier === "plus" ? "PLUS MEMBER" : t.topbar.proMember}
           </span>
         ) : (
           <Link 

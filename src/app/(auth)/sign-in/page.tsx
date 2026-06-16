@@ -66,7 +66,7 @@ export default function NativeSignInPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400">
+          <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-lg text-xs text-rose-400">
             {error}
           </div>
         )}
@@ -108,7 +108,7 @@ export default function NativeSignInPage() {
           isLoading={isPending}
           className="w-full mt-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold shadow-md shadow-indigo-500/10 hover:shadow-lg hover:shadow-indigo-500/20"
           size="lg"
-          radius="md"
+          radius="lg"
         >
           {isPending ? "Authenticating..." : "Sign In"}
         </Button>

@@ -133,7 +133,7 @@ export default async function SimulatedXenditCheckoutPage({
             </p>
           </div>
 
-          <div className="p-4 rounded-sm bg-white/5 border border-white/10 space-y-3">
+          <div className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-3">
             <div className="flex justify-between items-center text-sm">
               <span className="text-slate-300">Base subscription line item</span>
               <span className="font-mono font-bold text-white">{billingInfo.price}</span>
@@ -200,7 +200,7 @@ export default async function SimulatedXenditCheckoutPage({
                   type="text"
                   required
                   defaultValue="Jane Premium Streamer"
-                  className="w-full h-[38px] px-3 bg-slate-50 border border-slate-200 rounded-sm text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-indigo-600 transition-colors"
+                  className="w-full h-[38px] px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-indigo-600 transition-colors"
                 />
               </div>
 
@@ -216,7 +216,7 @@ export default async function SimulatedXenditCheckoutPage({
                     type="text"
                     required
                     defaultValue="4242 •••• •••• 4242"
-                    className="w-full h-[38px] pl-3 pr-9 bg-slate-50 border border-slate-200 rounded-sm text-xs font-mono font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="w-full h-[38px] pl-3 pr-9 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                 </div>
               </div>
@@ -230,7 +230,7 @@ export default async function SimulatedXenditCheckoutPage({
                     type="text"
                     required
                     defaultValue="12 / 29"
-                    className="w-full h-[38px] px-3 bg-slate-50 border border-slate-200 rounded-sm text-xs font-mono font-bold text-slate-800 text-center focus:bg-white focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="w-full h-[38px] px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 text-center focus:bg-white focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                 </div>
 
@@ -242,7 +242,7 @@ export default async function SimulatedXenditCheckoutPage({
                     type="text"
                     required
                     defaultValue="888"
-                    className="w-full h-[38px] px-3 bg-slate-50 border border-slate-200 rounded-sm text-xs font-mono font-bold text-slate-800 text-center focus:bg-white focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="w-full h-[38px] px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 text-center focus:bg-white focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                 </div>
               </div>
@@ -250,7 +250,7 @@ export default async function SimulatedXenditCheckoutPage({
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-[#043c7b] hover:bg-[#062649] active:scale-95 text-white rounded-sm text-xs font-extrabold shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                  className="w-full py-3.5 bg-[#043c7b] hover:bg-[#062649] active:scale-95 text-white rounded-lg text-xs font-extrabold shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-indigo-400 group-hover:rotate-12 transition-transform" />
                   <span>Authorize Subscription Fulfill ({billingInfo.price})</span>

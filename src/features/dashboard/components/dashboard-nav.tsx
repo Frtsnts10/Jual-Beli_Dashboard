@@ -11,7 +11,8 @@ import {
   MessageSquareWarning, 
   CreditCard, 
   Settings, 
-  X 
+  X,
+  GitPullRequest
 } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
 
@@ -41,6 +42,7 @@ export function DashboardNav() {
     { name: t.sidebar.overview, href: `/${storeId}/dashboard`, icon: LayoutDashboard },
     { name: t.sidebar.orders, href: `/${storeId}/orders`, icon: ShoppingCart },
     { name: t.sidebar.inventory, href: `/${storeId}/inventory`, icon: Package },
+    { name: (t.sidebar as any).approvals || "Approvals Desk", href: `/${storeId}/approvals`, icon: GitPullRequest },
     { name: t.sidebar.customers, href: `/${storeId}/customers`, icon: Users },
     { name: t.sidebar.complaints, href: `/${storeId}/complaints`, icon: MessageSquareWarning },
     { name: t.sidebar.billing, href: `/${storeId}/subscription`, icon: CreditCard },
@@ -89,7 +91,7 @@ export function DashboardNav() {
         </div>
 
         <div className="p-4 border-t border-slate-100 dark:border-slate-800/40">
-          <div className="bg-slate-50 dark:bg-slate-900/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800/60">
+          <div className="bg-slate-50 dark:bg-slate-900/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800/60">
             <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">{t.sidebar.status}</p>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -164,7 +166,7 @@ export function DashboardNav() {
             </div>
 
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-              <div className="bg-slate-50 dark:bg-slate-900/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800/60 flex items-center gap-2.5">
+              <div className="bg-slate-50 dark:bg-slate-900/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800/60 flex items-center gap-2.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <div>
                   <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">{t.sidebar.telemetry}</p>

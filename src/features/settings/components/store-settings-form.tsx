@@ -6,44 +6,44 @@ import { Save, AlertOctagon, Image as ImageIcon, Globe, Upload, Sun, Moon, Monit
 import { updateStoreSettingsAction, deleteStoreAction } from "../actions/settings-actions";
 import { useI18n } from "@/hooks/use-i18n";
 import { Language } from "@/locales/dictionary";
+import { countryCodes } from "@/lib/country-codes";
+import { toast } from "sonner";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
-interface StoreSettingsFormProps {
+interface StoreProfileFormProps {
   storeId: string;
   initialName: string;
   initialLogo?: string;
-  initialCurrency?: string;
   initialEmail?: string;
   initialInstagram?: string;
   initialWhatsapp?: string;
-  hideDangerPanel?: boolean;
 }
 
-export function StoreSettingsForm({ 
+export function StoreProfileForm({ 
   storeId, 
   initialName, 
   initialLogo = "", 
-  initialCurrency = "IDR", 
   initialEmail = "",
   initialInstagram = "",
-  initialWhatsapp = "",
-  hideDangerPanel = false 
-}: StoreSettingsFormProps) {
+  initialWhatsapp = ""
+}: StoreProfileFormProps) {
   const [isPending, setIsPending] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Client preview and storage states
   const [logoPreview, setLogoPreview] = useState(initialLogo);
-  const [currency, setCurrency] = useState(initialCurrency);
-  const { t, changeLanguage, lang } = useI18n();
+  const { t } = useI18n();
+  
+  // WhatsApp State
+  const [whatsappCountry, setWhatsappCountry] = useState("+62");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
 
   useEffect(() => {
-    // Only language effects if needed
-  }, []);
-
-  const handleLanguageChange = (val: string) => {
-    changeLanguage(val as Language);
-  };
+    const match = initialWhatsapp.match(/^(\+\d+)\s*(.*)$/);
+    if (match) {
+      setWhatsappCountry(match[1]);
+      setWhatsappNumber(match[2]);
+    } else {
+      setWhatsappNumber(initialWhatsapp);
+    }
+  }, [initialWhatsapp]);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -89,20 +89,192 @@ export function StoreSettingsForm({
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsPending(true);
-    setSuccess(false);
-    setError(null);
 
     const formData = new FormData(e.currentTarget);
     formData.set("logo_url", logoPreview);
+    
+    if (whatsappNumber) {
+      formData.set("whatsapp", `${whatsappCountry} ${whatsappNumber}`);
+    } else {
+      formData.delete("whatsapp");
+    }
+
+    let insta = formData.get("instagram") as string;
+    if (insta) {
+      if (!insta.startsWith('@')) {
+        insta = '@' + insta;
+      }
+      formData.set("instagram", insta);
+    }
+
+    const res = await updateStoreSettingsAction(storeId, formData);
+
+    setIsPending(false);
+    if (res?.error) {
+      toast.error(res.error);
+    } else {
+      toast.success(t.settings.tenantSuccess);
+    }
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
+    >
+      <div>
+        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{t.settings.tenantTitle}</h3>
+        <p className="text-xs text-slate-500 mt-0.5">{t.settings.tenantSubtitle}</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            {t.settings.labelWorkspaceName}
+          </label>
+          <Input
+            name="name"
+            isRequired
+            defaultValue={initialName}
+            radius="lg"
+            classNames={{
+              inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
+              input: "text-xs font-bold text-slate-800 dark:text-slate-100",
+            }}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            {t.settings.labelStoreEmail}
+          </label>
+          <Input
+            name="email"
+            type="email"
+            defaultValue={initialEmail}
+            radius="lg"
+            classNames={{
+              inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
+              input: "text-xs font-bold text-slate-800 dark:text-slate-100",
+            }}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            {t.settings.labelWhatsapp}
+          </label>
+          <Input
+            type="text"
+            value={whatsappNumber}
+            onChange={(e) => setWhatsappNumber(e.target.value)}
+            radius="lg"
+            startContent={
+              <div className="flex items-center h-full">
+                <select
+                  value={whatsappCountry}
+                  onChange={(e) => setWhatsappCountry(e.target.value)}
+                  className="outline-none border-0 bg-transparent text-slate-500 text-xs font-bold w-[90px] cursor-pointer"
+                >
+                  {countryCodes.map((c) => (
+                    <option key={`${c.code}-${c.dialCode}`} value={c.dialCode}>
+                      {c.code} ({c.dialCode})
+                    </option>
+                  ))}
+                </select>
+                <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-2" />
+              </div>
+            }
+            classNames={{
+              inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none pl-2",
+              input: "text-xs font-bold text-slate-800 dark:text-slate-100",
+            }}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            {t.settings.labelInstagram}
+          </label>
+          <Input
+            name="instagram"
+            defaultValue={initialInstagram.replace(/^@/, '')}
+            radius="lg"
+            startContent={<span className="text-slate-500 text-xs font-bold select-none pr-0.5">@</span>}
+            classNames={{
+              inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none pl-3",
+              input: "text-xs font-bold text-slate-800 dark:text-slate-100",
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2 pt-2 border-t border-slate-50 dark:border-slate-800">
+        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          {t.settings.labelLogoTitle}
+        </label>
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-lg bg-slate-50 dark:bg-[#0b0f19] border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+            {logoPreview ? (
+              <img src={logoPreview} alt="Logo preview" className="w-full h-full object-cover" />
+            ) : (
+              <ImageIcon className="w-5 h-5 text-slate-300" />
+            )}
+          </div>
+          <div className="space-y-1">
+            <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold rounded-lg cursor-pointer transition-colors shadow-sm">
+              <Upload className="w-3 h-3 text-slate-500" /> {t.settings.btnChooseGraphic}
+              <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+            </label>
+            <p className="text-[10px] text-slate-400">{t.settings.labelLogoDesc}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-auto flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
+        <Button
+          type="submit"
+          isLoading={isPending}
+          color="primary"
+          radius="lg"
+          startContent={!isPending && <Save className="w-3.5 h-3.5" />}
+          className="text-xs font-bold shadow-sm px-4 h-9"
+        >
+          {isPending ? t.settings.btnSavingSettings : t.settings.btnSaveSettings}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+interface StorePreferencesFormProps {
+  storeId: string;
+  initialCurrency?: string;
+}
+
+export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: StorePreferencesFormProps) {
+  const [isPending, setIsPending] = useState(false);
+  const [currency, setCurrency] = useState(initialCurrency.toUpperCase());
+  const { t, changeLanguage, lang } = useI18n();
+
+  const handleLanguageChange = (val: string) => {
+    changeLanguage(val as Language);
+  };
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsPending(true);
+
+    const formData = new FormData();
     formData.set("currency", currency);
 
     const res = await updateStoreSettingsAction(storeId, formData);
 
     setIsPending(false);
     if (res?.error) {
-      setError(res.error);
+      toast.error(res.error);
     } else {
-      setSuccess(true);
+      toast.success("Preferences saved successfully.");
     }
   }
 
@@ -121,215 +293,120 @@ export function StoreSettingsForm({
   }, []);
 
   return (
-    <div className="h-full flex flex-col justify-between space-y-6 font-sans">
-      <form
-        onSubmit={handleSubmit}
-        className="h-full flex flex-col p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-xl border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
-      >
-        <div>
-          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{t.settings.tenantTitle}</h3>
-          <p className="text-xs text-slate-500 mt-0.5">{t.settings.tenantSubtitle}</p>
-        </div>
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
+    >
+      <div>
+        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Global Preferences Matrix</h3>
+        <p className="text-xs text-slate-500 mt-0.5">Configure global preferences such as language and base currency.</p>
+      </div>
 
-        {success && (
-          <div className="p-2.5 text-xs text-emerald-700 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-lg font-medium animate-bounce-once">
-            {t.settings.tenantSuccess}
-          </div>
-        )}
-
-        {error && (
-          <div className="p-2.5 text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg font-medium">
-            {error}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              {t.settings.labelWorkspaceName}
-            </label>
-            <Input
-              name="name"
-              isRequired
-              defaultValue={initialName}
-              radius="sm"
-              classNames={{
-                inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
-                input: "text-xs font-bold text-slate-800 dark:text-slate-100",
-              }}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-              <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelGlobalCurrency}
-            </label>
-            <Select
-              selectedKeys={[currency]}
-              onChange={(e) => setCurrency(e.target.value)}
-              radius="sm"
-              classNames={{
-                trigger: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] shadow-none min-h-[36px] h-9",
-                value: "text-xs font-bold text-slate-800 dark:text-slate-100",
-              }}
-            >
-              {currencies.map((c) => (
-                <SelectItem key={c.code}>
-                  {c.code} ({c.symbol}) — {c.name}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-              <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelLanguage}
-            </label>
-            <Select
-              selectedKeys={[lang]}
-              onChange={(e) => handleLanguageChange(e.target.value)}
-              radius="sm"
-              classNames={{
-                trigger: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] shadow-none min-h-[36px] h-9",
-                value: "text-xs font-bold text-slate-800 dark:text-slate-100",
-              }}
-            >
-              <SelectItem key="id">🇮🇩 Bahasa Indonesia</SelectItem>
-              <SelectItem key="en">🇺🇸 English</SelectItem>
-              <SelectItem key="es">🇪🇸 Español</SelectItem>
-              <SelectItem key="fr">🇫🇷 Français</SelectItem>
-              <SelectItem key="de">🇩🇪 Deutsch</SelectItem>
-              <SelectItem key="ja">🇯🇵 日本語</SelectItem>
-              <SelectItem key="zh">🇨🇳 中文</SelectItem>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              {t.settings.labelStoreEmail}
-            </label>
-            <Input
-              name="email"
-              type="email"
-              defaultValue={initialEmail}
-              radius="sm"
-              classNames={{
-                inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
-                input: "text-xs font-bold text-slate-800 dark:text-slate-100",
-              }}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              {t.settings.labelWhatsapp}
-            </label>
-            <Input
-              name="whatsapp"
-              defaultValue={initialWhatsapp}
-              radius="sm"
-              classNames={{
-                inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
-                input: "text-xs font-bold text-slate-800 dark:text-slate-100",
-              }}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              {t.settings.labelInstagram}
-            </label>
-            <Input
-              name="instagram"
-              defaultValue={initialInstagram}
-              radius="sm"
-              classNames={{
-                inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
-                input: "text-xs font-bold text-slate-800 dark:text-slate-100",
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2 pt-2 border-t border-slate-50 dark:border-slate-800">
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            {t.settings.labelLogoTitle}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelGlobalCurrency}
           </label>
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-xl bg-slate-50 dark:bg-[#0b0f19] border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
-              {logoPreview ? (
-                <img src={logoPreview} alt="Logo preview" className="w-full h-full object-cover" />
-              ) : (
-                <ImageIcon className="w-5 h-5 text-slate-300" />
-              )}
-            </div>
-            <div className="space-y-1">
-              <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold rounded-lg cursor-pointer transition-colors shadow-sm">
-                <Upload className="w-3 h-3 text-slate-500" /> {t.settings.btnChooseGraphic}
-                <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-              </label>
-              <p className="text-[10px] text-slate-400">{t.settings.labelLogoDesc}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-auto flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
-          <Button
-            type="submit"
-            isLoading={isPending}
-            color="primary"
-            radius="sm"
-            startContent={!isPending && <Save className="w-3.5 h-3.5" />}
-            className="text-xs font-bold shadow-sm px-4 h-9"
+          <Select
+            selectedKeys={new Set([currency])}
+            onChange={(e) => setCurrency(e.target.value)}
+            radius="lg"
+            classNames={{
+              trigger: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] shadow-none min-h-[36px] h-9",
+              value: "text-xs font-bold text-slate-800 dark:text-slate-100",
+            }}
           >
-            {isPending ? t.settings.btnSavingSettings : t.settings.btnSaveSettings}
-          </Button>
+            {currencies.map((c) => (
+              <SelectItem key={c.code} textValue={`${c.code} ${c.name}`}>
+                {c.code} ({c.symbol}) — {c.name}
+              </SelectItem>
+            ))}
+          </Select>
         </div>
-      </form>
 
-      {!hideDangerPanel && (
-        <DangerZonePanel storeId={storeId} />
-      )}
-    </div>
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelLanguage}
+          </label>
+          <Select
+            selectedKeys={new Set([lang])}
+            onChange={(e) => handleLanguageChange(e.target.value)}
+            radius="lg"
+            classNames={{
+              trigger: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] shadow-none min-h-[36px] h-9",
+              value: "text-xs font-bold text-slate-800 dark:text-slate-100",
+            }}
+          >
+            <SelectItem key="id" textValue="Bahasa Indonesia">🇮🇩 Bahasa Indonesia</SelectItem>
+            <SelectItem key="en" textValue="English">🇺🇸 English</SelectItem>
+            <SelectItem key="es" textValue="Español">🇪🇸 Español</SelectItem>
+            <SelectItem key="fr" textValue="Français">🇫🇷 Français</SelectItem>
+            <SelectItem key="de" textValue="Deutsch">🇩🇪 Deutsch</SelectItem>
+            <SelectItem key="ja" textValue="日本語">🇯🇵 日本語</SelectItem>
+            <SelectItem key="zh" textValue="中文">🇨🇳 中文</SelectItem>
+          </Select>
+        </div>
+      </div>
+
+      <div className="mt-auto flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
+        <Button
+          type="submit"
+          isLoading={isPending}
+          color="primary"
+          radius="lg"
+          startContent={!isPending && <Save className="w-3.5 h-3.5" />}
+          className="text-xs font-bold shadow-sm px-4 h-9"
+        >
+          {isPending ? "Saving..." : "Save Preferences"}
+        </Button>
+      </div>
+    </form>
   );
 }
 
 export function DangerZonePanel({ storeId }: { storeId: string }) {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { t } = useI18n();
 
   async function handleDelete() {
-    if (!confirm("CRITICAL WARNING: This action drops the tenant partition and cascades deletion across all bounded inventory, customer vectors, and ticket rows. Confirm drop?")) {
-      return;
-    }
-    setIsDeleting(true);
     await deleteStoreAction(storeId);
   }
 
   return (
-    <div className="p-4 sm:p-6 bg-red-50/50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/40 space-y-3 transition-colors">
-      <div className="flex items-center gap-2">
-        <AlertOctagon className="w-4 h-4 text-red-600" />
-        <h3 className="text-xs font-bold text-red-950 dark:text-red-400 uppercase tracking-wider">
-          {t.settings.dangerTitle}
-        </h3>
+    <>
+      <div className="p-4 sm:p-6 bg-red-50/50 dark:bg-red-950/20 rounded-lg border border-red-100 dark:border-red-900/40 space-y-3 transition-colors">
+        <div className="flex items-center gap-2">
+          <AlertOctagon className="w-4 h-4 text-red-600" />
+          <h3 className="text-xs font-bold text-red-950 dark:text-red-400 uppercase tracking-wider">
+            {t.settings.dangerTitle}
+          </h3>
+        </div>
+        <p className="text-xs text-red-800/80 dark:text-red-300/80 leading-relaxed max-w-2xl">
+          {t.settings.dangerDesc}
+        </p>
+        <div>
+          <Button
+            type="button"
+            onPress={() => setIsModalOpen(true)}
+            color="danger"
+            radius="lg"
+            className="text-xs font-bold shadow-sm px-4 h-9"
+          >
+            {t.settings.btnPurge}
+          </Button>
+        </div>
       </div>
-      <p className="text-xs text-red-800/80 dark:text-red-300/80 leading-relaxed max-w-2xl">
-        {t.settings.dangerDesc}
-      </p>
-      <div>
-        <Button
-          type="button"
-          onPress={handleDelete}
-          isLoading={isDeleting}
-          color="danger"
-          radius="sm"
-          className="text-xs font-bold shadow-sm px-4 h-9"
-        >
-          {isDeleting ? t.settings.btnPurging : t.settings.btnPurge}
-        </Button>
-      </div>
-    </div>
+
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Confirm Workspace Deletion"
+        description="CRITICAL WARNING: This action drops the tenant partition and cascades deletion across all bounded inventory, customer vectors, and ticket rows. Confirm drop?"
+        confirmText={t.settings.btnPurging}
+        danger
+      />
+    </>
   );
 }
 
@@ -354,7 +431,7 @@ export function AppearanceSettingsPanel() {
   };
 
   return (
-    <div className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-xl border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-3 transition-colors">
+    <div className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-3 transition-colors">
       <div>
         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
           <Monitor className="w-4 h-4 text-indigo-500" /> {t.settings.appearanceTitle}
@@ -362,11 +439,11 @@ export function AppearanceSettingsPanel() {
         <p className="text-xs text-slate-500 mt-0.5">{t.settings.appearanceSubtitle}</p>
       </div>
 
-      <div className="inline-flex p-1 bg-slate-100 dark:bg-[#0b0f19] rounded-xl border border-slate-200/80 dark:border-slate-800 gap-1 text-xs font-bold w-full">
+      <div className="inline-flex p-1 bg-slate-100 dark:bg-[#0b0f19] rounded-lg border border-slate-200/80 dark:border-slate-800 gap-1 text-xs font-bold w-full">
         <Button
           type="button"
           onPress={() => handleThemeChange("system")}
-          radius="sm"
+          radius="lg"
           variant={activeTheme === "system" ? "solid" : "light"}
           className={`flex-1 flex items-center justify-center gap-1.5 h-8 ${
             activeTheme === "system"
@@ -380,7 +457,7 @@ export function AppearanceSettingsPanel() {
         <Button
           type="button"
           onPress={() => handleThemeChange("light")}
-          radius="sm"
+          radius="lg"
           variant={activeTheme === "light" ? "solid" : "light"}
           className={`flex-1 flex items-center justify-center gap-1.5 h-8 ${
             activeTheme === "light"
@@ -394,7 +471,7 @@ export function AppearanceSettingsPanel() {
         <Button
           type="button"
           onPress={() => handleThemeChange("dark")}
-          radius="sm"
+          radius="lg"
           variant={activeTheme === "dark" ? "solid" : "light"}
           className={`flex-1 flex items-center justify-center gap-1.5 h-8 ${
             activeTheme === "dark"

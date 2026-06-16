@@ -1,9 +1,34 @@
 import React from "react";
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
 import { DashboardNav } from "@/features/dashboard/components/dashboard-nav";
 import { getSubscriptionStatus } from "@/features/subscription/server/subscription-actions";
 import { DashboardHeader } from "@/features/dashboard/components/dashboard-header";
+
+export async function generateMetadata({ params }: { params: Promise<{ storeId: string }> }): Promise<Metadata> {
+  const { storeId } = await params;
+  const storeSnap = await adminDb.collection("stores").doc(storeId).get();
+  const storeData = storeSnap.data();
+  const storeName = storeData?.name || "Store";
+  const logoUrl = storeData?.logo_url;
+
+  const metadata: Metadata = {
+    title: {
+      template: `%s | ${storeName} | Dashboard`,
+      default: `${storeName} | Dashboard`,
+    },
+  };
+
+  if (logoUrl) {
+    metadata.icons = {
+      icon: logoUrl,
+      apple: logoUrl,
+    };
+  }
+
+  return metadata;
+}
 
 export default async function TenantStoreLayout({
   children,
@@ -26,14 +51,22 @@ export default async function TenantStoreLayout({
       .where("owner_id", "==", profileId)
       .orderBy("created_at", "asc")
       .get(),
-    getSubscriptionStatus(storeId)
+    getSubscriptionStatus()
   ]);
 
   const stores = storesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  const currentStore = stores.find((s: any) => s.id === storeId);
+  const currentStoreIndex = stores.findIndex((s: any) => s.id === storeId);
+  const currentStore = stores[currentStoreIndex];
 
   if (!currentStore) {
     redirect("/dashboard");
+  }
+
+  const maxStores = (subscription.tier === "pro" || subscription.tier === "plus") ? Infinity : 3;
+
+  // If the user tries to access a store beyond their limit, kick them back to the first store
+  if (currentStoreIndex >= maxStores && stores.length > 0) {
+    redirect(`/${stores[0].id}/dashboard`);
   }
 
   return (
@@ -43,6 +76,8 @@ export default async function TenantStoreLayout({
         profileId={profileId}
         currentStoreSlug={(currentStore as any).slug}
         isSubscribed={subscription.isSubscribed}
+        plan={subscription.plan}
+        tier={subscription.tier}
         stores={stores}
       />
 

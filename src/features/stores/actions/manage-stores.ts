@@ -39,7 +39,7 @@ export async function createStoreAction(profileId: string, formData: FormData) {
       .get();
     const sub = subsSnap.empty ? null : subsSnap.docs[0].data();
 
-    const maxStores = sub?.plan === "pro" ? Infinity : sub?.plan === "starter" ? 5 : 3;
+    const maxStores = (sub?.plan === "pro" || sub?.plan === "plus") ? Infinity : 3;
     if (count >= maxStores) {
       throw new Error(`Upgrade your plan to add more stores.`);
     }

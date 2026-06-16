@@ -1,6 +1,7 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase/server";
+import { adminDb, getUserProfile } from "@/lib/firebase/server";
+import { DraftRequest } from "@/features/approvals/types";
 import { revalidatePath } from "next/cache";
 
 export interface InventoryItem {
@@ -64,6 +65,10 @@ export async function createInventoryItemAction(storeId: string, formData: FormD
   }
 
   try {
+    const userProfile = await getUserProfile();
+    if (!userProfile) return { error: "Authentication required" };
+    const isStaff = userProfile.role === "staff";
+
     const docRef = adminDb.collection("inventory").doc();
     const data = {
       id: docRef.id,
@@ -84,11 +89,32 @@ export async function createInventoryItemAction(storeId: string, formData: FormD
       group_name,
       created_at: new Date().toISOString(),
     };
-    await docRef.set(data);
 
-    revalidatePath(`/${storeId}/inventory`);
-    revalidatePath(`/${storeId}/dashboard`);
-    return { data };
+    if (isStaff) {
+      const draftRef = adminDb.collection("draft_requests").doc();
+      const draft: DraftRequest = {
+        id: draftRef.id,
+        store_id: storeId,
+        type: "CREATE",
+        target_collection: "inventory",
+        target_id: null,
+        payload: data,
+        status: "PENDING",
+        proposed_by: {
+          uid: userProfile.uid,
+          name: userProfile.name,
+          email: userProfile.email || "",
+        },
+        created_at: new Date().toISOString(),
+      };
+      await draftRef.set(draft);
+      return { data, message: "Draft submitted for Admin approval" };
+    } else {
+      await docRef.set(data);
+      revalidatePath(`/${storeId}/inventory`);
+      revalidatePath(`/${storeId}/dashboard`);
+      return { data };
+    }
   } catch (err: any) {
     return { error: err.message };
   }
@@ -106,10 +132,35 @@ export async function updateItemGroupingAction(storeId: string, itemId: string, 
 
 export async function deleteInventoryItemAction(storeId: string, id: string) {
   try {
-    await adminDb.collection("inventory").doc(id).delete();
-    revalidatePath(`/${storeId}/inventory`);
-    revalidatePath(`/${storeId}/dashboard`);
-    return { success: true };
+    const userProfile = await getUserProfile();
+    if (!userProfile) return { error: "Authentication required" };
+    const isStaff = userProfile.role === "staff";
+
+    if (isStaff) {
+      const draftRef = adminDb.collection("draft_requests").doc();
+      const draft: DraftRequest = {
+        id: draftRef.id,
+        store_id: storeId,
+        type: "DELETE",
+        target_collection: "inventory",
+        target_id: id,
+        payload: { id },
+        status: "PENDING",
+        proposed_by: {
+          uid: userProfile.uid,
+          name: userProfile.name,
+          email: userProfile.email || "",
+        },
+        created_at: new Date().toISOString(),
+      };
+      await draftRef.set(draft);
+      return { success: true, message: "Delete request submitted for Admin approval" };
+    } else {
+      await adminDb.collection("inventory").doc(id).delete();
+      revalidatePath(`/${storeId}/inventory`);
+      revalidatePath(`/${storeId}/dashboard`);
+      return { success: true };
+    }
   } catch (err: any) {
     return { error: err.message };
   }
@@ -132,7 +183,11 @@ export async function updateInventoryItemAction(storeId: string, itemId: string,
   if (!name) return { error: "Product Name is required" };
 
   try {
-    await adminDb.collection("inventory").doc(itemId).update({
+    const userProfile = await getUserProfile();
+    if (!userProfile) return { error: "Authentication required" };
+    const isStaff = userProfile.role === "staff";
+
+    const payload = {
       name,
       profile_tier,
       profile_name,
@@ -146,17 +201,43 @@ export async function updateInventoryItemAction(storeId: string, itemId: string,
       date_buy,
       date_expired,
       group_name,
-    });
+    };
 
-    revalidatePath(`/${storeId}/inventory`);
-    revalidatePath(`/${storeId}/dashboard`);
-    return { data: { id: itemId } };
+    if (isStaff) {
+      const draftRef = adminDb.collection("draft_requests").doc();
+      const draft: DraftRequest = {
+        id: draftRef.id,
+        store_id: storeId,
+        type: "UPDATE",
+        target_collection: "inventory",
+        target_id: itemId,
+        payload,
+        status: "PENDING",
+        proposed_by: {
+          uid: userProfile.uid,
+          name: userProfile.name,
+          email: userProfile.email || "",
+        },
+        created_at: new Date().toISOString(),
+      };
+      await draftRef.set(draft);
+      return { data: { id: itemId }, message: "Update requested as Draft" };
+    } else {
+      await adminDb.collection("inventory").doc(itemId).update(payload);
+      revalidatePath(`/${storeId}/inventory`);
+      revalidatePath(`/${storeId}/dashboard`);
+      return { data: { id: itemId } };
+    }
   } catch (err: any) {
     return { error: err.message };
   }
 }
 
 export async function importInventoryCsvAction(storeId: string, rows: any[]) {
+  const userProfile = await getUserProfile();
+  if (!userProfile) return { error: "Authentication required" };
+  if (userProfile.role === "staff") return { error: "Staff members cannot perform bulk CSV imports at this time." };
+
   const multiProfileTriggers = ["netflix", "disney", "prime", "hulu", "hbo", "google", "youtube", "canva", "spotify"];
   const batch = adminDb.batch();
 

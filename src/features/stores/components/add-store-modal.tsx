@@ -61,7 +61,7 @@ export function AddStoreModal({ isOpen, onClose, profileId }: AddStoreModalProps
 
             <ModalBody>
               {error && (
-                <div className="p-3 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/40 rounded-xl font-bold">
+                <div className="p-3 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/40 rounded-lg font-bold">
                   {error}
                 </div>
               )}
@@ -87,7 +87,7 @@ export function AddStoreModal({ isOpen, onClose, profileId }: AddStoreModalProps
                 variant="light"
                 onPress={onClose}
                 className="text-xs font-bold text-slate-500 dark:text-slate-400"
-                radius="sm"
+                radius="lg"
               >
                 Cancel
               </Button>
@@ -95,7 +95,7 @@ export function AddStoreModal({ isOpen, onClose, profileId }: AddStoreModalProps
                 type="submit"
                 isLoading={isPending}
                 className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/10"
-                radius="sm"
+                radius="lg"
               >
                 {isPending ? "Allocating Partition..." : "Initialize Workspace"}
               </Button>

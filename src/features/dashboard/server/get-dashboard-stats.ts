@@ -21,6 +21,7 @@ export async function getDashboardStats(storeId: string) {
   const totalOrders = customers.reduce((acc, item) => acc + (item.total_orders || 0), 0);
   const activeComplaints = complaints.filter((c) => c.status !== "resolved").length;
   const totalRefunds = complaints.filter((c) => c.satisfaction_outcome && c.satisfaction_outcome.toLowerCase().includes("refund")).length;
+  const resolvedComplaints = complaints.filter((c) => c.status === "resolved").length;
 
   let activeStreams = 0;
   let expiringSoonStreams = 0;
@@ -121,6 +122,7 @@ export async function getDashboardStats(storeId: string) {
     totalOrders,
     activeComplaints,
     totalRefunds,
+    resolvedComplaints,
     activeStreams,
     expiringSoonStreams,
     expiredStreams,

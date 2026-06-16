@@ -33,7 +33,7 @@ function VerifyEmailContent() {
   }, [isVerifying, router]);
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-6 max-w-sm w-full mx-auto p-8 glass-panel rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl">
+    <div className="flex flex-col items-center justify-center space-y-6 max-w-sm w-full mx-auto p-8 glass-panel rounded-lg border border-white/5 bg-white/5 backdrop-blur-xl">
       <div className="flex flex-col items-center text-center space-y-4">
         {isVerifying && (
           <>
@@ -92,7 +92,7 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
-      <div className="flex flex-col items-center justify-center space-y-6 max-w-sm w-full mx-auto p-8 glass-panel rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl">
+      <div className="flex flex-col items-center justify-center space-y-6 max-w-sm w-full mx-auto p-8 glass-panel rounded-lg border border-white/5 bg-white/5 backdrop-blur-xl">
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="h-16 w-16 bg-blue-500/20 rounded-full flex items-center justify-center animate-pulse">
             <Loader2 className="h-8 w-8 text-blue-400 animate-spin" />

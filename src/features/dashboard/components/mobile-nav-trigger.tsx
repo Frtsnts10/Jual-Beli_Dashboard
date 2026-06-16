@@ -16,7 +16,7 @@ export function MobileNavTrigger() {
       variant="light"
       aria-label="Open navigation menu"
       className="md:hidden text-slate-500 dark:text-slate-400"
-      radius="sm"
+      radius="lg"
     >
       <Menu className="w-5 h-5" />
     </Button>

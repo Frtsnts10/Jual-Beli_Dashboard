@@ -9,7 +9,7 @@ export default function MarketingPage() {
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20 text-white font-bold text-xl tracking-wider">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20 text-white font-bold text-xl tracking-wider">
               Ω
             </div>
             <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent">
@@ -57,7 +57,7 @@ export default function MarketingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-5 duration-1000">
             <Link
               href="/dashboard"
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-2xl shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3 text-base"
+              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-lg shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3 text-base"
             >
               <Zap className="w-5 h-5 fill-white/20" />
               Launch Premium Console
@@ -65,20 +65,20 @@ export default function MarketingPage() {
           </div>
 
           {/* Premium UI Mockup Showcase */}
-          <div className="mt-16 max-w-5xl mx-auto relative rounded-2xl sm:rounded-3xl p-1.5 sm:p-3 bg-slate-900/5 backdrop-blur-xl border border-slate-900/10 shadow-2xl animate-in zoom-in-95 duration-1000">
-            <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-inner border border-slate-100">
+          <div className="mt-16 max-w-5xl mx-auto relative rounded-lg sm:rounded-3xl p-1.5 sm:p-3 bg-slate-900/5 backdrop-blur-xl border border-slate-900/10 shadow-2xl animate-in zoom-in-95 duration-1000">
+            <div className="bg-white rounded-lg sm:rounded-lg overflow-hidden shadow-inner border border-slate-100">
               <div className="h-12 bg-slate-50 border-b border-slate-100 flex items-center px-4 gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-400" />
                 <div className="w-3 h-3 rounded-full bg-amber-400" />
                 <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                <div className="ml-4 px-3 py-1 bg-white border border-slate-200/60 rounded-md text-[11px] text-slate-400 font-mono w-40 sm:w-64 truncate text-left">
+                <div className="ml-4 px-3 py-1 bg-white border border-slate-200/60 rounded-lg text-[11px] text-slate-400 font-mono w-40 sm:w-64 truncate text-left">
                   shopdashboard.premium/dashboard
                 </div>
               </div>
               <div className="p-4 sm:p-8 text-left bg-gradient-to-br from-slate-50/50 to-white">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 font-bold shrink-0">
+                    <div className="w-10 h-10 rounded-lg bg-indigo-600/10 flex items-center justify-center text-indigo-600 font-bold shrink-0">
                       🏪
                     </div>
                     <div>
@@ -94,21 +94,21 @@ export default function MarketingPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                  <div className="p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
+                  <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
                     <p className="text-[10px] font-bold text-slate-400 uppercase">Live SKU Count</p>
                     <p className="text-2xl font-black text-slate-800 mt-1">1,482</p>
                   </div>
-                  <div className="p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
+                  <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
                     <p className="text-[10px] font-bold text-slate-400 uppercase">VIP Loyalty Pool</p>
                     <p className="text-2xl font-black text-indigo-600 mt-1">849</p>
                   </div>
-                  <div className="p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
+                  <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
                     <p className="text-[10px] font-bold text-slate-400 uppercase">Open Incidents</p>
                     <p className="text-2xl font-black text-amber-600 mt-1">0 Pending</p>
                   </div>
                 </div>
 
-                <div className="min-h-24 py-6 px-4 rounded-xl bg-gradient-to-r from-indigo-50/50 via-violet-50/50 to-pink-50/50 border border-indigo-100/40 flex items-center justify-center border-dashed">
+                <div className="min-h-24 py-6 px-4 rounded-lg bg-gradient-to-r from-indigo-50/50 via-violet-50/50 to-pink-50/50 border border-indigo-100/40 flex items-center justify-center border-dashed">
                   <p className="text-xs font-medium text-indigo-400 text-center">Interactive live widgets rendered securely inside tenant dashboard boundaries</p>
                 </div>
               </div>
@@ -129,8 +129,8 @@ export default function MarketingPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="p-8 rounded-2xl bg-slate-50/60 border border-slate-100 hover:border-indigo-100 transition-all group">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <div className="p-8 rounded-lg bg-slate-50/60 border border-slate-100 hover:border-indigo-100 transition-all group">
+                <div className="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <Layers className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Partitioned Data Flow</h3>
@@ -139,8 +139,8 @@ export default function MarketingPage() {
                 </p>
               </div>
 
-              <div className="p-8 rounded-2xl bg-slate-50/60 border border-slate-100 hover:border-violet-100 transition-all group">
-                <div className="w-12 h-12 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <div className="p-8 rounded-lg bg-slate-50/60 border border-slate-100 hover:border-violet-100 transition-all group">
+                <div className="w-12 h-12 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Complaints SLA Desk</h3>
@@ -149,14 +149,103 @@ export default function MarketingPage() {
                 </p>
               </div>
 
-              <div className="p-8 rounded-2xl bg-slate-50/60 border border-slate-100 hover:border-pink-100 transition-all group">
-                <div className="w-12 h-12 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <div className="p-8 rounded-lg bg-slate-50/60 border border-slate-100 hover:border-pink-100 transition-all group">
+                <div className="w-12 h-12 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <Zap className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Blazing CRUD Speed</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   Fully native responsive database tables with built-in instant optimistic transitions. No external heavyweight API layer required.
                 </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing/Features Comparison */}
+        <section className="py-24 bg-slate-50 px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
+                Simple, Scalable Plans
+              </h2>
+              <p className="text-slate-500 mt-2 text-sm">
+                Choose the perfect tier for your commerce operations.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {/* Standard Tier */}
+              <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col">
+                <div className="mb-6">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold uppercase tracking-widest mb-4">
+                    <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    Standard
+                  </div>
+                  <h3 className="text-4xl font-black text-slate-900">Free</h3>
+                  <p className="text-sm text-slate-500 mt-2">Perfect for single-store operations starting out.</p>
+                </div>
+                <div className="flex-1 space-y-4 mb-8">
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                    <span>Up to 1 Store Workspace</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                    <span>Basic Inventory Management</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                    <span>Standard Customer Tracking</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                    <span>Basic Complaints Desk</span>
+                  </div>
+                </div>
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-center text-sm transition-colors">
+                  Get Started Free
+                </Link>
+              </div>
+
+              {/* Pro Tier */}
+              <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4">
+                  <Sparkles className="w-24 h-24 text-indigo-500/10" />
+                </div>
+                <div className="mb-6 relative z-10">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-4">
+                    <Sparkles className="w-3 h-3 text-indigo-400" />
+                    Pro Member
+                  </div>
+                  <h3 className="text-4xl font-black text-white">$29<span className="text-lg text-slate-400 font-medium">/mo</span></h3>
+                  <p className="text-sm text-indigo-200 mt-2">Unlimited power for multi-tenant empires.</p>
+                </div>
+                <div className="flex-1 space-y-4 mb-8 relative z-10">
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span className="text-white font-medium">Unlimited Store Workspaces</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span>Advanced Global Preferences</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span>Automated WhatsApp API Bots (n8n)</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span>Priority SLA Support Desk</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span>Cross-Tenant Analytics Engine</span>
+                  </div>
+                </div>
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-indigo-500/25 transition-all relative z-10">
+                  Upgrade to Pro
+                </Link>
               </div>
             </div>
           </div>

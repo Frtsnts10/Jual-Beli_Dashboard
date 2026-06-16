@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Input, Select, SelectItem, Button } from "@heroui/react";
+import { Input, Select, SelectItem, Button, Pagination } from "@heroui/react";
 
 interface OrdersTableProps {
   storeId: string;
@@ -42,6 +42,8 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
   const [paymentFilter, setPaymentFilter] = useState<string>("all");
   const [fulfillmentFilter, setFulfillmentFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   // Filter orders
   const filteredOrders = orders.filter((o) => {
@@ -53,6 +55,13 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
 
     return matchesPayment && matchesFulfillment && matchesSearch;
   });
+
+  const pages = Math.ceil(filteredOrders.length / rowsPerPage);
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredOrders.slice(start, end);
+  }, [page, filteredOrders, rowsPerPage]);
 
   const handleUpdateStatus = async (orderId: string, pStatus: string, fStatus: string) => {
     setUpdatingId(orderId);
@@ -120,17 +129,17 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-sm border border-indigo-100/40 dark:border-indigo-900/40">
+          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
             {orders.length} Total Orders
           </span>
-          <span className="text-xs font-bold px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-sm border border-amber-100/40 dark:border-amber-900/40">
+          <span className="text-xs font-bold px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-lg border border-amber-100/40 dark:border-amber-900/40">
             {orders.filter(o => o.fulfillment_status === "pending").length} Pending Fulfillment
           </span>
         </div>
       </div>
 
       {/* Interactive Sliders Filter Panel */}
-      <div className="p-4 bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-sm shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
+      <div className="p-4 bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-lg shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
         <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
           <SlidersHorizontal className="w-4 h-4 text-indigo-500" />
           <span className="text-xs font-extrabold uppercase">Queue Filters</span>
@@ -141,12 +150,13 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
             type="text"
             placeholder="Search by customer or order ID..."
             value={searchTerm}
-            onValueChange={setSearchTerm}
+            onValueChange={(val) => { setSearchTerm(val); setPage(1); }}
             variant="faded"
-            radius="sm"
+            radius="lg"
+            size="sm"
             className="sm:col-span-2"
             classNames={{
-              inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
+              inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
               input: "text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500"
             }}
           />
@@ -154,11 +164,12 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
           <Select
             aria-label="Payment Status Filter"
             selectedKeys={[paymentFilter]}
-            onChange={(e) => setPaymentFilter(e.target.value)}
+            onChange={(e) => { setPaymentFilter(e.target.value); setPage(1); }}
             variant="faded"
-            radius="sm"
+            radius="lg"
+            size="sm"
             classNames={{
-              trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
+              trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
               value: "text-xs font-bold text-slate-700 dark:text-slate-300"
             }}
           >
@@ -172,11 +183,12 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
           <Select
             aria-label="Fulfillment Status Filter"
             selectedKeys={[fulfillmentFilter]}
-            onChange={(e) => setFulfillmentFilter(e.target.value)}
+            onChange={(e) => { setFulfillmentFilter(e.target.value); setPage(1); }}
             variant="faded"
-            radius="sm"
+            radius="lg"
+            size="sm"
             classNames={{
-              trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
+              trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
               value: "text-xs font-bold text-slate-700 dark:text-slate-300"
             }}
           >
@@ -189,7 +201,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
       </div>
 
       {/* Main Grid View */}
-      <div className="bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-sm shadow-xs overflow-hidden transition-colors">
+      <div className="bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-lg shadow-xs overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -202,7 +214,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
-              {filteredOrders.map((o) => {
+              {items.map((o) => {
                 const isUpdating = updatingId === o.id;
                 const isExpanded = expandedOrderId === o.id;
                 const itemsCount = o.items.length;
@@ -214,7 +226,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                       {/* Order Details Column */}
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-sm bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
+                          <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
                             <ShoppingCart className="w-4 h-4" />
                           </div>
                           <div>
@@ -251,7 +263,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                       <td className="px-5 py-4">
                         <div className="flex flex-wrap items-center gap-1.5">
                           {/* Payment badge */}
-                          <span className={`px-2 py-0.5 font-bold text-[9px] uppercase tracking-wider rounded-sm ${
+                          <span className={`px-2 py-0.5 font-bold text-[9px] uppercase tracking-wider rounded-lg ${
                             o.payment_status === "paid"
                               ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200/30"
                               : o.payment_status === "pending"
@@ -262,7 +274,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                           </span>
 
                           {/* Fulfillment badge */}
-                          <span className={`px-2 py-0.5 font-bold text-[9px] uppercase tracking-wider rounded-sm ${
+                          <span className={`px-2 py-0.5 font-bold text-[9px] uppercase tracking-wider rounded-lg ${
                             o.fulfillment_status === "fulfilled"
                               ? "bg-indigo-100 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-400 border border-indigo-200/30"
                               : o.fulfillment_status === "pending"
@@ -281,7 +293,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                             onPress={() => setExpandedOrderId(isExpanded ? null : o.id)}
                             variant={isExpanded ? "flat" : "bordered"}
                             color={isExpanded ? "primary" : "default"}
-                            radius="sm"
+                            radius="lg"
                             className="h-[32px] px-3.5 text-xs font-bold shadow-sm"
                             startContent={<Eye className="w-3.5 h-3.5" />}
                           >
@@ -312,7 +324,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                   }}
                                   isDisabled={isUpdating}
                                   variant="faded"
-                                  radius="sm"
+                                  radius="lg"
                                   className="w-[180px]"
                                   classNames={{
                                     trigger: "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-[28px] min-h-0",
@@ -347,7 +359,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                 return (
                                   <div 
                                     key={idx} 
-                                    className={`p-3.5 rounded-sm border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
+                                    className={`p-3.5 rounded-lg border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
                                       isItemFulfilled 
                                         ? "bg-indigo-50/20 dark:bg-indigo-950/10 border-indigo-100/60 dark:border-indigo-900/20" 
                                         : "bg-white dark:bg-[#0d1322] border-slate-200/80 dark:border-slate-800/80"
@@ -363,7 +375,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                           <span className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">
                                             {item.name}
                                           </span>
-                                          <span className="px-1.5 py-0.2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-sm text-[8px] uppercase font-black">
+                                          <span className="px-1.5 py-0.2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-lg text-[8px] uppercase font-black">
                                             {item.variant}
                                           </span>
                                         </div>
@@ -415,7 +427,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                                   selectedKeys={selectedSlots[slotKey] ? [selectedSlots[slotKey]] : []}
                                                   onChange={(e) => setSelectedSlots(prev => ({ ...prev, [slotKey]: e.target.value }))}
                                                   variant="faded"
-                                                  radius="sm"
+                                                  radius="lg"
                                                   classNames={{
                                                     trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[32px] min-h-0",
                                                     value: "text-[11px] font-medium text-slate-800 dark:text-slate-200"
@@ -434,14 +446,14 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                                 isDisabled={!selectedSlots[slotKey]}
                                                 isLoading={fulfillingId === slotKey}
                                                 color="primary"
-                                                radius="sm"
+                                                radius="lg"
                                                 className="h-[32px] px-4 text-xs font-bold shadow-sm shrink-0 self-end"
                                               >
                                                 Allocate & Fulfill
                                               </Button>
                                             </>
                                           ) : (
-                                            <div className="w-full p-2.5 rounded-sm bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 flex items-start gap-2">
+                                            <div className="w-full p-2.5 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 flex items-start gap-2">
                                               <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                                               <div className="flex-1">
                                                 <p className="font-bold text-[11px] text-red-700 dark:text-red-400">Zero Unassigned Inventory Slots Available!</p>
@@ -471,7 +483,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                   </React.Fragment>
                 );
               })}
-              {filteredOrders.length === 0 && (
+              {items.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-5 py-16 text-center text-slate-400 italic">
                     Order queue inactive. Completed e-commerce purchases will trigger real-time transaction shards here.
@@ -481,6 +493,50 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination Footer */}
+        {pages > 0 && (
+          <div className="flex items-center justify-between p-4 border-t border-slate-200/60 dark:border-slate-800/80">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Rows per page:</span>
+              <Select
+                size="sm"
+                variant="faded"
+                selectedKeys={[rowsPerPage.toString()]}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setRowsPerPage(Number(e.target.value));
+                    setPage(1);
+                  }
+                }}
+                className="w-20"
+                classNames={{ 
+                  trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800",
+                  value: "text-xs font-bold"
+                }}
+              >
+                <SelectItem key="5">5</SelectItem>
+                <SelectItem key="10">10</SelectItem>
+              </Select>
+            </div>
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="primary"
+              page={page}
+              total={pages}
+              onChange={(p) => setPage(p)}
+              classNames={{
+                wrapper: "gap-1",
+                item: "w-8 h-8 text-xs font-bold rounded-lg",
+                cursor: "bg-indigo-500 text-white rounded-lg font-bold",
+                prev: "w-8 h-8 rounded-lg",
+                next: "w-8 h-8 rounded-lg"
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

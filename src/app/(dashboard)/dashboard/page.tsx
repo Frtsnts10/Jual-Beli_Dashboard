@@ -45,8 +45,8 @@ export default async function DashboardRootPage() {
         <UserButton />
       </header>
       <main className="flex-1 flex items-center justify-center p-6 text-center">
-        <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200/80 p-8 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4 font-bold text-xl">
+        <div className="max-w-md w-full bg-white rounded-lg border border-slate-200/80 p-8 shadow-sm">
+          <div className="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4 font-bold text-xl">
             🏪
           </div>
           <h2 className="text-lg font-bold text-slate-900 mb-1">Welcome to Shop Dashboard Console</h2>
