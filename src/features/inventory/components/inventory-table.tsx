@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import { InventoryItem, deleteInventoryItemAction, updateItemGroupingAction, updateInventoryItemAction, importInventoryCsvAction } from "../actions/inventory-actions";
 import { InventoryForm } from "./inventory-form";
-import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus, Package, Sparkles, FileText } from "lucide-react";
+import { Trash2, Loader2, Key, Calendar, Shield, Users, UserPlus, RefreshCw, Download, Upload, Edit, Copy, CheckCircle, Plus, Package, Sparkles, FileText, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import { getTierConfigForProduct } from "@/config/product-tiers";
+import { getTierConfigForProduct, formatTierName } from "@/config/product-tiers";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
@@ -541,6 +541,8 @@ function EditInventoryModal({
   const [stock, setStock] = useState(item.stock?.toString() || "1");
   const [dateBuy, setDateBuy] = useState(item.date_buy || "");
   const [dateExpired, setDateExpired] = useState(item.date_expired || "");
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
   const formatInitialPrice = (num: number) => {
     if (!num) return "";
@@ -651,7 +653,7 @@ function EditInventoryModal({
                   classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 >
                   {tierOptions.map((opt) => (
-                    <SelectItem key={opt}>{opt}</SelectItem>
+                    <SelectItem key={opt} textValue={formatTierName(opt)}>{formatTierName(opt)}</SelectItem>
                   ))}
                 </Select>
                 <Input
@@ -685,12 +687,21 @@ function EditInventoryModal({
                   classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
-                  type="text"
+                  type={isVisible ? "text" : "password"}
                   labelPlacement="outside" label="Password"
                   value={password}
                   onValueChange={setPassword}
                   variant="bordered"
                   radius="lg"
+                  endContent={
+                    <button className="focus:outline-none" type="button" onClick={toggleVisibility}>
+                      {isVisible ? (
+                        <EyeOff className="text-2xl text-default-400 pointer-events-none" />
+                      ) : (
+                        <Eye className="text-2xl text-default-400 pointer-events-none" />
+                      )}
+                    </button>
+                  }
                   classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input

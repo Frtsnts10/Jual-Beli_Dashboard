@@ -28,6 +28,74 @@ export const PRODUCT_TIERS_REGISTRY: Record<string, ProductTierConfig> = {
     defaultTier: "mega fan slot",
     options: ["mega fan slot", "ultimate tier", "private line"],
   },
+  disney: {
+    defaultTier: "profile slot",
+    options: ["profile slot", "premium shared", "private account"],
+  },
+  hbo: {
+    defaultTier: "profile slot",
+    options: ["profile slot", "ad free slot", "private account"],
+  },
+  max: {
+    defaultTier: "profile slot",
+    options: ["profile slot", "ad free slot", "private account"],
+  },
+  prime: {
+    defaultTier: "profile slot",
+    options: ["profile slot", "video only slot", "private account"],
+  },
+  hulu: {
+    defaultTier: "profile slot",
+    options: ["profile slot", "no ads slot", "live tv shared"],
+  },
+  apple: {
+    defaultTier: "family member",
+    options: ["family member", "individual account", "premier tier"],
+  },
+  chatgpt: {
+    defaultTier: "plus shared",
+    options: ["plus shared", "plus private", "team member"],
+  },
+  openai: {
+    defaultTier: "plus shared",
+    options: ["plus shared", "plus private", "team member"],
+  },
+  grammarly: {
+    defaultTier: "premium shared",
+    options: ["premium shared", "premium private", "business slot"],
+  },
+  nordvpn: {
+    defaultTier: "device slot",
+    options: ["device slot", "private account"],
+  },
+  expressvpn: {
+    defaultTier: "device slot",
+    options: ["device slot", "private account"],
+  },
+  surfshark: {
+    defaultTier: "device slot",
+    options: ["device slot", "private account"],
+  },
+  microsoft: {
+    defaultTier: "family slot",
+    options: ["family slot", "personal account", "business basic"],
+  },
+  office: {
+    defaultTier: "family slot",
+    options: ["family slot", "personal account", "business basic"],
+  },
+  google: {
+    defaultTier: "family member",
+    options: ["family member", "individual slot"],
+  },
+  capcut: {
+    defaultTier: "pro shared",
+    options: ["pro shared", "pro private"],
+  },
+  zoom: {
+    defaultTier: "pro shared",
+    options: ["pro shared", "pro private", "business slot"],
+  },
 };
 
 export const UNIVERSAL_FALLBACK_TIERS: ProductTierConfig = {
@@ -49,4 +117,17 @@ export function getTierConfigForProduct(productName: string): ProductTierConfig 
   }
 
   return UNIVERSAL_FALLBACK_TIERS;
+}
+
+/**
+ * Formats a raw tier ID into a beautiful, human-readable display name.
+ * Example: "1user" -> "1 User", "semi private" -> "Semi Private"
+ */
+export function formatTierName(tier: string): string {
+  if (!tier) return "";
+  return tier
+    .replace(/(\d+)user/ig, '$1 User')
+    .split(/[\s_]+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 }

@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { PlusCircle, Users } from "lucide-react";
+import { PlusCircle, Users, Eye, EyeOff } from "lucide-react";
 import { createInventoryItemAction } from "../actions/inventory-actions";
-import { getTierConfigForProduct } from "@/config/product-tiers";
+import { getTierConfigForProduct, formatTierName } from "@/config/product-tiers";
 import { Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
 import { toast } from "sonner";
 
@@ -35,6 +35,9 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
     setTierVariant(cfg.defaultTier);
     setTierOptions(cfg.options);
   };
+
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
   // Clean formatted input strings into native float metrics
   const parsePriceFloat = (str: string) => {
@@ -131,7 +134,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         >
           {tierOptions.map((opt) => (
-            <SelectItem key={opt}>{opt}</SelectItem>
+            <SelectItem key={opt} textValue={formatTierName(opt)}>{formatTierName(opt)}</SelectItem>
           ))}
         </Select>
         <Input
@@ -175,12 +178,21 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <Input
-          type="text"
+          type={isVisible ? "text" : "password"}
           name="password"
           labelPlacement="outside" label="Password"
           placeholder="••••••••"
           variant="bordered"
           radius="lg"
+          endContent={
+            <button className="focus:outline-none" type="button" onClick={toggleVisibility}>
+              {isVisible ? (
+                <EyeOff className="text-2xl text-default-400 pointer-events-none" />
+              ) : (
+                <Eye className="text-2xl text-default-400 pointer-events-none" />
+              )}
+            </button>
+          }
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <Input
