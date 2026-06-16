@@ -4,7 +4,7 @@ import { Sparkles, Layers, ShieldCheck, Zap, ArrowRight, CheckCircle2, MonitorPl
 
 export default function MarketingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 overflow-hidden font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 overflow-x-hidden font-sans">
       {/* Sleek top navigation */}
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -256,90 +256,128 @@ export default function MarketingPage() {
           </div>
         </section>
 
-        {/* Pricing/Features Comparison */}
+        {/* Bestselling Packages Catalog */}
         <section className="py-24 bg-slate-50 px-6">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-                Simple, Scalable Plans
+                Our Bestselling Packages
               </h2>
               <p className="text-slate-500 mt-2 text-sm">
-                Choose the perfect tier for your commerce operations.
+                Get instant access to premium digital accounts at a fraction of the cost.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {/* Standard Tier */}
-              <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Product 1: Netflix */}
+              <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all flex flex-col group">
                 <div className="mb-6">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold uppercase tracking-widest mb-4">
-                    <div className="w-2 h-2 rounded-full bg-amber-500" />
-                    Standard
+                    <MonitorPlay className="w-3 h-3 text-red-500" />
+                    Streaming
                   </div>
-                  <h3 className="text-4xl font-black text-slate-900">Free</h3>
-                  <p className="text-sm text-slate-500 mt-2">Perfect for single-store operations starting out.</p>
+                  <h3 className="text-2xl font-black text-slate-900">Netflix Premium</h3>
+                  <p className="text-sm font-bold text-slate-400 mt-1">1 Screen • 1 Month</p>
+                  <div className="mt-4 flex items-end gap-1">
+                    <span className="text-4xl font-black text-indigo-600">$3.99</span>
+                  </div>
                 </div>
                 <div className="flex-1 space-y-4 mb-8">
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span>Up to 1 Store Workspace</span>
+                    <span>4K Ultra HD Streaming</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span>Store up to 100 Credentials</span>
+                    <span>Private Profile PIN Lock</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span>Basic Stock & Expiry Tracking</span>
+                    <span>Instant Auto-Delivery</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span>Copy-to-Clipboard Features</span>
+                    <span>Full Replacement Warranty</span>
                   </div>
                 </div>
-                <Link href="/dashboard" className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-center text-sm transition-colors">
-                  Get Started Free
-                </Link>
+                <Button className="w-full py-6 bg-slate-900 hover:bg-indigo-600 text-white font-bold rounded-xl text-center text-sm transition-all group-hover:shadow-lg group-hover:shadow-indigo-500/25">
+                  Buy Now
+                </Button>
               </div>
 
-              {/* Pro Tier */}
-              <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden">
+              {/* Product 2: Spotify */}
+              <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-emerald-500/30 shadow-xl shadow-emerald-500/10 flex flex-col relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4">
-                  <Sparkles className="w-24 h-24 text-indigo-500/10" />
+                  <Sparkles className="w-24 h-24 text-emerald-500/10" />
                 </div>
                 <div className="mb-6 relative z-10">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-4">
-                    <Sparkles className="w-3 h-3 text-indigo-400" />
-                    Pro Member
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold uppercase tracking-widest mb-4">
+                    <Sparkles className="w-3 h-3 text-emerald-400" />
+                    Most Popular
                   </div>
-                  <h3 className="text-4xl font-black text-white">$29<span className="text-lg text-slate-400 font-medium">/mo</span></h3>
-                  <p className="text-sm text-indigo-200 mt-2">Unlimited power for digital empires.</p>
+                  <h3 className="text-2xl font-black text-white">Spotify Premium</h3>
+                  <p className="text-sm font-bold text-emerald-400/70 mt-1">Individual Upgrade • 1 Month</p>
+                  <div className="mt-4 flex items-end gap-1">
+                    <span className="text-4xl font-black text-emerald-400">$2.99</span>
+                  </div>
                 </div>
                 <div className="flex-1 space-y-4 mb-8 relative z-10">
                   <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
-                    <span className="text-white font-medium">Unlimited Store Workspaces</span>
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                    <span className="text-white font-medium">Ad-Free Listening</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
-                    <span>Unlimited Credential Storage</span>
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                    <span>Download for Offline</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
-                    <span>Automated WhatsApp Delivery (n8n)</span>
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                    <span>Upgrade Your Own Account</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
-                    <span>Smart Family Pool Automation</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
-                    <span>Cross-Tenant Analytics Engine</span>
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                    <span>No Playlists Lost</span>
                   </div>
                 </div>
-                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-indigo-500/25 transition-all relative z-10">
-                  Upgrade to Pro
-                </Link>
+                <Button className="w-full py-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-emerald-500/25 transition-all relative z-10">
+                  Buy Now
+                </Button>
+              </div>
+
+              {/* Product 3: ChatGPT */}
+              <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all flex flex-col group">
+                <div className="mb-6">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold uppercase tracking-widest mb-4">
+                    <Bot className="w-3 h-3 text-indigo-500" />
+                    AI Tools
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900">ChatGPT Plus</h3>
+                  <p className="text-sm font-bold text-slate-400 mt-1">Shared Slot • 1 Month</p>
+                  <div className="mt-4 flex items-end gap-1">
+                    <span className="text-4xl font-black text-indigo-600">$4.99</span>
+                  </div>
+                </div>
+                <div className="flex-1 space-y-4 mb-8">
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                    <span>Access to GPT-4o</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                    <span>DALL-E Image Generation</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                    <span>Advanced Data Analysis</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                    <span>High Uptime Guarantee</span>
+                  </div>
+                </div>
+                <Button className="w-full py-6 bg-slate-900 hover:bg-indigo-600 text-white font-bold rounded-xl text-center text-sm transition-all group-hover:shadow-lg group-hover:shadow-indigo-500/25">
+                  Buy Now
+                </Button>
               </div>
             </div>
           </div>
