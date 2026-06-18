@@ -396,3 +396,163 @@ export async function importCustomersCsvAction(storeId: string, rows: any[]) {
     return { error: err.message };
   }
 }
+
+export async function importComplexExcelDataAction(storeId: string, rows: any[]) {
+  // Declare all collections upfront
+  const customersMap = new Map<string, any>();
+  const inventoryMap = new Map<string, { ref: any; data: any }>();
+  const ordersToCreate: any[] = [];
+
+  rows.forEach(row => {
+    const phone = row.phone || row.customer_email || "UnknownPhone";
+    if (!customersMap.has(phone)) {
+      customersMap.set(phone, {
+        id: adminDb.collection("customers").doc().id,
+        phone: row.phone || null,
+        name: row.customer_name || "Unnamed Customer",
+        email: row.customer_email || null,
+        purchased_products: [],
+        total_orders: 0
+      });
+    }
+
+    const customer = customersMap.get(phone);
+    const boughtDate = new Date(row.bought_date || new Date().toISOString());
+    const expireObj = new Date(boughtDate.getTime() + ((row.duration_days || 30) * 86400000));
+    const groupName = `${row.product_name} Master Account Pool — ${row.vault_email || "Unknown"}`;
+
+    // Dedup key: same vault email + password + profile name = same physical slot
+    const dedupKey = [
+      (row.vault_email || "").toLowerCase().trim(),
+      (row.vault_password || "").trim(),
+      (row.profile_name || "").toLowerCase().trim(),
+      (row.product_name || "").toLowerCase().trim(),
+    ].join("||");
+
+    // Capacity based on tier
+    const tierStr = (row.product_variant || "1user").toLowerCase();
+    let capacity = 1;
+    if (tierStr === "2user" || tierStr === "2u") capacity = 2;
+    else if (tierStr === "3user" || tierStr === "3u") capacity = 3;
+
+    let invRef: any;
+    if (inventoryMap.has(dedupKey)) {
+      const existing = inventoryMap.get(dedupKey)!;
+      existing.data.stock = Math.max(0, existing.data.stock - 1);
+      invRef = existing.ref;
+    } else {
+      const invDocRef = adminDb.collection("inventory").doc();
+      const invData = {
+        id: invDocRef.id,
+        store_id: storeId,
+        name: row.product_name,
+        profile_tier: row.product_variant || "1user",
+        profile_name: row.profile_name || null,
+        email: row.vault_email || null,
+        password: row.vault_password || null,
+        pin: row.profile_pin || null,
+        base_price: 0,
+        selling_price: 0,
+        price: 0,
+        stock: capacity - 1,
+        capacity,
+        date_buy: boughtDate.toISOString(),
+        date_expired: expireObj.toISOString(),
+        category: row.product_name || null,
+        group_name: groupName,
+        created_at: new Date().toISOString(),
+      };
+      inventoryMap.set(dedupKey, { ref: invDocRef, data: invData });
+      invRef = invDocRef;
+    }
+
+    customer.purchased_products.push({
+      name: row.product_name,
+      variant: row.product_variant || "1user",
+      duration_days: row.duration_days || 30,
+      bought_date: boughtDate.toISOString(),
+      date_start: boughtDate.toISOString(),
+      expire_date: expireObj.toISOString(),
+      group_assigned: groupName,
+      inventory_id: invRef.id,
+      is_owner: false,
+    });
+    customer.total_orders += 1;
+
+    // Create a fulfilled order record (shows in Orders Queue)
+    const orderRef = adminDb.collection("orders").doc();
+    ordersToCreate.push({
+      ref: orderRef,
+      data: {
+        id: orderRef.id,
+        store_id: storeId,
+        customer_id: customer.id,
+        customer_name: row.phone || row.customer_email || "Unnamed Customer",
+        customer_email: row.customer_email || "",
+        items: [{
+          name: row.product_name,
+          variant: row.product_variant || "1user",
+          duration_days: row.duration_days || 30,
+          price: 0,
+          bought_date: boughtDate.toISOString(),
+          expire_date: expireObj.toISOString(),
+          inventory_id: invRef.id,
+        }],
+        total_amount: 0,
+        payment_status: "paid",
+        fulfillment_status: "fulfilled",
+        created_at: boughtDate.toISOString(),
+      }
+    });
+  });
+
+  const inventoryToCreate = Array.from(inventoryMap.values());
+
+  if (rows.length === 0) return { error: "No valid rows found to import" };
+
+  try {
+    const batches: Promise<any>[] = [];
+    let currentBatch = adminDb.batch();
+    let opCount = 0;
+
+    const commitCurrentBatch = () => {
+      batches.push(currentBatch.commit());
+      currentBatch = adminDb.batch();
+      opCount = 0;
+    };
+
+    inventoryToCreate.forEach(inv => {
+      currentBatch.set(inv.ref, inv.data);
+      opCount++;
+      if (opCount >= 450) commitCurrentBatch();
+    });
+
+    customersMap.forEach(customer => {
+      const docRef = adminDb.collection("customers").doc(customer.id);
+      currentBatch.set(docRef, {
+        ...customer,
+        store_id: storeId,
+        created_at: new Date().toISOString()
+      });
+      opCount++;
+      if (opCount >= 450) commitCurrentBatch();
+    });
+
+    ordersToCreate.forEach(order => {
+      currentBatch.set(order.ref, order.data);
+      opCount++;
+      if (opCount >= 450) commitCurrentBatch();
+    });
+
+    if (opCount > 0) batches.push(currentBatch.commit());
+    await Promise.all(batches);
+
+    revalidatePath(`/${storeId}/customers`);
+    revalidatePath(`/${storeId}/inventory`);
+    revalidatePath(`/${storeId}/orders`);
+    revalidatePath(`/${storeId}/dashboard`);
+    return { success: true, count: rows.length };
+  } catch (err: any) {
+    return { error: err.message };
+  }
+}

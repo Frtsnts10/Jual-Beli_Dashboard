@@ -258,7 +258,7 @@ export function EditInventoryModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <DatePicker
                   labelPlacement="outside" label="Date Buy"
-                  value={dateBuy ? (parseDate(dateBuy) as any) : null}
+                  value={dateBuy ? (parseDate(dateBuy.split("T")[0]) as any) : null}
                   onChange={(val) => setDateBuy(val ? val.toString() : "")}
                   variant="bordered"
                   radius="lg"
@@ -266,7 +266,7 @@ export function EditInventoryModal({
                 />
                 <DatePicker
                   labelPlacement="outside" label="Date Expired"
-                  value={dateExpired ? (parseDate(dateExpired) as any) : null}
+                  value={dateExpired ? (parseDate(dateExpired.split("T")[0]) as any) : null}
                   onChange={(val) => setDateExpired(val ? val.toString() : "")}
                   variant="bordered"
                   radius="lg"

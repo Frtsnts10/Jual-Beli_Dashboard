@@ -133,7 +133,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
             {orders.length} Total Orders
           </span>
           <span className="text-xs font-bold px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-lg border border-amber-100/40 dark:border-amber-900/40">
-            {orders.filter(o => o.fulfillment_status === "pending").length} Pending Fulfillment
+            {orders.filter(o => o.fulfillment_status === "pending" || (o.fulfillment_status as string) === "unfulfilled").length} Pending Fulfillment
           </span>
         </div>
       </div>

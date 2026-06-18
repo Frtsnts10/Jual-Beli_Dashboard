@@ -137,10 +137,10 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
     if (!file) return;
 
     setIsImporting(true);
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      try {
-        const text = event.target?.result as string;
+    try {
+      const fileName = file.name.toLowerCase();
+      if (fileName.endsWith('.csv')) {
+        const text = await file.text();
         if (!text) throw new Error("File content is empty");
 
         const lines = text.split(/\r\n|\n/).filter((l) => l.trim());
@@ -159,24 +159,214 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
         });
 
         const res = await importCustomersCsvAction(storeId, rows);
-        if (res?.error) {
-          toast.error(res.error);
-        } else {
-          toast.success(`Successfully imported ${res?.count || rows.length} customer records!`);
-        }
-      } catch (err: any) {
-        toast.error(err.message || "Failed to parse CSV file");
-      } finally {
-        setIsImporting(false);
-        e.target.value = "";
+        if (res?.error) toast.error(res.error);
+        else toast.success(`Successfully imported ${res?.count || rows.length} customer records from CSV!`);
+      } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+        const buffer = await file.arrayBuffer();
+        const XLSX = await import("xlsx");
+        const workbook = XLSX.read(buffer, { type: "array" });
+        const allRows: any[] = [];
+
+        workbook.SheetNames.forEach((sheetName) => {
+          const sheet = workbook.Sheets[sheetName];
+          const upSheet = sheetName.toUpperCase().replace(/\s/g, "");
+
+          // Determine product name from sheet name
+          let productName = sheetName;
+          if (upSheet.includes("NET") || upSheet.includes("SEMPRIV")) productName = "Netflix";
+          else if (upSheet.includes("CANVA")) productName = "Canva";
+          else if (upSheet.includes("CAPCUT")) productName = "Capcut";
+
+          // ─── CAPCUT sheet: has explicit lowercase headers (email, password, user) ───
+          if (upSheet.includes("CAPCUT")) {
+            const rawJson = XLSX.utils.sheet_to_json(sheet, { raw: false, defval: "" }) as any[];
+            rawJson.forEach((row) => {
+              const keys = Object.keys(row).map(k => k.trim().toLowerCase());
+              const getVal = (target: string) => {
+                const k = Object.keys(row).find(k => k.trim().toLowerCase() === target);
+                return k ? row[k]?.toString().trim() : "";
+              };
+              const phone = getVal("user");
+              const vaultEmail = getVal("email");
+              const vaultPass = getVal("password");
+              if (!phone || phone.includes("@")) return; // skip header-like or empty rows
+
+              const durasiStr = getVal("durasi").toUpperCase();
+              let durasiNum = 30;
+              if (durasiStr.includes("3")) durasiNum = 90;
+              if (durasiStr.includes("2")) durasiNum = 60;
+              if (durasiStr.includes("6")) durasiNum = 180;
+              if (durasiStr.includes("12")) durasiNum = 365;
+
+              let variant = getVal("jenis").toLowerCase();
+              if (variant === "1u") variant = "1user";
+              else if (variant === "2u") variant = "2user";
+              else if (variant === "priv") variant = "private";
+              if (!variant) variant = "1user";
+
+              const dateStr = getVal("langgal order") || getVal("tanggal order");
+              let dateObj = new Date();
+              if (dateStr) {
+                const d = new Date(dateStr + " " + new Date().getFullYear());
+                if (!isNaN(d.getTime())) dateObj = d;
+              }
+              allRows.push({
+                customer_name: "Unnamed Customer", phone,
+                vault_email: vaultEmail, vault_password: vaultPass,
+                profile_pin: "", device: "",
+                product_name: productName, product_variant: variant,
+                duration_days: durasiNum, bought_date: dateObj.toISOString(),
+              });
+            });
+            return; // done with this sheet
+          }
+
+          // ─── CANVAAA sheet: USERNAME = customer email, no vault ───
+          if (upSheet.includes("CANVA")) {
+            const rawJson = XLSX.utils.sheet_to_json(sheet, { raw: false, defval: "" }) as any[];
+            rawJson.forEach((row) => {
+              const usernameKey = Object.keys(row).find(k => k.trim().toUpperCase() === "USERNAME");
+              const usernameStr = usernameKey ? row[usernameKey]?.toString().trim() : "";
+              if (!usernameStr || usernameStr.toUpperCase() === "USERNAME") return;
+
+              const durasiKey = Object.keys(row).find(k => k.trim().toUpperCase() === "DURASI");
+              const jenisKey = Object.keys(row).find(k => k.trim().toUpperCase() === "JENIS");
+              const tanggalKey = Object.keys(row).find(k => k.trim().toUpperCase().includes("TANGGAL ORDER"));
+
+              const durasiStr = durasiKey ? row[durasiKey]?.toString().toUpperCase() : "3 BULAN";
+              let durasiNum = 90;
+              if (durasiStr.includes("1 ")) durasiNum = 30;
+              if (durasiStr.includes("6")) durasiNum = 180;
+              if (durasiStr.includes("12")) durasiNum = 365;
+
+              let variant = jenisKey ? row[jenisKey]?.toString().toLowerCase().trim() : "member";
+              if (variant === "member") variant = "member";
+
+              const dateStr = tanggalKey ? row[tanggalKey]?.toString() : "";
+              let dateObj = new Date();
+              if (dateStr) {
+                const d = new Date(dateStr + " " + new Date().getFullYear());
+                if (!isNaN(d.getTime())) dateObj = d;
+              }
+
+              // For Canva, USERNAME is the customer's own email
+              allRows.push({
+                customer_name: "Unnamed Customer",
+                phone: usernameStr.includes("@") ? "" : usernameStr,
+                customer_email: usernameStr.includes("@") ? usernameStr : "",
+                vault_email: "", vault_password: "",
+                profile_pin: "", device: "",
+                product_name: productName, product_variant: variant,
+                duration_days: durasiNum, bought_date: dateObj.toISOString(),
+              });
+            });
+            return; // done with this sheet
+          }
+
+          // ─── NET 2U, NET 1U, SEMPRIV: Netflix sheets with PASS rows ───
+          const rawJson = XLSX.utils.sheet_to_json(sheet, { raw: false, defval: "" }) as any[];
+          let currentPassword = "";
+          let currentEmail = "";
+
+          rawJson.forEach((row) => {
+            const allKeys = Object.keys(row);
+            const getKey = (target: string) => allKeys.find(k => k.trim().toUpperCase() === target.toUpperCase());
+            const getVal = (target: string) => {
+              const k = getKey(target);
+              return k ? row[k]?.toString().trim() : "";
+            };
+
+            const firstColStr = Object.values(row)[0]?.toString().trim() || "";
+            const secondColStr = Object.values(row)[1]?.toString().trim() || "";
+
+            // Detect PASS row (first column has "PASS :" text OR any column has it)
+            const anyPassCol = allKeys.find(k => row[k]?.toString().toUpperCase().includes("PASS :"));
+            if (anyPassCol) {
+              currentPassword = row[anyPassCol].toString().split(":")[1]?.trim() || "";
+              return;
+            }
+
+            // Detect vertically merged email (col A or B has @)
+            if (firstColStr.includes("@")) { currentEmail = firstColStr; }
+            if (secondColStr && !secondColStr.includes("@") && firstColStr.includes("@")) {
+              // col B is likely the password for SEMPRIV format
+              if (secondColStr && !currentPassword) currentPassword = secondColStr;
+            }
+
+            // Detect explicit EMAIL column (NET 2U format)
+            const emailVal = getVal("EMAIL");
+            if (emailVal && emailVal.includes("@")) currentEmail = emailVal;
+
+            // Detect explicit PASS column
+            const passVal = getVal("PASS");
+            if (passVal) currentPassword = passVal;
+
+            // Get customer phone from USERNAME column (col B for SEMPRIV, col A for NET)
+            let phone = getVal("USERNAME");
+            
+            // For SEMPRIV, USERNAME is actually in col C (index 2) since A=email, B=pass
+            if (!phone && !firstColStr.includes("@")) {
+              // might be flat format with B=PASS header label
+              const colVals = Object.values(row).map((v: any) => v?.toString().trim());
+              phone = colVals.find((v: string) => v && v.match(/^08\d{8,11}$/)) || "";
+            }
+
+            if (!phone || phone.trim() === "" || !phone.match(/^08/)) return;
+
+            // Get profile name (col D = PROFILE column, the Netflix slot name like mama/papa/kiwi)
+            const profileName = getVal("PROFILE") || "";
+
+            // PIN: look for explicit PIN column first, then scan __EMPTY cols for 4-digit number
+            let foundPin = getVal("PIN");
+            if (!foundPin) {
+              for (const k of allKeys.filter(k => k.startsWith("__EMPTY"))) {
+                const v = row[k]?.toString().trim();
+                if (v && v.match(/^\d{4}$/)) { foundPin = v; break; }
+              }
+            }
+
+            const durasiStr = getVal("DURASI").toUpperCase() || "1 BULAN";
+            let durasiNum = 30;
+            if (durasiStr.startsWith("2") || durasiStr.includes("2 BULAN")) durasiNum = 60;
+            else if (durasiStr.startsWith("3") || durasiStr.includes("3 BULAN")) durasiNum = 90;
+            else if (durasiStr.includes("6")) durasiNum = 180;
+            else if (durasiStr.includes("12")) durasiNum = 365;
+
+            let variant = getVal("JENIS").toLowerCase();
+            if (variant === "1u") variant = "1user";
+            else if (variant === "2u") variant = "2user";
+            if (!variant) variant = upSheet.includes("NET2") || upSheet.includes("2U") ? "2user" : "1user";
+
+            const dateStr = getVal("TANGGAL ORDER");
+            let dateObj = new Date();
+            if (dateStr) {
+              const d = new Date(dateStr + " " + new Date().getFullYear());
+              if (!isNaN(d.getTime())) dateObj = d;
+            }
+
+            allRows.push({
+              customer_name: "Unnamed Customer", phone,
+              profile_name: profileName,
+              vault_email: currentEmail, vault_password: currentPassword,
+              profile_pin: foundPin, device: getVal("JENIS DEVICE"),
+              product_name: productName, product_variant: variant,
+              duration_days: durasiNum, bought_date: dateObj.toISOString(),
+            });
+          });
+        });
+
+        // @ts-ignore
+        const { importComplexExcelDataAction } = await import("../actions/customer-actions");
+        const res = await importComplexExcelDataAction(storeId, allRows);
+        if (res?.error) toast.error(res.error);
+        else toast.success(`Successfully imported ${res?.count || allRows.length} records! Customers and Inventory created.`);
       }
-    };
-    reader.onerror = () => {
-      toast.error("Failed to read file storage");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to process file");
+    } finally {
       setIsImporting(false);
       e.target.value = "";
-    };
-    reader.readAsText(file);
+    }
   };
 
   const itemsPerPage = 5;
@@ -259,7 +449,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
             </Button>
             <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition-all gap-1.5 cursor-pointer">
               <Upload className="w-3.5 h-3.5" /> Import
-              <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
+              <input type="file" accept=".csv,.xlsx,.xls" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
             </label>
             <Button
               onPress={downloadCustomerTemplate}
@@ -549,7 +739,6 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 variant="faded"
                                 radius="lg"
                                 classNames={{
-                                  base: "h-[26px]",
                                   inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
                                   label: "text-[9px] font-bold text-slate-400 uppercase",
                                   input: "text-[11px] text-slate-800 dark:text-slate-200"
@@ -564,7 +753,6 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 variant="faded"
                                 radius="lg"
                                 classNames={{
-                                  base: "h-[26px]",
                                   inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
                                   label: "text-[9px] font-bold text-slate-400 uppercase",
                                   input: "text-[11px] font-bold text-emerald-700 dark:text-emerald-400"
