@@ -34,7 +34,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
     setTimeout(() => setIsTransitioning(false), 150);
   };
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
+  const [isImporing, setIsImporing] = useState(false);
   const [streamActionTarget, setStreamActionTarget] = useState<{
     customerId: string;
     productIndex: number;
@@ -91,9 +91,9 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
     setAppendDateEnd("");
   };
 
-  // Base Template Download Handlers
+  // Base Templat Download Handlers
   // Export Handlers
-  const downloadCustomerTemplate = () => {
+  const downloadCustomerTemplat = () => {
     const headers = "name;email;phone;product_name;product_variant;duration_days;bought_date\n";
     const example = "Jane Premium;jane@streaming.com;+15550192;Netflix Access;1user;30;2026-05-12\n";
     const blob = new Blob([headers + example], { type: "text/csv;charset=utf-8;" });
@@ -137,7 +137,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsImporting(true);
+    setIsImporing(true);
     try {
       const fileName = file.name.toLowerCase();
       if (fileName.endsWith('.csv')) {
@@ -320,7 +320,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
             // PIN: look for explicit PIN column first, then scan __EMPTY cols for 4-digit number
             let foundPin = getVal("PIN");
             if (!foundPin) {
-              for (const k of allKeys.filter(k => k.startsWith("__EMPTY"))) {
+              for (const k dari allKeys.filter(k => k.startsWith("__EMPTY"))) {
                 const v = row[k]?.toString().trim();
                 if (v && v.match(/^\d{4}$/)) { foundPin = v; break; }
               }
@@ -363,9 +363,9 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
         else toast.success(`Successfully imported ${res?.count || allRows.length} records! Customers and Inventory created.`);
       }
     } catch (err: any) {
-      toast.error(err.message || "Failed to process file");
+      toast.error(err.message || "Failed hingga process file");
     } finally {
-      setIsImporting(false);
+      setIsImporing(false);
       e.target.value = "";
     }
   };
@@ -388,15 +388,15 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
       {/* Top Controller Header Block */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Customer CRM Vectors</h2>
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Vektor CRM Pelanggan</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Bind external purchasing profiles and inspect transaction counts securely.
+            Ikat profil pembelian eksternal dan periksa jumlah transaksi dengan aman.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
-            {customers.length} Client Toko
+            {customers.length} Toko Klien
           </span>
           <Button 
             size="sm" 
@@ -405,7 +405,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
             isDisabled={isSyncing}
             startContent={<RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />}
           >
-            SYNC LIVE DATA
+            SINKRONISASI DATA LANGSUNG
           </Button>
           <Button
             onPress={() => setIsCreateModalOpen(true)}
@@ -414,7 +414,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
             className="h-[38px] px-5 text-xs font-bold shadow-md"
             startContent={<Plus className="w-4 h-4" />}
           >
-            Register Customer
+            Daftarkan Pelanggan
           </Button>
         </div>
       </div>
@@ -441,9 +441,9 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           <div>
             <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              Customer Database Matrix
+              Matriks Database Pelanggan
             </h3>
-            <p className="text-[10px] text-slate-500 mt-0.5">Directly manage profile ownerships and linked streaming asset segments.</p>
+            <p className="text-[10px] text-slate-500 mt-0.5">Kelola kepemilikan profil secara langsung dan segmen aset streaming yang ditautkan.</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -454,7 +454,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
-              CSV Export
+              Ekspor CSV
             </Button>
             <Button
               onPress={exportDatabaseDump}
@@ -463,20 +463,20 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               className="h-[34px] text-xs font-bold bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50"
               startContent={<Plus className="w-3.5 h-3.5" />}
             >
-              JSON Dump
+              Dump JSON
             </Button>
             <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition-all gap-1.5 cursor-pointer">
-              <Upload className="w-3.5 h-3.5" /> Import
-              <input type="file" accept=".csv,.xlsx,.xls" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
+              <Upload className="w-3.5 h-3.5" /> Impor
+              <input type="file" accept=".csv,.xlsx,.xls" onChange={handleFileUpload} disabled={isImporing} className="hidden" />
             </label>
             <Button
-              onPress={downloadCustomerTemplate}
+              onPress={downloadCustomerTemplat}
               variant="flat"
               radius="lg"
               className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
-              Template
+              Templat
             </Button>
           </div>
         </div>
@@ -530,7 +530,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                         </Button>
                       </div>
                       <div className="space-y-0.5 pl-9">
-                        <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate">{c.email || "No Email"}</p>
+                        <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate">{c.email || "Tidak Ada Email"}</p>
                         <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{c.phone || "No Phone"}</p>
                         <span className="inline-block mt-2 px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold text-[9px] rounded uppercase tracking-wider">
                           Orders: {products.length}
@@ -572,9 +572,9 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                         <Clock className="w-2.5 h-2.5" /> {p.duration_days} Days Cycle
                                       </span>
                                       <span>•</span>
-                                      <span>Coverage: <strong className="text-slate-700 dark:text-slate-300">{startStr}</strong> → <strong className="text-slate-700 dark:text-slate-300">{expStr}</strong></span>
+                                      <span>Cakupan: <strong className="text-slate-700 dark:text-slate-300">{startStr}</strong> → <strong className="text-slate-700 dark:text-slate-300">{expStr}</strong></span>
                                       <span>•</span>
-                                      <span className="text-[9px] text-slate-400">Captured: {timestampStr}</span>
+                                      <span className="text-[9px] text-slate-400">Ditangkap: {timestampStr}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -622,7 +622,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                       isIconOnly
                                       variant="light"
                                       onPress={async () => {
-                                        if (!confirm(`Are you absolutely sure you want to remove/kick ${p.name} from this profile? Connected inventory items will be unlinked and back available in stock.`)) return;
+                                        if (!confirm(`Are you absolutely sure you want hingga remove/kick ${p.name} from this profile? Connected inventory items will be unlinked and back available in stock.`)) return;
                                         setProcessingStream(`${c.id}-${idx}`);
                                         const res = await removeCustomerProductAction(storeId, c.id, idx);
                                         setProcessingStream(null);
@@ -656,7 +656,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                             className="h-[28px] text-[11px] font-bold text-indigo-600 dark:text-indigo-400"
                             startContent={<Plus className="w-3.5 h-3.5" />}
                           >
-                            Append Streaming Product Order
+                            Tambahkan Pesanan Produk Streaming
                           </Button>
                         ) : (
                           <div className="p-3 bg-slate-50 dark:bg-[#0b0f19] rounded-lg border border-slate-200 dark:border-slate-800 space-y-2.5 transition-colors">
@@ -811,11 +811,11 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
         {totalPages > 1 && (
           <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
             <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-              Showing <strong className="text-slate-700 dark:text-slate-200">{startIndex + 1}</strong> to{" "}
+              Menampilkan <strong className="text-slate-700 dark:text-slate-200">{startIndex + 1}</strong> to{" "}
               <strong className="text-slate-700 dark:text-slate-200">
                 {Math.min(startIndex + itemsPerPage, customers.length)}
               </strong>{" "}
-              of <strong className="text-slate-700 dark:text-slate-200">{customers.length}</strong> entries
+              dari <strong className="text-slate-700 dark:text-slate-200">{customers.length}</strong> entri
             </span>
             <div className="flex items-center gap-1">
               <Button
@@ -825,7 +825,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                 isDisabled={currentPage === 1}
                 className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               >
-                Prev
+                Seb
               </Button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <Button
@@ -848,7 +848,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                 isDisabled={currentPage === totalPages}
                 className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               >
-                Next
+                Lanjut
               </Button>
             </div>
           </div>

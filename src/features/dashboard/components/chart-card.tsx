@@ -58,10 +58,10 @@ export function ChartCard({ data }: ChartCardProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 relative z-10">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-tight uppercase">Telemetry Engine</h3>
+            <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-tight uppercase">Mesin Telemetri</h3>
             <span className="px-1.5 py-0.5 rounded-[4px] bg-indigo-500/10 text-indigo-500 text-[8px] font-black uppercase tracking-widest border border-indigo-500/20">Live</span>
           </div>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Transactional velocity vs inventory ingestion vectors.</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Kecepatan transaksi vs vektor penerimaan inventaris.</p>
         </div>
 
         <div className="flex items-center gap-6">

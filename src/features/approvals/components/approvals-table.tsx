@@ -65,8 +65,8 @@ export function ApprovalsTable({ storeId, drafts }: ApprovalsTableProps) {
         <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mb-4">
           <Check className="w-8 h-8 text-emerald-500" />
         </div>
-        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">You're all caught up!</h3>
-        <p className="text-xs text-slate-500 mt-1">There are no pending pull requests from staff.</p>
+        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Semua sudah selesai!</h3>
+        <p className="text-xs text-slate-500 mt-1">Tidak ada permintaan yang tertunda dari staf.</p>
       </div>
     );
   }
