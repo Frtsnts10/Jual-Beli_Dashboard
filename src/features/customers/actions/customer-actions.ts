@@ -10,6 +10,7 @@ export interface PurchasedProduct {
   bought_date: string;
   expire_date: string;
   date_start?: string;
+  device?: string;
 }
 
 export interface Customer {
@@ -119,7 +120,8 @@ export async function updateCustomerAction(storeId: string, id: string, data: { 
 export async function appendCustomerProductAction(
   storeId: string,
   customerId: string,
-  product: { name: string; variant: string; duration_days: number; bought_date?: string; date_start?: string; expire_date?: string }
+  product: { name: string; variant: string; duration_days: number; bought_date?: string; date_start?: string;
+  device?: string; expire_date?: string }
 ) {
   const custDoc = await adminDb.collection("customers").doc(customerId).get();
   if (!custDoc.exists) return { error: "Customer context missing" };
@@ -556,4 +558,21 @@ export async function importComplexExcelDataAction(storeId: string, rows: any[])
   } catch (err: any) {
     return { error: err.message };
   }
+}
+
+export async function updateCustomerProductDeviceAction(storeId: string, customerId: string, productIndex: number, device: string) {
+  const custDoc = await adminDb.collection("customers").doc(customerId).get();
+  if (!custDoc.exists) return { error: "Customer context missing" };
+
+  const customer = custDoc.data()!;
+  const products = Array.isArray(customer.purchased_products) ? [...customer.purchased_products] : [];
+  if (productIndex < 0 || productIndex >= products.length) return { error: "Invalid product target" };
+
+  products[productIndex].device = device;
+
+  await adminDb.collection("customers").doc(customerId).update({ purchased_products: products });
+
+  revalidatePath(`/${storeId}/customers`);
+  revalidatePath(`/${storeId}/dashboard`);
+  return { success: true };
 }

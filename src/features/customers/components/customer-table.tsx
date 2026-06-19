@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Customer, updateCustomerAction, deleteCustomerAction, appendCustomerProductAction, removeCustomerProductAction, extendCustomerProductAction, banCustomerProductAction, importCustomersCsvAction } from "../actions/customer-actions";
+import { Customer, updateCustomerAction, deleteCustomerAction, appendCustomerProductAction, removeCustomerProductAction, extendCustomerProductAction, banCustomerProductAction, importCustomersCsvAction, updateCustomerProductDeviceAction } from "../actions/customer-actions";
 import { CustomerForm } from "./customer-form";
-import { Trash2, Loader2, User, ShoppingBag, Plus, Calendar, Clock, Download, Upload, Ban, CalendarPlus, UserMinus, Edit2, RefreshCw } from "lucide-react";
+import { Trash2, Loader2, User, ShoppingBag, Plus, Calendar, Clock, Download, Upload, Ban, CalendarPlus, UserMinus, Edit2, RefreshCw, MonitorSmartphone, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
@@ -26,6 +26,8 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [processingStream, setProcessingStream] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingDeviceFor, setEditingDeviceFor] = useState<string | null>(null);
+  const [deviceInputValue, setDeviceInputValue] = useState("");
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handlePageChange = (newPage: number) => {
@@ -55,6 +57,16 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
     const cfg = getTierConfigForProduct(val);
     setAppendVariant(cfg.defaultTier);
     setAppendVariantOptions(cfg.options);
+  };
+
+  
+  const handleDeviceUpdate = async (customerId: string, idx: number) => {
+    setProcessingStream(`device-${customerId}-${idx}`);
+    const res = await updateCustomerProductDeviceAction(storeId, customerId, idx, deviceInputValue);
+    setProcessingStream(null);
+    if (res?.error) toast.error(res.error);
+    else toast.success("Device logged securely");
+    setEditingDeviceFor(null);
   };
 
   const handleDelete = async (id: string) => {

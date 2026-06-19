@@ -3,6 +3,7 @@ import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
 import { LanguageInitializer } from "@/components/language-initializer";
 
 export default async function DashboardRootLayout({ children }: { children: React.ReactNode }) {
+  let prefLang;
   try {
     const user = await getAuthenticatedUser();
 
@@ -10,7 +11,6 @@ export default async function DashboardRootLayout({ children }: { children: Reac
       // Upsert profile in Firestore
       const profileRef = adminDb.collection("profiles").doc(user.uid);
       const profileDoc = await profileRef.get();
-      let prefLang;
       if (profileDoc.exists) {
         prefLang = profileDoc.data()?.preferred_language;
       }
