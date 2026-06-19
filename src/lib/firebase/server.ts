@@ -3,6 +3,24 @@ import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 
+function formatPrivateKey(key?: string) {
+  if (!key) return undefined;
+  
+  let cleaned = key.replace(/\\n/g, '\n').replace(/"/g, '').replace(/'/g, '');
+  
+  const header = '-----BEGIN PRIVATE KEY-----';
+  const footer = '-----END PRIVATE KEY-----';
+  
+  if (cleaned.includes(header) && cleaned.includes(footer)) {
+    let base64Part = cleaned.replace(header, '').replace(footer, '');
+    base64Part = base64Part.replace(/\s+/g, '');
+    const chunks = base64Part.match(/.{1,64}/g) || [];
+    return `${header}\n${chunks.join('\n')}\n${footer}`;
+  }
+  
+  return cleaned;
+}
+
 function getAdminApp() {
   if (getApps().length > 0) {
     return getApp();
@@ -11,9 +29,7 @@ function getAdminApp() {
     credential: cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY
-        ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n').replace(/"/g, '')
-        : undefined,
+      privateKey: formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY),
     }),
   });
 }
