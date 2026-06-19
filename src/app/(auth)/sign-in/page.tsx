@@ -33,7 +33,7 @@ export default function NativeSignInPage() {
 
     if (!res.ok) {
       const data = await res.json();
-      throw new Error(data.error || "Failed to create session");
+      throw new Error(data.stack ? `${data.error}\nStack: ${data.stack}` : data.error || "Failed to create session");
     }
 
     router.push("/dashboard");
