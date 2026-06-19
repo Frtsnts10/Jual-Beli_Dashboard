@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 
 interface InventoryTableProps {
   storeId: string;
-  item: InventoryItem[];
+  items: InventoryItem[];
   currency?: string;
   isPremium?: boolean;
 }
@@ -64,7 +64,7 @@ function CopyableCredential({
   );
 }
 
-export function InventoryTable({ storeId, item, currency = "IDR", isPremium = false }: InventoryTableProps) {
+export function InventoryTable({ storeId, items, currency = "IDR", isPremium = false }: InventoryTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -213,7 +213,7 @@ export function InventoryTable({ storeId, item, currency = "IDR", isPremium = fa
     setTimeout(() => setIsTransitioning(false), 150);
   };
   const startIndex = (currentPage - 1) * itemPerPage;
-  const paginatedItems = item.slice(startIndex, startIndex + itemPerPage);
+  const paginatedItems = items.slice(startIndex, startIndex + itemPerPage);
   
   const router = useRouter();
   const [isSyncing, setIsSyncing] = useState(false);
@@ -267,7 +267,7 @@ export function InventoryTable({ storeId, item, currency = "IDR", isPremium = fa
 
           <Button
             onPress={() => {
-              if (!isPremium && item.length >= 3) {
+              if (!isPremium && items.length >= 3) {
                 toast.error("Standard Tier Quota Exceeded! Please upgrade hingga Pro hingga add more item.", {
                   action: {
                     label: "Upgrade",
@@ -293,7 +293,7 @@ export function InventoryTable({ storeId, item, currency = "IDR", isPremium = fa
           <div className="space-y-1">
             <p className="text-xs font-extrabold flex item-center gap-1.5 uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
               <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
-              Standard Toko Quota Exceeded (3/3 item allocated)
+              Standard Toko Quota Exceeded (3/3 items allocated)
             </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
               Standard tier workspaces are capped at 3 active digital products. Upgrade hingga Pro Matrix Level hingga ingest unlimited SKUs, run bulk CSV imports, and activate automated SLA credentials sync.
