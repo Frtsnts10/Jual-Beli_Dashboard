@@ -1,12 +1,13 @@
-import * as admin from 'firebase-admin';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import * as dotenv from 'dotenv';
 import path from 'path';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
@@ -14,7 +15,7 @@ if (!admin.apps.length) {
   });
 }
 
-const db = admin.firestore();
+const db = getFirestore();
 const STORE_ID = "4lHojACGdUrNKQDhocrt";
 
 function daysAgo(n: number) {
