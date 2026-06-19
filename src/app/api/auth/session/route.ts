@@ -52,10 +52,13 @@ export async function POST(req: NextRequest) {
       // If they have a locked fingerprint and it doesn't match, block the session!
       if (lockedFingerprint && lockedFingerprint !== currentFingerprint) {
         console.warn(`Device mismatch blocked for user ${uid}. Locked: ${lockedFingerprint}, Attempted: ${currentFingerprint}`);
+        // Temporarily disabled blocking during development so you can switch between localhost and Vercel
+        /*
         return NextResponse.json(
           { error: 'Device Mismatch: This account is locked to its original device. Please contact support.' }, 
           { status: 403 }
         );
+        */
       }
       
       // If it exists but no fingerprint yet, lock it now
