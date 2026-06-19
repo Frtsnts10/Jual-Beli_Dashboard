@@ -1,12 +1,14 @@
-import * as admin from 'firebase-admin';
+import { getApp, getApps, initializeApp, cert } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 
-function getAdminApp(): admin.app.App {
-  if (admin.apps.length > 0) {
-    return admin.apps[0]!;
+function getAdminApp() {
+  if (getApps().length > 0) {
+    return getApp();
   }
-  return admin.initializeApp({
-    credential: admin.credential.cert({
+  return initializeApp({
+    credential: cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
@@ -14,21 +16,21 @@ function getAdminApp(): admin.app.App {
   });
 }
 
-export const adminDb: admin.firestore.Firestore = new Proxy(
-  {} as admin.firestore.Firestore,
+export const adminDb = new Proxy(
+  {} as ReturnType<typeof getFirestore>,
   {
     get(_target, prop) {
-      const db = getAdminApp().firestore();
+      const db = getFirestore(getAdminApp());
       return (db as any)[prop];
     },
   }
 );
 
-export const adminAuth: admin.auth.Auth = new Proxy(
-  {} as admin.auth.Auth,
+export const adminAuth = new Proxy(
+  {} as ReturnType<typeof getAuth>,
   {
     get(_target, prop) {
-      const auth = getAdminApp().auth();
+      const auth = getAuth(getAdminApp());
       return (auth as any)[prop];
     },
   }

@@ -1,0 +1,13 @@
+Provider,Email,Password,Account_Type,Total_Slots,Profiles
+Netflix,netflix_alpha@dionycte.com,Pass123!@#,4U Premium,4,CustomerA;CustomerB
+Netflix,netflix_beta@dionycte.com,Secure456!@#,1U Standard,1,
+Netflix,netflix_gamma@dionycte.com,Gamma789!@#,4U Premium,4,Alice;Bob;Charlie
+Canva,design_team@dionycte.com,CanvaPro2026,Pro,5,User1;User2;User3
+Spotify,music_vault1@dionycte.com,SpotPass99,Family,6,Dad;Mom;Kid1
+Spotify,music_vault2@dionycte.com,SpotPass88,Family,6,
+Youtube,yt_premium@dionycte.com,YTPremo1122,Premium,5,Filbert
+Disney+,disney_magic@dionycte.com,Mickey2026,Premium,4,Kids;Parents
+HBO Max,hbo_stream@dionycte.com,HBOxMax00,Standard,3,
+Grammarly,grammar_pro@dionycte.com,WriteGood99,Premium,1,
+ChatGPT,ai_master@dionycte.com,GptPlus2026,Plus,1,
+NordVPN,nord_secure@dionycte.com,NordProtect!2,Premium,6,Device1;Device2

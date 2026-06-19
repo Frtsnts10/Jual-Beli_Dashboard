@@ -11,6 +11,7 @@ export async function updateStoreSettingsAction(storeId: string, formData: FormD
   const email = formData.get("email") as string | null;
   const instagram = formData.get("instagram") as string | null;
   const whatsapp = formData.get("whatsapp") as string | null;
+  const bio = formData.get("bio") as string | null;
 
   try {
     const updateData: Record<string, any> = {};
@@ -24,6 +25,7 @@ export async function updateStoreSettingsAction(storeId: string, formData: FormD
     if (email !== null) updateData.email = email;
     if (instagram !== null) updateData.instagram = instagram;
     if (whatsapp !== null) updateData.whatsapp = whatsapp;
+    if (bio !== null) updateData.bio = bio;
 
     if (Object.keys(updateData).length > 0) {
       await adminDb.collection("stores").doc(storeId).update(updateData);

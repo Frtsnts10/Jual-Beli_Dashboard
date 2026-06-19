@@ -10,6 +10,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select
 import { parseDate } from "@internationalized/date";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { EditInventoryModal } from "./edit-inventory-modal";
+import { useRouter } from "next/navigation";
 
 interface InventoryTableProps {
   storeId: string;
@@ -213,15 +214,34 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
   };
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedItems = items.slice(startIndex, startIndex + itemsPerPage);
+  
+  const router = useRouter();
+  const [isSyncing, setIsSyncing] = useState(false);
+  const handleSync = () => {
+    setIsSyncing(true);
+    router.refresh();
+    setTimeout(() => setIsSyncing(false), 600);
+  };
   return (
     <div className="space-y-8 font-sans">
       {/* Top Controller Header Block */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <span className="h-10 flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
-          {items.length} Total Inventory Shards
-        </span>
-        
-        <div className="flex flex-wrap items-center gap-2">
+        <div>
+          <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
+            {items.length} Total Inventory Shards
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button 
+            size="sm" 
+            className="h-[38px] bg-[#242b4d] hover:bg-[#2c345d] text-[#7daaf2] font-bold tracking-wide text-xs px-3"
+            onPress={handleSync}
+            isDisabled={isSyncing}
+            startContent={<RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />}
+          >
+            SYNC LIVE DATA
+          </Button>
+          
           <Button
             onPress={downloadProductTemplate}
             variant="flat"

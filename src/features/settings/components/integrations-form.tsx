@@ -5,6 +5,7 @@ import { Button, Input } from "@heroui/react";
 import { Globe } from "lucide-react";
 import { updateStoreApiKeysAction } from "../actions/settings-actions";
 import { toast } from "sonner";
+import { useI18n } from "@/hooks/use-i18n";
 
 export function IntegrationsForm({ 
   storeId,
@@ -17,6 +18,8 @@ export function IntegrationsForm({
 }) {
   const [isPending, setIsPending] = useState(false);
 
+  const { t } = useI18n();
+
   async function handleSubmit(formData: FormData) {
     setIsPending(true);
     const res = await updateStoreApiKeysAction(storeId, formData);
@@ -25,7 +28,7 @@ export function IntegrationsForm({
     if (res.error) {
       toast.error(res.error);
     } else {
-      toast.success("API keys updated successfully!");
+      toast.success(t.settings.successApiKeys);
     }
   }
 
@@ -33,10 +36,10 @@ export function IntegrationsForm({
     <div className="bg-white dark:bg-[#0d1322] rounded-xl border border-slate-200/60 dark:border-slate-800/80 shadow-sm p-6 relative overflow-hidden transition-colors">
       <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
         <Globe className="w-4 h-4 text-indigo-500" />
-        API Integrations & Keys
+        {t.settings.integrationsTitle}
       </h3>
       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-5 leading-relaxed">
-        Configure your payment gateways. These keys are used on your storefront to process customer transactions directly into your merchant account.
+        {t.settings.integrationsSubtitle}
       </p>
 
       <form action={handleSubmit} className="space-y-4">
@@ -46,7 +49,7 @@ export function IntegrationsForm({
             <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 pb-1">Midtrans</h4>
             <div className="space-y-1.5">
               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Server Key
+                {t.settings.labelServerKey}
               </label>
               <Input 
                 name="midtrans_server_key"
@@ -62,7 +65,7 @@ export function IntegrationsForm({
             </div>
             <div className="space-y-1.5">
               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Client Key
+                {t.settings.labelClientKey}
               </label>
               <Input 
                 name="midtrans_client_key"
@@ -84,7 +87,7 @@ export function IntegrationsForm({
             isLoading={isPending}
             className="w-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold tracking-wide shadow-md"
           >
-            {isPending ? "Saving Keys..." : "Save API Configuration"}
+            {isPending ? t.settings.btnSavingApiKeys : t.settings.btnSaveApiKeys}
           </Button>
         </div>
       </form>

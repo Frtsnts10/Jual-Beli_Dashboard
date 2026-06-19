@@ -3,9 +3,12 @@
 import React, { useState } from "react";
 import { KeyRound, Copy, CheckCircle2 } from "lucide-react";
 import { Input, Button } from "@heroui/react";
+import { useI18n } from "@/hooks/use-i18n";
 
 export function StoreCredentialsPanel({ storeId }: { storeId: string }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const { t } = useI18n();
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -17,16 +20,16 @@ export function StoreCredentialsPanel({ storeId }: { storeId: string }) {
     <div className="bg-white dark:bg-[#0d1322] rounded-xl border border-slate-200/60 dark:border-slate-800/80 shadow-sm p-6 relative overflow-hidden transition-colors">
       <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
         <KeyRound className="w-4 h-4 text-amber-500" />
-        Store Developer Credentials
+        {t.settings.credentialsTitle}
       </h3>
       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-5 leading-relaxed">
-        Use these parameters to interface your headless storefronts, mobile apps, or backend webhooks directly with this instance.
+        {t.settings.credentialsSubtitle}
       </p>
 
       <div className="space-y-4">
         <div className="space-y-1.5">
           <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Workspace ID (Store ID)
+            {t.settings.labelWorkspaceId}
           </label>
           <Input 
             readOnly
@@ -50,11 +53,11 @@ export function StoreCredentialsPanel({ storeId }: { storeId: string }) {
 
         <div className="space-y-1.5">
           <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Public API Key (Client)
+            {t.settings.labelPublicKey}
           </label>
           <Input 
             readOnly
-            value="Coming Soon..."
+            value={t.settings.comingSoon}
             size="sm"
             classNames={{
               inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",

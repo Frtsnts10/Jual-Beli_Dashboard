@@ -57,8 +57,8 @@ export function InventoryTabs({
             </div>
 
             {digitalAccounts && digitalAccounts.length > 0 ? (
-              <div className="bg-white dark:bg-[#0b0f19] rounded-xl p-1 shadow-sm border border-slate-200/60 dark:border-slate-800/80">
-                <AccountsTable accounts={digitalAccounts} />
+              <div className="bg-white dark:bg-[#0b0f19] rounded-xl shadow-sm border border-slate-200/60 dark:border-slate-800/80">
+                <AccountsTable accounts={digitalAccounts} storeId={storeId} />
               </div>
             ) : (
               <div className="bg-white dark:bg-[#0b0f19] border border-slate-200/60 dark:border-slate-800/80 rounded-xl p-8 text-center shadow-sm">

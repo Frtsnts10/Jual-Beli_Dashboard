@@ -13,10 +13,12 @@ import {
   Eye, 
   SlidersHorizontal,
   ChevronDown,
+  RefreshCw,
   Plus
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Input, Select, SelectItem, Button, Pagination } from "@heroui/react";
 
 interface OrdersTableProps {
@@ -37,6 +39,14 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
   const [fulfillingId, setFulfillingId] = useState<string | null>(null);
   const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({}); // orderId_itemIndex -> inventoryId
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+
+  const router = useRouter();
+  const [isSyncing, setIsSyncing] = useState(false);
+  const handleSync = () => {
+    setIsSyncing(true);
+    router.refresh();
+    setTimeout(() => setIsSyncing(false), 600);
+  };
 
   // Filters state
   const [paymentFilter, setPaymentFilter] = useState<string>("all");
@@ -135,6 +145,15 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
           <span className="text-xs font-bold px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-lg border border-amber-100/40 dark:border-amber-900/40">
             {orders.filter(o => o.fulfillment_status === "pending" || (o.fulfillment_status as string) === "unfulfilled").length} Pending Fulfillment
           </span>
+          <Button 
+            size="sm" 
+            className="bg-[#242b4d] hover:bg-[#2c345d] text-[#7daaf2] font-bold tracking-wide text-xs px-3"
+            onPress={handleSync}
+            isDisabled={isSyncing}
+            startContent={<RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />}
+          >
+            SYNC LIVE DATA
+          </Button>
         </div>
       </div>
 
@@ -231,7 +250,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                           </div>
                           <div>
                             <p className="font-extrabold text-slate-900 dark:text-slate-100 text-xs tracking-tight uppercase">
-                              Order #{o.id.slice(0, 8)}
+                              Order #{o.id.startsWith("ORD-") ? o.id.slice(4, 12) : o.id.slice(0, 8)}
                             </p>
                             <p className="text-[10px] text-slate-400 font-mono mt-0.5">{orderDate}</p>
                           </div>

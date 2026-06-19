@@ -17,10 +17,12 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
   const [isPending, setIsPending] = useState(false);
   const [currency, setCurrency] = useState(initialCurrency.toUpperCase());
   const { t, changeLanguage, lang } = useI18n();
+  const [selectedLang, setSelectedLang] = useState<string>(lang);
 
-  const handleLanguageChange = (val: string) => {
-    changeLanguage(val as Language);
-  };
+  // Sync selectedLang when lang updates from useI18n
+  React.useEffect(() => {
+    setSelectedLang(lang);
+  }, [lang]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -35,7 +37,11 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
     if (res?.error) {
       toast.error(res.error);
     } else {
-      toast.success("Preferences saved successfully.");
+      if (selectedLang !== lang && selectedLang) {
+        changeLanguage(selectedLang as Language);
+      } else {
+        toast.success(t.settings.successPreferences);
+      }
     }
   }
 
@@ -59,8 +65,8 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
       className="flex flex-col p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
     >
       <div>
-        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Global Preferences Matrix</h3>
-        <p className="text-xs text-slate-500 mt-0.5 mb-5">Configure global preferences such as language and base currency.</p>
+        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{t.settings.preferencesTitle}</h3>
+        <p className="text-xs text-slate-500 mt-0.5 mb-5">{t.settings.preferencesSubtitle}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -90,8 +96,8 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
             <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelLanguage}
           </label>
           <Select
-            selectedKeys={new Set([lang])}
-            onChange={(e) => handleLanguageChange(e.target.value)}
+            selectedKeys={new Set([selectedLang])}
+            onChange={(e) => setSelectedLang(e.target.value)}
             radius="lg"
             classNames={{
               trigger: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
@@ -118,7 +124,7 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
           startContent={!isPending && <Save className="w-3.5 h-3.5" />}
           className="text-xs font-bold shadow-sm px-4 h-9"
         >
-          {isPending ? "Saving..." : "Save Preferences"}
+          {isPending ? t.settings.btnSavingPreferences : t.settings.btnSavePreferences}
         </Button>
       </div>
     </form>

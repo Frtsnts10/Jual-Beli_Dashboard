@@ -268,7 +268,7 @@ export default function MarketingPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Standard Tier */}
               <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col">
                 <div className="mb-6">
@@ -297,12 +297,12 @@ export default function MarketingPage() {
                     <span>Copy-to-Clipboard Features</span>
                   </div>
                 </div>
-                <Link href="/dashboard" className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-center text-sm transition-colors">
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-center text-sm transition-colors mt-auto">
                   Get Started Free
                 </Link>
               </div>
 
-              {/* Pro Tier */}
+              {/* Weekly Tier */}
               <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4">
                   <Sparkles className="w-24 h-24 text-indigo-500/10" />
@@ -310,7 +310,42 @@ export default function MarketingPage() {
                 <div className="mb-6 relative z-10">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-4">
                     <Sparkles className="w-3 h-3 text-indigo-400" />
-                    Pro Member
+                    Pro Weekly
+                  </div>
+                  <h3 className="text-4xl font-black text-white">$9<span className="text-lg text-slate-400 font-medium">/wk</span></h3>
+                  <p className="text-sm text-indigo-200 mt-2">Short-term power for digital empires.</p>
+                </div>
+                <div className="flex-1 space-y-4 mb-8 relative z-10">
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span className="text-white font-medium">Unlimited Store Workspaces</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span>Unlimited Credential Storage</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span>Automated WhatsApp Delivery (n8n)</span>
+                  </div>
+                </div>
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-indigo-500/25 transition-all relative z-10 mt-auto">
+                  Upgrade to Weekly
+                </Link>
+              </div>
+
+              {/* Monthly Tier */}
+              <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden ring-2 ring-indigo-500 scale-105">
+                <div className="absolute top-0 right-0 p-4">
+                  <Sparkles className="w-24 h-24 text-indigo-500/10" />
+                </div>
+                <div className="mb-6 relative z-10">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-4">
+                    <Sparkles className="w-3 h-3 text-indigo-400" />
+                    Pro Monthly
+                  </div>
+                  <div className="absolute -top-1 -right-1">
+                     <span className="px-2 py-1 bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-bl-lg rounded-tr-lg">Most Popular</span>
                   </div>
                   <h3 className="text-4xl font-black text-white">$29<span className="text-lg text-slate-400 font-medium">/mo</span></h3>
                   <p className="text-sm text-indigo-200 mt-2">Unlimited power for digital empires.</p>
@@ -332,13 +367,73 @@ export default function MarketingPage() {
                     <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
                     <span>Smart Family Pool Automation</span>
                   </div>
+                </div>
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-indigo-500/25 transition-all relative z-10 mt-auto">
+                  Upgrade to Monthly
+                </Link>
+              </div>
+
+              {/* Yearly Tier */}
+              <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4">
+                  <Sparkles className="w-24 h-24 text-indigo-500/10" />
+                </div>
+                <div className="mb-6 relative z-10">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-4">
+                    <Sparkles className="w-3 h-3 text-indigo-400" />
+                    Pro Yearly
+                  </div>
+                  <h3 className="text-4xl font-black text-white">$59<span className="text-lg text-slate-400 font-medium">/yr</span></h3>
+                  <p className="text-sm text-indigo-200 mt-2">Save 30% on annual billing.</p>
+                </div>
+                <div className="flex-1 space-y-4 mb-8 relative z-10">
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span className="text-white font-medium">Everything in Monthly</span>
+                  </div>
                   <div className="flex items-center gap-3 text-sm text-slate-300">
                     <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
                     <span>Cross-Tenant Analytics Engine</span>
                   </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                    <span className="text-emerald-400 font-medium">Priority Support Access</span>
+                  </div>
                 </div>
-                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-indigo-500/25 transition-all relative z-10">
-                  Upgrade to Pro
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-indigo-500/25 transition-all relative z-10 mt-auto">
+                  Upgrade to Yearly
+                </Link>
+              </div>
+
+              {/* Lifetime Tier */}
+              <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-amber-500/30 shadow-xl shadow-amber-500/10 flex flex-col relative overflow-hidden md:col-span-2 lg:col-span-1">
+                <div className="absolute top-0 right-0 p-4">
+                  <Sparkles className="w-24 h-24 text-amber-500/10" />
+                </div>
+                <div className="mb-6 relative z-10">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-bold uppercase tracking-widest mb-4">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    Pro Lifetime
+                  </div>
+                  <h3 className="text-4xl font-black text-white">$99<span className="text-lg text-slate-400 font-medium"> once</span></h3>
+                  <p className="text-sm text-amber-200 mt-2">Pay once, own forever.</p>
+                </div>
+                <div className="flex-1 space-y-4 mb-8 relative z-10">
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span className="text-white font-medium">Everything in Yearly</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span>Lifetime Core Updates</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span>No recurring subscription</span>
+                  </div>
+                </div>
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-amber-500/25 transition-all relative z-10 mt-auto">
+                  Get Lifetime Access
                 </Link>
               </div>
             </div>

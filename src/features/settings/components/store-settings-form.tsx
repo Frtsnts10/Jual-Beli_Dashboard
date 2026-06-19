@@ -17,6 +17,7 @@ interface StoreProfileFormProps {
   initialEmail?: string;
   initialInstagram?: string;
   initialWhatsapp?: string;
+  initialBio?: string;
 }
 
 export function StoreProfileForm({ 
@@ -25,7 +26,8 @@ export function StoreProfileForm({
   initialLogo = "", 
   initialEmail = "",
   initialInstagram = "",
-  initialWhatsapp = ""
+  initialWhatsapp = "",
+  initialBio = ""
 }: StoreProfileFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [logoPreview, setLogoPreview] = useState(initialLogo);
@@ -180,6 +182,18 @@ export function StoreProfileForm({
               inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none pl-3",
               input: "text-xs font-bold text-slate-800 dark:text-slate-100",
             }}
+          />
+        </div>
+
+        <div className="space-y-1.5 sm:col-span-2">
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            {t.settings.labelStoreBio || "Store Bio / Description"}
+          </label>
+          <textarea
+            name="bio"
+            defaultValue={initialBio}
+            placeholder="Tell your customers about your store..."
+            className="w-full min-h-[80px] bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-none rounded-lg p-3 text-xs font-bold text-slate-800 dark:text-slate-100 resize-y"
           />
         </div>
       </div>

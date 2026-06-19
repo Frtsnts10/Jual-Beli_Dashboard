@@ -49,3 +49,14 @@ export async function getDigitalAccountsAction(storeId: string) {
     return { error: err.message };
   }
 }
+
+export async function deleteDigitalAccountAction(storeId: string, accountId: string) {
+  try {
+    await adminDb.collection("digital_accounts").doc(accountId).delete();
+    revalidatePath(`/${storeId}/digital-accounts`);
+    revalidatePath(`/${storeId}/inventory`);
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message };
+  }
+}

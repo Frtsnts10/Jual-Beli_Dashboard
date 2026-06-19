@@ -12,6 +12,7 @@ import { StorePreferencesForm } from "@/features/settings/components/store-prefe
 import { DangerZonePanel } from "@/features/settings/components/danger-zone-panel";
 import { StoreCredentialsPanel } from "@/features/settings/components/store-credentials-panel";
 import { IntegrationsForm } from "@/features/settings/components/integrations-form";
+import { SettingsPageHeader } from "@/features/settings/components/settings-page-header";
 
 export default async function TenantSettingsPage({
   params,
@@ -33,10 +34,7 @@ export default async function TenantSettingsPage({
 
   return (
     <div className="space-y-6 font-sans max-w-full pb-12">
-      <div className="pb-6 border-b border-slate-200 dark:border-slate-800">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Store Settings</h1>
-        <p className="text-sm text-slate-500 mt-1">Manage your workspace identity, preferences, and integrations.</p>
-      </div>
+      <SettingsPageHeader />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch pt-2">
         <div className="flex flex-col gap-6 h-full">
@@ -47,6 +45,7 @@ export default async function TenantSettingsPage({
             initialEmail={store.email || ""}
             initialInstagram={store.instagram || ""}
             initialWhatsapp={store.whatsapp || ""}
+            initialBio={store.bio || ""}
           />
           <StorePreferencesForm 
             storeId={storeId} 

@@ -241,47 +241,90 @@ export async function importInventoryCsvAction(storeId: string, rows: any[]) {
   const multiProfileTriggers = ["netflix", "disney", "prime", "hulu", "hbo", "google", "youtube", "canva", "spotify"];
   const batch = adminDb.batch();
 
-  const inserts = rows.map((row) => {
-    const name = row.name || "Unnamed Asset";
-    const profile_tier = row.profile_tier || null;
-    const email = row.email || null;
-    const date_expired = row.date_expired || null;
-    let group_name = row.group_name || null;
+  const inserts: any[] = [];
 
-    const isMultiProfile = multiProfileTriggers.some((t) => name.toLowerCase().includes(t));
-    if (isMultiProfile && !group_name) {
-      const baseAlias = name.split(" ")[0];
-      if (email) {
-        group_name = `${baseAlias} Master Account Pool — ${email.toLowerCase().trim()}`;
-      } else {
-        const durationToken = date_expired ? `Exp-${date_expired}` : "RollingPool";
-        const tierToken = profile_tier || "1u";
-        group_name = `${baseAlias} Shared Hub [${tierToken}] — ${durationToken}`;
+  rows.forEach((row) => {
+    // Check if this is a Master Account CSV format
+    if (row.Provider && row.Total_Slots) {
+      const provider = row.Provider || "Unknown Provider";
+      const totalSlots = parseInt(row.Total_Slots, 10) || 1;
+      const accountType = row.Account_Type || "Standard";
+      const email = row.Email || null;
+      const password = row.Password || null;
+      const profilesStr = row.Profiles || "";
+      const profilesArray = profilesStr.split(/[,;]/).map((p: string) => p.trim()).filter((p: string) => p !== "");
+      
+      const groupName = `${provider} ${accountType} Pool — ${email?.toLowerCase().trim() || 'Unknown'}`;
+      
+      for (let i = 0; i < totalSlots; i++) {
+        const docRef = adminDb.collection("inventory").doc();
+        const profileName = profilesArray[i] || null; // Unassigned if null
+        
+        const data = {
+          id: docRef.id,
+          store_id: storeId,
+          name: `${provider} 1 User`.trim(),
+          profile_tier: accountType,
+          profile_name: profileName,
+          email,
+          password,
+          pin: null,
+          base_price: 0,
+          selling_price: 0,
+          price: 0,
+          stock: profileName ? 0 : 1, // If assigned to someone, stock is 0. If empty, stock is 1.
+          date_buy: new Date().toLocaleDateString('en-CA'),
+          date_expired: null,
+          category: "Shared Account",
+          group_name: groupName,
+          created_at: new Date().toISOString(),
+        };
+        batch.set(docRef, data);
+        inserts.push(data);
       }
-    }
+    } else {
+      // Standard Direct SKU Format
+      const name = row.name || "Unnamed Asset";
+      const profile_tier = row.profile_tier || null;
+      const email = row.email || null;
+      const date_expired = row.date_expired || null;
+      let group_name = row.group_name || null;
 
-    const docRef = adminDb.collection("inventory").doc();
-    const data = {
-      id: docRef.id,
-      store_id: storeId,
-      name,
-      profile_tier,
-      profile_name: row.profile_name || null,
-      email,
-      password: row.password || null,
-      pin: row.pin || null,
-      base_price: parseFloat(row.base_price) || 0,
-      selling_price: parseFloat(row.selling_price) || 0,
-      price: parseFloat(row.selling_price) || 0,
-      stock: parseInt(row.stock, 10) || 1,
-      date_buy: row.date_buy || null,
-      date_expired,
-      category: row.category || null,
-      group_name,
-      created_at: new Date().toISOString(),
-    };
-    batch.set(docRef, data);
-    return data;
+      const isMultiProfile = multiProfileTriggers.some((t) => name.toLowerCase().includes(t));
+      if (isMultiProfile && !group_name) {
+        const baseAlias = name.split(" ")[0];
+        if (email) {
+          group_name = `${baseAlias} Master Account Pool — ${email.toLowerCase().trim()}`;
+        } else {
+          const durationToken = date_expired ? `Exp-${date_expired}` : "RollingPool";
+          const tierToken = profile_tier || "1u";
+          group_name = `${baseAlias} Shared Hub [${tierToken}] — ${durationToken}`;
+        }
+      }
+
+      const docRef = adminDb.collection("inventory").doc();
+      const data = {
+        id: docRef.id,
+        store_id: storeId,
+        name,
+        profile_tier,
+        profile_name: row.profile_name || null,
+        email,
+        password: row.password || null,
+        pin: row.pin || null,
+        base_price: parseFloat(row.base_price) || 0,
+        selling_price: parseFloat(row.selling_price) || 0,
+        price: parseFloat(row.selling_price) || 0,
+        stock: parseInt(row.stock, 10) || 1,
+        date_buy: row.date_buy || null,
+        date_expired,
+        category: row.category || null,
+        group_name,
+        created_at: new Date().toISOString(),
+      };
+      batch.set(docRef, data);
+      inserts.push(data);
+    }
   });
 
   if (inserts.length === 0) return { error: "No valid rows found to import" };

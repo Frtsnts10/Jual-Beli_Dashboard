@@ -480,7 +480,8 @@ export async function importComplexExcelDataAction(storeId: string, rows: any[])
     customer.total_orders += 1;
 
     // Create a fulfilled order record (shows in Orders Queue)
-    const orderRef = adminDb.collection("orders").doc();
+    const orderId = `ORD-${Date.now()}${Math.floor(Math.random() * 10000)}`;
+    const orderRef = adminDb.collection("orders").doc(orderId);
     ordersToCreate.push({
       ref: orderRef,
       data: {

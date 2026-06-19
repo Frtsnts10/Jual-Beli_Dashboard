@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Customer, updateCustomerAction, deleteCustomerAction, appendCustomerProductAction, removeCustomerProductAction, extendCustomerProductAction, banCustomerProductAction, importCustomersCsvAction } from "../actions/customer-actions";
 import { CustomerForm } from "./customer-form";
-import { Trash2, Loader2, User, ShoppingBag, Plus, Calendar, Clock, Download, Upload, Ban, CalendarPlus, UserMinus, Edit2 } from "lucide-react";
+import { Trash2, Loader2, User, ShoppingBag, Plus, Calendar, Clock, Download, Upload, Ban, CalendarPlus, UserMinus, Edit2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { getTierConfigForProduct } from "@/config/product-tiers";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
@@ -11,6 +11,7 @@ import { parseDate } from "@internationalized/date";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { EditCustomerModal } from "./edit-customer-modal";
 import { StreamActionModal } from "./stream-action-modal";
+import { useRouter } from "next/navigation";
 
 interface CustomerTableProps {
   storeId: string;
@@ -374,6 +375,14 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCustomers = customers.slice(startIndex, startIndex + itemsPerPage);
 
+  const router = useRouter();
+  const [isSyncing, setIsSyncing] = useState(false);
+  const handleSync = () => {
+    setIsSyncing(true);
+    router.refresh();
+    setTimeout(() => setIsSyncing(false), 600);
+  };
+
   return (
     <div className="space-y-8 font-sans">
       {/* Top Controller Header Block */}
@@ -389,6 +398,15 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
             {customers.length} Client Shards
           </span>
+          <Button 
+            size="sm" 
+            className="h-[38px] bg-[#242b4d] hover:bg-[#2c345d] text-[#7daaf2] font-bold tracking-wide text-xs px-4"
+            onPress={handleSync}
+            isDisabled={isSyncing}
+            startContent={<RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />}
+          >
+            SYNC LIVE DATA
+          </Button>
           <Button
             onPress={() => setIsCreateModalOpen(true)}
             color="primary"
