@@ -288,7 +288,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
       </div>
 
       {/* Premium Inventory Quota Cap Banner */}
-      {!isPremium && item.length >= 3 && (
+      {!isPremium && items.length >= 3 && (
         <div className="p-4 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 border border-indigo-500/20 dark:border-indigo-900/40 rounded-lg flex flex-col sm:flex-row item-start sm:items-center justify-between gap-4 text-indigo-950 dark:text-indigo-300 shadow-sm animate-in fade-in duration-300">
           <div className="space-y-1">
             <p className="text-xs font-extrabold flex item-center gap-1.5 uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
