@@ -19,10 +19,10 @@ export default async function ApprovalsPage({
     <div className="space-y-6 max-w-full pb-12 font-sans">
       <div className="flex flex-col gap-1.5 animate-in fade-in duration-300">
         <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-          Approvals Desk
+          Meja Persetujuan
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-          Review and merge proposed changes from staff members before they go live.
+          Tinjau dan gabungkan usulan perubahan dari anggota staf sebelum ditayangkan.
         </p>
       </div>
 
