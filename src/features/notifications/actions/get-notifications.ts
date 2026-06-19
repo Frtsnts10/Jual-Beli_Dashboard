@@ -1,6 +1,7 @@
 "use server";
 
 import { adminDb } from "@/lib/firebase/server";
+import { dictionaries, Language } from "@/locales/dictionary";
 
 export interface NotificationItem {
   id: string;
@@ -16,7 +17,8 @@ export interface NotificationItem {
   };
 }
 
-export async function getNotificationsAction(storeId: string): Promise<NotificationItem[]> {
+export async function getNotificationsAction(storeId: string, lang: Language = "id"): Promise<NotificationItem[]> {
+  const t = dictionaries[lang]?.notifications || dictionaries.id.notifications;
   const [invSnap, custSnap] = await Promise.all([
     adminDb.collection("inventory").where("store_id", "==", storeId).get(),
     adminDb.collection("customers").where("store_id", "==", storeId).get(),
@@ -50,10 +52,8 @@ export async function getNotificationsAction(storeId: string): Promise<Notificat
         items.push({
           id: `inv-${doc.id}`,
           type: "inventory",
-          title: isExpired ? "Inventory Toko Expired!" : "Stock Expiry Warning",
-          message: `Master credential pool "${item.name}" ${item.profile_name ? `(${item.profile_name})` : ""} ${
-            isExpired ? `expired ${daysLeft} days ago.` : `expires in ${daysLeft} days.`
-          } Ensure subscription renewal to maintain pooled capacity.`,
+          title: isExpired ? t.invExpired : t.stockWarning,
+          message: isExpired ? t.invMsgExpired.replace("{name}", item.name).replace("{profile}", item.profile_name ? `(${item.profile_name})` : "").replace("{days}", String(daysLeft)) : t.invMsgExpiring.replace("{name}", item.name).replace("{profile}", item.profile_name ? `(${item.profile_name})` : "").replace("{days}", String(daysLeft)),
           targetDate: item.date_expired,
           isUrgent: isExpired || diff <= 24 * 60 * 60 * 1000,
         });
@@ -78,10 +78,8 @@ export async function getNotificationsAction(storeId: string): Promise<Notificat
           items.push({
             id: `cust-${doc.id}-${index}`,
             type: "customer",
-            title: isExpired ? "Customer Toko Lapsed" : "SLA Stream Extension Countdown",
-            message: `Client "${cust.name}" subscription stream for "${p.product_name}" ${
-              isExpired ? `lapsed ${daysLeft} days ago.` : `expires in ${daysLeft} days.`
-            } Target for automated n8n WhatsApp trigger loop.`,
+            title: isExpired ? t.custLapsed : t.slaCountdown,
+            message: isExpired ? t.custMsgExpired.replace("{name}", cust.name).replace("{product}", p.product_name).replace("{days}", String(daysLeft)) : t.custMsgExpiring.replace("{name}", cust.name).replace("{product}", p.product_name).replace("{days}", String(daysLeft)),
             targetDate: new Date(exp).toISOString().split("T")[0],
             isUrgent: isExpired || diff <= 24 * 60 * 60 * 1000,
             actionPayload: {
@@ -105,8 +103,8 @@ export async function getNotificationsAction(storeId: string): Promise<Notificat
     items.push({
       id: `order-${order.id}`,
       type: "order",
-      title: "Order Fulfillment Pending",
-      message: `Client "${order.customer_name}" purchased "${itemNames}" (${itemCount} item${itemCount > 1 ? 's' : ''}). Credentials require allocation.`,
+      title: t.orderPending,
+      message: t.orderMsg.replace("{name}", order.customer_name).replace("{product}", itemNames).replace("{count}", String(itemCount)),
       targetDate: new Date(order.created_at).toISOString().split("T")[0],
       isUrgent: true,
       actionPayload: {

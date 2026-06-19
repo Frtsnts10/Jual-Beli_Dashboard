@@ -181,6 +181,27 @@ export const dictionaries = {
       },
       connecting: "Menghubungkan Vektor Aman...",
       simulateMidtrans: "Simulasikan Midtrans Gateway"
+        },
+    notifications: {
+      hubTitle: "Pusat Pengingat Hitung Mundur",
+      pending: "Tertunda",
+      scanning: "Memindai vektor database...",
+      allClean: "Semua aliran memori berjalan dengan bersih.",
+      zeroBounds: "Nol batas inventaris atau SLA pelanggan yang berakhir dalam ≤ 3 hari.",
+      syncReady: "Sinkronisasi Gateway n8n Siap",
+      manualOverride: "Timpa Manual WhatsApp",
+      botDisclaimer: "⚡ Bot WhatsApp API otomatis terhubung via alur kerja Webhook terintegrasi n8n.",
+      viewReminders: "Lihat Pengingat Kedaluwarsa & Perpanjangan",
+      invExpired: "Inventaris Toko Kedaluwarsa!",
+      stockWarning: "Peringatan Kedaluwarsa Stok",
+      custLapsed: "Toko Pelanggan Kedaluwarsa",
+      slaCountdown: "Hitung Mundur Perpanjangan Aliran SLA",
+      orderPending: "Pemenuhan Pesanan Tertunda",
+      invMsgExpired: "Kredensial pool utama \"{name}\" {profile} kedaluwarsa {days} hari yang lalu. Pastikan perpanjangan langganan untuk menjaga kapasitas pool.",
+      invMsgExpiring: "Kredensial pool utama \"{name}\" {profile} kedaluwarsa dalam {days} hari. Pastikan perpanjangan langganan untuk menjaga kapasitas pool.",
+      custMsgExpired: "Aliran langganan Klien \"{name}\" untuk \"{product}\" berakhir {days} hari yang lalu. Target untuk putaran pemicu otomatis n8n WhatsApp.",
+      custMsgExpiring: "Aliran langganan Klien \"{name}\" untuk \"{product}\" berakhir dalam {days} hari. Target untuk putaran pemicu otomatis n8n WhatsApp.",
+      orderMsg: "Klien \"{name}\" membeli \"{product}\" ({count} item). Kredensial memerlukan alokasi."
     }
   },
   en: {
@@ -365,6 +386,27 @@ export const dictionaries = {
       },
       connecting: "Connecting Secure Vector...",
       simulateMidtrans: "Simulate Midtrans Gateway"
+        },
+    notifications: {
+      hubTitle: "Countdown Reminders Hub",
+      pending: "Pending",
+      scanning: "Scanning database vectors...",
+      allClean: "All memory streams running cleanly.",
+      zeroBounds: "Zero inventory or customer SLA bounds expiring within ≤ 3 days.",
+      syncReady: "n8n Gateway Sync Ready",
+      manualOverride: "WhatsApp Manual Override",
+      botDisclaimer: "⚡ Automated WhatsApp API bots map via integrated n8n Webhook workflows.",
+      viewReminders: "View Expiry & Extension Reminders",
+      invExpired: "Inventory Toko Expired!",
+      stockWarning: "Stock Expiry Warning",
+      custLapsed: "Customer Toko Lapsed",
+      slaCountdown: "SLA Stream Extension Countdown",
+      orderPending: "Order Fulfillment Pending",
+      invMsgExpired: "Master credential pool \"{name}\" {profile} expired {days} days ago. Ensure subscription renewal to maintain pooled capacity.",
+      invMsgExpiring: "Master credential pool \"{name}\" {profile} expires in {days} days. Ensure subscription renewal to maintain pooled capacity.",
+      custMsgExpired: "Client \"{name}\" subscription stream for \"{product}\" lapsed {days} days ago. Target for automated n8n WhatsApp trigger loop.",
+      custMsgExpiring: "Client \"{name}\" subscription stream for \"{product}\" expires in {days} days. Target for automated n8n WhatsApp trigger loop.",
+      orderMsg: "Client \"{name}\" purchased \"{product}\" ({count} items). Credentials require allocation."
     }
   },
   es: {
@@ -546,6 +588,27 @@ export const dictionaries = {
       },
       connecting: "Conectando Vector Seguro...",
       simulateMidtrans: "Simular Midtrans Gateway"
+        },
+    notifications: {
+      hubTitle: "Countdown Reminders Hub",
+      pending: "Pending",
+      scanning: "Scanning database vectors...",
+      allClean: "All memory streams running cleanly.",
+      zeroBounds: "Zero inventory or customer SLA bounds expiring within ≤ 3 days.",
+      syncReady: "n8n Gateway Sync Ready",
+      manualOverride: "WhatsApp Manual Override",
+      botDisclaimer: "⚡ Automated WhatsApp API bots map via integrated n8n Webhook workflows.",
+      viewReminders: "View Expiry & Extension Reminders",
+      invExpired: "Inventory Toko Expired!",
+      stockWarning: "Stock Expiry Warning",
+      custLapsed: "Customer Toko Lapsed",
+      slaCountdown: "SLA Stream Extension Countdown",
+      orderPending: "Order Fulfillment Pending",
+      invMsgExpired: "Master credential pool \"{name}\" {profile} expired {days} days ago. Ensure subscription renewal to maintain pooled capacity.",
+      invMsgExpiring: "Master credential pool \"{name}\" {profile} expires in {days} days. Ensure subscription renewal to maintain pooled capacity.",
+      custMsgExpired: "Client \"{name}\" subscription stream for \"{product}\" lapsed {days} days ago. Target for automated n8n WhatsApp trigger loop.",
+      custMsgExpiring: "Client \"{name}\" subscription stream for \"{product}\" expires in {days} days. Target for automated n8n WhatsApp trigger loop.",
+      orderMsg: "Client \"{name}\" purchased \"{product}\" ({count} items). Credentials require allocation."
     }
   },
   fr: {
@@ -727,6 +790,27 @@ export const dictionaries = {
       },
       connecting: "Connexion au Vecteur Sécurisé...",
       simulateMidtrans: "Simuler Midtrans Gateway"
+        },
+    notifications: {
+      hubTitle: "Countdown Reminders Hub",
+      pending: "Pending",
+      scanning: "Scanning database vectors...",
+      allClean: "All memory streams running cleanly.",
+      zeroBounds: "Zero inventory or customer SLA bounds expiring within ≤ 3 days.",
+      syncReady: "n8n Gateway Sync Ready",
+      manualOverride: "WhatsApp Manual Override",
+      botDisclaimer: "⚡ Automated WhatsApp API bots map via integrated n8n Webhook workflows.",
+      viewReminders: "View Expiry & Extension Reminders",
+      invExpired: "Inventory Toko Expired!",
+      stockWarning: "Stock Expiry Warning",
+      custLapsed: "Customer Toko Lapsed",
+      slaCountdown: "SLA Stream Extension Countdown",
+      orderPending: "Order Fulfillment Pending",
+      invMsgExpired: "Master credential pool \"{name}\" {profile} expired {days} days ago. Ensure subscription renewal to maintain pooled capacity.",
+      invMsgExpiring: "Master credential pool \"{name}\" {profile} expires in {days} days. Ensure subscription renewal to maintain pooled capacity.",
+      custMsgExpired: "Client \"{name}\" subscription stream for \"{product}\" lapsed {days} days ago. Target for automated n8n WhatsApp trigger loop.",
+      custMsgExpiring: "Client \"{name}\" subscription stream for \"{product}\" expires in {days} days. Target for automated n8n WhatsApp trigger loop.",
+      orderMsg: "Client \"{name}\" purchased \"{product}\" ({count} items). Credentials require allocation."
     }
   },
   de: {
@@ -909,6 +993,27 @@ export const dictionaries = {
       },
       connecting: "Verbindung zum Sicherheitsvektor...",
       simulateMidtrans: "Midtrans Gateway simulieren"
+        },
+    notifications: {
+      hubTitle: "Countdown Reminders Hub",
+      pending: "Pending",
+      scanning: "Scanning database vectors...",
+      allClean: "All memory streams running cleanly.",
+      zeroBounds: "Zero inventory or customer SLA bounds expiring within ≤ 3 days.",
+      syncReady: "n8n Gateway Sync Ready",
+      manualOverride: "WhatsApp Manual Override",
+      botDisclaimer: "⚡ Automated WhatsApp API bots map via integrated n8n Webhook workflows.",
+      viewReminders: "View Expiry & Extension Reminders",
+      invExpired: "Inventory Toko Expired!",
+      stockWarning: "Stock Expiry Warning",
+      custLapsed: "Customer Toko Lapsed",
+      slaCountdown: "SLA Stream Extension Countdown",
+      orderPending: "Order Fulfillment Pending",
+      invMsgExpired: "Master credential pool \"{name}\" {profile} expired {days} days ago. Ensure subscription renewal to maintain pooled capacity.",
+      invMsgExpiring: "Master credential pool \"{name}\" {profile} expires in {days} days. Ensure subscription renewal to maintain pooled capacity.",
+      custMsgExpired: "Client \"{name}\" subscription stream for \"{product}\" lapsed {days} days ago. Target for automated n8n WhatsApp trigger loop.",
+      custMsgExpiring: "Client \"{name}\" subscription stream for \"{product}\" expires in {days} days. Target for automated n8n WhatsApp trigger loop.",
+      orderMsg: "Client \"{name}\" purchased \"{product}\" ({count} items). Credentials require allocation."
     }
   },
   ja: {
@@ -1090,6 +1195,27 @@ export const dictionaries = {
       },
       connecting: "セキュリティベクターに接続中...",
       simulateMidtrans: "Midtransゲートウェイのシミュレーション"
+        },
+    notifications: {
+      hubTitle: "Countdown Reminders Hub",
+      pending: "Pending",
+      scanning: "Scanning database vectors...",
+      allClean: "All memory streams running cleanly.",
+      zeroBounds: "Zero inventory or customer SLA bounds expiring within ≤ 3 days.",
+      syncReady: "n8n Gateway Sync Ready",
+      manualOverride: "WhatsApp Manual Override",
+      botDisclaimer: "⚡ Automated WhatsApp API bots map via integrated n8n Webhook workflows.",
+      viewReminders: "View Expiry & Extension Reminders",
+      invExpired: "Inventory Toko Expired!",
+      stockWarning: "Stock Expiry Warning",
+      custLapsed: "Customer Toko Lapsed",
+      slaCountdown: "SLA Stream Extension Countdown",
+      orderPending: "Order Fulfillment Pending",
+      invMsgExpired: "Master credential pool \"{name}\" {profile} expired {days} days ago. Ensure subscription renewal to maintain pooled capacity.",
+      invMsgExpiring: "Master credential pool \"{name}\" {profile} expires in {days} days. Ensure subscription renewal to maintain pooled capacity.",
+      custMsgExpired: "Client \"{name}\" subscription stream for \"{product}\" lapsed {days} days ago. Target for automated n8n WhatsApp trigger loop.",
+      custMsgExpiring: "Client \"{name}\" subscription stream for \"{product}\" expires in {days} days. Target for automated n8n WhatsApp trigger loop.",
+      orderMsg: "Client \"{name}\" purchased \"{product}\" ({count} items). Credentials require allocation."
     }
   },
   zh: {
@@ -1271,6 +1397,27 @@ export const dictionaries = {
       },
       connecting: "正在连接安全通道...",
       simulateMidtrans: "模拟 Midtrans 支付网关"
+        },
+    notifications: {
+      hubTitle: "Countdown Reminders Hub",
+      pending: "Pending",
+      scanning: "Scanning database vectors...",
+      allClean: "All memory streams running cleanly.",
+      zeroBounds: "Zero inventory or customer SLA bounds expiring within ≤ 3 days.",
+      syncReady: "n8n Gateway Sync Ready",
+      manualOverride: "WhatsApp Manual Override",
+      botDisclaimer: "⚡ Automated WhatsApp API bots map via integrated n8n Webhook workflows.",
+      viewReminders: "View Expiry & Extension Reminders",
+      invExpired: "Inventory Toko Expired!",
+      stockWarning: "Stock Expiry Warning",
+      custLapsed: "Customer Toko Lapsed",
+      slaCountdown: "SLA Stream Extension Countdown",
+      orderPending: "Order Fulfillment Pending",
+      invMsgExpired: "Master credential pool \"{name}\" {profile} expired {days} days ago. Ensure subscription renewal to maintain pooled capacity.",
+      invMsgExpiring: "Master credential pool \"{name}\" {profile} expires in {days} days. Ensure subscription renewal to maintain pooled capacity.",
+      custMsgExpired: "Client \"{name}\" subscription stream for \"{product}\" lapsed {days} days ago. Target for automated n8n WhatsApp trigger loop.",
+      custMsgExpiring: "Client \"{name}\" subscription stream for \"{product}\" expires in {days} days. Target for automated n8n WhatsApp trigger loop.",
+      orderMsg: "Client \"{name}\" purchased \"{product}\" ({count} items). Credentials require allocation."
     }
   }
 };

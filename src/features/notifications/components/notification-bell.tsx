@@ -4,8 +4,10 @@ import React, { useState, useEffect } from "react";
 import { Bell, AlertTriangle, Clock, Send } from "lucide-react";
 import { getNotificationsAction, NotificationItem } from "../actions/get-notifications";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/hooks/use-i18n";
 
 export function NotificationBell({ storeId }: { storeId: string }) {
+  const { lang, t } = useI18n();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
@@ -29,7 +31,7 @@ export function NotificationBell({ storeId }: { storeId: string }) {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const data = await getNotificationsAction(storeId);
+      const data = await getNotificationsAction(storeId, lang);
       setItems(data);
     } catch (e) {
     } finally {
@@ -39,7 +41,7 @@ export function NotificationBell({ storeId }: { storeId: string }) {
 
   useEffect(() => {
     fetchNotifications();
-  }, [storeId]);
+  }, [storeId, lang]);
 
   return (
     <div className="relative font-sans">
@@ -48,7 +50,7 @@ export function NotificationBell({ storeId }: { storeId: string }) {
           setIsOpen(!isOpen);
           if (!isOpen) fetchNotifications();
         }}
-        title="View Expiry & Extension Reminders"
+        title={t.notifications.viewReminders}
         className="relative flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0d1322] hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-300 transition-all shadow-sm active:scale-95"
       >
         <Bell className="w-4 h-4" />
@@ -65,20 +67,20 @@ export function NotificationBell({ storeId }: { storeId: string }) {
           <div className="absolute right-0 mt-2 w-[360px] md:w-[420px] max-w-[90vw] bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800 rounded-lg shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="p-3 bg-slate-50 dark:bg-[#0b0f19] border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
               <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-                <Bell className="w-3.5 h-3.5 text-indigo-500 shrink-0" /> Countdown Reminders Hub
+                <Bell className="w-3.5 h-3.5 text-indigo-500 shrink-0" /> {t.notifications.hubTitle}
               </span>
               <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
-                {items.length} Pending
+                {items.length} {t.notifications.pending}
               </span>
             </div>
 
             <div className="max-h-[360px] overflow-y-auto divide-y divide-slate-50 dark:divide-slate-800/40 overscroll-contain">
               {loading && items.length === 0 ? (
-                <div className="p-6 text-center text-xs text-slate-400 italic">Scanning database vectors...</div>
+                <div className="p-6 text-center text-xs text-slate-400 italic">{t.notifications.scanning}</div>
               ) : items.length === 0 ? (
                 <div className="p-8 text-center text-xs text-slate-400 italic space-y-1">
-                  <p>All memory streams running cleanly.</p>
-                  <p className="text-[10px] text-slate-500">Zero inventory or customer SLA bounds expiring within ≤ 3 days.</p>
+                  <p>{t.notifications.allClean}</p>
+                  <p className="text-[10px] text-slate-500">{t.notifications.zeroBounds}</p>
                 </div>
               ) : (
                 items.map((item) => (
@@ -102,7 +104,7 @@ export function NotificationBell({ storeId }: { storeId: string }) {
                     </p>
                     {item.type === "customer" && (
                       <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] pl-1">
-                        <span className="text-slate-400 italic">n8n Gateway Sync Ready</span>
+                        <span className="text-slate-400 italic">{t.notifications.syncReady}</span>
                         <a
                           href={item.actionPayload?.phone ? `https://wa.me/${item.actionPayload.phone.replace(/\D/g, '')}` : "#"}
                           onClick={(e) => e.stopPropagation()}
@@ -110,7 +112,7 @@ export function NotificationBell({ storeId }: { storeId: string }) {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
                         >
-                          <Send className="w-2.5 h-2.5" /> WhatsApp Manual Override
+                          <Send className="w-2.5 h-2.5" /> {t.notifications.manualOverride}
                         </a>
                       </div>
                     )}
@@ -120,7 +122,7 @@ export function NotificationBell({ storeId }: { storeId: string }) {
             </div>
 
             <div className="p-2 bg-slate-50 dark:bg-[#0b0f19] border-t border-slate-100 dark:border-slate-800 text-[9px] text-center text-slate-400">
-              ⚡ Automated WhatsApp API bots map via integrated n8n Webhook workflows.
+              {t.notifications.botDisclaimer}
             </div>
           </div>
         </>
