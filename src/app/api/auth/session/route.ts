@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createSessionCookie, adminDb } from '@/lib/firebase/server';
+import { getAuth } from 'firebase-admin/auth';
+import { cookies } from 'next/headers';
 
 export async function GET() {
   const pk = process.env.FIREBASE_PRIVATE_KEY || '';
@@ -13,10 +16,6 @@ export async function GET() {
     email: process.env.FIREBASE_CLIENT_EMAIL,
   });
 }
-
-import { createSessionCookie, adminDb } from '@/lib/firebase/server';
-import { getAuth } from 'firebase-admin/auth';
-import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
   try {
