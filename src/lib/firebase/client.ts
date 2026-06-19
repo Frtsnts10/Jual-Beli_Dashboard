@@ -12,7 +12,24 @@ const firebaseConfig = {
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
+
+// Initialize auth and db safely, accounting for SSR/SSG build environments
+// where environment variables might not be populated yet.
+let auth: ReturnType<typeof getAuth>;
+let db: ReturnType<typeof getFirestore>;
+
+try {
+  auth = getAuth(app);
+} catch (error) {
+  console.warn("Firebase Auth initialization failed (likely during build):", error);
+  auth = {} as ReturnType<typeof getAuth>;
+}
+
+try {
+  db = getFirestore(app);
+} catch (error) {
+  console.warn("Firebase Firestore initialization failed (likely during build):", error);
+  db = {} as ReturnType<typeof getFirestore>;
+}
 
 export { app, auth, db };
