@@ -149,11 +149,11 @@ export function EditProfileForm({
               defaultValue={initialRole}
               className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg h-10 px-3 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-indigo-500"
             >
-              <option value="admin">Administrator (Direct Write Access)</option>
+              <option value="admin">Administrator (Akses Tulis Langsung)</option>
               <option value="staff">Staff Member (Draft / PR Approvals Only)</option>
             </select>
             <p className="text-[10px] text-slate-500">
-              For testing purposes, you can switch your role. Staff members will route edits through the Data Approval Workflow (Drafting System).
+              Untuk tujuan pengujian, Anda dapat mengubah peran Anda. Staf akan merutekan pengeditan melalui Alur Kerja Persetujuan Data (Sistem Penyusunan).
             </p>
           </div>
           <div className="grid grid-cols-1 gap-4 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
@@ -166,7 +166,7 @@ export function EditProfileForm({
               <Input
                 type={showPassword ? "text" : "password"}
                 name="currentPassword"
-                placeholder="Required to set new password"
+                placeholder="Diperlukan untuk mengatur kata sandi baru"
                 value={currentPassword}
                 onValueChange={setCurrentPassword}
                 startContent={<Key className="w-3.5 h-3.5 text-slate-400" />}
@@ -195,7 +195,7 @@ export function EditProfileForm({
               <Input
                 type={showPassword ? "text" : "password"}
                 name="newPassword"
-                placeholder="Leave blank to keep current"
+                placeholder="Biarkan kosong untuk mempertahankan saat ini"
                 value={newPassword}
                 onValueChange={setNewPassword}
                 startContent={<Lock className="w-3.5 h-3.5 text-slate-400" />}
@@ -231,7 +231,7 @@ export function EditProfileForm({
               </label>
               <Input
                 type={showPassword ? "text" : "password"}
-                placeholder="Re-type new password"
+                placeholder="Ketik ulang kata sandi baru"
                 value={confirmPassword}
                 onValueChange={setConfirmPassword}
                 startContent={<CheckCircle className="w-3.5 h-3.5 text-slate-400" />}

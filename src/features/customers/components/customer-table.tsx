@@ -320,7 +320,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
             // PIN: look for explicit PIN column first, then scan __EMPTY cols for 4-digit number
             let foundPin = getVal("PIN");
             if (!foundPin) {
-              for (const k dari allKeys.filter(k => k.startsWith("__EMPTY"))) {
+              for (const k of allKeys.filter(k => k.startsWith("__EMPTY"))) {
                 const v = row[k]?.toString().trim();
                 if (v && v.match(/^\d{4}$/)) { foundPin = v; break; }
               }

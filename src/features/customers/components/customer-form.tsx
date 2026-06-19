@@ -93,10 +93,10 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
       <div>
         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
           <UserPlus className="w-4 h-4 text-indigo-600" />
-          Register Customer & Ordered Variants
+          Daftarkan Pelanggan & Varian Pesanan
         </h3>
         <p className="text-xs text-slate-500 mt-0.5">
-          Provision buyer profile profiles along with embedded product streams and automated auto-sum duration mapping.
+          Sediakan profil pembeli beserta aliran produk tersemat dan pemetaan durasi otomatis.
         </p>
       </div>
 
@@ -112,7 +112,7 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
           name="name"
           label="Customer Full Name"
           isRequired
-          placeholder="e.g. Alex Rivera"
+          placeholder="Cth: Alex Rivera"
           variant="faded"
           radius="lg"
           classNames={{
@@ -202,11 +202,11 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
         <div className="flex items-center justify-between mb-2.5">
           <label className="flex items-center gap-1.5 text-xs font-bold text-indigo-950 dark:text-indigo-400">
             <ShoppingBag className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Map Initial Order Item (Optional)</span>
+            <span>Petakan Item Pesanan Awal (Opsional)</span>
           </label>
           <div className="flex items-center gap-1.5 text-[10px] text-slate-500 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
             <Clock className="w-3 h-3 text-emerald-500 animate-pulse" />
-            <span>Transaction captured automatically as precise real-time timestamp</span>
+            <span>Transaksi ditangkap otomatis dengan stempel waktu real-time yang akurat</span>
           </div>
         </div>
 
@@ -348,7 +348,7 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
           radius="lg"
           className="px-5 font-bold shadow-md h-[40px] text-xs"
         >
-          {isPending ? "Connecting Toko..." : "Create Profile & Bind Order"}
+          {isPending ? "Connecting Toko..." : "Buat Profil & Ikat Pesanan"}
         </Button>
       </div>
     </form>

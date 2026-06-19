@@ -128,7 +128,7 @@ export const dictionaries = {
       standardCoreDesc: "Pengaturan pencatatan data penting untuk ruang kerja bukti konsep sederhana.",
       monthForever: " / bulan selamanya",
       freeFeatures: [
-        "Hingga 3 Toko Toko Aktif",
+        "Hingga 3 Toko Aktif",
         "Aliran penyerapan SKU dasar",
         "Kisi telemetri tingkat lanjut (terkunci)",
         "Sinkronisasi Live Midtrans SLA (terkunci)"
@@ -148,19 +148,19 @@ export const dictionaries = {
       ctaLifetime: "Dapatkan Akses Seumur Hidup",
       proFeatures: {
         weekly: [
-          "Toko Toko Tanpa Batas",
+          "Toko Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
           "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas"
         ],
         monthly: [
-          "Toko Toko Tanpa Batas",
+          "Toko Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
           "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas"
         ],
         yearly: [
-          "Toko Toko Tanpa Batas",
+          "Toko Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
           "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas",
@@ -169,7 +169,7 @@ export const dictionaries = {
           "Akses langsung dengan pengembang proyek ini"
         ],
         lifetime: [
-          "Toko Toko Tanpa Batas",
+          "Toko Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
           "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas",

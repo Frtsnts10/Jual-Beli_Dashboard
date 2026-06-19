@@ -29,9 +29,9 @@ export default async function TenantComplaintsPage({
   return (
     <div className="space-y-6 font-sans transition-colors">
       <div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">SLA Support Incident Logs</h2>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Log Insiden Dukungan SLA</h2>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-          Ingest critical telemetry breakdowns and click badge tokens to advance cycle status.
+          Terima rincian telemetri kritis dan klik lencana untuk memajukan status siklus.
         </p>
       </div>
 
@@ -44,9 +44,9 @@ export default async function TenantComplaintsPage({
       ) : (
         <>
           <div className="p-4 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 rounded-lg">
-            <h3 className="text-xs font-bold text-indigo-900 dark:text-indigo-300">Automated Customer Telemetry Feed</h3>
+            <h3 className="text-xs font-bold text-indigo-900 dark:text-indigo-300">Umpan Telemetri Pelanggan Otomatis</h3>
             <p className="text-[11px] text-indigo-700 dark:text-indigo-400 mt-0.5 leading-relaxed">
-              Incidents flow automatically from client-facing portals. Actions such as sending OTPs, credential resynced, refunds, and duration extensions are natively managed on individual customer profiles inside the Customer desk module.
+              Insiden mengalir otomatis dari portal klien. Tindakan seperti mengirim OTP, sinkronisasi kredensial, pengembalian dana, dan perpanjangan durasi dikelola langsung di profil pelanggan individu di modul Meja Pelanggan.
             </p>
           </div>
 
