@@ -10,6 +10,7 @@ import { redirect } from "next/navigation";
 import { EditProfileForm } from "@/features/auth/components/edit-profile-form";
 import { AppearanceSettingsPanel } from "@/features/settings/components/appearance-settings-panel";
 import { MfaEnrollment } from "@/features/auth/components/mfa-enrollment";
+import { SubscriptionDetailsPanel } from "@/features/subscription/components/subscription-details-panel";
 
 export default async function UserProfilePage({
   params,
@@ -51,6 +52,12 @@ export default async function UserProfilePage({
           />
         </div>
         <div className="flex flex-col gap-6 h-full">
+                    <SubscriptionDetailsPanel 
+            isPremium={profile.is_premium || false}
+            tier={profile.subscription_tier}
+            planName={profile.subscription_plan_name}
+            activeUntil={profile.subscription_active_until}
+          />
           <AppearanceSettingsPanel />
           <div className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-lg shadow-sm font-sans">
             <MfaEnrollment />

@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import { Select, SelectItem, Button } from "@heroui/react";
 import { Save, Globe } from "lucide-react";
 import { updateStoreSettingsAction } from "../actions/settings-actions";
+import { updateUserLanguageAction } from "@/features/auth/actions/update-language-action";
 import { useI18n } from "@/hooks/use-i18n";
 import { Language } from "@/locales/dictionary";
 import { toast } from "sonner";
@@ -38,6 +39,7 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
       toast.error(res.error);
     } else {
       if (selectedLang !== lang && selectedLang) {
+        await updateUserLanguageAction(selectedLang as Language);
         changeLanguage(selectedLang as Language);
       } else {
         toast.success(t.settings.successPreferences);

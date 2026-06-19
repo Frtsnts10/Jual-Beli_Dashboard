@@ -1,5 +1,6 @@
 import React from "react";
 import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
+import { LanguageInitializer } from "@/components/language-initializer";
 
 export default async function DashboardRootLayout({ children }: { children: React.ReactNode }) {
   try {
@@ -9,6 +10,10 @@ export default async function DashboardRootLayout({ children }: { children: Reac
       // Upsert profile in Firestore
       const profileRef = adminDb.collection("profiles").doc(user.uid);
       const profileDoc = await profileRef.get();
+      let prefLang;
+      if (profileDoc.exists) {
+        prefLang = profileDoc.data()?.preferred_language;
+      }
       if (!profileDoc.exists) {
         await profileRef.set({
           id: user.uid,
@@ -24,5 +29,8 @@ export default async function DashboardRootLayout({ children }: { children: Reac
     // Graceful startup flow
   }
 
-  return <>{children}</>;
+  return <>
+      {prefLang && <LanguageInitializer preferredLanguage={prefLang} />}
+      {children}
+    </>;
 }

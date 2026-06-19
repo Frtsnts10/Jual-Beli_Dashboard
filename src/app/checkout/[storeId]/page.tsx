@@ -99,9 +99,14 @@ export default async function SimulatedXenditCheckoutPage({
       current_period_end: expiryDate,
     }, { merge: true });
 
-    // 2. Set is_premium in user profile
+        // 2. Set is_premium in user profile
     if (store?.owner_id) {
-      await adminDb.collection("profiles").doc(store.owner_id).update({ is_premium: true });
+      await adminDb.collection("profiles").doc(store.owner_id).update({ 
+        is_premium: true,
+        subscription_tier: interval,
+        subscription_plan_name: billingInfo.planName,
+        subscription_active_until: expiryDate
+      });
     }
 
     redirect(`/${storeId}/subscription?payment_success=true`);
