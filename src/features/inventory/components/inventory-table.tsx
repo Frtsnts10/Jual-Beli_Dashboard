@@ -45,7 +45,7 @@ function CopyableCredential({
     <button
       type="button"
       onClick={handleCopy}
-      className={`group inline-flex item-center gap-1.5 text-left hover:bg-indigo-50 dark:hover:bg-indigo-950/50 px-1.5 py-0.5 rounded transition-all relative active:scale-95 max-w-full ${
+      className={`group inline-flex items-center gap-1.5 text-left hover:bg-indigo-50 dark:hover:bg-indigo-950/50 px-1.5 py-0.5 rounded transition-all relative active:scale-95 max-w-full ${
         isTiny ? "text-[9px] font-mono" : "text-[11px] font-mono"
       } ${
         isPassword
@@ -227,11 +227,11 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
       {/* Top Controller Header Block */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="h-[38px] flex item-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
+          <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
             {items.length} Total Inventaris Toko
           </span>
         </div>
-        <div className="flex flex-wrap item-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Button 
             size="sm" 
             className="h-[38px] bg-[#242b4d] hover:bg-[#2c345d] text-[#7daaf2] font-bold tracking-wide text-xs px-3"
@@ -251,7 +251,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             Templat
           </Button>
 
-          <label className="h-10 flex item-center justify-center px-4 font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-sm transition-all gap-2 cursor-pointer">
+          <label className="h-10 flex items-center justify-center px-4 font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-sm transition-all gap-2 cursor-pointer">
             <Upload className="w-4 h-4" /> Impor CSV
             <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
           </label>
@@ -289,9 +289,9 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
 
       {/* Premium Inventory Quota Cap Banner */}
       {!isPremium && items.length >= 3 && (
-        <div className="p-4 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 border border-indigo-500/20 dark:border-indigo-900/40 rounded-lg flex flex-col sm:flex-row item-start sm:items-center justify-between gap-4 text-indigo-950 dark:text-indigo-300 shadow-sm animate-in fade-in duration-300">
+        <div className="p-4 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 border border-indigo-500/20 dark:border-indigo-900/40 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-indigo-950 dark:text-indigo-300 shadow-sm animate-in fade-in duration-300">
           <div className="space-y-1">
-            <p className="text-xs font-extrabold flex item-center gap-1.5 uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
+            <p className="text-xs font-extrabold flex items-center gap-1.5 uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
               <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
               Standard Toko Quota Exceeded (3/3 items allocated)
             </p>
@@ -346,12 +346,12 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50/80 dark:bg-[#0b0f19]/80 border-b border-slate-100 dark:border-slate-800">
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[140px]">Product Asset</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Profile Designation</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[150px]">Delivery Credentials</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Pricing Matrix</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[130px]">Lifecycle Target</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right min-w-[120px]">Controls</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[140px]">Aset Produk</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Profil</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[150px]">Kredensial</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Harga</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[130px]">Masa Aktif</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right min-w-[120px]">Aksi</th>
                 </tr>
               </thead>
               <tbody className={`divide-y divide-slate-50 dark:divide-slate-800/60 transition-all duration-150 ${isTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
@@ -361,7 +361,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                   return (
                     <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                       <td className="px-5 py-3.5">
-                        <div className="flex item-center gap-2">
+                        <div className="flex items-center gap-2">
                           <span className="font-extrabold text-slate-900 dark:text-slate-100 text-sm">{item.name}</span>
                           {item.profile_tier && (
                             <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] uppercase tracking-wide">
@@ -369,7 +369,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                             </span>
                           )}
                         </div>
-                        <div className="flex item-center gap-1.5 mt-1 text-[10px] text-slate-400">
+                        <div className="flex items-center gap-1.5 mt-1 text-[10px] text-slate-400">
                           <Shield className="w-3 h-3" />
                           <span>Stok: {item.stock}</span>
                         </div>
@@ -386,11 +386,11 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                           </div>
                         ) : null}
                         {item.password ? (
-                          <div className="flex flex-wrap item-center gap-1.5">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-[10px] text-slate-400 select-none">🔑</span>
                             <CopyableCredential value={item.password} label="Password" isPassword />
                             {item.pin && (
-                              <span className="inline-flex item-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px]">
+                              <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px]">
                                 PIN: <CopyableCredential value={item.pin} label="PIN" isTiny />
                               </span>
                             )}
@@ -399,7 +399,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                         {!item.email && !item.password && <span className="text-slate-300 italic text-[11px] font-sans">Tidak ada kredensial</span>}
                       </td>
                       <td className="px-5 py-3.5">
-                        <div className="flex item-baseline gap-1.5">
+                        <div className="flex items-baseline gap-1.5">
                           <span className="text-sm font-black text-emerald-600">
                             {formatCustomPrice(Number(item.selling_price || item.price || 0))}
                           </span>
@@ -411,11 +411,11 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                         </div>
                       </td>
                       <td className="px-5 py-3.5 text-[11px] text-slate-500">
-                        <div className="flex item-center gap-1">
+                        <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3 text-slate-400" />
-                          <span>Buy: {item.date_buy || "N/A"}</span>
+                          <span>Beli: {item.date_buy || "N/A"}</span>
                         </div>
-                        <div className="flex item-center gap-1 mt-0.5">
+                        <div className="flex items-center gap-1 mt-0.5">
                           <span className="w-3 text-center text-slate-300">↳</span>
                           <span className="text-red-500 font-medium">Exp: {item.date_expired || "N/A"}</span>
                         </div>
@@ -457,7 +457,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             </table>
           </div>
           {totalPages > 1 && (
-            <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row item-center justify-between gap-2 text-xs transition-colors">
+            <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
                 Menampilkan <strong className="text-slate-700 dark:text-slate-200">{startIndex + 1}</strong> to{" "}
                 <strong className="text-slate-700 dark:text-slate-200">
@@ -465,7 +465,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                 </strong>{" "}
                 dari <strong className="text-slate-700 dark:text-slate-200">{items.length}</strong> item
               </span>
-              <div className="flex item-center gap-1">
+              <div className="flex items-center gap-1">
                 <Button
                   variant="bordered"
                   radius="lg"

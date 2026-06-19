@@ -282,7 +282,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                       <td className="px-5 py-4">
                         <div className="flex flex-wrap items-center gap-1.5">
                           {/* Payment badge */}
-                          <span className={`px-2 py-0.5 font-bold text-[9px] uppercase tracking-wider rounded-lg ${
+                          <span className={`inline-flex items-center justify-center px-2 h-[22px] font-bold text-[9px] leading-none uppercase tracking-wider rounded-lg ${
                             o.payment_status === "paid"
                               ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200/30"
                               : o.payment_status === "pending"
@@ -293,7 +293,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                           </span>
 
                           {/* Fulfillment badge */}
-                          <span className={`px-2 py-0.5 font-bold text-[9px] uppercase tracking-wider rounded-lg ${
+                          <span className={`inline-flex items-center justify-center px-2 h-[22px] font-bold text-[9px] leading-none uppercase tracking-wider rounded-lg ${
                             o.fulfillment_status === "fulfilled"
                               ? "bg-indigo-100 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-400 border border-indigo-200/30"
                               : o.fulfillment_status === "pending"
