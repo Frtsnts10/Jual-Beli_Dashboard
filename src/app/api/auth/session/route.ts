@@ -1,4 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET() {
+  const pk = process.env.FIREBASE_PRIVATE_KEY || '';
+  return NextResponse.json({
+    diagnostics: true,
+    hasKey: !!pk,
+    length: pk.length,
+    includesBegin: pk.includes('BEGIN PRIVATE KEY'),
+    includesEnd: pk.includes('END PRIVATE KEY'),
+    hasNewlines: pk.includes('\\n') || pk.includes('\n'),
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    email: process.env.FIREBASE_CLIENT_EMAIL,
+  });
+}
+
 import { createSessionCookie, adminDb } from '@/lib/firebase/server';
 import { getAuth } from 'firebase-admin/auth';
 import { cookies } from 'next/headers';
