@@ -461,7 +461,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
                 Menampilkan <strong className="text-slate-700 dark:text-slate-200">{startIndex + 1}</strong> to{" "}
                 <strong className="text-slate-700 dark:text-slate-200">
-                  {Math.min(startIndex + itemPerPage, item.length)}
+                  {Math.min(startIndex + itemPerPage, items.length)}
                 </strong>{" "}
                 dari <strong className="text-slate-700 dark:text-slate-200">{items.length}</strong> item
               </span>
