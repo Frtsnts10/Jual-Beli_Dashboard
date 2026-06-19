@@ -46,7 +46,7 @@ export function PremiumLockOverlay({ storeId, featureName, description }: Premiu
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left w-full max-w-md pt-4 pb-2 border-t border-slate-100 dark:border-slate-800">
           {[
             "Real-time PostgreSQL webhook syncs",
-            "Unlimited multitenant store shards",
+            "Unlimited multitenant store toko",
             "Advanced @tanstack telemetry tools",
             "Priority customer desk SLA triggers",
           ].map((benefit, i) => (

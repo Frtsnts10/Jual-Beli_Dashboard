@@ -112,7 +112,7 @@ export default async function SimulatedXenditCheckoutPage({
       {/* Top micro bar */}
       <header className="border-b border-white/10 px-6 py-4 flex items-center justify-between max-w-6xl w-full mx-auto">
         <Link href={`/${storeId}/subscription`} className="flex items-center gap-2 text-xs font-bold text-indigo-300 hover:text-white transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Return to Shard Console
+          <ArrowLeft className="w-4 h-4" /> Return to Toko Console
         </Link>
         <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
           <Lock className="w-3.5 h-3.5 text-emerald-400" /> <span>XENDIT TEST GATEWAY SIMULATOR</span>
@@ -150,7 +150,7 @@ export default async function SimulatedXenditCheckoutPage({
 
           <ul className="space-y-2 text-xs text-slate-300">
             <li className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" /> Immediate unlimited shard deployment
+              <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" /> Immediate unlimited toko deployment
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" /> Synchronized Firestore SLA triggers

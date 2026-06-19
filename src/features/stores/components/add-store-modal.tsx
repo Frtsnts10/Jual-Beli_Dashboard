@@ -52,7 +52,7 @@ export function AddStoreModal({ isOpen, onClose, profileId }: AddStoreModalProps
                 <Sparkles className="w-2.5 h-2.5 animate-spin" /> Provision Gateway
               </div>
               <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight">
-                Create Workspace Shard
+                Create Workspace Toko
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-normal leading-relaxed">
                 Initialize an isolated premium tenant partition mapping streaming inventory pools and dedicated SLA vector blocks.

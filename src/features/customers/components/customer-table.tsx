@@ -396,7 +396,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
 
         <div className="flex items-center gap-3">
           <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
-            {customers.length} Client Shards
+            {customers.length} Client Toko
           </span>
           <Button 
             size="sm" 

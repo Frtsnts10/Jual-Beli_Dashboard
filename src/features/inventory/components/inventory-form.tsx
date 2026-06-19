@@ -81,7 +81,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
     if (res?.error) {
       toast.error(res.error);
     } else {
-      toast.success("Digital resale variant mapped successfully");
+      toast.success("Data inventaris berhasil ditambahkan");
       form.reset();
       setBasePriceStr("");
       setSellingPriceStr("");
@@ -99,10 +99,10 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
       <div>
         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
           <PlusCircle className="w-4 h-4 text-indigo-600" />
-          Add Digital Resale Account Variant
+          Tambah Akun Inventaris Baru
         </h3>
         <p className="text-xs text-slate-500 mt-0.5">
-          Map specific sub-accounts, streaming tiers, credentials, and auto-allocated family pool partitions.
+          Masukkan detail akun, varian tier, kredensial, dan informasi gabungan.
         </p>
       </div>
 
@@ -110,7 +110,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
       <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6">
         <Input
           name="name"
-          labelPlacement="outside" label="Product Name"
+          labelPlacement="outside" label="Nama Produk"
           isRequired
           value={productName}
           onValueChange={(val) => {
@@ -119,14 +119,14 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
             setTierVariant(cfg.defaultTier);
             setTierOptions(cfg.options);
           }}
-          placeholder="e.g. YouTube Premium Family"
+          placeholder="Cth: YouTube Premium Family"
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
-        <Select placeholder="Select tier..."
+        <Select placeholder="Pilih tier..."
           name="profile_tier"
-          labelPlacement="outside" label="Profile Tier Variant"
+          labelPlacement="outside" label="Varian Tier Profil"
           selectedKeys={[tierVariant]}
           onChange={(e) => setTierVariant(e.target.value)}
           variant="bordered"
@@ -139,8 +139,8 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         </Select>
         <Input
           name="profile_name"
-          labelPlacement="outside" label="Profile Designation"
-          placeholder="e.g. Member Slot Alpha"
+          labelPlacement="outside" label="Penanda Profil (Opsional)"
+          placeholder="Cth: Profil Alpha"
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
@@ -153,16 +153,16 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           name="group_name"
           labelPlacement="outside" label={
             <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase">
-              <Users className="w-3 h-3 text-indigo-500" /> Family Pool Group Designation (Optional)
+              <Users className="w-3 h-3 text-indigo-500" /> Nama Grup Gabungan (Opsional)
             </div>
           }
-          placeholder="Leave blank for auto-assignment based on name/duration parameters (Max 5/6 members)"
+          placeholder="Biarkan kosong untuk penugasan otomatis berdasarkan nama/durasi"
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <p className="text-[10px] text-slate-400 mt-1">
-          💡 For family assets (Google, YouTube, Canva), omission triggers smart bucket filling matching active unconstrained groups automatically.
+          💡 Untuk akun keluarga (Google, YouTube, Canva), jika dikosongkan akan otomatis digabungkan dengan grup yang tersedia.
         </p>
       </div>
 
@@ -171,8 +171,8 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         <Input
           type="email"
           name="email"
-          labelPlacement="outside" label="Account Email"
-          placeholder="account@streaming.com"
+          labelPlacement="outside" label="Email Akun"
+          placeholder="akun@streaming.com"
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
@@ -180,7 +180,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         <Input
           type={isVisible ? "text" : "password"}
           name="password"
-          labelPlacement="outside" label="Password"
+          labelPlacement="outside" label="Kata Sandi"
           placeholder="••••••••"
           variant="bordered"
           radius="lg"
@@ -198,8 +198,8 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         <Input
           type="text"
           name="pin"
-          labelPlacement="outside" label="Profile PIN"
-          placeholder="e.g. 1234"
+          labelPlacement="outside" label="PIN Profil"
+          placeholder="Cth: 1234"
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
@@ -212,7 +212,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           <Input
             type="text"
             inputMode="decimal"
-            labelPlacement="outside" label={`Base Price (${currency})`}
+            labelPlacement="outside" label={`Harga Modal (${currency})`}
             value={basePriceStr}
             onValueChange={setBasePriceStr}
             onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)}
@@ -227,7 +227,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           <Input
             type="text"
             inputMode="decimal"
-            labelPlacement="outside" label={`Selling Price (${currency})`}
+            labelPlacement="outside" label={`Harga Jual (${currency})`}
             isRequired
             value={sellingPriceStr}
             onValueChange={setSellingPriceStr}
@@ -242,7 +242,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         <Input
           name="stock"
           type="number"
-          labelPlacement="outside" label="Available Profiles (Stock)"
+          labelPlacement="outside" label="Stok Akun (Profil)"
           defaultValue="1"
           variant="bordered"
           radius="lg"
@@ -254,14 +254,14 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
         <DatePicker
           name="date_buy"
-          labelPlacement="outside" label="Date Buy"
+          labelPlacement="outside" label="Tanggal Beli"
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <DatePicker
           name="date_expired"
-          labelPlacement="outside" label="Date Expired"
+          labelPlacement="outside" label="Tanggal Kedaluwarsa"
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
@@ -276,7 +276,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           radius="lg"
           className="text-xs font-bold shadow-md"
         >
-          {isPending ? "Mapping Variant Payload..." : "Add Digital Inventory Row"}
+          {isPending ? "Menyimpan Data..." : "Simpan Data Inventaris"}
         </Button>
       </div>
     </form>

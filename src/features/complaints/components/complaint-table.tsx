@@ -171,7 +171,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
 
                           <button
                             type="button"
-                            onClick={() => handleSatisfaction(c.id, "Priority Account Support Shard Assigned")}
+                            onClick={() => handleSatisfaction(c.id, "Priority Account Support Toko Assigned")}
                             disabled={isSatisfying}
                             className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
                           >

@@ -348,7 +348,7 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
           radius="lg"
           className="px-5 font-bold shadow-md h-[40px] text-xs"
         >
-          {isPending ? "Connecting Shard..." : "Create Profile & Bind Order"}
+          {isPending ? "Connecting Toko..." : "Create Profile & Bind Order"}
         </Button>
       </div>
     </form>

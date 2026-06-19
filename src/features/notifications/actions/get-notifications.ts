@@ -50,7 +50,7 @@ export async function getNotificationsAction(storeId: string): Promise<Notificat
         items.push({
           id: `inv-${doc.id}`,
           type: "inventory",
-          title: isExpired ? "Inventory Shard Expired!" : "Stock Expiry Warning",
+          title: isExpired ? "Inventory Toko Expired!" : "Stock Expiry Warning",
           message: `Master credential pool "${item.name}" ${item.profile_name ? `(${item.profile_name})` : ""} ${
             isExpired ? `expired ${daysLeft} days ago.` : `expires in ${daysLeft} days.`
           } Ensure subscription renewal to maintain pooled capacity.`,
@@ -78,7 +78,7 @@ export async function getNotificationsAction(storeId: string): Promise<Notificat
           items.push({
             id: `cust-${doc.id}-${index}`,
             type: "customer",
-            title: isExpired ? "Customer Shard Lapsed" : "SLA Stream Extension Countdown",
+            title: isExpired ? "Customer Toko Lapsed" : "SLA Stream Extension Countdown",
             message: `Client "${cust.name}" subscription stream for "${p.product_name}" ${
               isExpired ? `lapsed ${daysLeft} days ago.` : `expires in ${daysLeft} days.`
             } Target for automated n8n WhatsApp trigger loop.`,

@@ -13,7 +13,7 @@ export default function TenantStoreLoadingSkeleton() {
         <div className="flex items-center gap-2">
           <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
           <span className="text-xs font-bold text-slate-400 dark:text-slate-500 animate-pulse hidden sm:inline-block">
-            Resolving Shard Streams...
+            Resolving Toko Streams...
           </span>
         </div>
       </div>

@@ -228,7 +228,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
-            {items.length} Total Inventory Shards
+            {items.length} Total Inventory Toko
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -293,7 +293,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           <div className="space-y-1">
             <p className="text-xs font-extrabold flex items-center gap-1.5 uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
               <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
-              Standard Shard Quota Exceeded (3/3 items allocated)
+              Standard Toko Quota Exceeded (3/3 items allocated)
             </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
               Standard tier workspaces are capped at 3 active digital products. Upgrade to Pro Matrix Level to ingest unlimited SKUs, run bulk CSV imports, and activate automated SLA credentials sync.

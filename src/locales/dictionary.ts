@@ -5,7 +5,7 @@ export const dictionaries = {
       pageSubtitle: "Konfigurasi tanda tangan domain, logo merek, dan parameter mata uang global."
     },
     topbar: {
-      activeShard: "Shard Aktif",
+      activeShard: "Toko Aktif",
       proMember: "Anggota Pro",
       standard: "Standar",
       upgrade: "Tingkatkan",
@@ -24,10 +24,10 @@ export const dictionaries = {
       billing: "Paket Tagihan",
       settings: "Pengaturan",
       status: "Status",
-      liveSync: "Sinkronisasi Shard Langsung",
-      console: "Konsol Shard",
-      activeModules: "Modul Shard Aktif",
-      mobileGateway: "Gerbang Shard Seluler",
+      liveSync: "Sinkronisasi Toko Langsung",
+      console: "Konsol Toko",
+      activeModules: "Modul Toko Aktif",
+      mobileGateway: "Gerbang Toko Seluler",
       telemetry: "Telemetri",
       mobileSession: "Sesi Seluler Aktif"
     },
@@ -90,7 +90,7 @@ export const dictionaries = {
       labelLogoDesc: "Gambar yang diunggah dikompresi secara dinamis melalui buffer kanvas lokal untuk payload WEBP yang optimal.",
       btnChooseGraphic: "Pilih Gambar",
       btnSaveSettings: "Simpan Properti Toko",
-      btnSavingSettings: "Menerapkan Mutasi Shard...",
+      btnSavingSettings: "Menerapkan Mutasi Toko...",
       appearanceTitle: "Preferensi Tampilan Antarmuka",
       appearanceSubtitle: "Konfigurasikan parameter pemetaan warna sistem secara instan. Pilihan memicu sinkronisasi penyimpanan lokal yang persisten secara real-time.",
       themeSystem: "Sistem",
@@ -99,7 +99,7 @@ export const dictionaries = {
       dangerTitle: "Area Penghapusan Bahaya",
       dangerDesc: "Menghapus instans ruang kerja ini secara permanen dari server. Tindakan ini tidak dapat dibatalkan. Semua data terkait akan terhapus selamanya.",
       btnPurge: "Hapus Instans Ruang Kerja",
-      btnPurging: "Menghapus Shard..."
+      btnPurging: "Menghapus Toko..."
     },
     subscription: {
       title: "Manajemen Tagihan & Kuota",
@@ -115,7 +115,7 @@ export const dictionaries = {
       slaTelemetry: "Telemetri Aktif SLA",
       slaDesc: "Kait PostgreSQL tersinkronisasi",
       provisionTitle: "Skala Sumber Daya Penyediaan",
-      provisionDesc: "Tingkatkan shard aktif Anda untuk melewati batas API secara instan",
+      provisionDesc: "Tingkatkan toko aktif Anda untuk melewati batas API secara instan",
       weekly: "Mingguan",
       monthly: "Bulanan",
       yearly: "Tahunan",
@@ -128,7 +128,7 @@ export const dictionaries = {
       standardCoreDesc: "Pengaturan pencatatan data penting untuk ruang kerja bukti konsep sederhana.",
       monthForever: " / bulan selamanya",
       freeFeatures: [
-        "Hingga 3 Toko Shard Aktif",
+        "Hingga 3 Toko Toko Aktif",
         "Aliran penyerapan SKU dasar",
         "Kisi telemetri tingkat lanjut (terkunci)",
         "Sinkronisasi Live Midtrans SLA (terkunci)"
@@ -143,24 +143,24 @@ export const dictionaries = {
       workspaceYear: " / tahun ruang kerja",
       oneTimeLifetime: " / seumur hidup sekali bayar",
       ctaWeekly: "Tingkatkan Mingguan",
-      ctaMonthly: "Tingkatkan Shard Bulanan",
-      ctaYearly: "Tingkatkan Shard Tahunan",
+      ctaMonthly: "Tingkatkan Toko Bulanan",
+      ctaYearly: "Tingkatkan Toko Tahunan",
       ctaLifetime: "Dapatkan Akses Seumur Hidup",
       proFeatures: {
         weekly: [
-          "Toko Shard Tanpa Batas",
+          "Toko Toko Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
           "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas"
         ],
         monthly: [
-          "Toko Shard Tanpa Batas",
+          "Toko Toko Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
           "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas"
         ],
         yearly: [
-          "Toko Shard Tanpa Batas",
+          "Toko Toko Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
           "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas",
@@ -169,7 +169,7 @@ export const dictionaries = {
           "Akses langsung dengan pengembang proyek ini"
         ],
         lifetime: [
-          "Toko Shard Tanpa Batas",
+          "Toko Toko Tanpa Batas",
           "Kisi telemetri @tanstack/react-table canggih",
           "Pengikatan otomatis Midtrans SLA instan",
           "Tindakan siklus SLA Meja Pelanggan Prioritas",
@@ -189,7 +189,7 @@ export const dictionaries = {
       pageSubtitle: "Configure domain signatures, brand logos, and global currency parameters."
     },
     topbar: {
-      activeShard: "Active Shard",
+      activeShard: "Active Toko",
       proMember: "Pro Member",
       standard: "Standard",
       upgrade: "Upgrade",
@@ -208,10 +208,10 @@ export const dictionaries = {
       billing: "Billing Plan",
       settings: "Settings",
       status: "Status",
-      liveSync: "Live Shard Sync",
-      console: "Shard Console",
-      activeModules: "Active Shard Modules",
-      mobileGateway: "Mobile Shard Gateway",
+      liveSync: "Live Toko Sync",
+      console: "Toko Console",
+      activeModules: "Active Toko Modules",
+      mobileGateway: "Mobile Toko Gateway",
       telemetry: "Telemetry",
       mobileSession: "Live Mobile Session"
     },
@@ -226,7 +226,7 @@ export const dictionaries = {
       labelResetPassword: "Reset Account Password",
       placeholderPassword: "Enter new password to update Firebase authentication",
       label2faTitle: "Two-Factor Synchronization (Google Authenticator)",
-      label2faActiveDesc: "Multi-factor authentication is currently active for this workspace shard.",
+      label2faActiveDesc: "Multi-factor authentication is currently active for this workspace toko.",
       label2faInactiveDesc: "Enforce multi-factor authentication (MFA) via Google Authenticator for secure access.",
       btnSetup2fa: "Setup 2FA",
       btnRevoke2fa: "Revoke 2FA",
@@ -274,16 +274,16 @@ export const dictionaries = {
       labelLogoDesc: "Uploaded images compress dynamically via local canvas buffers to optimal lightweight WEBP payloads.",
       btnChooseGraphic: "Choose Graphic",
       btnSaveSettings: "Save Properties Matrix",
-      btnSavingSettings: "Applying Shard Mutations...",
+      btnSavingSettings: "Applying Toko Mutations...",
       appearanceTitle: "Interface Appearance Preferences",
       appearanceSubtitle: "Configure system color mapping parameters instantly. Selections trigger real-time persistent local storage syncing.",
       themeSystem: "System",
       themeLight: "Light",
       themeDark: "Dark",
       dangerTitle: "Danger Deletion Area",
-      dangerDesc: "Instantly drops the active shard pointer and deletes memory footprints irrevocably. Data exports must be captured prior to triggering execution.",
+      dangerDesc: "Instantly drops the active toko pointer and deletes memory footprints irrevocably. Data exports must be captured prior to triggering execution.",
       btnPurge: "Purge Workspace Instance",
-      btnPurging: "Dropping Shard..."
+      btnPurging: "Dropping Toko..."
     },
     subscription: {
       title: "Billing & Quota Management",
@@ -299,7 +299,7 @@ export const dictionaries = {
       slaTelemetry: "SLA Active Telemetry",
       slaDesc: "PostgreSQL hooks synchronized",
       provisionTitle: "Provision Resource Scales",
-      provisionDesc: "Upgrade your active shard to bypass API limits instantly",
+      provisionDesc: "Upgrade your active toko to bypass API limits instantly",
       weekly: "Weekly",
       monthly: "Monthly",
       yearly: "Yearly",
@@ -312,7 +312,7 @@ export const dictionaries = {
       standardCoreDesc: "Essential data logging setup for simple proof-of-concept workspaces.",
       monthForever: " / month forever",
       freeFeatures: [
-        "Up to 3 Active Store Shards",
+        "Up to 3 Active Store Toko",
         "Basic SKU ingestion stream",
         "Advanced telemetry grids (locked)",
         "Live Midtrans SLA Syncing (locked)"
@@ -326,25 +326,25 @@ export const dictionaries = {
       workspaceMonth: " / workspace month",
       workspaceYear: " / workspace year",
       oneTimeLifetime: " / one-time lifetime",
-      ctaWeekly: "Upgrade Weekly Shard",
-      ctaMonthly: "Upgrade Monthly Shard",
-      ctaYearly: "Upgrade Yearly Shard",
+      ctaWeekly: "Upgrade Weekly Toko",
+      ctaMonthly: "Upgrade Monthly Toko",
+      ctaYearly: "Upgrade Yearly Toko",
       ctaLifetime: "Acquire Lifetime Access",
       proFeatures: {
         weekly: [
-          "Unlimited Store Shards",
+          "Unlimited Store Toko",
           "Advanced @tanstack/react-table telemetry grids",
           "Instant Midtrans SLA automatic bindings",
           "Priority Customer Desk SLA cycle actions"
         ],
         monthly: [
-          "Unlimited Store Shards",
+          "Unlimited Store Toko",
           "Advanced @tanstack/react-table telemetry grids",
           "Instant Midtrans SLA automatic bindings",
           "Priority Customer Desk SLA cycle actions"
         ],
         yearly: [
-          "Unlimited Store Shards",
+          "Unlimited Store Toko",
           "Advanced @tanstack/react-table telemetry grids",
           "Instant Midtrans SLA automatic bindings",
           "Priority Customer Desk SLA cycle actions",
@@ -353,7 +353,7 @@ export const dictionaries = {
           "Direct access with developer of this project"
         ],
         lifetime: [
-          "Unlimited Store Shards",
+          "Unlimited Store Toko",
           "Advanced @tanstack/react-table telemetry grids",
           "Instant Midtrans SLA automatic bindings",
           "Priority Customer Desk SLA cycle actions",
@@ -392,8 +392,8 @@ export const dictionaries = {
       settings: "Configuración",
       status: "Estado",
       liveSync: "Sincronización en Vivo",
-      console: "Consola de Shard",
-      activeModules: "Módulos de Shard Activos",
+      console: "Consola de Toko",
+      activeModules: "Módulos de Toko Activos",
       mobileGateway: "Puerta de Enlace Móvil",
       telemetry: "Telemetría",
       mobileSession: "Sesión Móvil en Vivo"
@@ -457,7 +457,7 @@ export const dictionaries = {
       labelLogoDesc: "Las imágenes subidas se comprimen localmente mediante un lienzo para generar archivos WEBP ligeros.",
       btnChooseGraphic: "Elegir Gráfico",
       btnSaveSettings: "Guardar Matriz de Propiedades",
-      btnSavingSettings: "Aplicando Mutaciones de Shard...",
+      btnSavingSettings: "Aplicando Mutaciones de Toko...",
       appearanceTitle: "Preferencias de Apariencia de la Interfaz",
       appearanceSubtitle: "Configure los parámetros de color del sistema de forma instantánea.",
       themeSystem: "Sistema",
@@ -466,7 +466,7 @@ export const dictionaries = {
       dangerTitle: "Área de Eliminación Peligrosa",
       dangerDesc: "Elimina de forma irreversible el espacio de trabajo activo y todos sus registros.",
       btnPurge: "Purgar Instancia de Espacio de Trabajo",
-      btnPurging: "Purgando Shard..."
+      btnPurging: "Purgando Toko..."
     },
     subscription: {
       title: "Gestión de Facturación y Cuotas",
@@ -482,7 +482,7 @@ export const dictionaries = {
       slaTelemetry: "Telemetría Activa SLA",
       slaDesc: "Ganchos de PostgreSQL sincronizados",
       provisionTitle: "Escalas de Aprovisionamiento de Recursos",
-      provisionDesc: "Mejore su shard para omitir los límites de API instantáneamente",
+      provisionDesc: "Mejore su toko para omitir los límites de API instantáneamente",
       weekly: "Semanal",
       monthly: "Mensual",
       yearly: "Anual",
@@ -509,9 +509,9 @@ export const dictionaries = {
       workspaceMonth: " / mes de espacio de trabajo",
       workspaceYear: " / año de espacio de trabajo",
       oneTimeLifetime: " / pago único de por vida",
-      ctaWeekly: "Mejorar Shard Semanal",
-      ctaMonthly: "Mejorar Shard Mensual",
-      ctaYearly: "Mejorar Shard Anual",
+      ctaWeekly: "Mejorar Toko Semanal",
+      ctaMonthly: "Mejorar Toko Mensual",
+      ctaYearly: "Mejorar Toko Anual",
       ctaLifetime: "Obtener Acceso de Por Vida",
       proFeatures: {
         weekly: [
@@ -554,7 +554,7 @@ export const dictionaries = {
       pageSubtitle: "Configurez les signatures de domaine, les logos de marque et les devises globales."
     },
     topbar: {
-      activeShard: "Shard Actif",
+      activeShard: "Toko Actif",
       proMember: "Membre Pro",
       standard: "Standard",
       upgrade: "Mettre à niveau",
@@ -572,10 +572,10 @@ export const dictionaries = {
       billing: "Facturation",
       settings: "Paramètres",
       status: "Statut",
-      liveSync: "Synchro Shard en Direct",
-      console: "Console Shard",
-      activeModules: "Modules Shard Actifs",
-      mobileGateway: "Passerelle Shard Mobile",
+      liveSync: "Synchro Toko en Direct",
+      console: "Console Toko",
+      activeModules: "Modules Toko Actifs",
+      mobileGateway: "Passerelle Toko Mobile",
       telemetry: "Télémétrie",
       mobileSession: "Session Mobile en Direct"
     },
@@ -647,7 +647,7 @@ export const dictionaries = {
       dangerTitle: "Zone de Danger et Suppression",
       dangerDesc: "Supprime définitivement cet espace de travail et toutes ses dépendances.",
       btnPurge: "Supprimer l'Espace de Travail",
-      btnPurging: "Suppression du Shard..."
+      btnPurging: "Suppression du Toko..."
     },
     subscription: {
       title: "Gestion de Facturation & Quotas",
@@ -663,7 +663,7 @@ export const dictionaries = {
       slaTelemetry: "Télémétrie SLA Active",
       slaDesc: "Crochets PostgreSQL synchronisés",
       provisionTitle: "Provisionnement de Ressources",
-      provisionDesc: "Améliorez votre shard actif pour contourner instantanément les limites API",
+      provisionDesc: "Améliorez votre toko actif pour contourner instantanément les limites API",
       weekly: "Hebdomadaire",
       monthly: "Mensuel",
       yearly: "Annuel",
@@ -690,25 +690,25 @@ export const dictionaries = {
       workspaceMonth: " / mois par espace",
       workspaceYear: " / an par espace",
       oneTimeLifetime: " / paiement unique à vie",
-      ctaWeekly: "Améliorer Shard Hebdomadaire",
-      ctaMonthly: "Amélier Shard Mensuel",
-      ctaYearly: "Amélier Shard Annuel",
+      ctaWeekly: "Améliorer Toko Hebdomadaire",
+      ctaMonthly: "Amélier Toko Mensuel",
+      ctaYearly: "Amélier Toko Annuel",
       ctaLifetime: "Obtenir l'Accès à Vie",
       proFeatures: {
         weekly: [
-          "Boutiques Shards Illimitées",
+          "Boutiques Toko Illimitées",
           "Télémétrie @tanstack/react-table avancée",
           "Liaison Midtrans SLA automatique instantanée",
           "Support client prioritaires SLA"
         ],
         monthly: [
-          "Boutiques Shards Illimitées",
+          "Boutiques Toko Illimitées",
           "Télémétrie @tanstack/react-table avancée",
           "Liaison Midtrans SLA automatique instantanée",
           "Support client prioritaires SLA"
         ],
         yearly: [
-          "Boutiques Shards Illimitées",
+          "Boutiques Toko Illimitées",
           "Télémétrie @tanstack/react-table avancée",
           "Liaison Midtrans SLA automatique instantanée",
           "Support client prioritaires SLA",
@@ -716,7 +716,7 @@ export const dictionaries = {
           "Audits annuels de conformité PCI-DSS"
         ],
         lifetime: [
-          "Boutiques Shards Illimitées",
+          "Boutiques Toko Illimitées",
           "Télémétrie @tanstack/react-table avancée",
           "Liaison Midtrans SLA automatique instantanée",
           "Support client prioritaires SLA",
@@ -735,7 +735,7 @@ export const dictionaries = {
       pageSubtitle: "Konfigurieren Sie Domänensignaturen, Markenlogos und globale Währungsparameter."
     },
     topbar: {
-      activeShard: "Aktiver Shard",
+      activeShard: "Aktiver Toko",
       proMember: "Pro-Mitglied",
       standard: "Standard",
       upgrade: "Upgrade",
@@ -753,10 +753,10 @@ export const dictionaries = {
       billing: "Abrechnungsplan",
       settings: "Einstellungen",
       status: "Status",
-      liveSync: "Live Shard Synchronisierung",
-      console: "Shard-Konsole",
-      activeModules: "Aktive Shard-Module",
-      mobileGateway: "Mobiles Shard-Gateway",
+      liveSync: "Live Toko Synchronisierung",
+      console: "Toko-Konsole",
+      activeModules: "Aktive Toko-Module",
+      mobileGateway: "Mobiles Toko-Gateway",
       telemetry: "Telemetrie",
       mobileSession: "Live-Mobile-Sitzung"
     },
@@ -771,7 +771,7 @@ export const dictionaries = {
       labelResetPassword: "Kontopasswort Zurücksetzen",
       placeholderPassword: "Neues Passwort zur Aktualisierung von Firebase eingeben",
       label2faTitle: "Zwei-Faktor-Synchronisierung (Google Authenticator)",
-      label2faActiveDesc: "Die Multi-Faktor-Authentifizierung ist für diesen Shard derzeit aktiv.",
+      label2faActiveDesc: "Die Multi-Faktor-Authentifizierung ist für diesen Toko derzeit aktiv.",
       label2faInactiveDesc: "Erzwingen Sie die Zwei-Faktor-Authentifizierung (MFA) via Google Authenticator.",
       btnSetup2fa: "2FA Einrichten",
       btnRevoke2fa: "2FA Deaktivieren",
@@ -827,9 +827,9 @@ export const dictionaries = {
       themeLight: "Hell",
       themeDark: "Dunkel",
       dangerTitle: "Gefahrenbereich Löschen",
-      dangerDesc: "Löscht den aktiven Shard und alle zugehörigen Daten unwiderruflich.",
+      dangerDesc: "Löscht den aktiven Toko und alle zugehörigen Daten unwiderruflich.",
       btnPurge: "Arbeitsbereich Löschen",
-      btnPurging: "Shard wird gelöscht..."
+      btnPurging: "Toko wird gelöscht..."
     },
     subscription: {
       title: "Abrechnung & Kontingentverwaltung",
@@ -845,7 +845,7 @@ export const dictionaries = {
       slaTelemetry: "SLA Aktive Telemetrie",
       slaDesc: "PostgreSQL-Hooks synchronisiert",
       provisionTitle: "Ressourcenskalierung bereitstellen",
-      provisionDesc: "Aktualisieren Sie Ihren Shard, um API-Limits sofort zu umgehen",
+      provisionDesc: "Aktualisieren Sie Ihren Toko, um API-Limits sofort zu umgehen",
       weekly: "Wöchentlich",
       monthly: "Monatlich",
       yearly: "Jährlich",
@@ -858,7 +858,7 @@ export const dictionaries = {
       standardCoreDesc: "Grundlegende Datenprotokollierung für einfache Konzepterprobungen.",
       monthForever: " / Monat für immer",
       freeFeatures: [
-        "Bis zu 3 aktive Store-Shards",
+        "Bis zu 3 aktive Store-Toko",
         "Basis-SKU-Aufnahmestrom",
         "Erweiterte Telemetriegitter (gesperrt)",
         "Live Midtrans SLA-Synchronisierung (gesperrt)"
@@ -872,25 +872,25 @@ export const dictionaries = {
       workspaceMonth: " / Workspace Monat",
       workspaceYear: " / Workspace Jahr",
       oneTimeLifetime: " / Einmalig Lebenslang",
-      ctaWeekly: "Wöchentliches Shard Upgrade",
-      ctaMonthly: "Monatliches Shard Upgrade",
-      ctaYearly: "Jährliches Shard Upgrade",
+      ctaWeekly: "Wöchentliches Toko Upgrade",
+      ctaMonthly: "Monatliches Toko Upgrade",
+      ctaYearly: "Jährliches Toko Upgrade",
       ctaLifetime: "Lebenslangen Zugriff erwerben",
       proFeatures: {
         weekly: [
-          "Unbegrenzte Store-Shards",
+          "Unbegrenzte Store-Toko",
           "Fortgeschrittene @tanstack/react-table Telemetrie",
           "Sofortige automatische Midtrans SLA-Anbindung",
           "Priorisierter Kundensupport-Schreibtisch"
         ],
         monthly: [
-          "Unbegrenzte Store-Shards",
+          "Unbegrenzte Store-Toko",
           "Fortgeschrittene @tanstack/react-table Telemetrie",
           "Sofortige automatische Midtrans SLA-Anbindung",
           "Priorisierter Kundensupport-Schreibtisch"
         ],
         yearly: [
-          "Unbegrenzte Store-Shards",
+          "Unbegrenzte Store-Toko",
           "Fortgeschrittene @tanstack/react-table Telemetrie",
           "Sofortige automatische Midtrans SLA-Anbindung",
           "Priorisierter Kundensupport-Schreibtisch",
@@ -898,7 +898,7 @@ export const dictionaries = {
           "Jährliche PCI-DSS-Compliance-Audits"
         ],
         lifetime: [
-          "Unbegrenzte Store-Shards",
+          "Unbegrenzte Store-Toko",
           "Fortgeschrittene @tanstack/react-table Telemetrie",
           "Sofortige automatische Midtrans SLA-Anbindung",
           "Priorisierter Kundensupport-Schreibtisch",

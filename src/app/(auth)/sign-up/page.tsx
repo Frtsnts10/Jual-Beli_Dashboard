@@ -14,8 +14,8 @@ export default function NativeSignUpPage() {
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-500 text-white font-bold text-xl mb-4 shadow-lg shadow-violet-500/25">
           ✨
         </div>
-        <h2 className="text-2xl font-black tracking-tight text-white">Create Console Shard</h2>
-        <p className="text-xs text-indigo-300 mt-1 uppercase tracking-widest font-bold">Provision Auth Profile Shard</p>
+        <h2 className="text-2xl font-black tracking-tight text-white">Create Console Toko</h2>
+        <p className="text-xs text-indigo-300 mt-1 uppercase tracking-widest font-bold">Provision Auth Profile Toko</p>
       </div>
 
       <form action={formAction} className="space-y-4">
@@ -86,13 +86,13 @@ export default function NativeSignUpPage() {
           size="lg"
           radius="lg"
         >
-          {isPending ? "Provisioning Shard..." : "Initialize Profile"}
+          {isPending ? "Provisioning Toko..." : "Initialize Profile"}
         </Button>
       </form>
 
       <div className="mt-6 pt-6 border-t border-white/10 text-center">
         <p className="text-xs text-slate-400">
-          Already mapped an authentication shard?{" "}
+          Already mapped an authentication toko?{" "}
           <Link href="/sign-in" className="text-violet-400 font-semibold hover:underline">
             Sign in here
           </Link>
