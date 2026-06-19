@@ -234,12 +234,12 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
         <div className="flex flex-wrap items-center gap-3">
           <Button 
             size="sm" 
-            className="h-[38px] bg-[#242b4d] hover:bg-[#2c345d] text-[#7daaf2] font-bold tracking-wide text-xs px-3"
+            className="h-[38px] bg-[#e2e2f6] hover:bg-[#d0d0ed] text-[#065bce] font-bold tracking-wide text-xs px-3"
             onPress={handleSync}
             isDisabled={isSyncing}
             startContent={<RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />}
           >
-            SINKRONISASI DATA LANGSUNG
+            SYNC
           </Button>
           
           <Button

@@ -412,12 +412,12 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           </span>
           <Button 
             size="sm" 
-            className="h-[38px] bg-[#242b4d] hover:bg-[#2c345d] text-[#7daaf2] font-bold tracking-wide text-xs px-4"
+            className="h-[38px] bg-[#e2e2f6] hover:bg-[#d0d0ed] text-[#065bce] font-bold tracking-wide text-xs px-4"
             onPress={handleSync}
             isDisabled={isSyncing}
             startContent={<RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />}
           >
-            SINKRONISASI DATA LANGSUNG
+            SYNC
           </Button>
           <Button
             onPress={() => setIsCreateModalOpen(true)}
@@ -594,7 +594,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 <div className="flex flex-wrap items-center gap-2 sm:justify-end border-t sm:border-t-0 pt-1.5 sm:pt-0 border-slate-200/40 dark:border-slate-800/40">
                                   <div className="text-right flex sm:flex-col items-center sm:items-end gap-1 sm:gap-0">
                                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                                      Coverage Status
+                                      Status Cakupan
                                     </span>
                                     <span className={`text-[11px] font-black ${isExpired ? "text-red-600 line-through" : "text-emerald-700"}`}>
                                       {expStr}
@@ -605,7 +605,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                       isExpired ? "bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400" : "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-400"
                                     }`}
                                   >
-                                    {isExpired ? "Expired" : "Active"}
+                                    {isExpired ? "Kedaluwarsa" : "Aktif"}
                                   </span>
 
                                   {/* Custom Actions Array for this particular ordered asset segment */}
