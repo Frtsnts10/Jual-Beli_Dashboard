@@ -21,14 +21,14 @@ export function SubscriptionDetailsPanel({ isPremium, tier, planName, activeUnti
           <Crown className="w-4 h-4 text-slate-400" />
           {t.topbar.standard} Status
         </h3>
-        <p className="text-xs text-slate-500">You are currently on the free standard tier. Upgrade to unlock premium features.</p>
+        <p className="text-xs text-slate-500">{t.subscription.freeTierStatus}</p>
       </div>
     );
   }
 
   const formattedDate = activeUntil 
     ? new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(activeUntil))
-    : 'Lifetime / No Expiration';
+    : t.subscription.lifetimeExpiration;
 
   return (
     <div className="p-4 sm:p-6 bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-500/20 rounded-lg shadow-sm font-sans space-y-4">
@@ -43,8 +43,8 @@ export function SubscriptionDetailsPanel({ isPremium, tier, planName, activeUnti
             <Package className="w-3.5 h-3.5 text-indigo-500" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Subscription Plan</p>
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{planName || 'Pro Tier'}</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t.subscription.subscriptionPlanTitle}</p>
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{planName || t.subscription.planNameDefault}</p>
           </div>
         </div>
 
@@ -53,7 +53,7 @@ export function SubscriptionDetailsPanel({ isPremium, tier, planName, activeUnti
             <Calendar className="w-3.5 h-3.5 text-emerald-500" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Until</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t.subscription.activeUntilTitle}</p>
             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{formattedDate}</p>
           </div>
         </div>

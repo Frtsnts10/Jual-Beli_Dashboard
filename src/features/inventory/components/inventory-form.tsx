@@ -81,7 +81,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
     if (res?.error) {
       toast.error(res.error);
     } else {
-      toast.success("Data inventaris berhasil ditambahkan");
+      toast.success("Inventory data added successfully");
       form.reset();
       setBasePriceStr("");
       setSellingPriceStr("");
@@ -99,7 +99,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
       <div>
         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
           <PlusCircle className="w-4 h-4 text-indigo-600" />
-          Tambah Akun Inventaris Baru
+          Add New Inventory Account
         </h3>
         <p className="text-xs text-slate-500 mt-0.5">
           Masukkan detail akun, varian tier, kredensial, dan informasi gabungan.
@@ -227,7 +227,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           <Input
             type="text"
             inputMode="decimal"
-            labelPlacement="outside" label={`Harga Jual (${currency})`}
+            labelPlacement="outside" label={`Selling Price (${currency})`}
             isRequired
             value={sellingPriceStr}
             onValueChange={setSellingPriceStr}
@@ -254,7 +254,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
         <DatePicker
           name="date_buy"
-          labelPlacement="outside" label="Tanggal Beli"
+          labelPlacement="outside" label="Purchase Date"
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
@@ -276,7 +276,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           radius="lg"
           className="text-xs font-bold shadow-md"
         >
-          {isPending ? "Menyimpan Data..." : "Simpan Data Inventaris"}
+          {isPending ? "Saving Data..." : "Save Inventory Data"}
         </Button>
       </div>
     </form>

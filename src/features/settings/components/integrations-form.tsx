@@ -53,6 +53,7 @@ export function IntegrationsForm({
               </label>
               <Input 
                 name="midtrans_server_key"
+                aria-label={t.settings.labelServerKey}
                 defaultValue={initialMidtransServerKey}
                 placeholder="SB-Mid-server-..."
                 type="password"
@@ -69,6 +70,7 @@ export function IntegrationsForm({
               </label>
               <Input 
                 name="midtrans_client_key"
+                aria-label={t.settings.labelClientKey}
                 defaultValue={initialMidtransClientKey}
                 placeholder="SB-Mid-client-..."
                 size="sm"

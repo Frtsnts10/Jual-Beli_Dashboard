@@ -36,8 +36,8 @@ export default function NativeSignInPage() {
       throw new Error(data.stack ? `${data.error}\nStack: ${data.stack}` : data.error || "Failed to create session");
     }
 
-    router.push("/dashboard");
-    router.refresh();
+    // Use hard navigation to guarantee cookies are sent correctly and the cache is bypassed
+    window.location.href = "/dashboard";
   };
 
   const setupRecaptcha = () => {

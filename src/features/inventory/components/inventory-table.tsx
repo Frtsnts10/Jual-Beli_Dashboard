@@ -11,6 +11,7 @@ import { parseDate } from "@internationalized/date";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { EditInventoryModal } from "./edit-inventory-modal";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/hooks/use-i18n";
 
 interface InventoryTableProps {
   storeId: string;
@@ -26,7 +27,7 @@ function CopyableCredential({
   isTiny,
 }: {
   value: string;
-  label: "Email" | "Password" | "PIN";
+  label: string;
   isPassword?: boolean;
   isTiny?: boolean;
 }) {
@@ -65,6 +66,8 @@ function CopyableCredential({
 }
 
 export function InventoryTable({ storeId, items, currency = "IDR", isPremium = false }: InventoryTableProps) {
+  const { t } = useI18n();
+  const d = t.inventory;
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -153,7 +156,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isPremium) {
-      toast.error("Bulk CSV Import is locked under the Standard plan. Upgrade hingga Shop Dashboard Pro hingga activate catalog uploads!");
+      toast.error(d.quotaDesc);
       e.target.value = "";
       return;
     }
@@ -203,17 +206,52 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
     reader.readAsText(file);
   };
 
+  const groupedItems = React.useMemo(() => {
+    const groups: Record<string, {
+      name: string;
+      tier: string;
+      totalStock: number;
+      basePrice: number;
+      sellingPrice: number;
+      items: InventoryItem[];
+    }> = {};
+
+    items.forEach(item => {
+      const key = `${item.name}:::${item.profile_tier || "default"}`;
+      if (!groups[key]) {
+        groups[key] = {
+          name: item.name,
+          tier: item.profile_tier || "",
+          totalStock: 0,
+          basePrice: item.base_price,
+          sellingPrice: Number(item.selling_price || item.price || 0),
+          items: []
+        };
+      }
+      groups[key].items.push(item);
+      groups[key].totalStock += (item.stock || 0);
+    });
+
+    return Object.values(groups);
+  }, [items]);
+
   const itemPerPage = 10;
-  const totalPages = Math.ceil(items.length / itemPerPage);
+  const totalPages = Math.ceil(groupedItems.length / itemPerPage);
   const [currentPage, setCurrentPage] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+
+  const toggleGroup = (key: string) => {
+    setExpandedGroups(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const handlePageChange = (p: number) => {
     setIsTransitioning(true);
     setCurrentPage(p);
     setTimeout(() => setIsTransitioning(false), 150);
   };
   const startIndex = (currentPage - 1) * itemPerPage;
-  const paginatedItems = items.slice(startIndex, startIndex + itemPerPage);
+  const paginatedGroups = groupedItems.slice(startIndex, startIndex + itemPerPage);
   
   const router = useRouter();
   const [isSyncing, setIsSyncing] = useState(false);
@@ -228,7 +266,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
-            {items.length} Total Inventaris Toko
+            {d.total.replace("{count}", items.length.toString())}
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -248,11 +286,11 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             className="font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 h-10 px-4"
             startContent={<FileText className="w-4 h-4" />}
           >
-            Templat
+            {d.template}
           </Button>
 
           <label className="h-10 flex items-center justify-center px-4 font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-sm transition-all gap-2 cursor-pointer">
-            <Upload className="w-4 h-4" /> Impor CSV
+            <Upload className="w-4 h-4" /> {d.importCsv}
             <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
           </label>
 
@@ -262,7 +300,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             className="font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 h-10 px-4"
             startContent={<Download className="w-4 h-4" />}
           >
-            Ekspor
+            {d.export}
           </Button>
 
           <Button
@@ -282,7 +320,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             className="font-bold shadow-md h-10 px-4 ml-auto"
             startContent={<Plus className="w-4 h-4" />}
           >
-            Tambah Baris Inventaris
+            {d.addRow}
           </Button>
         </div>
       </div>
@@ -293,17 +331,17 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           <div className="space-y-1">
             <p className="text-xs font-extrabold flex items-center gap-1.5 uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
               <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
-              Standard Toko Quota Exceeded (3/3 items allocated)
+              {d.quotaExceeded.replace("{count}", "3")}
             </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-              Standard tier workspaces are capped at 3 active digital products. Upgrade hingga Pro Matrix Level hingga ingest unlimited SKUs, run bulk CSV imports, and activate automated SLA credentials sync.
+              {d.quotaDesc}
             </p>
           </div>
           <a
             href={`/${storeId}/subscription`}
             className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-[11px] font-black uppercase tracking-wider rounded-lg shadow-sm transition-all"
           >
-            Upgrade hingga Pro
+            {d.upgradePro}
           </a>
         </div>
       )}
@@ -336,7 +374,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
         }}
         title="Buang Varian Baru"
         description="Apakah Anda yakin ingin menutup formulir ini? Data yang belum disimpan akan hilang permanen."
-        confirmText="Buang"
+        confirmText={d.discardBtn}
       />
 
       {/* Unified Product Inventory Array */}
@@ -346,110 +384,139 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50/80 dark:bg-[#0b0f19]/80 border-b border-slate-100 dark:border-slate-800">
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[140px]">Aset Produk</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Profil</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[150px]">Kredensial</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">Harga</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[130px]">Masa Aktif</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right min-w-[120px]">Aksi</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[140px]">{d.colAsset}</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">{d.colProfile}</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[150px]">{d.colCredential}</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">{d.colPrice}</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[130px]">{d.colActive}</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right min-w-[120px]">{d.colAction}</th>
                 </tr>
               </thead>
               <tbody className={`divide-y divide-slate-50 dark:divide-slate-800/60 transition-all duration-150 ${isTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
-                {paginatedItems.map((item) => {
-                  const isDeleting = deletingId === item.id;
-                  const isUpdating = updatingId === item.id;
+                {paginatedGroups.map((group) => {
+                  const groupKey = `${group.name}:::${group.tier}`;
+                  const isExpanded = expandedGroups[groupKey];
                   return (
-                    <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-extrabold text-slate-900 dark:text-slate-100 text-sm">{item.name}</span>
-                          {item.profile_tier && (
-                            <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] uppercase tracking-wide">
-                              {item.profile_tier}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1.5 mt-1 text-[10px] text-slate-400">
-                          <Shield className="w-3 h-3" />
-                          <span>Stok: {item.stock}</span>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <span className="font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-[11px]">
-                          {item.profile_name || "Belum Ditugaskan"}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3.5 space-y-1.5">
-                        {item.email ? (
-                          <div className="block">
-                            <CopyableCredential value={item.email} label="Email" />
-                          </div>
-                        ) : null}
-                        {item.password ? (
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="text-[10px] text-slate-400 select-none">🔑</span>
-                            <CopyableCredential value={item.password} label="Password" isPassword />
-                            {item.pin && (
-                              <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px]">
-                                PIN: <CopyableCredential value={item.pin} label="PIN" isTiny />
+                    <React.Fragment key={groupKey}>
+                      <tr 
+                        className="hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-colors cursor-pointer bg-slate-50/30 dark:bg-slate-900/20"
+                        onClick={() => toggleGroup(groupKey)}
+                      >
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-2">
+                            <span className="font-extrabold text-slate-900 dark:text-slate-100 text-sm">{group.name}</span>
+                            {group.tier && (
+                              <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-[10px] uppercase tracking-wide">
+                                {group.tier}
                               </span>
                             )}
                           </div>
-                        ) : null}
-                        {!item.email && !item.password && <span className="text-slate-300 italic text-[11px] font-sans">Tidak ada kredensial</span>}
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="text-sm font-black text-emerald-600">
-                            {formatCustomPrice(Number(item.selling_price || item.price || 0))}
-                          </span>
-                          {item.base_price > 0 && (
-                            <span className="text-[10px] line-through text-slate-400">
-                              {formatCustomPrice(Number(item.base_price))} Base
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-1.5 font-bold text-slate-600 dark:text-slate-300 text-xs">
+                            <Package className="w-4 h-4 text-indigo-500" />
+                            {group.totalStock} {d.accounts}
+                          </div>
+                        </td>
+                        <td className="px-5 py-4" colSpan={3}>
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-sm font-black text-emerald-600">
+                              {formatCustomPrice(group.sellingPrice)}
                             </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-5 py-3.5 text-[11px] text-slate-500">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-slate-400" />
-                          <span>Beli: {item.date_buy || "N/A"}</span>
-                        </div>
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <span className="w-3 text-center text-slate-300">↳</span>
-                          <span className="text-red-500 font-medium">Exp: {item.date_expired || "N/A"}</span>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3.5 text-right space-x-1.5">
-                        <Button
-                          isIconOnly
-                          variant="light"
-                          size="sm"
-                          onPress={() => setEditingItem(item)}
-                          isDisabled={isDeleting || isUpdating}
-                          className="h-7 w-7 min-w-0 text-slate-400 data-[hover=true]:text-indigo-600 dark:data-[hover=true]:text-indigo-400 data-[hover=true]:bg-indigo-50 dark:data-[hover=true]:bg-indigo-950/40"
-                          title="Edit item profile parameters"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          isIconOnly
-                          variant="light"
-                          size="sm"
-                          onPress={() => setDeleteConfirmId(item.id)}
-                          isDisabled={isDeleting}
-                          className="h-7 w-7 min-w-0 text-slate-400 data-[hover=true]:text-red-600 dark:data-[hover=true]:text-red-400 data-[hover=true]:bg-red-50 dark:data-[hover=true]:bg-red-950/40"
-                        >
-                          {isDeleting ? <Loader2 className="w-4 h-4 animate-spin text-red-600" /> : <Trash2 className="w-4 h-4" />}
-                        </Button>
-                      </td>
-                    </tr>
+                          </div>
+                        </td>
+                        <td className="px-5 py-4 text-right">
+                          <Button 
+                            size="sm" 
+                            variant="flat" 
+                            className="font-bold text-[10px] h-7"
+                            onPress={() => toggleGroup(groupKey)}
+                          >
+                            {isExpanded ? d.close : d.viewAccounts}
+                          </Button>
+                        </td>
+                      </tr>
+
+                      {isExpanded && group.items.map((item) => {
+                        const isDeleting = deletingId === item.id;
+                        const isUpdating = updatingId === item.id;
+                        return (
+                          <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors border-l-4 border-l-indigo-400 dark:border-l-indigo-600">
+                            <td className="px-5 py-3.5 pl-6">
+                              <div className="flex items-center gap-1.5 mt-1 text-[10px] text-slate-400">
+                                <Shield className="w-3 h-3" />
+                                <span>Stok ID: {item.id.slice(0, 6)}</span>
+                              </div>
+                            </td>
+                            <td className="px-5 py-3.5">
+                              <span className="font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-[11px]">
+                                {item.profile_name || d.unassigned}
+                              </span>
+                            </td>
+                            <td className="px-5 py-3.5 space-y-1.5">
+                              {item.email ? (
+                                <div className="block">
+                                  <CopyableCredential value={item.email} label={d.email} />
+                                </div>
+                              ) : null}
+                              {item.password ? (
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="text-[10px] text-slate-400 select-none">🔑</span>
+                                  <CopyableCredential value={item.password} label={d.password} isPassword />
+                                  {item.pin && (
+                                    <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px]">
+                                      PIN: <CopyableCredential value={item.pin} label={d.pin} isTiny />
+                                    </span>
+                                  )}
+                                </div>
+                              ) : null}
+                              {!item.email && !item.password && <span className="text-slate-300 italic text-[11px] font-sans">{d.noCredential}</span>}
+                            </td>
+                            <td className="px-5 py-3.5">
+                              {/* Empty price col for children as parent shows it, or show if it differs */}
+                            </td>
+                            <td className="px-5 py-3.5 text-[11px] text-slate-500">
+                              <div className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3 text-slate-400" />
+                                <span>{d.buy.replace("{date}", item.date_buy || "N/A")}</span>
+                              </div>
+                              <div className="flex items-center gap-1 mt-0.5">
+                                <span className="w-3 text-center text-slate-300">↳</span>
+                                <span className="text-red-500 font-medium">{d.exp.replace("{date}", item.date_expired || "N/A")}</span>
+                              </div>
+                            </td>
+                            <td className="px-5 py-3.5 text-right space-x-1.5">
+                              <Button
+                                isIconOnly
+                                variant="light"
+                                size="sm"
+                                onPress={() => setEditingItem(item)}
+                                isDisabled={isDeleting || isUpdating}
+                                className="h-7 w-7 min-w-0 text-slate-400 data-[hover=true]:text-indigo-600 dark:data-[hover=true]:text-indigo-400 data-[hover=true]:bg-indigo-50 dark:data-[hover=true]:bg-indigo-950/40"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                isIconOnly
+                                variant="light"
+                                size="sm"
+                                onPress={() => setDeleteConfirmId(item.id)}
+                                isDisabled={isDeleting}
+                                className="h-7 w-7 min-w-0 text-slate-400 data-[hover=true]:text-red-600 dark:data-[hover=true]:text-red-400 data-[hover=true]:bg-red-50 dark:data-[hover=true]:bg-red-950/40"
+                              >
+                                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin text-red-600" /> : <Trash2 className="w-4 h-4" />}
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </React.Fragment>
                   );
                 })}
-                {items.length === 0 && (
+                {groupedItems.length === 0 && (
                   <tr>
                     <td colSpan={6} className="px-5 py-10 text-center text-slate-400 italic">
-                      No products found. Add your first digital inventory row.
+                      {d.noProducts}
                     </td>
                   </tr>
                 )}
@@ -461,9 +528,9 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
                 Menampilkan <strong className="text-slate-700 dark:text-slate-200">{startIndex + 1}</strong> to{" "}
                 <strong className="text-slate-700 dark:text-slate-200">
-                  {Math.min(startIndex + itemPerPage, items.length)}
+                  {Math.min(startIndex + itemPerPage, groupedItems.length)}
                 </strong>{" "}
-                dari <strong className="text-slate-700 dark:text-slate-200">{items.length}</strong> item
+                dari <strong className="text-slate-700 dark:text-slate-200">{groupedItems.length}</strong> grup
               </span>
               <div className="flex items-center gap-1">
                 <Button
@@ -516,9 +583,9 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
         isOpen={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
         onConfirm={confirmDelete}
-        title="Delete Inventory Variant"
-        description="Are you sure you want hingga permanently delete this inventory asset? This action cannot be undone."
-        confirmText="Purge Variant"
+        title={d.delTitle}
+        description={d.delDesc}
+        confirmText={d.purge}
         danger
       />
     </div>

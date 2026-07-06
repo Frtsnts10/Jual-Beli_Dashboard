@@ -93,7 +93,7 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
       <div>
         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
           <UserPlus className="w-4 h-4 text-indigo-600" />
-          Daftarkan Pelanggan & Varian Pesanan
+          Register Customer & Order Variant
         </h3>
         <p className="text-xs text-slate-500 mt-0.5">
           Sediakan profil pembeli beserta aliran produk tersemat dan pemetaan durasi otomatis.

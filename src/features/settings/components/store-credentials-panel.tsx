@@ -33,6 +33,7 @@ export function StoreCredentialsPanel({ storeId }: { storeId: string }) {
           </label>
           <Input 
             readOnly
+            aria-label={t.settings.labelWorkspaceId}
             value={storeId}
             size="sm"
             classNames={{
@@ -57,6 +58,7 @@ export function StoreCredentialsPanel({ storeId }: { storeId: string }) {
           </label>
           <Input 
             readOnly
+            aria-label={t.settings.labelPublicKey}
             value={t.settings.comingSoon}
             size="sm"
             classNames={{

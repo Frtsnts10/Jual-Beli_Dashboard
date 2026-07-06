@@ -46,10 +46,10 @@ export function SubscriptionClientPage({
     }
   }, [showSuccess, router]);
 
-  const handleUpgrade = async (tier: "plus" | "pro") => {
+  const handleUpgrade = async () => {
     setIsPending(true);
     const returnUrl = typeof window !== "undefined" ? window.location.href : "";
-    const res = await createCheckoutSessionAction(storeId, returnUrl, billingInterval, tier);
+    const res = await createCheckoutSessionAction(storeId, returnUrl, billingInterval, "pro");
     if (res?.url) {
       window.location.href = res.url;
     } else {
@@ -77,40 +77,83 @@ export function SubscriptionClientPage({
     }).format(usdAmount);
   };
 
+  // Pricing structure matching homepage exactly
   const pricingData = {
     weekly: {
-      standard: { price: formatPrice(4.99), suffix: t.subscription.workspaceWeek, cta: t.subscription.ctaWeekly, badge: "Standard Premium", features: t.subscription.proFeatures.weekly.slice(0, 2) },
-      pro: { price: formatPrice(9), suffix: t.subscription.workspaceWeek, cta: t.subscription.ctaWeekly, badge: "Premium Enterprise", features: t.subscription.proFeatures.weekly }
+      price: formatPrice(9),
+      suffix: "/wk",
+      label: "Pro Weekly",
+      desc: t.subscription.proFeatures ? "Short-term power for digital empires." : "",
+      features: [
+        "Unlimited Store Workspaces",
+        "Unlimited Credential Storage",
+        "Automated WhatsApp Delivery (n8n)",
+      ],
     },
     monthly: {
-      standard: { price: formatPrice(14.99), suffix: t.subscription.workspaceMonth, cta: t.subscription.ctaMonthly, badge: "Standard Premium", features: t.subscription.proFeatures.monthly.slice(0, 2) },
-      pro: { price: formatPrice(29), suffix: t.subscription.workspaceMonth, cta: t.subscription.ctaMonthly, badge: "Premium Enterprise", features: t.subscription.proFeatures.monthly }
+      price: formatPrice(29),
+      suffix: "/mo",
+      label: "Pro Monthly",
+      desc: "Unlimited power for digital empires.",
+      mostPopular: true,
+      features: [
+        "Unlimited Store Workspaces",
+        "Unlimited Credential Storage",
+        "Automated WhatsApp Delivery (n8n)",
+        "Smart Family Pool Automation",
+      ],
     },
     yearly: {
-      standard: { price: formatPrice(29.99), suffix: t.subscription.workspaceYear, cta: t.subscription.ctaYearly, badge: "Standard Premium", features: t.subscription.proFeatures.yearly.slice(0, 3) },
-      pro: { price: formatPrice(59), suffix: t.subscription.workspaceYear, cta: t.subscription.ctaYearly, badge: "Premium Enterprise", features: t.subscription.proFeatures.yearly }
+      price: formatPrice(59),
+      suffix: "/yr",
+      label: "Pro Yearly",
+      desc: "Save 30% on annual billing.",
+      features: [
+        "Unlimited Store Workspaces",
+        "Unlimited Credential Storage",
+        "Automated WhatsApp Delivery (n8n)",
+        "Smart Family Pool Automation",
+        "Cross-Tenant Analytics Engine",
+        "Priority Support Access",
+      ],
     },
     lifetime: {
-      standard: { price: formatPrice(49.99), suffix: t.subscription.oneTimeLifetime, cta: t.subscription.ctaLifetime, badge: "Standard Premium", features: t.subscription.proFeatures.lifetime.slice(0, 4) },
-      pro: { price: formatPrice(99), suffix: t.subscription.oneTimeLifetime, cta: t.subscription.ctaLifetime, badge: "Premium Enterprise", features: t.subscription.proFeatures.lifetime }
-    }
+      price: formatPrice(99),
+      suffix: " once",
+      label: "Pro Lifetime",
+      desc: "Pay once, own forever.",
+      features: [
+        "Unlimited Store Workspaces",
+        "Unlimited Credential Storage",
+        "Automated WhatsApp Delivery (n8n)",
+        "Smart Family Pool Automation",
+        "Cross-Tenant Analytics Engine",
+        "Priority Support Access",
+        "Lifetime Core Updates",
+        "No recurring subscription",
+      ],
+    },
   };
 
-  const currentPricing = pricingData[billingInterval];
+  const freeFeatures = [
+    "Up to 1 Store Workspace",
+    "Store up to 100 Credentials",
+    "Basic Stock & Expiry Tracking",
+    "Copy-to-Clipboard Features",
+  ];
 
-  const isActiveInterval = isSubscribed && (
+  const currentPlan = pricingData[billingInterval];
+
+  const isProActive = isSubscribed && (
     (billingInterval === "weekly" && plan.toLowerCase().includes("week")) ||
     (billingInterval === "monthly" && plan.toLowerCase().includes("month")) ||
     (billingInterval === "yearly" && plan.toLowerCase().includes("year")) ||
-    (billingInterval === "lifetime" && !plan.toLowerCase().includes("week") && !plan.toLowerCase().includes("month") && !plan.toLowerCase().includes("year"))
+    (billingInterval === "lifetime" && !plan.toLowerCase().includes("week") && !plan.toLowerCase().includes("month") && !plan.toLowerCase().includes("year") && plan !== "free")
   );
-
-  const isPlusActive = isActiveInterval && tier === "plus";
-  const isProActive = isActiveInterval && tier === "pro";
 
   return (
     <div className="space-y-4 font-sans pb-4 animate-in fade-in duration-300">
-      {/* Page Header (No local switcher - clean settings bind) */}
+      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 dark:border-slate-800/80 pb-3 transition-colors">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">{t.subscription.title}</h2>
@@ -146,7 +189,7 @@ export function SubscriptionClientPage({
             </span>
           </div>
           <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 capitalize flex items-center gap-2">
-            {plan === "free" ? t.subscription.standardCoreTitle : plan === "Shop Dashboard Pro (Monthly)" || plan === "Shop Dashboard Pro (Yearly)" || plan === "Shop Dashboard Pro (Lifetime)" || plan === "Shop Dashboard Pro" ? t.subscription.proTitle : plan} {t.subscription.matrixLevel}
+            {plan === "free" ? "Standard (Free)" : plan} 
             {isSubscribed && <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />}
           </h3>
           {currentPeriodEnd ? (
@@ -174,15 +217,15 @@ export function SubscriptionClientPage({
         </div>
       </div>
 
-      {/* Pricing and interval selector section */}
+      {/* Pricing Section — Matching Homepage */}
       <div className="pt-2">
         <div className="text-center mb-6">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t.subscription.provisionTitle}</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t.subscription.provisionDesc}</p>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Simple, Scalable Plans</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Choose the perfect tier for your commerce operations.</p>
         </div>
 
         <div className="w-full">
-          {/* Dynamic Pills Interval Selector Toggle */}
+          {/* Interval Selector Tabs */}
           <div className="flex justify-center mb-8">
             <div className="bg-slate-100 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800/80 p-1.5 rounded-lg flex gap-1 shadow-sm relative transition-all">
               <button
@@ -234,131 +277,84 @@ export function SubscriptionClientPage({
             </div>
           </div>
 
-          {/* <div className="flex justify-center mb-8">
-            <button
-              onClick={() => {
-                setBillingInterval("monthly");
-                handleUpgrade("test" as any);
-              }}
-              disabled={isPending}
-              className="px-6 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 transition-colors shadow-sm disabled:opacity-50"
-            >
-              {isPending ? "Connecting..." : "Simulate Test Payment (Rp1)"}
-            </button>
-          </div> */}
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Free tier card */}
-            <div className="h-full px-6 py-5 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/80 dark:border-slate-800/80 shadow-sm flex flex-col justify-between opacity-90 relative transition-colors">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* Standard (Free) Card */}
+            <div className="h-full px-6 py-5 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/80 dark:border-slate-800/80 shadow-sm flex flex-col justify-between relative transition-colors">
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{t.subscription.baseTier}</span>
-                  <span className="text-[10px] bg-slate-100 dark:bg-[#0b0f19] text-slate-600 dark:text-slate-400 px-2.5 py-0.5 rounded-lg font-bold transition-colors">
-                    {t.subscription.defaultActive}
-                  </span>
+                <div className="mb-4">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest mb-3">
+                    <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    Standard
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">{t.subscription.standardCoreTitle}</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
-                  {t.subscription.standardCoreDesc}
+                <h3 className="text-3xl font-black text-slate-900 dark:text-slate-100 mb-1">Free</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+                  Perfect for single-store operations starting out.
                 </p>
-                <div className="mb-3">
-                  <span className="text-4xl font-black text-slate-900 dark:text-slate-100">{formatPrice(0)}</span>
-                  <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">{t.subscription.monthForever}</span>
-                </div>
-                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                  {t.subscription.freeFeatures.map((feature, i) => (
-                    <li key={i} className={`flex items-center gap-2.5 ${i >= 2 ? "text-slate-300 dark:text-slate-700 line-through" : ""}`}>
-                      <Check className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-300 font-medium">
+                  {freeFeatures.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 transition-colors">
+              <div className="pt-4 mt-6 border-t border-slate-100 dark:border-slate-800 transition-colors">
                 <button
                   disabled
-                  className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-xs font-bold rounded-lg text-center transition-colors"
+                  className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold rounded-xl text-center transition-colors"
                 >
-                  {isSubscribed ? t.subscription.includedInPackage : t.subscription.activeCoreBound}
+                  {isSubscribed ? t.subscription.includedInPackage : "Get Started Free"}
                 </button>
               </div>
             </div>
 
-            {/* Standard Premium tier card */}
-            <div className="h-full px-6 py-5 bg-white dark:bg-[#0d1322] rounded-lg border-2 border-indigo-500/20 shadow-md flex flex-col justify-between relative transition-colors">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider">{(t.subscription as any).standardPremium || "Standard Premium"}</span>
-                  <span className="text-[10px] bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 px-2.5 py-0.5 rounded-lg font-bold transition-colors">
-                    {currentPricing.standard.badge}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">Shop Dashboard Plus</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
-                  {(t.subscription as any).standardPremiumDesc || "Advanced tools for growing teams and automated syncs."}
-                </p>
-                <div className="mb-3">
-                  <span className="text-4xl font-black text-slate-900 dark:text-slate-100">{currentPricing.standard.price}</span>
-                  <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">{currentPricing.standard.suffix}</span>
-                </div>
-                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                  {currentPricing.standard.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2.5">
-                      <Zap className="w-4 h-4 text-indigo-400 shrink-0 fill-indigo-100 dark:fill-indigo-950" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 transition-colors">
-                <button
-                  onClick={() => handleUpgrade("plus")}
-                  disabled={isPending || isPlusActive}
-                  className="w-full py-2.5 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-lg text-center transition-colors disabled:opacity-50 cursor-pointer"
-                >
-                  {isPending ? t.subscription.connecting : isPlusActive ? "Current Active Package" : currentPricing.standard.cta}
-                </button>
-              </div>
-            </div>
-
-            {/* Pro tier card */}
+            {/* Pro Card — Dynamic based on interval */}
             <div className="h-full px-6 py-5 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 rounded-lg border border-indigo-500/30 shadow-2xl flex flex-col justify-between relative overflow-hidden text-white transition-colors">
               {/* Glow orb */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute top-0 right-0 p-3">
+                <Sparkles className="w-16 h-16 text-indigo-500/10" />
+              </div>
 
               <div className="relative z-10">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
-                    <Sparkles className="w-3.5 h-3.5" /> {t.subscription.premiumEnterprise}
-                  </span>
-                  <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2.5 py-0.5 rounded-lg font-bold">
-                    {currentPricing.pro.badge}
-                  </span>
+                <div className="mb-4">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-3">
+                    <Sparkles className="w-3 h-3 text-indigo-400" />
+                    {currentPlan.label}
+                  </div>
+                  {"mostPopular" in currentPlan && currentPlan.mostPopular && (
+                    <span className="ml-2 px-2 py-0.5 bg-indigo-500 text-white text-[9px] font-bold uppercase tracking-widest rounded-md">
+                      Most Popular
+                    </span>
+                  )}
                 </div>
-                <h3 className="text-xl font-bold text-white mb-1">{t.subscription.proTitle}</h3>
-                <p className="text-xs text-indigo-200/70 mb-3 leading-relaxed">
-                  {t.subscription.proDesc}
+                <div className="mb-2 animate-in fade-in zoom-in-95 duration-200">
+                  <span className="text-4xl font-black text-white">{currentPlan.price}</span>
+                  <span className="text-base text-indigo-300/80 font-bold">{currentPlan.suffix}</span>
+                </div>
+                <p className="text-xs text-indigo-200/70 mb-4 leading-relaxed">
+                  {currentPlan.desc}
                 </p>
-                <div className="mb-3 animate-in fade-in zoom-in-95 duration-200">
-                  <span className="text-4xl font-black text-white">{currentPricing.pro.price}</span>
-                  <span className="text-xs text-indigo-300/80 font-bold">{currentPricing.pro.suffix}</span>
-                </div>
-                <ul className="space-y-2 text-xs text-indigo-100/90 font-medium">
-                  {currentPricing.pro.features.map((feature, i) => (
+                <ul className="space-y-3 text-sm text-indigo-100/90 font-medium">
+                  {currentPlan.features.map((feature, i) => (
                     <li key={i} className="flex items-center gap-2.5 animate-in slide-in-from-left-2 duration-200" style={{ animationDelay: `${i * 40}ms` }}>
-                      <Zap className="w-4 h-4 text-indigo-400 shrink-0 fill-indigo-400 animate-pulse" />
-                      <span>{feature}</span>
+                      <CheckCircle2 className={`w-4.5 h-4.5 shrink-0 ${billingInterval === "lifetime" ? "text-amber-400" : "text-indigo-400"}`} />
+                      <span className={feature.startsWith("Everything") || feature === "Priority Support Access" ? "text-white font-semibold" : ""}>
+                        {feature}
+                      </span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="pt-4 mt-4 border-t border-white/10 relative z-10">
+              <div className="pt-4 mt-6 border-t border-white/10 relative z-10">
                 <button
-                  onClick={() => handleUpgrade("pro")}
+                  onClick={handleUpgrade}
                   disabled={isPending || isProActive}
-                  className="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 active:scale-95 text-white text-xs font-bold rounded-lg text-center shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 active:scale-95 text-white text-xs font-bold rounded-xl text-center shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  {isPending ? t.subscription.connecting : isProActive ? "Current Active Package" : currentPricing.pro.cta}
+                  {isPending ? t.subscription.connecting : isProActive ? "Current Active Package" : `Upgrade to ${billingInterval.charAt(0).toUpperCase() + billingInterval.slice(1)}`}
                 </button>
               </div>
             </div>

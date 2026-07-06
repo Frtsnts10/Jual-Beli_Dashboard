@@ -14,7 +14,8 @@ import {
   X,
   GitPullRequest,
   MonitorPlay,
-  UserCog
+  UserCog,
+  Wallet
 } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
 
@@ -44,15 +45,15 @@ export function DashboardNav() {
     { name: t.sidebar.overview, href: `/${storeId}/dashboard`, icon: LayoutDashboard },
     { name: t.sidebar.orders, href: `/${storeId}/orders`, icon: ShoppingCart },
     { name: t.sidebar.inventory, href: `/${storeId}/inventory`, icon: Package },
-    { name: (t.sidebar as any).approvals || "Approvals Desk", href: `/${storeId}/approvals`, icon: GitPullRequest },
     { name: t.sidebar.customers, href: `/${storeId}/customers`, icon: Users },
+    { name: t.payouts.title, href: `/${storeId}/payouts`, icon: Wallet },
     { name: t.sidebar.complaints, href: `/${storeId}/complaints`, icon: MessageSquareWarning },
   ];
 
   const settingsRoutes = [
     { name: t.sidebar.billing, href: `/${storeId}/subscription`, icon: CreditCard },
-    { name: "Store Settings", href: `/${storeId}/settings`, icon: Settings },
-    { name: "User Profile", href: `/${storeId}/profile`, icon: UserCog },
+    { name: t.sidebar.settings, href: `/${storeId}/settings`, icon: Settings },
+    { name: t.profile.profileTitle ? t.profile.profileTitle.split(" ").slice(0, 2).join(" ") : "User Profile", href: `/${storeId}/profile`, icon: UserCog },
   ];
 
   return (
@@ -97,7 +98,7 @@ export function DashboardNav() {
 
           <div className="mt-8 mb-4 px-3">
             <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
-              Settings & Identity
+              {t.sidebar.settings}
             </p>
           </div>
 

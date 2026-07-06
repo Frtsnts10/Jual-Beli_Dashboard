@@ -11,6 +11,7 @@ import { EditProfileForm } from "@/features/auth/components/edit-profile-form";
 import { AppearanceSettingsPanel } from "@/features/settings/components/appearance-settings-panel";
 import { MfaEnrollment } from "@/features/auth/components/mfa-enrollment";
 import { SubscriptionDetailsPanel } from "@/features/subscription/components/subscription-details-panel";
+import { ProfileHeader } from "@/features/auth/components/profile-header";
 
 export default async function UserProfilePage({
   params,
@@ -38,10 +39,7 @@ export default async function UserProfilePage({
 
   return (
     <div className="space-y-6 font-sans max-w-full pb-12">
-      <div className="pb-6 border-b border-slate-200 dark:border-slate-800">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Profil Pengguna</h1>
-        <p className="text-sm text-slate-500 mt-1">Kelola pengaturan dan preferensi akun pribadi Anda.</p>
-      </div>
+      <ProfileHeader />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch pt-2">
         <div className="flex flex-col gap-6 h-full">

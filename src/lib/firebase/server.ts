@@ -6,7 +6,7 @@ import { cookies } from 'next/headers';
 function formatPrivateKey(key?: string) {
   if (!key) return undefined;
   
-  let cleaned = key.replace(/\\n/g, '\n').replace(/"/g, '').replace(/'/g, '');
+  const cleaned = key.replace(/\\n/g, '\n').replace(/"/g, '').replace(/'/g, '');
   
   const header = '-----BEGIN PRIVATE KEY-----';
   const footer = '-----END PRIVATE KEY-----';
@@ -39,6 +39,7 @@ export const adminDb = new Proxy(
   {
     get(_target, prop) {
       const db = getFirestore(getAdminApp());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (db as any)[prop];
     },
   }
@@ -49,6 +50,7 @@ export const adminAuth = new Proxy(
   {
     get(_target, prop) {
       const auth = getAuth(getAdminApp());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (auth as any)[prop];
     },
   }
@@ -66,7 +68,8 @@ export async function getAuthenticatedUser() {
 
     const decoded = await adminAuth.verifySessionCookie(session, true);
     return decoded;
-  } catch {
+  } catch (err: unknown) {
+    console.error("verifySessionCookie failed:", err);
     return null;
   }
 }

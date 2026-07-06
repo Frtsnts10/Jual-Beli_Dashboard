@@ -142,18 +142,18 @@ export function EditProfileForm({
 
           <div className="grid grid-cols-1 gap-4 pt-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              Workspace Role
+              {t.profile.labelWorkspaceRole}
             </label>
             <select
               name="role"
               defaultValue={initialRole}
               className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg h-10 px-3 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-indigo-500"
             >
-              <option value="admin">Administrator (Akses Tulis Langsung)</option>
-              <option value="staff">Staff Member (Draft / PR Approvals Only)</option>
+              <option value="admin">{t.profile.roleAdmin}</option>
+              <option value="staff">{t.profile.roleStaff}</option>
             </select>
             <p className="text-[10px] text-slate-500">
-              Untuk tujuan pengujian, Anda dapat mengubah peran Anda. Staf akan merutekan pengeditan melalui Alur Kerja Persetujuan Data (Sistem Penyusunan).
+              {t.profile.roleDisclaimer}
             </p>
           </div>
           <div className="grid grid-cols-1 gap-4 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
@@ -161,12 +161,12 @@ export function EditProfileForm({
             <div className="space-y-3">
             <div className="space-y-1.5">
               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Current Password
+                {t.profile.labelCurrentPassword}
               </label>
               <Input
                 type={showPassword ? "text" : "password"}
                 name="currentPassword"
-                placeholder="Diperlukan untuk mengatur kata sandi baru"
+                placeholder={t.profile.placeholderCurrentPassword}
                 value={currentPassword}
                 onValueChange={setCurrentPassword}
                 startContent={<Key className="w-3.5 h-3.5 text-slate-400" />}
@@ -190,12 +190,12 @@ export function EditProfileForm({
 
             <div className="space-y-1.5">
               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                New Password
+                {t.profile.labelNewPassword}
               </label>
               <Input
                 type={showPassword ? "text" : "password"}
                 name="newPassword"
-                placeholder="Biarkan kosong untuk mempertahankan saat ini"
+                placeholder={t.profile.placeholderNewPassword}
                 value={newPassword}
                 onValueChange={setNewPassword}
                 startContent={<Lock className="w-3.5 h-3.5 text-slate-400" />}
@@ -211,9 +211,9 @@ export function EditProfileForm({
               {newPassword && (
                 <div className="space-y-1.5 px-1">
                   <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-wider">
-                    <span className="text-slate-500">Strength</span>
+                    <span className="text-slate-500">{t.profile.passwordStrength}</span>
                     <span className={strength < 50 ? "text-rose-500" : strength < 75 ? "text-amber-500" : "text-emerald-500"}>
-                      {strength < 50 ? "Weak" : strength < 75 ? "Good" : "Strong"}
+                      {strength < 50 ? t.profile.passwordWeak : strength < 75 ? t.profile.passwordGood : t.profile.passwordStrong}
                     </span>
                   </div>
                   <div className="h-1 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -227,16 +227,16 @@ export function EditProfileForm({
 
             <div className="space-y-1.5">
               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Confirm Password
+                {t.profile.labelConfirmPassword}
               </label>
               <Input
                 type={showPassword ? "text" : "password"}
-                placeholder="Ketik ulang kata sandi baru"
+                placeholder={t.profile.placeholderConfirmPassword}
                 value={confirmPassword}
                 onValueChange={setConfirmPassword}
                 startContent={<CheckCircle className="w-3.5 h-3.5 text-slate-400" />}
                 isInvalid={confirmPassword.length > 0 && !passwordsMatch}
-                errorMessage={confirmPassword.length > 0 && !passwordsMatch ? "Passwords do not match" : undefined}
+                errorMessage={confirmPassword.length > 0 && !passwordsMatch ? t.profile.passwordMismatch : undefined}
                 variant="faded"
                 radius="lg"
                 classNames={{

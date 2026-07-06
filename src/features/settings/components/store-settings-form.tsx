@@ -125,6 +125,7 @@ export function StoreProfileForm({
           </label>
           <Input
             name="name"
+            aria-label={t.settings.labelWorkspaceName}
             isRequired
             defaultValue={initialName}
             radius="lg"
@@ -141,6 +142,7 @@ export function StoreProfileForm({
           </label>
           <Input
             name="email"
+            aria-label={t.settings.labelStoreEmail}
             type="email"
             defaultValue={initialEmail}
             radius="lg"
@@ -156,6 +158,7 @@ export function StoreProfileForm({
             {t.settings.labelWhatsapp}
           </label>
           <PhoneInput
+            aria-label={t.settings.labelWhatsapp}
             label=""
             value={whatsapp}
             onChange={setWhatsapp}
@@ -175,6 +178,7 @@ export function StoreProfileForm({
           </label>
           <Input
             name="instagram"
+            aria-label={t.settings.labelInstagram}
             defaultValue={initialInstagram.replace(/^@/, '')}
             radius="lg"
             startContent={<span className="text-slate-500 text-xs font-bold select-none pr-0.5">@</span>}
@@ -191,6 +195,7 @@ export function StoreProfileForm({
           </label>
           <textarea
             name="bio"
+            aria-label={t.settings.labelStoreBio || "Store Bio / Description"}
             defaultValue={initialBio}
             placeholder="Tell your customers about your store..."
             className="w-full min-h-[80px] bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-none rounded-lg p-3 text-xs font-bold text-slate-800 dark:text-slate-100 resize-y"

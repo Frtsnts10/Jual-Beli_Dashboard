@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb, getAuthenticatedUser } from "@/lib/firebase/server";
+import { adminDb } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 
 export interface Store {
@@ -76,7 +76,10 @@ export async function createStoreAction(profileId: string, formData: FormData) {
 
     revalidatePath("/", "layout");
     return { data: storeData };
-  } catch (err: any) {
-    return { error: err.message || "Failed to provision workspace partition." };
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return { error: err.message || "Failed to provision workspace partition." };
+    }
+    return { error: "Failed to provision workspace partition." };
   }
 }

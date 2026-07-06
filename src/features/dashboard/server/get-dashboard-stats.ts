@@ -3,17 +3,19 @@
 import { adminDb } from "@/lib/firebase/server";
 
 export async function getDashboardStats(storeId: string) {
-  const [storeSnap, invSnap, custSnap, compSnap] = await Promise.all([
+  const [storeSnap, invSnap, custSnap, compSnap, ordSnap] = await Promise.all([
     adminDb.collection("stores").doc(storeId).get(),
     adminDb.collection("inventory").where("store_id", "==", storeId).get(),
     adminDb.collection("customers").where("store_id", "==", storeId).get(),
     adminDb.collection("complaints").where("store_id", "==", storeId).get(),
+    adminDb.collection("orders").where("store_id", "==", storeId).get(),
   ]);
 
   const currency = storeSnap.data()?.currency || "IDR";
   const inventory = invSnap.docs.map(d => d.data());
   const customers = custSnap.docs.map(d => d.data());
   const complaints = compSnap.docs.map(d => d.data());
+  const orders = ordSnap.docs.map(d => d.data());
 
   const totalProducts = inventory.length;
   const totalStock = inventory.reduce((acc, item) => acc + (item.stock || 0), 0);
@@ -23,12 +25,34 @@ export async function getDashboardStats(storeId: string) {
   const totalRefunds = complaints.filter((c) => c.satisfaction_outcome && c.satisfaction_outcome.toLowerCase().includes("refund")).length;
   const resolvedComplaints = complaints.filter((c) => c.status === "resolved").length;
 
+  const nowMs = Date.now();
+  const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+  
   let activeStreams = 0;
   let expiringSoonStreams = 0;
   let expiredStreams = 0;
 
-  const nowMs = Date.now();
-  const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const thisMonthStart = new Date();
+  thisMonthStart.setDate(1);
+  thisMonthStart.setHours(0, 0, 0, 0);
+
+  let todayRevenue = 0;
+  let thisMonthRevenue = 0;
+
+  orders.forEach((o) => {
+    if (o.payment_status === "paid") {
+      const orderDate = new Date(o.created_at);
+      const amount = Number(o.total_amount || 0);
+      if (orderDate >= thisMonthStart) {
+        thisMonthRevenue += amount;
+      }
+      if (orderDate >= todayStart) {
+        todayRevenue += amount;
+      }
+    }
+  });
 
   inventory.forEach((item) => {
     if (!item.date_expired) return;
@@ -120,6 +144,8 @@ export async function getDashboardStats(storeId: string) {
     totalValue,
     totalCustomers: customers.length,
     totalOrders,
+    todayRevenue,
+    thisMonthRevenue,
     activeComplaints,
     totalRefunds,
     resolvedComplaints,

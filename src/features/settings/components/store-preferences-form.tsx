@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Select, SelectItem, Button } from "@heroui/react";
 import { Save, Globe } from "lucide-react";
 import { updateStoreSettingsAction } from "../actions/settings-actions";
@@ -20,8 +20,7 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
   const { t, changeLanguage, lang } = useI18n();
   const [selectedLang, setSelectedLang] = useState<string>(lang);
 
-  // Sync selectedLang when lang updates from useI18n
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedLang(lang);
   }, [lang]);
 
@@ -77,6 +76,7 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
             <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelGlobalCurrency}
           </label>
           <Select
+            aria-label={t.settings.labelGlobalCurrency}
             selectedKeys={new Set([currency])}
             onChange={(e) => setCurrency(e.target.value)}
             radius="lg"
@@ -98,6 +98,7 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
             <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelLanguage}
           </label>
           <Select
+            aria-label={t.settings.labelLanguage}
             selectedKeys={new Set([selectedLang])}
             onChange={(e) => setSelectedLang(e.target.value)}
             radius="lg"

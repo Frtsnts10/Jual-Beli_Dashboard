@@ -12,6 +12,7 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { EditCustomerModal } from "./edit-customer-modal";
 import { StreamActionModal } from "./stream-action-modal";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/hooks/use-i18n";
 
 interface CustomerTableProps {
   storeId: string;
@@ -20,6 +21,8 @@ interface CustomerTableProps {
 }
 
 export function CustomerTable({ storeId, customers, inventoryItems = [] }: CustomerTableProps) {
+  const { t } = useI18n();
+  const d = t.customers;
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [appendingId, setAppendingId] = useState<string | null>(null);
   const [activeFormId, setActiveFormId] = useState<string | null>(null);
@@ -400,15 +403,15 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
       {/* Top Controller Header Block */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Vektor CRM Pelanggan</h2>
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{d.title}</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Ikat profil pembelian eksternal dan periksa jumlah transaksi dengan aman.
+            {d.subtitle}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
-            {customers.length} Toko Klien
+            {d.totalClients.replace("{count}", customers.length.toString())}
           </span>
           <Button 
             size="sm" 
@@ -426,7 +429,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
             className="h-[38px] px-5 text-xs font-bold shadow-md"
             startContent={<Plus className="w-4 h-4" />}
           >
-            Daftarkan Pelanggan
+            {d.register}
           </Button>
         </div>
       </div>
@@ -453,9 +456,9 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           <div>
             <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              Matriks Database Pelanggan
+              {d.matrixTitle}
             </h3>
-            <p className="text-[10px] text-slate-500 mt-0.5">Kelola kepemilikan profil secara langsung dan segmen aset streaming yang ditautkan.</p>
+            <p className="text-[10px] text-slate-500 mt-0.5">{d.matrixSubtitle}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -466,7 +469,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
-              Ekspor CSV
+              {d.exportCsv}
             </Button>
             <Button
               onPress={exportDatabaseDump}
@@ -478,7 +481,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               Dump JSON
             </Button>
             <label className="h-[34px] flex items-center justify-center px-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition-all gap-1.5 cursor-pointer">
-              <Upload className="w-3.5 h-3.5" /> Impor
+              <Upload className="w-3.5 h-3.5" /> {d.import}
               <input type="file" accept=".csv,.xlsx,.xls" onChange={handleFileUpload} disabled={isImporing} className="hidden" />
             </label>
             <Button
@@ -488,7 +491,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
-              Templat
+              {d.template}
             </Button>
           </div>
         </div>
@@ -498,8 +501,8 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/80 dark:bg-[#0b0f19]/80 border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                <th className="px-5 py-3.5 min-w-[220px]">Customer Profile</th>
-                <th className="px-5 py-3.5 min-w-[340px]">Ordered Asset Streams & Expiry Lifecycles</th>
+                <th className="px-5 py-3.5 min-w-[150px]">{d.colPhone}</th>
+                <th className="px-5 py-3.5 min-w-[340px]">{d.colDetails}</th>
               </tr>
             </thead>
             <tbody className={`divide-y divide-slate-100 dark:divide-slate-800/60 text-xs transition-all duration-150 ${isTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
@@ -512,23 +515,11 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                 return (
                   <tr key={c.id} className="hover:bg-slate-50/30 dark:hover:bg-slate-800/20 align-top transition-colors">
                     {/* Customer Profile Column */}
-                    <td className="px-5 py-4.5 bg-slate-50/20 dark:bg-[#0b0f19]/30 border-r border-slate-50 dark:border-slate-800/50">
-                      <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <div className="flex items-center gap-2 truncate">
-                          <div className="w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
-                            <User className="w-3.5 h-3.5" />
-                          </div>
-                          <p className="font-extrabold text-slate-900 dark:text-slate-100 text-sm truncate">{c.name}</p>
-                        </div>
-                        <Button
-                          isIconOnly
-                          variant="light"
-                          onPress={() => setEditingCustomer(c)}
-                          className="w-7 h-7 min-w-0 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
-                          title="Edit Customer Details"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </Button>
+                    <td className="px-5 py-4.5 bg-slate-50/20 dark:bg-[#0b0f19]/30 border-r border-slate-50 dark:border-slate-800/50 align-middle">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-extrabold text-slate-900 dark:text-slate-100 text-sm truncate">
+                          {c.phone || c.name}
+                        </p>
                         <Button
                           isIconOnly
                           variant="light"
@@ -536,17 +527,10 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                           isDisabled={isDeleting}
                           isLoading={isDeleting}
                           className="w-7 h-7 min-w-0 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
-                          title="Erase Customer Container"
+                          title={d.delCustomer}
                         >
                           {!isDeleting && <Trash2 className="w-3.5 h-3.5" />}
                         </Button>
-                      </div>
-                      <div className="space-y-0.5 pl-9">
-                        <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate">{c.email || "Tidak Ada Email"}</p>
-                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{c.phone || "No Phone"}</p>
-                        <span className="inline-block mt-2 px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold text-[9px] rounded uppercase tracking-wider">
-                          Orders: {products.length}
-                        </span>
                       </div>
                     </td>
 
@@ -555,107 +539,55 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                       {products.length > 0 ? (
                         <div className="space-y-2">
                           {products.map((p, idx) => {
-                            // Check expiration status automatically
-                            const isExpired = p.expire_date ? new Date(p.expire_date).getTime() < Date.now() : false;
-                            const timestampStr = p.bought_date ? new Date(p.bought_date).toLocaleString() : "N/A";
-                            const startStr = (p as any).date_start ? new Date((p as any).date_start).toLocaleDateString() : (p.bought_date ? new Date(p.bought_date).toLocaleDateString() : "N/A");
-                            const expStr = p.expire_date ? new Date(p.expire_date).toLocaleDateString() : "N/A";
+                            // find inventory item to get email
+                            const inventoryItem = inventoryItems?.find(inv => inv.id === (p as any).inventory_id);
+                            let email = inventoryItem?.email || d.noEmail;
+                            // Fallback to customer's vault_email if using import
+                            if (email === d.noEmail && (c as any).vault_email) {
+                                email = (c as any).vault_email;
+                            }
+
+                            const profile = inventoryItem?.profile_name || (p as any).profile_name || (c as any).profile_name || "";
+                            const isNetflix = p.name.toLowerCase().includes("netflix") || p.name.toLowerCase().includes("net");
+                            const boughtDate = p.bought_date ? new Date(p.bought_date).toLocaleDateString() : "N/A";
 
                             return (
                               <div
                                 key={idx}
-                                className={`p-2.5 rounded-lg border flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all ${
-                                  isExpired
-                                    ? "bg-red-50/40 dark:bg-red-950/20 border-red-100 dark:border-red-900/30"
-                                    : "bg-emerald-50/30 dark:bg-emerald-950/10 border-emerald-100/60 dark:border-emerald-900/30"
-                                }`}
+                                className="p-2.5 rounded-lg border flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all bg-emerald-50/30 dark:bg-emerald-950/10 border-emerald-100/60 dark:border-emerald-900/30"
                               >
-                                <div className="flex items-center gap-2">
-                                  <ShoppingBag className={`w-3.5 h-3.5 ${isExpired ? "text-red-400" : "text-emerald-500"}`} />
+                                <div className="flex items-center gap-3">
+                                  <ShoppingBag className="w-4 h-4 text-emerald-500" />
                                   <div>
                                     <div className="flex items-center gap-1.5">
-                                      <span className="font-bold text-slate-900 dark:text-slate-200 text-xs">{p.name}</span>
-                                      <span className="px-1.5 py-0.2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-lg text-[9px] uppercase font-bold">
+                                      <span className="font-bold text-slate-900 dark:text-slate-200 text-sm">{p.name}</span>
+                                      <span className="px-1.5 py-0.2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-lg text-[10px] uppercase font-bold">
                                         {p.variant}
                                       </span>
                                     </div>
-                                    <div className="flex flex-wrap items-center gap-2 mt-0.5 text-[10px] text-slate-500 font-medium">
-                                      <span className="flex items-center gap-0.5 font-bold text-indigo-900 dark:text-indigo-300">
-                                        <Clock className="w-2.5 h-2.5" /> {p.duration_days} Days Cycle
-                                      </span>
-                                      <span>•</span>
-                                      <span>Cakupan: <strong className="text-slate-700 dark:text-slate-300">{startStr}</strong> → <strong className="text-slate-700 dark:text-slate-300">{expStr}</strong></span>
-                                      <span>•</span>
-                                      <span className="text-[9px] text-slate-400">Ditangkap: {timestampStr}</span>
+                                    <div className="flex flex-col mt-0.5 text-[11px] text-slate-500 font-medium">
+                                      <span className="text-slate-600 dark:text-slate-400">{email}</span>
+                                      {isNetflix && profile && (
+                                          <span className="text-[10px] text-indigo-500 font-bold">{d.profilePrefix} {profile}</span>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
 
-                                <div className="flex flex-wrap items-center gap-2 sm:justify-end border-t sm:border-t-0 pt-1.5 sm:pt-0 border-slate-200/40 dark:border-slate-800/40">
-                                  <div className="text-right flex sm:flex-col items-center sm:items-end gap-1 sm:gap-0">
-                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                                      Status Cakupan
+                                <div className="flex flex-col sm:items-end gap-1 border-t sm:border-t-0 pt-1.5 sm:pt-0 border-slate-200/40 dark:border-slate-800/40">
+                                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                                      {d.order} {boughtDate}
                                     </span>
-                                    <span className={`text-[11px] font-black ${isExpired ? "text-red-600 line-through" : "text-emerald-700"}`}>
-                                      {expStr}
+                                    <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+                                      {d.duration.replace("{days}", p.duration_days.toString())}
                                     </span>
-                                  </div>
-                                  <span
-                                    className={`px-2 py-0.5 rounded-lg font-bold text-[9px] uppercase tracking-wider shrink-0 ${
-                                      isExpired ? "bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400" : "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-400"
-                                    }`}
-                                  >
-                                    {isExpired ? "Kedaluwarsa" : "Aktif"}
-                                  </span>
-
-                                  {/* Custom Actions Array for this particular ordered asset segment */}
-                                  <div className="flex items-center gap-1 border-l pl-2 ml-1 border-slate-200/50 dark:border-slate-800/50">
-                                    <Button
-                                      isIconOnly
-                                      variant="light"
-                                      onPress={() => setStreamActionTarget({ customerId: c.id, productIndex: idx, productName: p.name, mode: "extend" })}
-                                      isDisabled={processingStream === `${c.id}-${idx}`}
-                                      className="w-7 h-7 min-w-0 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                      title="Extend stream duration coverage"
-                                    >
-                                      <CalendarPlus className="w-3.5 h-3.5" />
-                                    </Button>
-                                    <Button
-                                      isIconOnly
-                                      variant="light"
-                                      onPress={() => setStreamActionTarget({ customerId: c.id, productIndex: idx, productName: p.name, mode: "ban" })}
-                                      isDisabled={processingStream === `${c.id}-${idx}`}
-                                      className="w-7 h-7 min-w-0 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                      title="Ban / terminate stream partition"
-                                    >
-                                      <Ban className="w-3.5 h-3.5" />
-                                    </Button>
-                                    <Button
-                                      isIconOnly
-                                      variant="light"
-                                      onPress={async () => {
-                                        if (!confirm(`Are you absolutely sure you want hingga remove/kick ${p.name} from this profile? Connected inventory items will be unlinked and back available in stock.`)) return;
-                                        setProcessingStream(`${c.id}-${idx}`);
-                                        const res = await removeCustomerProductAction(storeId, c.id, idx);
-                                        setProcessingStream(null);
-                                        if (res?.error) toast.error(res.error);
-                                        else toast.success(`Stream ${p.name} disassociated successfully`);
-                                      }}
-                                      isDisabled={processingStream === `${c.id}-${idx}`}
-                                      isLoading={processingStream === `${c.id}-${idx}`}
-                                      className="w-7 h-7 min-w-0 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                      title="Remove/kick stream from profile"
-                                    >
-                                      {processingStream !== `${c.id}-${idx}` && <UserMinus className="w-3.5 h-3.5" />}
-                                    </Button>
-                                  </div>
                                 </div>
                               </div>
                             );
                           })}
                         </div>
                       ) : (
-                        <p className="text-slate-400 text-xs italic py-2">No product variants ordered yet.</p>
+                        <p className="text-slate-400 text-xs italic py-2">{d.noOrders}</p>
                       )}
 
                       {/* Inline Appender Trigger Section */}
@@ -668,12 +600,12 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                             className="h-[28px] text-[11px] font-bold text-indigo-600 dark:text-indigo-400"
                             startContent={<Plus className="w-3.5 h-3.5" />}
                           >
-                            Tambahkan Pesanan Produk Streaming
+                            {d.addOrder}
                           </Button>
                         ) : (
                           <div className="p-3 bg-slate-50 dark:bg-[#0b0f19] rounded-lg border border-slate-200 dark:border-slate-800 space-y-2.5 transition-colors">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">Assign Additional Product Variant</span>
+                              <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">{d.assignProduct}</span>
                               <Button
                                 isIconOnly
                                 variant="light"
@@ -688,9 +620,9 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                             <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-end">
                               <Input
                                 type="text"
-                                label="Product"
+                                label={d.product}
                                 labelPlacement="outside"
-                                placeholder="e.g. Netflix"
+                                placeholder={d.placeholderProduct}
                                 value={appendName}
                                 onValueChange={handleAppendNameChange}
                                 variant="faded"
@@ -704,7 +636,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                               <div className="flex flex-col w-full">
                                 <Select
                                   aria-label="Append Variant"
-                                  label="Variant"
+                                  label={d.variant}
                                   labelPlacement="outside"
                                   selectedKeys={[appendVariant]}
                                   onChange={(e) => setAppendVariant(e.target.value)}
@@ -722,7 +654,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 </Select>
                               </div>
                               <Select
-                                label="Duration"
+                                label={d.durationLabel}
                                 labelPlacement="outside"
                                 selectedKeys={[appendDuration]}
                                 onChange={(e) => {
@@ -752,7 +684,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                               </Select>
                               <DatePicker
                                 name="date_start"
-                                label="Date Start"
+                                label={d.dateStart}
                                 labelPlacement="outside"
                                 value={appendDateStart ? (parseDate(appendDateStart) as any) : null}
                                 onChange={(val) => {
@@ -776,7 +708,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                               />
                               <DatePicker
                                 name="date_end"
-                                label="Date End"
+                                label={d.dateEnd}
                                 labelPlacement="outside"
                                 value={appendDateEnd ? (parseDate(appendDateEnd) as any) : null}
                                 onChange={(val) => setAppendDateEnd(val ? val.toString() : "")}
@@ -812,7 +744,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               {customers.length === 0 && (
                 <tr>
                   <td colSpan={2} className="px-5 py-12 text-center text-slate-400 italic">
-                    Customer pool inactive. Provision buyers and streaming accesses using the core input above.
+                    {d.inactivePool}
                   </td>
                 </tr>
               )}

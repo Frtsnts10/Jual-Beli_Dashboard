@@ -61,7 +61,7 @@ export async function getSubscriptionStatus() {
   };
 }
 
-// @ts-expect-error
+// @ts-expect-error missing types for midtrans
 import * as midtransClient from "midtrans-client";
 
 export async function createCheckoutSessionAction(
@@ -91,7 +91,7 @@ export async function createCheckoutSessionAction(
 
     // Create Snap API instance
     const serverKey = process.env.MIDTRANS_SERVER_KEY.trim();
-    let snap = new midtransClient.Snap({
+    const snap = new midtransClient.Snap({
       // We explicitly set this to false for testing.
       // Do not rely on SB- prefix since some sandbox keys don't have it.
       isProduction: process.env.NODE_ENV === "production" ? true : false,
@@ -100,7 +100,7 @@ export async function createCheckoutSessionAction(
 
     const orderId = `sub_${user.uid}_${Date.now()}`;
 
-    let parameter = {
+    const parameter = {
       "transaction_details": {
         "order_id": orderId,
         "gross_amount": amount

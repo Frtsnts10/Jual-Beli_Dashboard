@@ -258,7 +258,7 @@ export default function MarketingPage() {
 
         {/* Pricing/Features Comparison */}
         <section className="py-24 bg-slate-50 px-6">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
                 Simple, Scalable Plans
@@ -268,9 +268,9 @@ export default function MarketingPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto">
               {/* Standard Tier */}
-              <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col">
+              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col">
                 <div className="mb-6">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold uppercase tracking-widest mb-4">
                     <div className="w-2 h-2 rounded-full bg-amber-500" />
@@ -303,7 +303,7 @@ export default function MarketingPage() {
               </div>
 
               {/* Weekly Tier */}
-              <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden">
+              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4">
                   <Sparkles className="w-24 h-24 text-indigo-500/10" />
                 </div>
@@ -335,7 +335,7 @@ export default function MarketingPage() {
               </div>
 
               {/* Monthly Tier */}
-              <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden ring-2 ring-indigo-500 scale-105">
+              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden ring-2 ring-indigo-500">
                 <div className="absolute top-0 right-0 p-4">
                   <Sparkles className="w-24 h-24 text-indigo-500/10" />
                 </div>
@@ -372,9 +372,8 @@ export default function MarketingPage() {
                   Upgrade to Monthly
                 </Link>
               </div>
-
               {/* Yearly Tier */}
-              <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden">
+              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4">
                   <Sparkles className="w-24 h-24 text-indigo-500/10" />
                 </div>
@@ -389,7 +388,19 @@ export default function MarketingPage() {
                 <div className="flex-1 space-y-4 mb-8 relative z-10">
                   <div className="flex items-center gap-3 text-sm text-slate-300">
                     <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
-                    <span className="text-white font-medium">Everything in Monthly</span>
+                    <span className="text-white font-medium">Unlimited Store Workspaces</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span>Unlimited Credential Storage</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span>Automated WhatsApp Delivery (n8n)</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span>Smart Family Pool Automation</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-300">
                     <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
@@ -406,7 +417,7 @@ export default function MarketingPage() {
               </div>
 
               {/* Lifetime Tier */}
-              <div className="p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-amber-500/30 shadow-xl shadow-amber-500/10 flex flex-col relative overflow-hidden md:col-span-2 lg:col-span-1">
+              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-amber-500/30 shadow-xl shadow-amber-500/10 flex flex-col relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4">
                   <Sparkles className="w-24 h-24 text-amber-500/10" />
                 </div>
@@ -421,7 +432,27 @@ export default function MarketingPage() {
                 <div className="flex-1 space-y-4 mb-8 relative z-10">
                   <div className="flex items-center gap-3 text-sm text-slate-300">
                     <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
-                    <span className="text-white font-medium">Everything in Yearly</span>
+                    <span className="text-white font-medium">Unlimited Store Workspaces</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span>Unlimited Credential Storage</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span>Automated WhatsApp Delivery (n8n)</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span>Smart Family Pool Automation</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span>Cross-Tenant Analytics Engine</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span>Priority Support Access</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-300">
                     <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
