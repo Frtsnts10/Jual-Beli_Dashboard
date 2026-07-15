@@ -1,8 +1,11 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase/server";
+import { adminDb, verifyStoreAccess } from "@/lib/firebase/server";
 
 export async function getDashboardStats(storeId: string) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) throw new Error("Unauthorized access to store");
+
   const [storeSnap, invSnap, custSnap, compSnap, ordSnap] = await Promise.all([
     adminDb.collection("stores").doc(storeId).get(),
     adminDb.collection("inventory").where("store_id", "==", storeId).get(),

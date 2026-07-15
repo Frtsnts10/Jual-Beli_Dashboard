@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb, getUserProfile } from "@/lib/firebase/server";
+import { adminDb, getUserProfile, verifyStoreAccess } from "@/lib/firebase/server";
 import { DraftRequest } from "@/features/approvals/types";
 import { revalidatePath } from "next/cache";
 
@@ -25,6 +25,9 @@ export interface InventoryItem {
 }
 
 export async function getInventoryAction(storeId: string): Promise<InventoryItem[]> {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) throw new Error("Unauthorized access to store");
+
   const snap = await adminDb.collection("inventory")
     .where("store_id", "==", storeId)
     .orderBy("created_at", "desc")
@@ -34,6 +37,9 @@ export async function getInventoryAction(storeId: string): Promise<InventoryItem
 }
 
 export async function createInventoryItemAction(storeId: string, formData: FormData) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const name = formData.get("name") as string;
   const profile_tier = (formData.get("profile_tier") as string) || null;
   const profile_name = (formData.get("profile_name") as string) || null;
@@ -48,6 +54,7 @@ export async function createInventoryItemAction(storeId: string, formData: FormD
   const category = (formData.get("category") as string) || null;
   let group_name = (formData.get("group_name") as string) || null;
 
+  if (!category) return { error: "Category is required" };
   if (!name) return { error: "Product Name is required" };
 
   const multiProfileTriggers = ["netflix", "disney", "prime", "hulu", "hbo", "google", "youtube", "canva", "spotify"];
@@ -121,6 +128,9 @@ export async function createInventoryItemAction(storeId: string, formData: FormD
 }
 
 export async function updateItemGroupingAction(storeId: string, itemId: string, nextGroup: string | null) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   try {
     await adminDb.collection("inventory").doc(itemId).update({ group_name: nextGroup || null });
     revalidatePath(`/${storeId}/inventory`);
@@ -131,6 +141,9 @@ export async function updateItemGroupingAction(storeId: string, itemId: string, 
 }
 
 export async function deleteInventoryItemAction(storeId: string, id: string) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   try {
     const userProfile = await getUserProfile();
     if (!userProfile) return { error: "Authentication required" };
@@ -167,6 +180,9 @@ export async function deleteInventoryItemAction(storeId: string, id: string) {
 }
 
 export async function updateInventoryItemAction(storeId: string, itemId: string, formData: FormData) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const name = formData.get("name") as string;
   const profile_tier = (formData.get("profile_tier") as string) || null;
   const profile_name = (formData.get("profile_name") as string) || null;
@@ -178,8 +194,10 @@ export async function updateInventoryItemAction(storeId: string, itemId: string,
   const stock = parseInt(formData.get("stock") as string, 10) || 1;
   const date_buy = (formData.get("date_buy") as string) || null;
   const date_expired = (formData.get("date_expired") as string) || null;
+  const category = (formData.get("category") as string) || null;
   const group_name = (formData.get("group_name") as string) || null;
 
+  if (!category) return { error: "Category is required" };
   if (!name) return { error: "Product Name is required" };
 
   try {
@@ -200,6 +218,7 @@ export async function updateInventoryItemAction(storeId: string, itemId: string,
       stock,
       date_buy,
       date_expired,
+      category,
       group_name,
     };
 
@@ -234,6 +253,9 @@ export async function updateInventoryItemAction(storeId: string, itemId: string,
 }
 
 export async function importInventoryCsvAction(storeId: string, rows: any[]) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const userProfile = await getUserProfile();
   if (!userProfile) return { error: "Authentication required" };
   if (userProfile.role === "staff") return { error: "Staff members cannot perform bulk CSV imports at this time." };

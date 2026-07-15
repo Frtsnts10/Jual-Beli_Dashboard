@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase/server";
+import { adminDb, verifyStoreAccess } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 
 export interface PurchasedProduct {
@@ -27,6 +27,9 @@ export interface Customer {
 }
 
 export async function getCustomersAction(storeId: string): Promise<Customer[]> {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) throw new Error("Unauthorized access to store");
+
   const snap = await adminDb.collection("customers")
     .where("store_id", "==", storeId)
     .orderBy("created_at", "desc")
@@ -43,6 +46,9 @@ export async function getCustomersAction(storeId: string): Promise<Customer[]> {
 }
 
 export async function createCustomerAction(storeId: string, formData: FormData) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const name = formData.get("name") as string;
   const email = (formData.get("email") as string) || null;
   const phone = (formData.get("phone") as string) || null;
@@ -98,6 +104,9 @@ export async function createCustomerAction(storeId: string, formData: FormData) 
 }
 
 export async function updateCustomerAction(storeId: string, id: string, data: { first_name: string; last_name: string; email: string | null; phone: string | null }) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   if (!data.first_name) return { error: "First name required" };
 
   try {
@@ -123,6 +132,9 @@ export async function appendCustomerProductAction(
   product: { name: string; variant: string; duration_days: number; bought_date?: string; date_start?: string;
   device?: string; expire_date?: string }
 ) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const custDoc = await adminDb.collection("customers").doc(customerId).get();
   if (!custDoc.exists) return { error: "Customer context missing" };
 
@@ -157,6 +169,9 @@ export async function appendCustomerProductAction(
 }
 
 export async function deleteCustomerAction(storeId: string, id: string) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   try {
     await adminDb.collection("customers").doc(id).delete();
     revalidatePath(`/${storeId}/customers`);
@@ -168,6 +183,9 @@ export async function deleteCustomerAction(storeId: string, id: string) {
 }
 
 export async function removeCustomerProductAction(storeId: string, customerId: string, productIndex: number) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const custDoc = await adminDb.collection("customers").doc(customerId).get();
   if (!custDoc.exists) return { error: "Customer context missing" };
 
@@ -194,6 +212,9 @@ export async function removeCustomerProductAction(storeId: string, customerId: s
 }
 
 export async function extendCustomerProductAction(storeId: string, customerId: string, productIndex: number, addedDays: number) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const custDoc = await adminDb.collection("customers").doc(customerId).get();
   if (!custDoc.exists) return { error: "Customer context missing" };
 
@@ -224,6 +245,9 @@ export async function extendCustomerProductAction(storeId: string, customerId: s
 }
 
 export async function banCustomerProductAction(storeId: string, customerId: string, productIndex: number, banReason?: string) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const custDoc = await adminDb.collection("customers").doc(customerId).get();
   if (!custDoc.exists) return { error: "Customer context missing" };
 
@@ -251,6 +275,9 @@ export interface AllocationOrderInput {
 }
 
 export async function createAndAllocateCustomerOrderAction(input: AllocationOrderInput) {
+  const isAuthorized = await verifyStoreAccess(input.storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const now = new Date();
   const expireDate = new Date(now.getTime() + input.durationDays * 86400000);
 
@@ -347,6 +374,9 @@ export async function createAndAllocateCustomerOrderAction(input: AllocationOrde
 }
 
 export async function importCustomersCsvAction(storeId: string, rows: any[]) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const batch = adminDb.batch();
   const inserts = rows.map(row => {
     const name = row.name || "Unnamed Customer";
@@ -400,6 +430,9 @@ export async function importCustomersCsvAction(storeId: string, rows: any[]) {
 }
 
 export async function importComplexExcelDataAction(storeId: string, rows: any[]) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   // Declare all collections upfront
   const customersMap = new Map<string, any>();
   const inventoryMap = new Map<string, { ref: any; data: any }>();
@@ -561,6 +594,9 @@ export async function importComplexExcelDataAction(storeId: string, rows: any[])
 }
 
 export async function updateCustomerProductDeviceAction(storeId: string, customerId: string, productIndex: number, device: string) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const custDoc = await adminDb.collection("customers").doc(customerId).get();
   if (!custDoc.exists) return { error: "Customer context missing" };
 

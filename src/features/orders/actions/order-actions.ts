@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase/server";
+import { adminDb, verifyStoreAccess } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 
 export interface OrderItem {
@@ -27,6 +27,9 @@ export interface Order {
 }
 
 export async function getOrdersAction(storeId: string): Promise<Order[]> {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) throw new Error("Unauthorized access to store");
+
   try {
     const snap = await adminDb.collection("orders")
       .where("store_id", "==", storeId)
@@ -55,6 +58,9 @@ export async function updateOrderStatusAction(
   paymentStatus: string,
   fulfillmentStatus: string
 ) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   try {
     await adminDb.collection("orders").doc(orderId).update({
       payment_status: paymentStatus,
@@ -81,6 +87,9 @@ export interface FulfillOrderInput {
 }
 
 export async function fulfillOrderWithSlotAction(input: FulfillOrderInput) {
+  const isAuthorized = await verifyStoreAccess(input.storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const now = new Date();
   const expireDate = new Date(now.getTime() + input.durationDays * 86400000);
 

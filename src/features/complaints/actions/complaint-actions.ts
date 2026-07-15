@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb, getAuthenticatedUser } from "@/lib/firebase/server";
+import { adminDb, getAuthenticatedUser, verifyStoreAccess } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 
 export interface Complaint {
@@ -18,6 +18,9 @@ export interface Complaint {
 }
 
 export async function getComplaintsAction(storeId: string): Promise<Complaint[]> {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) throw new Error("Unauthorized access to store");
+
   const snap = await adminDb.collection("complaints")
     .where("store_id", "==", storeId)
     .orderBy("created_at", "desc")
@@ -27,6 +30,9 @@ export async function getComplaintsAction(storeId: string): Promise<Complaint[]>
 }
 
 export async function createComplaintAction(storeId: string, formData: FormData) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const customer_name = formData.get("customer_name") as string;
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
@@ -61,6 +67,9 @@ export async function createComplaintAction(storeId: string, formData: FormData)
 }
 
 export async function updateComplaintStatusAction(storeId: string, id: string, nextStatus: Complaint["status"]) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   try {
     await adminDb.collection("complaints").doc(id).update({ status: nextStatus });
     revalidatePath(`/${storeId}/complaints`);
@@ -71,6 +80,9 @@ export async function updateComplaintStatusAction(storeId: string, id: string, n
 }
 
 export async function applyComplaintSatisfactionAction(storeId: string, id: string, outcome: string) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   try {
     await adminDb.collection("complaints").doc(id).update({
       satisfaction_outcome: outcome,
@@ -84,6 +96,9 @@ export async function applyComplaintSatisfactionAction(storeId: string, id: stri
 }
 
 export async function processComplaintRefundAction(storeId: string, id: string, amount: number) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   try {
     // In a real app, you would integrate Stripe/PayPal API here
     // e.g., const refund = await stripe.refunds.create({ charge: 'ch_123', amount: amount * 100 });
@@ -103,6 +118,9 @@ export async function processComplaintRefundAction(storeId: string, id: string, 
 }
 
 export async function deleteComplaintAction(storeId: string, id: string) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   try {
     await adminDb.collection("complaints").doc(id).delete();
     revalidatePath(`/${storeId}/complaints`);

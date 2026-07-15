@@ -6,8 +6,10 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Select
 import { parseDate } from "@internationalized/date";
 import { Eye, EyeOff } from "lucide-react";
 import { getTierConfigForProduct, formatTierName } from "@/config/product-tiers";
+import { ALL_CATEGORIES, getProductsForCategory } from "@/config/categories";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { toast } from "sonner";
+import { useI18n } from "@/hooks/use-i18n";
 
 export function EditInventoryModal({
   item,
@@ -20,6 +22,7 @@ export function EditInventoryModal({
   storeId: string;
   currency?: string;
 }) {
+  const { t } = useI18n();
   const [isPending, setIsPending] = useState(false);
 
   const isIDR = currency.toUpperCase() === "IDR";
@@ -30,7 +33,22 @@ export function EditInventoryModal({
   const [tierOptions, setTierOptions] = useState<string[]>(initialCfg.options);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [category, setCategory] = useState(item.category || "");
+  const [productOptions, setProductOptions] = useState<string[]>(
+    item.category ? getProductsForCategory(item.category) : []
+  );
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setCategory(val);
+    const products = getProductsForCategory(val);
+    setProductOptions(products);
+    setName("");
+    setProfileTier("");
+    setTierOptions([]);
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setName(val);
     const cfg = getTierConfigForProduct(val);
@@ -96,6 +114,7 @@ export function EditInventoryModal({
     setIsPending(true);
 
     const formData = new FormData();
+    formData.append("category", category);
     formData.append("name", name);
     formData.append("profile_tier", profileTier);
     formData.append("profile_name", profileName);
@@ -135,24 +154,43 @@ export function EditInventoryModal({
           <form onSubmit={handleSubmit} className="flex flex-col h-full">
             <ModalHeader className="flex flex-col gap-1">
               <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                Edit Asset Variant Profile
+                {t.inventoryForm.editTitle}
               </h3>
             </ModalHeader>
             <ModalBody>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6">
-                <Input
-                  labelPlacement="outside" label="Product Name"
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-6">
+                <Select placeholder={t.inventoryForm.selectCategory}
+                  labelPlacement="outside" label={t.inventoryForm.category}
                   isRequired
-                  value={name}
-                  onChange={handleNameChange}
+                  selectedKeys={category ? [category] : []}
+                  onChange={handleCategoryChange}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
-                />
-                <Select placeholder="Select tier..."
-                  labelPlacement="outside" label="Tier Variant"
-                  selectedKeys={[profileTier]}
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                >
+                  {ALL_CATEGORIES.map((opt) => (
+                    <SelectItem key={opt} textValue={opt}>{opt}</SelectItem>
+                  ))}
+                </Select>
+                <Select placeholder={t.inventoryForm.selectProduct}
+                  labelPlacement="outside" label={t.inventoryForm.productName}
+                  isRequired
+                  selectedKeys={name ? [name] : []}
+                  onChange={handleNameChange}
+                  isDisabled={!category}
+                  variant="bordered"
+                  radius="lg"
+                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                >
+                  {productOptions.map((opt) => (
+                    <SelectItem key={opt} textValue={opt}>{opt}</SelectItem>
+                  ))}
+                </Select>
+                <Select placeholder={t.inventoryForm.selectTier}
+                  labelPlacement="outside" label={t.inventoryForm.tierVariant}
+                  selectedKeys={profileTier ? [profileTier] : []}
                   onChange={(e) => setProfileTier(e.target.value)}
+                  isDisabled={!name}
                   variant="bordered"
                   radius="lg"
                   classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
@@ -162,7 +200,7 @@ export function EditInventoryModal({
                   ))}
                 </Select>
                 <Input
-                  labelPlacement="outside" label="Designation"
+                  labelPlacement="outside" label={t.inventoryForm.profileNameOpt}
                   value={profileName}
                   onValueChange={setProfileName}
                   variant="bordered"
@@ -172,8 +210,8 @@ export function EditInventoryModal({
               </div>
 
               <Input
-                labelPlacement="outside" label="Family Pool String"
-                placeholder="Leave empty for Independent Asset status"
+                labelPlacement="outside" label={t.inventoryForm.groupNameOpt}
+                placeholder={t.inventoryForm.groupNamePh}
                 value={groupName}
                 onValueChange={setGroupName}
                 variant="bordered"
@@ -184,7 +222,7 @@ export function EditInventoryModal({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <Input
                   type="email"
-                  labelPlacement="outside" label="Email"
+                  labelPlacement="outside" label={t.inventoryForm.accountEmail}
                   value={email}
                   onValueChange={setEmail}
                   variant="bordered"
@@ -193,7 +231,7 @@ export function EditInventoryModal({
                 />
                 <Input
                   type={isVisible ? "text" : "password"}
-                  labelPlacement="outside" label="Password"
+                  labelPlacement="outside" label={t.inventoryForm.password}
                   value={password}
                   onValueChange={setPassword}
                   variant="bordered"
@@ -211,7 +249,7 @@ export function EditInventoryModal({
                 />
                 <Input
                   type="text"
-                  labelPlacement="outside" label="PIN"
+                  labelPlacement="outside" label={t.inventoryForm.profilePin}
                   value={pin}
                   onValueChange={setPin}
                   variant="bordered"
@@ -224,7 +262,7 @@ export function EditInventoryModal({
                 <Input
                   type="text"
                   inputMode="decimal"
-                  labelPlacement="outside" label={`Base Price (${currency})`}
+                  labelPlacement="outside" label={`${t.inventoryForm.basePrice} (${currency})`}
                   value={basePriceStr}
                   onValueChange={setBasePriceStr}
                   onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)}
@@ -235,7 +273,7 @@ export function EditInventoryModal({
                 <Input
                   type="text"
                   inputMode="decimal"
-                  labelPlacement="outside" label={`Selling Price (${currency})`}
+                  labelPlacement="outside" label={`${t.inventoryForm.sellingPrice} (${currency})`}
                   isRequired
                   value={sellingPriceStr}
                   onValueChange={setSellingPriceStr}
@@ -246,7 +284,7 @@ export function EditInventoryModal({
                 />
                 <Input
                   type="number"
-                  labelPlacement="outside" label="Stock"
+                  labelPlacement="outside" label={t.inventoryForm.accountStock}
                   value={stock}
                   onValueChange={setStock}
                   variant="bordered"
@@ -257,7 +295,7 @@ export function EditInventoryModal({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <DatePicker
-                  labelPlacement="outside" label="Date Buy"
+                  labelPlacement="outside" label={t.inventoryForm.purchaseDate}
                   value={dateBuy ? (parseDate(dateBuy.split("T")[0]) as any) : null}
                   onChange={(val) => setDateBuy(val ? val.toString() : "")}
                   variant="bordered"
@@ -265,7 +303,7 @@ export function EditInventoryModal({
                   classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <DatePicker
-                  labelPlacement="outside" label="Date Expired"
+                  labelPlacement="outside" label={t.inventoryForm.expDate}
                   value={dateExpired ? (parseDate(dateExpired.split("T")[0]) as any) : null}
                   onChange={(val) => setDateExpired(val ? val.toString() : "")}
                   variant="bordered"
@@ -279,7 +317,7 @@ export function EditInventoryModal({
                 Cancel
               </Button>
               <Button type="submit" isLoading={isPending} color="primary" radius="lg" className="text-xs font-bold shadow-md">
-                {isPending ? "Broadcasting Updates..." : "Save Variant Profile"}
+                {isPending ? t.inventoryForm.updatingBtn : t.inventoryForm.updateBtn}
               </Button>
             </ModalFooter>
           </form>

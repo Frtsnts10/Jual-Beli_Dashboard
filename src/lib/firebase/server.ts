@@ -102,3 +102,23 @@ export async function createSessionCookie(idToken: string) {
   const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
   return { sessionCookie, expiresIn };
 }
+
+/**
+ * Strictly verifies if the currently authenticated user owns the given storeId.
+ * Used by all Server Actions to prevent unauthorized cross-tenant data access.
+ */
+export async function verifyStoreAccess(storeId: string): Promise<boolean> {
+  const user = await getAuthenticatedUser();
+  if (!user) return false;
+
+  try {
+    const storeSnap = await adminDb.collection("stores").doc(storeId).get();
+    if (!storeSnap.exists) return false;
+    
+    const storeData = storeSnap.data();
+    return storeData?.owner_id === user.uid;
+  } catch (err) {
+    console.error("verifyStoreAccess failed:", err);
+    return false;
+  }
+}

@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import { PlusCircle, Users, Eye, EyeOff } from "lucide-react";
 import { createInventoryItemAction } from "../actions/inventory-actions";
 import { getTierConfigForProduct, formatTierName } from "@/config/product-tiers";
+import { ALL_CATEGORIES, getProductsForCategory } from "@/config/categories";
 import { Input, Select, SelectItem, Button, DatePicker } from "@heroui/react";
 import { toast } from "sonner";
+import { useI18n } from "@/hooks/use-i18n";
 
 interface InventoryFormProps {
   storeId: string;
@@ -14,6 +16,7 @@ interface InventoryFormProps {
 }
 
 export function InventoryForm({ storeId, currency = "IDR", onSuccess }: InventoryFormProps) {
+  const { t } = useI18n();
   const [isPending, setIsPending] = useState(false);
 
   const isIDR = currency.toUpperCase() === "IDR";
@@ -26,9 +29,21 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
 
   const [productName, setProductName] = useState("");
   const [tierVariant, setTierVariant] = useState("");
-  const [tierOptions, setTierOptions] = useState<string[]>(["1user", "2user", "semi private", "private"]);
+  const [tierOptions, setTierOptions] = useState<string[]>([]);
+  const [category, setCategory] = useState("");
+  const [productOptions, setProductOptions] = useState<string[]>([]);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setCategory(val);
+    const products = getProductsForCategory(val);
+    setProductOptions(products);
+    setProductName("");
+    setTierVariant("");
+    setTierOptions([]);
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setProductName(val);
     const cfg = getTierConfigForProduct(val);
@@ -81,12 +96,15 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
     if (res?.error) {
       toast.error(res.error);
     } else {
-      toast.success("Inventory data added successfully");
+      toast.success(t.inventoryForm.saveBtn);
       form.reset();
+      setCategory("");
+      setProductOptions([]);
       setBasePriceStr("");
       setSellingPriceStr("");
       setProductName("");
       setTierVariant("");
+      setTierOptions([]);
       onSuccess?.();
     }
   }
@@ -99,36 +117,50 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
       <div>
         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
           <PlusCircle className="w-4 h-4 text-indigo-600" />
-          Add New Inventory Account
+          {t.inventoryForm.addTitle}
         </h3>
         <p className="text-xs text-slate-500 mt-0.5">
-          Masukkan detail akun, varian tier, kredensial, dan informasi gabungan.
+          {t.inventoryForm.addDesc}
         </p>
       </div>
 
       {/* Row 1: Asset Core */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6">
-        <Input
-          name="name"
-          labelPlacement="outside" label="Nama Produk"
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-6">
+        <Select placeholder={t.inventoryForm.selectCategory}
+          name="category"
+          labelPlacement="outside" label={t.inventoryForm.category}
           isRequired
-          value={productName}
-          onValueChange={(val) => {
-            setProductName(val);
-            const cfg = getTierConfigForProduct(val);
-            setTierVariant(cfg.defaultTier);
-            setTierOptions(cfg.options);
-          }}
-          placeholder="Cth: YouTube Premium Family"
+          selectedKeys={category ? [category] : []}
+          onChange={handleCategoryChange}
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
-        />
-        <Select placeholder="Pilih tier..."
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+        >
+          {ALL_CATEGORIES.map((opt) => (
+            <SelectItem key={opt} textValue={opt}>{opt}</SelectItem>
+          ))}
+        </Select>
+        <Select placeholder={t.inventoryForm.selectProduct}
+          name="name"
+          labelPlacement="outside" label={t.inventoryForm.productName}
+          isRequired
+          selectedKeys={productName ? [productName] : []}
+          onChange={handleNameChange}
+          isDisabled={!category}
+          variant="bordered"
+          radius="lg"
+          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+        >
+          {productOptions.map((opt) => (
+            <SelectItem key={opt} textValue={opt}>{opt}</SelectItem>
+          ))}
+        </Select>
+        <Select placeholder={t.inventoryForm.selectTier}
           name="profile_tier"
-          labelPlacement="outside" label="Varian Tier Profil"
-          selectedKeys={[tierVariant]}
+          labelPlacement="outside" label={t.inventoryForm.tierVariant}
+          selectedKeys={tierVariant ? [tierVariant] : []}
           onChange={(e) => setTierVariant(e.target.value)}
+          isDisabled={!productName}
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
@@ -139,8 +171,8 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         </Select>
         <Input
           name="profile_name"
-          labelPlacement="outside" label="Penanda Profil (Opsional)"
-          placeholder="Cth: Profil Alpha"
+          labelPlacement="outside" label={t.inventoryForm.profileNameOpt}
+          placeholder={t.inventoryForm.profileNamePh}
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
@@ -153,16 +185,16 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           name="group_name"
           labelPlacement="outside" label={
             <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase">
-              <Users className="w-3 h-3 text-indigo-500" /> Nama Grup Gabungan (Opsional)
+              <Users className="w-3 h-3 text-indigo-500" /> {t.inventoryForm.groupNameOpt}
             </div>
           }
-          placeholder="Biarkan kosong untuk penugasan otomatis berdasarkan nama/durasi"
+          placeholder={t.inventoryForm.groupNamePh}
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <p className="text-[10px] text-slate-400 mt-1">
-          💡 Untuk akun keluarga (Google, YouTube, Canva), jika dikosongkan akan otomatis digabungkan dengan grup yang tersedia.
+          {t.inventoryForm.groupHint}
         </p>
       </div>
 
@@ -171,7 +203,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         <Input
           type="email"
           name="email"
-          labelPlacement="outside" label="Email Akun"
+          labelPlacement="outside" label={t.inventoryForm.accountEmail}
           placeholder="akun@streaming.com"
           variant="bordered"
           radius="lg"
@@ -180,7 +212,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         <Input
           type={isVisible ? "text" : "password"}
           name="password"
-          labelPlacement="outside" label="Kata Sandi"
+          labelPlacement="outside" label={t.inventoryForm.password}
           placeholder="••••••••"
           variant="bordered"
           radius="lg"
@@ -198,8 +230,8 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         <Input
           type="text"
           name="pin"
-          labelPlacement="outside" label="PIN Profil"
-          placeholder="Cth: 1234"
+          labelPlacement="outside" label={t.inventoryForm.profilePin}
+          placeholder="1234"
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
@@ -212,7 +244,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           <Input
             type="text"
             inputMode="decimal"
-            labelPlacement="outside" label={`Harga Modal (${currency})`}
+            labelPlacement="outside" label={`${t.inventoryForm.basePrice} (${currency})`}
             value={basePriceStr}
             onValueChange={setBasePriceStr}
             onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)}
@@ -227,7 +259,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           <Input
             type="text"
             inputMode="decimal"
-            labelPlacement="outside" label={`Selling Price (${currency})`}
+            labelPlacement="outside" label={`${t.inventoryForm.sellingPrice} (${currency})`}
             isRequired
             value={sellingPriceStr}
             onValueChange={setSellingPriceStr}
@@ -242,7 +274,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
         <Input
           name="stock"
           type="number"
-          labelPlacement="outside" label="Stok Akun (Profil)"
+          labelPlacement="outside" label={t.inventoryForm.accountStock}
           defaultValue="1"
           variant="bordered"
           radius="lg"
@@ -254,14 +286,14 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
         <DatePicker
           name="date_buy"
-          labelPlacement="outside" label="Purchase Date"
+          labelPlacement="outside" label={t.inventoryForm.purchaseDate}
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <DatePicker
           name="date_expired"
-          labelPlacement="outside" label="Tanggal Kedaluwarsa"
+          labelPlacement="outside" label={t.inventoryForm.expDate}
           variant="bordered"
           radius="lg"
           classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
@@ -276,7 +308,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           radius="lg"
           className="text-xs font-bold shadow-md"
         >
-          {isPending ? "Saving Data..." : "Save Inventory Data"}
+          {isPending ? t.inventoryForm.savingBtn : t.inventoryForm.saveBtn}
         </Button>
       </div>
     </form>

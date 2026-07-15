@@ -1,10 +1,13 @@
 "use server";
 
-import { adminDb, getAuthenticatedUser } from "@/lib/firebase/server";
+import { adminDb, getAuthenticatedUser, verifyStoreAccess } from "@/lib/firebase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function updateStoreSettingsAction(storeId: string, formData: FormData) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   const name = formData.get("name") as string | null;
   const logo_url = formData.get("logo_url") as string | null;
   const currency = formData.get("currency") as string | null;
@@ -69,6 +72,9 @@ export async function updateStoreApiKeysAction(storeId: string, formData: FormDa
 }
 
 export async function deleteStoreAction(storeId: string) {
+  const isAuthorized = await verifyStoreAccess(storeId);
+  if (!isAuthorized) return { error: "Unauthorized access to store" };
+
   try {
     await adminDb.collection("stores").doc(storeId).delete();
     revalidatePath("/");
