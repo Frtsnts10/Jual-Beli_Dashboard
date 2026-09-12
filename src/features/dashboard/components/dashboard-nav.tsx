@@ -15,7 +15,8 @@ import {
   GitPullRequest,
   MonitorPlay,
   UserCog,
-  Wallet
+  Wallet,
+  GalleryHorizontal
 } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
 
@@ -45,6 +46,7 @@ export function DashboardNav() {
     { name: t.sidebar.overview, href: `/${storeId}/dashboard`, icon: LayoutDashboard },
     { name: t.sidebar.orders, href: `/${storeId}/orders`, icon: ShoppingCart },
     { name: t.sidebar.inventory, href: `/${storeId}/inventory`, icon: Package },
+    { name: "Carousel", href: `/${storeId}/carousel`, icon: GalleryHorizontal },
     { name: t.sidebar.customers, href: `/${storeId}/customers`, icon: Users },
     { name: t.payouts.title, href: `/${storeId}/payouts`, icon: Wallet },
     { name: t.sidebar.complaints, href: `/${storeId}/complaints`, icon: MessageSquareWarning },
