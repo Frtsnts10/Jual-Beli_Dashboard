@@ -63,17 +63,17 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
+      className="flex flex-col p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-stone-200/60 dark:border-slate-800/80 shadow-sm space-y-5 transition-colors"
     >
       <div>
-        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{t.settings.preferencesTitle}</h3>
-        <p className="text-xs text-slate-500 mt-0.5 mb-5">{t.settings.preferencesSubtitle}</p>
+        <h3 className="text-sm font-bold text-stone-900 dark:text-slate-100">{t.settings.preferencesTitle}</h3>
+        <p className="text-xs text-stone-500 mt-0.5 mb-5">{t.settings.preferencesSubtitle}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-            <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelGlobalCurrency}
+          <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center gap-1">
+            <Globe className="w-3 h-3 text-blue-500" /> {t.settings.labelGlobalCurrency}
           </label>
           <Select
             aria-label={t.settings.labelGlobalCurrency}
@@ -81,8 +81,8 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
             onChange={(e) => setCurrency(e.target.value)}
             radius="lg"
             classNames={{
-              trigger: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
-              value: "text-xs font-bold text-slate-800 dark:text-slate-100",
+              trigger: "bg-stone-50 dark:bg-[#0b0f19] border border-stone-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 shadow-none",
+              value: "text-xs font-bold text-stone-800 dark:text-slate-100",
             }}
           >
             {currencies.map((c) => (
@@ -94,8 +94,8 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
         </div>
 
         <div className="space-y-1.5">
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-            <Globe className="w-3 h-3 text-indigo-500" /> {t.settings.labelLanguage}
+          <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center gap-1">
+            <Globe className="w-3 h-3 text-blue-500" /> {t.settings.labelLanguage}
           </label>
           <Select
             aria-label={t.settings.labelLanguage}
@@ -103,8 +103,8 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
             onChange={(e) => setSelectedLang(e.target.value)}
             radius="lg"
             classNames={{
-              trigger: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
-              value: "text-xs font-bold text-slate-800 dark:text-slate-100",
+              trigger: "bg-stone-50 dark:bg-[#0b0f19] border border-stone-200 dark:border-slate-800 focus:bg-white dark:focus:bg-[#131b2e] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 shadow-none",
+              value: "text-xs font-bold text-stone-800 dark:text-slate-100",
             }}
           >
             <SelectItem key="id" textValue="Bahasa Indonesia">🇮🇩 Bahasa Indonesia</SelectItem>
@@ -118,7 +118,7 @@ export function StorePreferencesForm({ storeId, initialCurrency = "IDR" }: Store
         </div>
       </div>
 
-      <div className="mt-auto flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
+      <div className="mt-auto flex justify-end pt-3 border-t border-stone-100 dark:border-slate-800">
         <Button
           type="submit"
           isLoading={isPending}

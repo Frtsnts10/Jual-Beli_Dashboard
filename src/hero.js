@@ -6,7 +6,7 @@ module.exports = heroui({
     light: {
       colors: {
         primary: {
-          DEFAULT: "#4f46e5",
+          DEFAULT: "#2952cc",
           foreground: "#ffffff",
         },
       },

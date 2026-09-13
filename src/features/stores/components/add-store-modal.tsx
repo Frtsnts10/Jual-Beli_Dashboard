@@ -45,16 +45,16 @@ export function AddStoreModal({ isOpen, onClose, profileId }: AddStoreModalProps
       <ModalContent>
         {(onClose) => (
           <form onSubmit={handleSubmit}>
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
             
             <ModalHeader className="flex flex-col gap-1 mt-2">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 w-max rounded-full bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/40 text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 w-max rounded-full bg-blue-50 dark:bg-indigo-950/50 border border-blue-100 dark:border-indigo-900/40 text-[10px] font-black text-blue-600 dark:text-indigo-400 uppercase tracking-widest mb-2">
                 <Sparkles className="w-2.5 h-2.5 animate-spin" /> Provision Gateway
               </div>
-              <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight">
+              <h3 className="text-lg font-black text-stone-900 dark:text-slate-100 tracking-tight">
                 Create Workspace Toko
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-normal leading-relaxed">
+              <p className="text-xs text-stone-500 dark:text-slate-400 font-normal leading-relaxed">
                 Initialize an isolated premium tenant partition mapping streaming inventory pools and dedicated SLA vector blocks.
               </p>
             </ModalHeader>
@@ -75,18 +75,18 @@ export function AddStoreModal({ isOpen, onClose, profileId }: AddStoreModalProps
                 placeholder="e.g. Premium Hub Outlets"
                 variant="faded"
                 classNames={{
-                  inputWrapper: "bg-slate-50/80 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
-                  label: "text-slate-400",
-                  input: "text-slate-800 dark:text-slate-100 font-bold placeholder:font-normal"
+                  inputWrapper: "bg-stone-50/80 dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500",
+                  label: "text-stone-400",
+                  input: "text-stone-800 dark:text-slate-100 font-bold placeholder:font-normal"
                 }}
               />
             </ModalBody>
 
-            <ModalFooter className="border-t border-slate-50 dark:border-slate-800/60 mt-4">
+            <ModalFooter className="border-t border-stone-50 dark:border-slate-800/60 mt-4">
               <Button
                 variant="light"
                 onPress={onClose}
-                className="text-xs font-bold text-slate-500 dark:text-slate-400"
+                className="text-xs font-bold text-stone-500 dark:text-slate-400"
                 radius="lg"
               >
                 Cancel
@@ -94,7 +94,7 @@ export function AddStoreModal({ isOpen, onClose, profileId }: AddStoreModalProps
               <Button
                 type="submit"
                 isLoading={isPending}
-                className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/10"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/10"
                 radius="lg"
               >
                 {isPending ? "Allocating Partition..." : "Initialize Workspace"}

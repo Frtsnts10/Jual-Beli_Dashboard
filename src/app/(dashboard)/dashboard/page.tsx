@@ -39,24 +39,24 @@ export default async function DashboardRootPage() {
 
   // If zero stores exist, present explicit provision workflow layout
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
-      <header className="h-16 border-b border-slate-200 bg-white px-8 flex items-center justify-between">
-        <span className="font-bold text-slate-800">Shop Dashboard Suite</span>
+    <div className="min-h-screen flex flex-col bg-stone-50 font-sans">
+      <header className="h-16 border-b border-stone-200 bg-white px-8 flex items-center justify-between">
+        <span className="font-bold text-stone-800">Shop Dashboard Suite</span>
         <UserButton />
       </header>
       <main className="flex-1 flex items-center justify-center p-6 text-center">
-        <div className="max-w-md w-full bg-white rounded-lg border border-slate-200/80 p-8 shadow-sm">
-          <div className="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4 font-bold text-xl">
+        <div className="max-w-md w-full bg-white rounded-lg border border-stone-200/80 p-8 shadow-sm">
+          <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 font-bold text-xl">
             🏪
           </div>
-          <h2 className="text-lg font-bold text-slate-900 mb-1">Welcome to Shop Dashboard Console</h2>
-          <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+          <h2 className="text-lg font-bold text-stone-900 mb-1">Welcome to Shop Dashboard Console</h2>
+          <p className="text-xs text-stone-500 mb-6 leading-relaxed">
             You don&apos;t have any mapped storefront instances yet. Create your first workspace partition below to unlock live inventory tables and customer CRM vectors.
           </p>
           <div className="flex justify-center">
             <StoreSwitcher stores={[]} profileId={profileId} />
           </div>
-          <p className="text-[10px] text-slate-400 mt-4">
+          <p className="text-[10px] text-stone-400 mt-4">
             Click the dropdown button above to prompt the Add Workspace window.
           </p>
         </div>

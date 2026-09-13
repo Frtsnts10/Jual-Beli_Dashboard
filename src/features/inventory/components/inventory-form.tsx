@@ -115,11 +115,11 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
       className="p-6 space-y-8 font-sans transition-colors"
     >
       <div>
-        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-          <PlusCircle className="w-4 h-4 text-indigo-600" />
+        <h3 className="text-sm font-bold text-stone-900 dark:text-slate-100 flex items-center gap-2">
+          <PlusCircle className="w-4 h-4 text-blue-600" />
           {t.inventoryForm.addTitle}
         </h3>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-stone-500 mt-0.5">
           {t.inventoryForm.addDesc}
         </p>
       </div>
@@ -134,7 +134,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           onChange={handleCategoryChange}
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", trigger: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         >
           {ALL_CATEGORIES.map((opt) => (
             <SelectItem key={opt} textValue={opt}>{opt}</SelectItem>
@@ -149,7 +149,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           isDisabled={!category}
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", trigger: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         >
           {productOptions.map((opt) => (
             <SelectItem key={opt} textValue={opt}>{opt}</SelectItem>
@@ -163,7 +163,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           isDisabled={!productName}
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", trigger: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         >
           {tierOptions.map((opt) => (
             <SelectItem key={opt} textValue={formatTierName(opt)}>{formatTierName(opt)}</SelectItem>
@@ -175,31 +175,31 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           placeholder={t.inventoryForm.profileNamePh}
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
       </div>
 
       {/* Row 2: Grouping & Pool Configuration */}
-      <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
+      <div className="pt-4 mt-2 border-t border-stone-100 dark:border-slate-800">
         <Input
           name="group_name"
           labelPlacement="outside" label={
-            <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase">
-              <Users className="w-3 h-3 text-indigo-500" /> {t.inventoryForm.groupNameOpt}
+            <div className="flex items-center gap-1 text-[10px] font-bold text-stone-400 uppercase">
+              <Users className="w-3 h-3 text-blue-500" /> {t.inventoryForm.groupNameOpt}
             </div>
           }
           placeholder={t.inventoryForm.groupNamePh}
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
-        <p className="text-[10px] text-slate-400 mt-1">
+        <p className="text-[10px] text-stone-400 mt-1">
           {t.inventoryForm.groupHint}
         </p>
       </div>
 
       {/* Row 3: Credentials */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-stone-100 dark:border-slate-800">
         <Input
           type="email"
           name="email"
@@ -207,7 +207,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           placeholder="akun@streaming.com"
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <Input
           type={isVisible ? "text" : "password"}
@@ -225,7 +225,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
               )}
             </button>
           }
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <Input
           type="text"
@@ -234,12 +234,12 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           placeholder="1234"
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
       </div>
 
       {/* Row 4: Pricing & Quota */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-stone-100 dark:border-slate-800">
         <div>
           <Input
             type="text"
@@ -251,7 +251,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
             placeholder={basePlaceholder}
             variant="bordered"
             radius="lg"
-            classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+            classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
           />
           <input type="hidden" name="base_price" value={parsePriceFloat(basePriceStr)} />
         </div>
@@ -267,7 +267,7 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
             placeholder={sellingPlaceholder}
             variant="bordered"
             radius="lg"
-            classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+            classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
           />
           <input type="hidden" name="selling_price" value={parsePriceFloat(sellingPriceStr)} />
         </div>
@@ -278,25 +278,25 @@ export function InventoryForm({ storeId, currency = "IDR", onSuccess }: Inventor
           defaultValue="1"
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
       </div>
 
       {/* Row 5: Lifecycles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-4 mt-2 border-t border-stone-100 dark:border-slate-800">
         <DatePicker
           name="date_buy"
           labelPlacement="outside" label={t.inventoryForm.purchaseDate}
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <DatePicker
           name="date_expired"
           labelPlacement="outside" label={t.inventoryForm.expDate}
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
       </div>
 

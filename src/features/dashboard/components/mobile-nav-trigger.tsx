@@ -15,7 +15,7 @@ export function MobileNavTrigger() {
       onPress={triggerToggle}
       variant="light"
       aria-label="Open navigation menu"
-      className="md:hidden text-slate-500 dark:text-slate-400"
+      className="md:hidden text-stone-500 dark:text-slate-400"
       radius="lg"
     >
       <Menu className="w-5 h-5" />

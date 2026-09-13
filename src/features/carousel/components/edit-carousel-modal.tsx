@@ -44,7 +44,7 @@ export function EditCarouselModal({
         {() => (
           <form onSubmit={handleSubmit}>
             <ModalHeader className="flex flex-col gap-1">
-              <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight">
+              <h3 className="text-lg font-black text-stone-900 dark:text-slate-100 tracking-tight">
                 Edit Hero Slide
               </h3>
             </ModalHeader>
@@ -58,7 +58,7 @@ export function EditCarouselModal({
                   isRequired
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   name="image_url"
@@ -68,7 +68,7 @@ export function EditCarouselModal({
                   isRequired
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
               </div>
               <Textarea
@@ -79,7 +79,7 @@ export function EditCarouselModal({
                 variant="bordered"
                 radius="lg"
                 minRows={2}
-                classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
               />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-5">
                 <Input
@@ -89,7 +89,7 @@ export function EditCarouselModal({
                   defaultValue={slide.cta_text || ""}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   name="cta_link"
@@ -98,7 +98,7 @@ export function EditCarouselModal({
                   defaultValue={slide.cta_link || ""}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   name="order"
@@ -108,18 +108,18 @@ export function EditCarouselModal({
                   defaultValue={slide.order.toString()}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
               </div>
-              <div className="flex items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-3 pt-2 border-t border-stone-100 dark:border-slate-800">
                 <Switch isSelected={active} onValueChange={setActive} size="sm" />
-                <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                <span className="text-xs font-bold text-stone-600 dark:text-slate-400">
                   {active ? "Visible on storefront" : "Hidden (draft)"}
                 </span>
               </div>
             </ModalBody>
-            <ModalFooter className="border-t border-slate-50 dark:border-slate-800/60 mt-4">
-              <Button variant="light" onPress={onClose} isDisabled={isPending} className="text-xs font-bold text-slate-500 dark:text-slate-400" radius="lg">
+            <ModalFooter className="border-t border-stone-50 dark:border-slate-800/60 mt-4">
+              <Button variant="light" onPress={onClose} isDisabled={isPending} className="text-xs font-bold text-stone-500 dark:text-slate-400" radius="lg">
                 Cancel
               </Button>
               <Button type="submit" isLoading={isPending} color="primary" radius="lg" className="text-xs font-bold shadow-md">

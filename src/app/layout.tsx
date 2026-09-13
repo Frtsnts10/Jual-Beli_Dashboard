@@ -33,7 +33,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="font-sans antialiased bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-50 min-h-screen selection:bg-indigo-500 selection:text-white transition-colors">
+      <body className="font-sans antialiased bg-background dark:bg-[#090d16] text-foreground dark:text-slate-50 min-h-screen selection:bg-blue-600 selection:text-white transition-colors">
         <Providers>
           {children}
         </Providers>

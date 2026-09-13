@@ -51,40 +51,40 @@ export function ChartCard({ data }: ChartCardProps) {
   };
 
   return (
-    <div className="p-7 bg-white dark:bg-[#080c14] rounded-lg border border-slate-100 dark:border-white/5 shadow-2xl shadow-indigo-500/5 font-sans transition-all h-full flex flex-col group overflow-hidden relative">
+    <div className="p-7 bg-white dark:bg-[#080c14] rounded-lg border border-stone-100 dark:border-white/5 shadow-2xl shadow-blue-500/5 font-sans transition-all h-full flex flex-col group overflow-hidden relative">
       {/* Background Decorative Glow */}
-      <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/5 blur-[100px] pointer-events-none" />
+      <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
       
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 relative z-10">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-tight uppercase">Mesin Telemetri</h3>
-            <span className="px-1.5 py-0.5 rounded-[4px] bg-indigo-500/10 text-indigo-500 text-[8px] font-black uppercase tracking-widest border border-indigo-500/20">Live</span>
+            <h3 className="text-sm font-black text-stone-900 dark:text-white tracking-tight uppercase">Mesin Telemetri</h3>
+            <span className="px-1.5 py-0.5 rounded-[4px] bg-blue-500/10 text-blue-500 text-[8px] font-black uppercase tracking-widest border border-blue-500/20">Live</span>
           </div>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Kecepatan transaksi vs vektor penerimaan inventaris.</p>
+          <p className="text-[11px] text-stone-500 dark:text-slate-400 font-medium leading-relaxed">Kecepatan transaksi vs vektor penerimaan inventaris.</p>
         </div>
 
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-6 pr-6 border-r border-slate-100 dark:border-slate-800/50">
+          <div className="flex items-center gap-6 pr-6 border-r border-stone-100 dark:border-slate-800/50">
             <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sales</span>
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+              <span className="text-[10px] font-bold text-stone-400 dark:text-slate-500 uppercase tracking-widest">Sales</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Inventory</span>
+              <span className="text-[10px] font-bold text-stone-400 dark:text-slate-500 uppercase tracking-widest">Inventory</span>
             </div>
           </div>
 
-          <div className="flex p-1 bg-slate-100/50 dark:bg-white/5 rounded-lg border border-slate-200/50 dark:border-white/5">
+          <div className="flex p-1 bg-stone-100/50 dark:bg-white/5 rounded-lg border border-stone-200/50 dark:border-white/5">
             {(["daily", "monthly", "yearly"] as ViewMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setView(mode)}
                 className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
                   view === mode 
-                    ? "bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-lg shadow-indigo-500/20" 
-                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    ? "bg-white dark:bg-indigo-600 text-blue-600 dark:text-white shadow-lg shadow-blue-500/20" 
+                    : "text-stone-400 hover:text-stone-600 dark:hover:text-slate-300"
                 }`}
               >
                 {mode}
@@ -122,7 +122,7 @@ export function ChartCard({ data }: ChartCardProps) {
                   x2={width - padding}
                   y2={padding + (chartHeight * p)}
                   stroke="currentColor"
-                  className="text-slate-100 dark:text-white/5"
+                  className="text-stone-100 dark:text-white/5"
                   strokeWidth="1"
                   strokeDasharray="4 4"
                 />
@@ -178,14 +178,14 @@ export function ChartCard({ data }: ChartCardProps) {
             {/* X-Axis Labels */}
             <div className="flex justify-between items-center px-8 mt-4">
               {currentData.map((item, idx) => (
-                <span key={idx} className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-tighter w-12 text-center">
+                <span key={idx} className="text-[10px] font-black text-stone-400 dark:text-slate-600 uppercase tracking-tighter w-12 text-center">
                   {item.name}
                 </span>
               ))}
             </div>
           </>
         ) : (
-          <div className="h-full w-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-800 gap-3">
+          <div className="h-full w-full flex flex-col items-center justify-center text-stone-300 dark:text-slate-800 gap-3">
              <div className="w-12 h-12 rounded-full border-2 border-dashed border-current flex items-center justify-center">
                 <span className="text-xl">📊</span>
              </div>

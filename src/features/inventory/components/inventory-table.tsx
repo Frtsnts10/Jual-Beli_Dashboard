@@ -46,12 +46,12 @@ function CopyableCredential({
     <button
       type="button"
       onClick={handleCopy}
-      className={`group inline-flex items-center gap-1.5 text-left hover:bg-indigo-50 dark:hover:bg-indigo-950/50 px-1.5 py-0.5 rounded transition-all relative active:scale-95 max-w-full ${
+      className={`group inline-flex items-center gap-1.5 text-left hover:bg-blue-50 dark:hover:bg-indigo-950/50 px-1.5 py-0.5 rounded transition-all relative active:scale-95 max-w-full ${
         isTiny ? "text-[9px] font-mono" : "text-[11px] font-mono"
       } ${
         isPassword
-          ? "text-slate-700 dark:text-slate-300 font-bold"
-          : "text-slate-600 dark:text-slate-400 font-medium"
+          ? "text-stone-700 dark:text-slate-300 font-bold"
+          : "text-stone-600 dark:text-slate-400 font-medium"
       }`}
       title={`Click hingga copy ${label}`}
     >
@@ -59,7 +59,7 @@ function CopyableCredential({
       {copied ? (
         <CheckCircle className="w-3 h-3 text-emerald-500 shrink-0 animate-in zoom-in duration-150" />
       ) : (
-        <Copy className="w-2.5 h-2.5 text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+        <Copy className="w-2.5 h-2.5 text-stone-300 dark:text-slate-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
       )}
     </button>
   );
@@ -265,7 +265,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
       {/* Top Controller Header Block */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
+          <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-blue-50 dark:bg-indigo-950/40 text-blue-600 dark:text-indigo-400 rounded-lg border border-blue-100/40 dark:border-indigo-900/40">
             {d.total.replace("{count}", items.length.toString())}
           </span>
         </div>
@@ -283,13 +283,13 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           <Button
             onPress={downloadProductTemplat}
             variant="flat"
-            className="font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 h-10 px-4"
+            className="font-bold text-stone-600 dark:text-slate-300 bg-stone-100 dark:bg-slate-800 hover:bg-stone-200 dark:hover:bg-slate-700 h-10 px-4"
             startContent={<FileText className="w-4 h-4" />}
           >
             {d.template}
           </Button>
 
-          <label className="h-10 flex items-center justify-center px-4 font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-sm transition-all gap-2 cursor-pointer">
+          <label className="h-10 flex items-center justify-center px-4 font-bold text-stone-600 dark:text-slate-300 bg-stone-100 dark:bg-slate-800 hover:bg-stone-200 dark:hover:bg-slate-700 rounded-xl text-sm transition-all gap-2 cursor-pointer">
             <Upload className="w-4 h-4" /> {d.importCsv}
             <input type="file" accept=".csv" onChange={handleFileUpload} disabled={isImporting} className="hidden" />
           </label>
@@ -297,7 +297,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
           <Button
             onPress={() => exportData(items, "inventory_export.csv")}
             variant="flat"
-            className="font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 h-10 px-4"
+            className="font-bold text-blue-600 dark:text-indigo-400 bg-blue-50 dark:bg-indigo-500/10 hover:bg-blue-100 dark:hover:bg-indigo-500/20 h-10 px-4"
             startContent={<Download className="w-4 h-4" />}
           >
             {d.export}
@@ -327,19 +327,19 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
 
       {/* Premium Inventory Quota Cap Banner */}
       {!isPremium && items.length >= 3 && (
-        <div className="p-4 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 border border-indigo-500/20 dark:border-indigo-900/40 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-indigo-950 dark:text-indigo-300 shadow-sm animate-in fade-in duration-300">
+        <div className="p-4 bg-gradient-to-r from-blue-500/10 via-violet-500/10 to-blue-500/10 border border-blue-500/20 dark:border-indigo-900/40 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-blue-950 dark:text-indigo-300 shadow-sm animate-in fade-in duration-300">
           <div className="space-y-1">
-            <p className="text-xs font-extrabold flex items-center gap-1.5 uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
+            <p className="text-xs font-extrabold flex items-center gap-1.5 uppercase tracking-wider text-blue-700 dark:text-indigo-400">
+              <Sparkles className="w-3.5 h-3.5 text-blue-500 dark:text-indigo-400 shrink-0" />
               {d.quotaExceeded.replace("{count}", "3")}
             </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+            <p className="text-[11px] text-stone-500 dark:text-slate-400 leading-relaxed font-medium">
               {d.quotaDesc}
             </p>
           </div>
           <a
             href={`/${storeId}/subscription`}
-            className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-[11px] font-black uppercase tracking-wider rounded-lg shadow-sm transition-all"
+            className="shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-[11px] font-black uppercase tracking-wider rounded-lg shadow-sm transition-all"
           >
             {d.upgradePro}
           </a>
@@ -351,7 +351,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
         if (!open) setIsCreateConfirmOpen(true);
         else setIsCreateModalOpen(true);
       }} size="4xl" scrollBehavior="inside" classNames={{
-        base: "bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-lg shadow-2xl",
+        base: "bg-white dark:bg-[#0d1322] border border-stone-200/80 dark:border-slate-800/80 rounded-lg shadow-2xl",
         body: "p-0"
       }}>
         <ModalContent>
@@ -379,42 +379,42 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
 
       {/* Unified Product Inventory Array */}
       <div className="space-y-8 pt-4">
-        <div className="bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
+        <div className="bg-white dark:bg-[#0d1322] rounded-lg border border-stone-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50/80 dark:bg-[#0b0f19]/80 border-b border-slate-100 dark:border-slate-800">
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[140px]">{d.colAsset}</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">{d.colProfile}</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[150px]">{d.colCredential}</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[120px]">{d.colPrice}</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[130px]">{d.colActive}</th>
-                  <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right min-w-[120px]">{d.colAction}</th>
+                <tr className="bg-stone-50/80 dark:bg-[#0b0f19]/80 border-b border-stone-100 dark:border-slate-800">
+                  <th className="px-5 py-3 text-[10px] font-bold text-stone-400 uppercase tracking-wider min-w-[140px]">{d.colAsset}</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-stone-400 uppercase tracking-wider min-w-[120px]">{d.colProfile}</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-stone-400 uppercase tracking-wider min-w-[150px]">{d.colCredential}</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-stone-400 uppercase tracking-wider min-w-[120px]">{d.colPrice}</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-stone-400 uppercase tracking-wider min-w-[130px]">{d.colActive}</th>
+                  <th className="px-5 py-3 text-[10px] font-bold text-stone-400 uppercase tracking-wider text-right min-w-[120px]">{d.colAction}</th>
                 </tr>
               </thead>
-              <tbody className={`divide-y divide-slate-50 dark:divide-slate-800/60 transition-all duration-150 ${isTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
+              <tbody className={`divide-y divide-stone-50 dark:divide-slate-800/60 transition-all duration-150 ${isTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
                 {paginatedGroups.map((group) => {
                   const groupKey = `${group.name}:::${group.tier}`;
                   const isExpanded = expandedGroups[groupKey];
                   return (
                     <React.Fragment key={groupKey}>
                       <tr 
-                        className="hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-colors cursor-pointer bg-slate-50/30 dark:bg-slate-900/20"
+                        className="hover:bg-blue-50/50 dark:hover:bg-indigo-900/10 transition-colors cursor-pointer bg-stone-50/30 dark:bg-slate-900/20"
                         onClick={() => toggleGroup(groupKey)}
                       >
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <span className="font-extrabold text-slate-900 dark:text-slate-100 text-sm">{group.name}</span>
+                            <span className="font-extrabold text-stone-900 dark:text-slate-100 text-sm">{group.name}</span>
                             {group.tier && (
-                              <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-[10px] uppercase tracking-wide">
+                              <span className="px-2 py-0.5 rounded-full bg-stone-200 dark:bg-slate-700 text-stone-800 dark:text-slate-200 font-bold text-[10px] uppercase tracking-wide">
                                 {group.tier}
                               </span>
                             )}
                           </div>
                         </td>
                         <td className="px-5 py-4">
-                          <div className="flex items-center gap-1.5 font-bold text-slate-600 dark:text-slate-300 text-xs">
-                            <Package className="w-4 h-4 text-indigo-500" />
+                          <div className="flex items-center gap-1.5 font-bold text-stone-600 dark:text-slate-300 text-xs">
+                            <Package className="w-4 h-4 text-blue-500" />
                             {group.totalStock} {d.accounts}
                           </div>
                         </td>
@@ -441,15 +441,15 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                         const isDeleting = deletingId === item.id;
                         const isUpdating = updatingId === item.id;
                         return (
-                          <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors border-l-4 border-l-indigo-400 dark:border-l-indigo-600">
+                          <tr key={item.id} className="hover:bg-stone-50/50 dark:hover:bg-slate-800/20 transition-colors border-l-4 border-l-blue-400 dark:border-l-blue-600">
                             <td className="px-5 py-3.5 pl-6">
-                              <div className="flex items-center gap-1.5 mt-1 text-[10px] text-slate-400">
+                              <div className="flex items-center gap-1.5 mt-1 text-[10px] text-stone-400">
                                 <Shield className="w-3 h-3" />
                                 <span>Stok ID: {item.id.slice(0, 6)}</span>
                               </div>
                             </td>
                             <td className="px-5 py-3.5">
-                              <span className="font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-[11px]">
+                              <span className="font-bold text-stone-700 dark:text-slate-300 bg-stone-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-[11px]">
                                 {item.profile_name || d.unassigned}
                               </span>
                             </td>
@@ -461,27 +461,27 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                               ) : null}
                               {item.password ? (
                                 <div className="flex flex-wrap items-center gap-1.5">
-                                  <span className="text-[10px] text-slate-400 select-none">🔑</span>
+                                  <span className="text-[10px] text-stone-400 select-none">🔑</span>
                                   <CopyableCredential value={item.password} label={d.password} isPassword />
                                   {item.pin && (
-                                    <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px]">
+                                    <span className="inline-flex items-center gap-1 bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px]">
                                       PIN: <CopyableCredential value={item.pin} label={d.pin} isTiny />
                                     </span>
                                   )}
                                 </div>
                               ) : null}
-                              {!item.email && !item.password && <span className="text-slate-300 italic text-[11px] font-sans">{d.noCredential}</span>}
+                              {!item.email && !item.password && <span className="text-stone-300 italic text-[11px] font-sans">{d.noCredential}</span>}
                             </td>
                             <td className="px-5 py-3.5">
                               {/* Empty price col for children as parent shows it, or show if it differs */}
                             </td>
-                            <td className="px-5 py-3.5 text-[11px] text-slate-500">
+                            <td className="px-5 py-3.5 text-[11px] text-stone-500">
                               <div className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3 text-slate-400" />
+                                <Calendar className="w-3 h-3 text-stone-400" />
                                 <span>{d.buy.replace("{date}", item.date_buy || "N/A")}</span>
                               </div>
                               <div className="flex items-center gap-1 mt-0.5">
-                                <span className="w-3 text-center text-slate-300">↳</span>
+                                <span className="w-3 text-center text-stone-300">↳</span>
                                 <span className="text-red-500 font-medium">{d.exp.replace("{date}", item.date_expired || "N/A")}</span>
                               </div>
                             </td>
@@ -492,7 +492,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                                 size="sm"
                                 onPress={() => setEditingItem(item)}
                                 isDisabled={isDeleting || isUpdating}
-                                className="h-7 w-7 min-w-0 text-slate-400 data-[hover=true]:text-indigo-600 dark:data-[hover=true]:text-indigo-400 data-[hover=true]:bg-indigo-50 dark:data-[hover=true]:bg-indigo-950/40"
+                                className="h-7 w-7 min-w-0 text-stone-400 data-[hover=true]:text-blue-600 dark:data-[hover=true]:text-blue-400 data-[hover=true]:bg-blue-50 dark:data-[hover=true]:bg-blue-950/40"
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -502,7 +502,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                                 size="sm"
                                 onPress={() => setDeleteConfirmId(item.id)}
                                 isDisabled={isDeleting}
-                                className="h-7 w-7 min-w-0 text-slate-400 data-[hover=true]:text-red-600 dark:data-[hover=true]:text-red-400 data-[hover=true]:bg-red-50 dark:data-[hover=true]:bg-red-950/40"
+                                className="h-7 w-7 min-w-0 text-stone-400 data-[hover=true]:text-red-600 dark:data-[hover=true]:text-red-400 data-[hover=true]:bg-red-50 dark:data-[hover=true]:bg-red-950/40"
                               >
                                 {isDeleting ? <Loader2 className="w-4 h-4 animate-spin text-red-600" /> : <Trash2 className="w-4 h-4" />}
                               </Button>
@@ -515,7 +515,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                 })}
                 {groupedItems.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-5 py-10 text-center text-slate-400 italic">
+                    <td colSpan={6} className="px-5 py-10 text-center text-stone-400 italic">
                       {d.noProducts}
                     </td>
                   </tr>
@@ -524,13 +524,13 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
             </table>
           </div>
           {totalPages > 1 && (
-            <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                Menampilkan <strong className="text-slate-700 dark:text-slate-200">{startIndex + 1}</strong> to{" "}
-                <strong className="text-slate-700 dark:text-slate-200">
+            <div className="px-5 py-3 bg-stone-50/50 dark:bg-[#0b0f19]/50 border-t border-stone-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
+              <span className="text-[11px] font-bold text-stone-500 dark:text-slate-400">
+                Menampilkan <strong className="text-stone-700 dark:text-slate-200">{startIndex + 1}</strong> to{" "}
+                <strong className="text-stone-700 dark:text-slate-200">
                   {Math.min(startIndex + itemPerPage, groupedItems.length)}
                 </strong>{" "}
-                dari <strong className="text-slate-700 dark:text-slate-200">{groupedItems.length}</strong> grup
+                dari <strong className="text-stone-700 dark:text-slate-200">{groupedItems.length}</strong> grup
               </span>
               <div className="flex items-center gap-1">
                 <Button
@@ -538,7 +538,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                   radius="lg"
                   onPress={() => handlePageChange(Math.max(1, currentPage - 1))}
                   isDisabled={currentPage === 1}
-                  className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+                  className="h-[26px] min-w-0 px-2.5 font-bold text-stone-600 dark:text-slate-300 border-stone-200 dark:border-slate-700"
                 >
                   Seb
                 </Button>
@@ -550,7 +550,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                     radius="lg"
                     onPress={() => handlePageChange(page)}
                     className={`h-[26px] min-w-[26px] px-0 font-bold ${
-                      currentPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+                      currentPage === page ? "shadow-xs" : "border-stone-200 dark:border-slate-700 text-stone-600 dark:text-slate-300"
                     }`}
                   >
                     {page}
@@ -561,7 +561,7 @@ export function InventoryTable({ storeId, items, currency = "IDR", isPremium = f
                   radius="lg"
                   onPress={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                   isDisabled={currentPage === totalPages}
-                  className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+                  className="h-[26px] min-w-0 px-2.5 font-bold text-stone-600 dark:text-slate-300 border-stone-200 dark:border-slate-700"
                 >
                   Lanjut
                 </Button>

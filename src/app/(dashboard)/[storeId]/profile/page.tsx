@@ -57,7 +57,7 @@ export default async function UserProfilePage({
             activeUntil={profile.subscription_active_until}
           />
           <AppearanceSettingsPanel />
-          <div className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-lg shadow-sm font-sans">
+          <div className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] border border-stone-200/60 dark:border-slate-800/80 rounded-lg shadow-sm font-sans">
             <MfaEnrollment />
           </div>
         </div>

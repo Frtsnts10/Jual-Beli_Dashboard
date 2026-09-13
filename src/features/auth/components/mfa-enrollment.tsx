@@ -128,17 +128,17 @@ export function MfaEnrollment() {
   }
 
   return (
-    <div className="flex flex-col p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0b0f19]/50 gap-3">
+    <div className="flex flex-col p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-[#0b0f19]/50 gap-3">
       <div id="recaptcha-container"></div>
       
       <div className="flex items-center justify-between">
         <div className="flex gap-3 items-center">
-          <div className="w-8 h-8 rounded-full bg-slate-200/50 dark:bg-slate-800/50 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-stone-200/50 dark:bg-slate-800/50 flex items-center justify-center">
             <ShieldAlert className="w-4 h-4 text-rose-500 dark:text-rose-400" />
           </div>
           <div>
-            <h4 className="text-[11px] font-bold text-slate-900 dark:text-slate-100">Two-Factor Auth</h4>
-            <p className="text-[9px] text-slate-500">Protect your account with SMS</p>
+            <h4 className="text-[11px] font-bold text-stone-900 dark:text-slate-100">Two-Factor Auth</h4>
+            <p className="text-[9px] text-stone-500">Protect your account with SMS</p>
           </div>
         </div>
         {step === "idle" && (
@@ -161,7 +161,7 @@ export function MfaEnrollment() {
             value={phoneNumber}
             onValueChange={setPhoneNumber}
             classNames={{
-              inputWrapper: "h-8 bg-white dark:bg-black/40 border-slate-200 dark:border-white/10",
+              inputWrapper: "h-8 bg-white dark:bg-black/40 border-stone-200 dark:border-white/10",
               input: "text-[11px]"
             }}
           />
@@ -169,7 +169,7 @@ export function MfaEnrollment() {
             size="sm" 
             isLoading={isLoading} 
             onPress={handleSendCode}
-            className="h-8 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-[10px] font-bold"
+            className="h-8 bg-stone-900 dark:bg-slate-100 text-white dark:text-slate-900 text-[10px] font-bold"
           >
             Send
           </Button>
@@ -185,7 +185,7 @@ export function MfaEnrollment() {
             onValueChange={setVerificationCode}
             maxLength={6}
             classNames={{
-              inputWrapper: "h-8 bg-white dark:bg-black/40 border-slate-200 dark:border-white/10",
+              inputWrapper: "h-8 bg-white dark:bg-black/40 border-stone-200 dark:border-white/10",
               input: "text-[11px] font-mono tracking-widest text-center"
             }}
           />

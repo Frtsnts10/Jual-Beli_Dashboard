@@ -26,15 +26,15 @@ export function AppearanceSettingsPanel() {
   };
 
   return (
-    <div className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-3 transition-colors">
+    <div className="p-4 sm:p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-stone-200/60 dark:border-slate-800/80 shadow-sm space-y-3 transition-colors">
       <div>
-        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-          <Monitor className="w-4 h-4 text-indigo-500" /> {t.settings.appearanceTitle}
+        <h3 className="text-sm font-bold text-stone-900 dark:text-slate-100 flex items-center gap-1.5">
+          <Monitor className="w-4 h-4 text-blue-500" /> {t.settings.appearanceTitle}
         </h3>
-        <p className="text-xs text-slate-500 mt-0.5 mb-5">{t.settings.appearanceSubtitle}</p>
+        <p className="text-xs text-stone-500 mt-0.5 mb-5">{t.settings.appearanceSubtitle}</p>
       </div>
 
-      <div className="inline-flex p-1 bg-slate-100 dark:bg-[#0b0f19] rounded-lg border border-slate-200/80 dark:border-slate-800 gap-1 text-xs font-bold w-full">
+      <div className="inline-flex p-1 bg-stone-100 dark:bg-[#0b0f19] rounded-lg border border-stone-200/80 dark:border-slate-800 gap-1 text-xs font-bold w-full">
         <Button
           type="button"
           onPress={() => handleThemeChange("system")}
@@ -42,8 +42,8 @@ export function AppearanceSettingsPanel() {
           variant={activeTheme === "system" ? "solid" : "light"}
           className={`flex-1 flex items-center justify-center gap-1.5 h-8 ${
             activeTheme === "system"
-              ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm"
-              : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
+              ? "bg-white dark:bg-slate-800 text-blue-600 dark:text-indigo-400 shadow-sm"
+              : "text-stone-500 hover:text-stone-800 dark:hover:text-slate-300"
           }`}
         >
           <Monitor className="w-3.5 h-3.5" />
@@ -56,8 +56,8 @@ export function AppearanceSettingsPanel() {
           variant={activeTheme === "light" ? "solid" : "light"}
           className={`flex-1 flex items-center justify-center gap-1.5 h-8 ${
             activeTheme === "light"
-              ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm"
-              : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
+              ? "bg-white dark:bg-slate-800 text-blue-600 dark:text-indigo-400 shadow-sm"
+              : "text-stone-500 hover:text-stone-800 dark:hover:text-slate-300"
           }`}
         >
           <Sun className="w-3.5 h-3.5" />
@@ -70,8 +70,8 @@ export function AppearanceSettingsPanel() {
           variant={activeTheme === "dark" ? "solid" : "light"}
           className={`flex-1 flex items-center justify-center gap-1.5 h-8 ${
             activeTheme === "dark"
-              ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm"
-              : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
+              ? "bg-white dark:bg-slate-800 text-blue-600 dark:text-indigo-400 shadow-sm"
+              : "text-stone-500 hover:text-stone-800 dark:hover:text-slate-300"
           }`}
         >
           <Moon className="w-3.5 h-3.5" />

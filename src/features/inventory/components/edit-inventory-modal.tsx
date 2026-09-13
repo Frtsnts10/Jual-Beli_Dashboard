@@ -145,15 +145,15 @@ export function EditInventoryModal({
         setIsConfirmOpen(true);
       }
     }} size="2xl" scrollBehavior="inside" classNames={{
-      base: "bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-lg shadow-2xl",
-      header: "bg-slate-50 dark:bg-[#0b0f19] border-b border-slate-100 dark:border-slate-800",
+      base: "bg-white dark:bg-[#0d1322] border border-stone-200 dark:border-slate-800 rounded-lg shadow-2xl",
+      header: "bg-stone-50 dark:bg-[#0b0f19] border-b border-stone-100 dark:border-slate-800",
       body: "p-6 space-y-8"
     }}>
       <ModalContent>
         {(onClose) => (
           <form onSubmit={handleSubmit} className="flex flex-col h-full">
             <ModalHeader className="flex flex-col gap-1">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              <h3 className="text-sm font-bold text-stone-900 dark:text-slate-100">
                 {t.inventoryForm.editTitle}
               </h3>
             </ModalHeader>
@@ -166,7 +166,7 @@ export function EditInventoryModal({
                   onChange={handleCategoryChange}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", trigger: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 >
                   {ALL_CATEGORIES.map((opt) => (
                     <SelectItem key={opt} textValue={opt}>{opt}</SelectItem>
@@ -180,7 +180,7 @@ export function EditInventoryModal({
                   isDisabled={!category}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", trigger: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 >
                   {productOptions.map((opt) => (
                     <SelectItem key={opt} textValue={opt}>{opt}</SelectItem>
@@ -193,7 +193,7 @@ export function EditInventoryModal({
                   isDisabled={!name}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", trigger: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", trigger: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 >
                   {tierOptions.map((opt) => (
                     <SelectItem key={opt} textValue={formatTierName(opt)}>{formatTierName(opt)}</SelectItem>
@@ -205,7 +205,7 @@ export function EditInventoryModal({
                   onValueChange={setProfileName}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
               </div>
 
@@ -216,10 +216,10 @@ export function EditInventoryModal({
                 onValueChange={setGroupName}
                 variant="bordered"
                 radius="lg"
-                classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-2 border-t border-stone-100 dark:border-slate-800">
                 <Input
                   type="email"
                   labelPlacement="outside" label={t.inventoryForm.accountEmail}
@@ -227,7 +227,7 @@ export function EditInventoryModal({
                   onValueChange={setEmail}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   type={isVisible ? "text" : "password"}
@@ -245,7 +245,7 @@ export function EditInventoryModal({
                       )}
                     </button>
                   }
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   type="text"
@@ -254,11 +254,11 @@ export function EditInventoryModal({
                   onValueChange={setPin}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6 pt-2 border-t border-stone-100 dark:border-slate-800">
                 <Input
                   type="text"
                   inputMode="decimal"
@@ -268,7 +268,7 @@ export function EditInventoryModal({
                   onBlur={() => handlePriceBlur(setBasePriceStr, basePriceStr)}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   type="text"
@@ -280,7 +280,7 @@ export function EditInventoryModal({
                   onBlur={() => handlePriceBlur(setSellingPriceStr, sellingPriceStr)}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <Input
                   type="number"
@@ -289,18 +289,18 @@ export function EditInventoryModal({
                   onValueChange={setStock}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 pt-2 border-t border-stone-100 dark:border-slate-800">
                 <DatePicker
                   labelPlacement="outside" label={t.inventoryForm.purchaseDate}
                   value={dateBuy ? (parseDate(dateBuy.split("T")[0]) as any) : null}
                   onChange={(val) => setDateBuy(val ? val.toString() : "")}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
                 <DatePicker
                   labelPlacement="outside" label={t.inventoryForm.expDate}
@@ -308,12 +308,12 @@ export function EditInventoryModal({
                   onChange={(val) => setDateExpired(val ? val.toString() : "")}
                   variant="bordered"
                   radius="lg"
-                  classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+                  classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
                 />
               </div>
             </ModalBody>
-            <ModalFooter className="border-t border-slate-100 dark:border-slate-800">
-              <Button variant="light" onPress={onClose} radius="lg" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            <ModalFooter className="border-t border-stone-100 dark:border-slate-800">
+              <Button variant="light" onPress={onClose} radius="lg" className="text-xs font-bold text-stone-700 dark:text-slate-300">
                 Cancel
               </Button>
               <Button type="submit" isLoading={isPending} color="primary" radius="lg" className="text-xs font-bold shadow-md">

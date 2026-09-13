@@ -57,7 +57,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
   }, {} as Record<string, Complaint[]>);
 
   const priorityStyles: Record<Complaint["priority"], string> = {
-    low: "bg-slate-50 dark:bg-[#0b0f19] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800",
+    low: "bg-stone-50 dark:bg-[#0b0f19] text-stone-500 dark:text-slate-400 border-stone-200 dark:border-slate-800",
     medium: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/40",
     high: "bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 border-red-300 dark:border-red-800/80 shadow-2xs font-extrabold transition-colors",
   };
@@ -68,47 +68,47 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
         Object.entries(groupedComplaints).map(([userName, userComplaints]) => (
           <div
             key={userName}
-            className="bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/80 dark:border-slate-800/80 shadow-sm overflow-hidden transition-all hover:shadow-md"
+            className="bg-white dark:bg-[#0d1322] rounded-lg border border-stone-200/80 dark:border-slate-800/80 shadow-sm overflow-hidden transition-all hover:shadow-md"
           >
             {/* User Grouping Header Container */}
-            <div className="bg-gradient-to-r from-slate-50 dark:from-[#0b0f19] to-slate-100/60 dark:to-[#0d1322]/60 px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+            <div className="bg-gradient-to-r from-stone-50 dark:from-[#0b0f19] to-stone-100/60 dark:to-[#0d1322]/60 px-6 py-4 border-b border-stone-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs border border-indigo-100 dark:border-indigo-900/50 shrink-0 shadow-inner">
+                <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-indigo-950/50 text-blue-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs border border-blue-100 dark:border-indigo-900/50 shrink-0 shadow-inner">
                   <User className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">
+                  <span className="text-[10px] font-bold text-stone-400 dark:text-slate-500 uppercase tracking-widest block">
                     Grouped Telemetry Vector
                   </span>
-                  <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{userName}</h4>
+                  <h4 className="text-sm font-extrabold text-stone-900 dark:text-slate-100">{userName}</h4>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 bg-white dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-300 shadow-2xs transition-colors">
+                <span className="px-2.5 py-1 bg-white dark:bg-[#0b0f19] border border-stone-200 dark:border-slate-800 rounded-lg text-[11px] font-bold text-stone-600 dark:text-slate-300 shadow-2xs transition-colors">
                   Active SLA Logs:{" "}
-                  <span className="text-indigo-600 dark:text-indigo-400 font-black">{userComplaints.length}</span>
+                  <span className="text-blue-600 dark:text-indigo-400 font-black">{userComplaints.length}</span>
                 </span>
               </div>
             </div>
 
             {/* User Complaints Matrix List */}
-            <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
+            <div className="divide-y divide-stone-100 dark:divide-slate-800/60">
               {userComplaints.map((c) => {
                 const isDeleting = deletingId === c.id;
                 const isSatisfying = satisfactionId === c.id;
 
                 return (
-                  <div key={c.id} className="p-5 sm:p-6 flex flex-col lg:flex-row gap-5 items-start justify-between hover:bg-slate-50/20 dark:hover:bg-slate-800/20 transition-colors">
+                  <div key={c.id} className="p-5 sm:p-6 flex flex-col lg:flex-row gap-5 items-start justify-between hover:bg-stone-50/20 dark:hover:bg-slate-800/20 transition-colors">
                     {/* Left Column: Core context description */}
                     <div className="space-y-2.5 max-w-2xl flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider border ${priorityStyles[c.priority]}`}>
                           {c.priority} Priority
                         </span>
-                        <h5 className="text-xs font-black text-slate-900 dark:text-slate-100 tracking-tight">{c.title}</h5>
+                        <h5 className="text-xs font-black text-stone-900 dark:text-slate-100 tracking-tight">{c.title}</h5>
                       </div>
 
-                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal bg-slate-50/50 dark:bg-[#0b0f19]/50 p-3 rounded-lg border border-slate-100/80 dark:border-slate-800/80 transition-colors">
+                      <p className="text-xs text-stone-600 dark:text-slate-300 leading-relaxed font-normal bg-stone-50/50 dark:bg-[#0b0f19]/50 p-3 rounded-lg border border-stone-100/80 dark:border-slate-800/80 transition-colors">
                         {c.description}
                       </p>
 
@@ -120,7 +120,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                         </div>
                       ) : (
                         <div className="flex flex-wrap items-center gap-2 pt-1">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase">Apply Satisfaction Goodwill:</span>
+                          <span className="text-[10px] font-bold text-stone-400 uppercase">Apply Satisfaction Goodwill:</span>
                           
                           {/* Satisfaction Trigger Tokens */}
                           {refundingId === c.id ? (
@@ -130,7 +130,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                                 placeholder={`Amount in ${currency}`}
                                 value={refundAmount}
                                 onChange={(e) => setRefundAmount(e.target.value)}
-                                className="px-2 py-1 text-[10px] w-24 bg-white dark:bg-[#0b0f19] border border-red-200 dark:border-red-900/40 rounded-lg text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-red-500"
+                                className="px-2 py-1 text-[10px] w-24 bg-white dark:bg-[#0b0f19] border border-red-200 dark:border-red-900/40 rounded-lg text-stone-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-red-500"
                                 autoFocus
                               />
                               <button
@@ -144,7 +144,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                               <button
                                 type="button"
                                 onClick={() => setRefundingId(null)}
-                                className="px-2 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-[10px] font-bold transition-colors"
+                                className="px-2 py-1 bg-stone-200 dark:bg-slate-800 hover:bg-stone-300 dark:hover:bg-slate-700 text-stone-700 dark:text-slate-300 rounded-lg text-[10px] font-bold transition-colors"
                               >
                                 Cancel
                               </button>
@@ -164,7 +164,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                             type="button"
                             onClick={() => handleSatisfaction(c.id, "Extended Access (+7 Days)")}
                             disabled={isSatisfying}
-                            className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/40 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
+                            className="px-2.5 py-1 bg-blue-50 dark:bg-indigo-950/20 hover:bg-blue-100 dark:hover:bg-indigo-900/30 text-blue-700 dark:text-indigo-400 border border-blue-200 dark:border-indigo-900/40 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
                           >
                             <Gift className="w-2.5 h-2.5" /> Free Plus 7 Days
                           </button>
@@ -173,7 +173,7 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                             type="button"
                             onClick={() => handleSatisfaction(c.id, "Priority Account Support Toko Assigned")}
                             disabled={isSatisfying}
-                            className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
+                            className="px-2.5 py-1 bg-stone-100 dark:bg-slate-800 hover:bg-stone-200 dark:hover:bg-slate-700 text-stone-700 dark:text-slate-300 border border-stone-200/80 dark:border-slate-700/80 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
                           >
                             <ShieldAlert className="w-2.5 h-2.5" /> Route Premium Pool
                           </button>
@@ -182,22 +182,22 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
                     </div>
 
                     {/* Right Column: Dynamic Matrix Badges & Controls */}
-                    <div className="flex items-center lg:flex-col justify-between w-full lg:w-auto gap-4 lg:items-end border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100 dark:border-slate-800 shrink-0 transition-colors">
+                    <div className="flex items-center lg:flex-col justify-between w-full lg:w-auto gap-4 lg:items-end border-t lg:border-t-0 pt-3 lg:pt-0 border-stone-100 dark:border-slate-800 shrink-0 transition-colors">
                       <div className="flex items-center gap-2 lg:flex-col lg:items-end">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+                        <span className="text-[9px] font-bold text-stone-400 uppercase tracking-wider block">
                           State Matrix
                         </span>
                         <ComplaintStatusBadge storeId={storeId} complaint={c} />
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-400 font-mono hidden sm:inline-block">
+                        <span className="text-[10px] text-stone-400 font-mono hidden sm:inline-block">
                           ID: {c.id.split("-")[0]}
                         </span>
                         <button
                           onClick={() => handleDelete(c.id)}
                           disabled={isDeleting}
-                          className="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors disabled:opacity-50"
+                          className="p-2 text-stone-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors disabled:opacity-50"
                           title="Erase Incident Matrix"
                         >
                           {isDeleting ? <Loader2 className="w-4 h-4 animate-spin text-red-600 dark:text-red-400" /> : <Trash2 className="w-4 h-4" />}
@@ -211,11 +211,11 @@ export function ComplaintTable({ storeId, complaints, currency = "IDR" }: Compla
           </div>
         ))
       ) : (
-        <div className="p-12 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 text-center space-y-2 shadow-2xs transition-colors">
-          <p className="text-xs font-bold text-slate-400 italic uppercase tracking-wider">
+        <div className="p-12 bg-white dark:bg-[#0d1322] rounded-lg border border-stone-200/60 dark:border-slate-800/80 text-center space-y-2 shadow-2xs transition-colors">
+          <p className="text-xs font-bold text-stone-400 italic uppercase tracking-wider">
             SLA Streams Highly Operational
           </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-stone-500 dark:text-slate-400">
             Zero support breakdown incidents or streaming credentials logged. Use the master payload form to provision logs manually.
           </p>
         </div>

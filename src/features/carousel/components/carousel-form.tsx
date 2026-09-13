@@ -40,11 +40,11 @@ export function CarouselForm({ storeId, nextOrder, onSuccess }: CarouselFormProp
   return (
     <form onSubmit={handleSubmit} className="p-6 space-y-6 font-sans transition-colors">
       <div>
-        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-          <PlusCircle className="w-4 h-4 text-indigo-600" />
+        <h3 className="text-sm font-bold text-stone-900 dark:text-slate-100 flex items-center gap-2">
+          <PlusCircle className="w-4 h-4 text-blue-600" />
           Add Hero Slide
         </h3>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-stone-500 mt-0.5">
           Slides appear on the main storefront hero carousel, ordered lowest to highest.
         </p>
       </div>
@@ -58,7 +58,7 @@ export function CarouselForm({ storeId, nextOrder, onSuccess }: CarouselFormProp
           isRequired
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <Input
           name="image_url"
@@ -68,7 +68,7 @@ export function CarouselForm({ storeId, nextOrder, onSuccess }: CarouselFormProp
           isRequired
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
       </div>
 
@@ -80,7 +80,7 @@ export function CarouselForm({ storeId, nextOrder, onSuccess }: CarouselFormProp
         variant="bordered"
         radius="lg"
         minRows={2}
-        classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+        classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-6">
@@ -91,7 +91,7 @@ export function CarouselForm({ storeId, nextOrder, onSuccess }: CarouselFormProp
           placeholder="Shop Now"
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <Input
           name="cta_link"
@@ -100,7 +100,7 @@ export function CarouselForm({ storeId, nextOrder, onSuccess }: CarouselFormProp
           placeholder="/products"
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
         <Input
           name="order"
@@ -110,14 +110,14 @@ export function CarouselForm({ storeId, nextOrder, onSuccess }: CarouselFormProp
           defaultValue={nextOrder.toString()}
           variant="bordered"
           radius="lg"
-          classNames={{ label: "font-bold text-slate-700 dark:text-slate-300", inputWrapper: "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
+          classNames={{ label: "font-bold text-stone-700 dark:text-slate-300", inputWrapper: "border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] shadow-sm" }}
         />
       </div>
 
-      <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+      <div className="flex items-center justify-between pt-2 border-t border-stone-100 dark:border-slate-800">
         <div className="flex items-center gap-3 pt-4">
           <Switch isSelected={active} onValueChange={setActive} size="sm" />
-          <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
+          <span className="text-xs font-bold text-stone-600 dark:text-slate-400">
             {active ? "Visible on storefront" : "Hidden (draft)"}
           </span>
         </div>

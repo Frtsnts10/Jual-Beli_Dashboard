@@ -88,14 +88,14 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm space-y-4 font-sans transition-colors"
+      className="p-6 bg-white dark:bg-[#0d1322] rounded-lg border border-stone-200/60 dark:border-slate-800/80 shadow-sm space-y-4 font-sans transition-colors"
     >
       <div>
-        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-          <UserPlus className="w-4 h-4 text-indigo-600" />
+        <h3 className="text-sm font-bold text-stone-900 dark:text-slate-100 flex items-center gap-2">
+          <UserPlus className="w-4 h-4 text-blue-600" />
           Register Customer & Order Variant
         </h3>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-stone-500 mt-0.5">
           Sediakan profil pembeli beserta aliran produk tersemat dan pemetaan durasi otomatis.
         </p>
       </div>
@@ -116,9 +116,9 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
           variant="faded"
           radius="lg"
           classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[52px]",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+            inputWrapper: "bg-stone-50 dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[52px]",
+            label: "text-[10px] font-bold text-stone-400 uppercase",
+            input: "text-xs font-bold text-stone-800 dark:text-slate-100"
           }}
         />
         <Input
@@ -129,32 +129,32 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
           variant="faded"
           radius="lg"
           classNames={{
-            inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[52px]",
-            label: "text-[10px] font-bold text-slate-400 uppercase",
-            input: "text-xs text-slate-800 dark:text-slate-100"
+            inputWrapper: "bg-stone-50 dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[52px]",
+            label: "text-[10px] font-bold text-stone-400 uppercase",
+            input: "text-xs text-stone-800 dark:text-slate-100"
           }}
         />
         <div>
           <div className="flex flex-col gap-0.5">
-            <label className="text-[10px] font-bold text-slate-400 uppercase">Phone Number</label>
-            <div className="flex items-center w-full h-[34px] bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-lg focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-colors relative">
+            <label className="text-[10px] font-bold text-stone-400 uppercase">Phone Number</label>
+            <div className="flex items-center w-full h-[34px] bg-stone-50 dark:bg-[#0b0f19] border border-stone-200 dark:border-slate-800 rounded-lg focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-colors relative">
             {/* Custom Popover Trigger */}
             <button
               type="button"
               onClick={() => setIsOpenCountry(!isOpenCountry)}
-              className="h-full px-2.5 flex items-center gap-1.5 bg-transparent text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800 focus:outline-none cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors shrink-0"
+              className="h-full px-2.5 flex items-center gap-1.5 bg-transparent text-xs font-bold text-stone-700 dark:text-slate-300 border-r border-stone-200 dark:border-slate-800 focus:outline-none cursor-pointer hover:bg-stone-100 dark:hover:bg-slate-800/50 transition-colors shrink-0"
               title={selectedCountryObj.country}
             >
               <span>{selectedCountryObj.flag}</span>
               <span>{selectedCountryObj.code}</span>
-              <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${isOpenCountry ? "rotate-180" : ""}`} />
+              <ChevronDown className={`w-3 h-3 text-stone-400 transition-transform ${isOpenCountry ? "rotate-180" : ""}`} />
             </button>
 
             {/* Custom Floating Popover Menu List */}
             {isOpenCountry && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setIsOpenCountry(false)} />
-                <div className="absolute top-[36px] left-0 z-50 w-64 max-h-56 overflow-y-auto bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-lg shadow-xl py-1">
+                <div className="absolute top-[36px] left-0 z-50 w-64 max-h-56 overflow-y-auto bg-white dark:bg-[#0d1322] border border-stone-200 dark:border-slate-800 rounded-lg shadow-xl py-1">
                   {COUNTRY_CODES.map((item) => {
                     const isSelected = item.code === countryCode;
                     return (
@@ -165,13 +165,13 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
                           setCountryCode(item.code);
                           setIsOpenCountry(false);
                         }}
-                        className={`w-full px-3 py-1.5 text-left text-xs flex items-center gap-2.5 hover:bg-slate-50 dark:hover:bg-[#131b2e] transition-colors ${
-                          isSelected ? "bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 font-bold" : "text-slate-700 dark:text-slate-300 font-medium"
+                        className={`w-full px-3 py-1.5 text-left text-xs flex items-center gap-2.5 hover:bg-stone-50 dark:hover:bg-[#131b2e] transition-colors ${
+                          isSelected ? "bg-blue-50/50 dark:bg-indigo-950/20 text-blue-600 dark:text-indigo-400 font-bold" : "text-stone-700 dark:text-slate-300 font-medium"
                         }`}
                       >
                         <span className="text-sm">{item.flag}</span>
                         <span className="font-bold w-10 shrink-0">{item.code}</span>
-                        <span className="text-slate-500 dark:text-slate-400 truncate">{item.country}</span>
+                        <span className="text-stone-500 dark:text-slate-400 truncate">{item.country}</span>
                       </button>
                     );
                   })}
@@ -184,7 +184,7 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="812-3456-7890"
-              className="w-full h-full px-2.5 bg-transparent text-xs text-slate-800 dark:text-slate-100 font-medium focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
+              className="w-full h-full px-2.5 bg-transparent text-xs text-stone-800 dark:text-slate-100 font-medium focus:outline-none placeholder:text-stone-400 dark:placeholder:text-slate-600"
             />
             {/* Hidden combined payload for standard form submission */}
             <input
@@ -198,19 +198,19 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
       </div>
 
       {/* Ordered Product Embedded Sub-Form */}
-      <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+      <div className="pt-2 border-t border-stone-100 dark:border-slate-800">
         <div className="flex items-center justify-between mb-2.5">
-          <label className="flex items-center gap-1.5 text-xs font-bold text-indigo-950 dark:text-indigo-400">
-            <ShoppingBag className="w-3.5 h-3.5 text-indigo-600" />
+          <label className="flex items-center gap-1.5 text-xs font-bold text-blue-950 dark:text-indigo-400">
+            <ShoppingBag className="w-3.5 h-3.5 text-blue-600" />
             <span>Petakan Item Pesanan Awal (Opsional)</span>
           </label>
-          <div className="flex items-center gap-1.5 text-[10px] text-slate-500 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
+          <div className="flex items-center gap-1.5 text-[10px] text-stone-500 bg-stone-100 dark:bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-stone-200/60 dark:border-slate-700/60">
             <Clock className="w-3 h-3 text-emerald-500 animate-pulse" />
             <span>Transaksi ditangkap otomatis dengan stempel waktu real-time yang akurat</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 p-3 bg-slate-50/70 dark:bg-[#0b0f19]/70 rounded-lg border border-slate-200/50 dark:border-slate-800/50 transition-colors items-end">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 p-3 bg-stone-50/70 dark:bg-[#0b0f19]/70 rounded-lg border border-stone-200/50 dark:border-slate-800/50 transition-colors items-end">
           {/* Active Inventory Product Selector */}
           <div className="flex flex-col">
             {distinctProducts.length > 0 ? (
@@ -223,9 +223,9 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
                 variant="faded"
                 radius="lg"
                 classNames={{
-                  trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
-                  label: "text-[9px] font-bold text-slate-400 uppercase",
-                  value: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                  trigger: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[34px] min-h-0",
+                  label: "text-[9px] font-bold text-stone-400 uppercase",
+                  value: "text-xs font-bold text-stone-800 dark:text-slate-100"
                 }}
               >
                 {distinctProducts.map((prodName) => (
@@ -243,9 +243,9 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
                 variant="faded"
                 radius="lg"
                 classNames={{
-                  inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px]",
-                  label: "text-[9px] font-bold text-slate-400 uppercase",
-                  input: "text-xs font-bold text-slate-800 dark:text-slate-100"
+                  inputWrapper: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[34px]",
+                  label: "text-[9px] font-bold text-stone-400 uppercase",
+                  input: "text-xs font-bold text-stone-800 dark:text-slate-100"
                 }}
               />
             )}
@@ -262,9 +262,9 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
               variant="faded"
               radius="lg"
               classNames={{
-                trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
-                label: "text-[9px] font-bold text-slate-400 uppercase",
-                value: "text-xs font-semibold text-slate-800 dark:text-slate-100"
+                trigger: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[34px] min-h-0",
+                label: "text-[9px] font-bold text-stone-400 uppercase",
+                value: "text-xs font-semibold text-stone-800 dark:text-slate-100"
               }}
             >
               {tierOptions.map((opt) => (
@@ -284,9 +284,9 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
               variant="faded"
               radius="lg"
               classNames={{
-                trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-0",
-                label: "text-[9px] font-bold text-slate-400 uppercase",
-                value: "text-xs font-bold text-indigo-900 dark:text-indigo-300"
+                trigger: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[34px] min-h-0",
+                label: "text-[9px] font-bold text-stone-400 uppercase",
+                value: "text-xs font-bold text-blue-900 dark:text-indigo-300"
               }}
             >
               <SelectItem key="1">1 Day Pass (24h)</SelectItem>
@@ -310,9 +310,9 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
               radius="lg"
               classNames={{
                 base: "h-[34px]",
-                inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
-                label: "text-[9px] font-bold text-slate-400 uppercase",
-                input: "text-xs font-medium text-slate-800 dark:text-slate-100"
+                inputWrapper: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[34px] min-h-[34px]",
+                label: "text-[9px] font-bold text-stone-400 uppercase",
+                input: "text-xs font-medium text-stone-800 dark:text-slate-100"
               }}
             />
             <input type="hidden" name="date_start" value={dateStart} />
@@ -330,8 +330,8 @@ export function CustomerForm({ storeId, inventoryItems = [], onSuccess }: Custom
               radius="lg"
               classNames={{
                 base: "h-[34px]",
-                inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[34px] min-h-[34px]",
-                label: "text-[9px] font-bold text-slate-400 uppercase",
+                inputWrapper: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[34px] min-h-[34px]",
+                label: "text-[9px] font-bold text-stone-400 uppercase",
                 input: "text-xs font-bold text-emerald-700 dark:text-emerald-400"
               }}
             />
