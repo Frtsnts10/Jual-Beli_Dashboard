@@ -2,34 +2,20 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+// Public client config — safe to embed directly (access is enforced by
+// Firestore Security Rules, not by keeping these values secret).
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  apiKey: "AIzaSyAFDaggQZQNTG850wYancu2H9WB0VYQ0fY",
+  authDomain: "web-store-4cf23.firebaseapp.com",
+  projectId: "web-store-4cf23",
+  storageBucket: "web-store-4cf23.firebasestorage.app",
+  messagingSenderId: "551756253728",
+  appId: "1:551756253728:web:c57962a3ddf26028da0a45"
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize auth and db safely, accounting for SSR/SSG build environments
-// where environment variables might not be populated yet.
-let auth: ReturnType<typeof getAuth>;
-let db: ReturnType<typeof getFirestore>;
-
-try {
-  auth = getAuth(app);
-} catch (error) {
-  console.warn("Firebase Auth initialization failed (likely during build):", error);
-  auth = {} as ReturnType<typeof getAuth>;
-}
-
-try {
-  db = getFirestore(app);
-} catch (error) {
-  console.warn("Firebase Firestore initialization failed (likely during build):", error);
-  db = {} as ReturnType<typeof getFirestore>;
-}
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 export { app, auth, db };

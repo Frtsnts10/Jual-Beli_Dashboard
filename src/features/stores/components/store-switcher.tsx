@@ -31,16 +31,16 @@ export function StoreSwitcher({ stores, profileId, maxStores = 3 }: StoreSwitche
   return (
     <>
       <div className="relative font-sans">
-        <Dropdown classNames={{ content: "w-56 bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800" }}>
+        <Dropdown classNames={{ content: "w-56 bg-white dark:bg-[#0d1322] border border-stone-200 dark:border-slate-800" }}>
           <DropdownTrigger>
             <Button
               variant="bordered"
               radius="lg"
-              className="w-56 h-[34px] justify-between border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0d1322] text-slate-800 dark:text-slate-100 font-bold"
-              endContent={<ChevronsUpDown className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1" />}
+              className="w-56 h-[34px] justify-between border-stone-200 dark:border-slate-800 bg-white dark:bg-[#0d1322] text-stone-800 dark:text-slate-100 font-bold"
+              endContent={<ChevronsUpDown className="w-3.5 h-3.5 text-stone-400 shrink-0 ml-1" />}
             >
               <div className="flex items-center gap-2 truncate">
-                <div className="p-1 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-lg shrink-0 flex items-center justify-center">
+                <div className="p-1 bg-blue-50 dark:bg-indigo-950/50 text-blue-600 dark:text-indigo-400 rounded-lg shrink-0 flex items-center justify-center">
                   <StoreIcon className="w-3.5 h-3.5" />
                 </div>
                 <span className="truncate font-bold">
@@ -65,12 +65,12 @@ export function StoreSwitcher({ stores, profileId, maxStores = 3 }: StoreSwitche
                       }
                     }}
                     endContent={
-                      isLocked ? <div className="text-[9px] uppercase tracking-wider font-bold text-slate-400">Locked</div> :
-                      selectedStore?.id === store.id ? <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" /> : null
+                      isLocked ? <div className="text-[9px] uppercase tracking-wider font-bold text-stone-400">Locked</div> :
+                      selectedStore?.id === store.id ? <Check className="w-3.5 h-3.5 text-blue-600 dark:text-indigo-400 shrink-0" /> : null
                     }
                     className={
-                      isLocked ? "opacity-70 text-slate-500" :
-                      selectedStore?.id === store.id ? "bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400" : ""
+                      isLocked ? "opacity-70 text-stone-500" :
+                      selectedStore?.id === store.id ? "bg-blue-50/80 dark:bg-indigo-950/40 text-blue-700 dark:text-indigo-400" : ""
                     }
                   >
                     <span className="truncate">{store.name}</span>
@@ -90,7 +90,7 @@ export function StoreSwitcher({ stores, profileId, maxStores = 3 }: StoreSwitche
                   }
                 }}
                 startContent={<Plus className="w-3.5 h-3.5" />}
-                className={isLimitReached ? "opacity-70 text-slate-500" : "text-indigo-600 dark:text-indigo-400 font-bold"}
+                className={isLimitReached ? "opacity-70 text-stone-500" : "text-blue-600 dark:text-indigo-400 font-bold"}
               >
                 {isLimitReached ? "Store Limit Reached" : "Add Store"}
               </DropdownItem>

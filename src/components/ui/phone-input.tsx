@@ -71,18 +71,18 @@ export function PhoneInput({
   const activeCountry = COUNTRY_CODES.find((c) => c.code === countryCode) || COUNTRY_CODES[0];
 
   const startContent = (
-    <div className="relative flex items-center pr-2 border-r border-slate-200 dark:border-slate-800">
+    <div className="relative flex items-center pr-2 border-r border-stone-200 dark:border-slate-800">
       <button
         type="button"
         onClick={() => setIsOpenCountry(!isOpenCountry)}
-        className="flex items-center gap-1.5 px-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+        className="flex items-center gap-1.5 px-1 hover:bg-stone-100 dark:hover:bg-slate-800 rounded transition-colors"
       >
         <span className="text-sm">{activeCountry.flag}</span>
-        <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+        <span className="text-xs font-bold text-stone-600 dark:text-slate-300">
           {countryCode}
         </span>
         <ChevronDown
-          className={`w-3 h-3 text-slate-400 transition-transform ${
+          className={`w-3 h-3 text-stone-400 transition-transform ${
             isOpenCountry ? "rotate-180" : ""
           }`}
         />
@@ -94,7 +94,7 @@ export function PhoneInput({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpenCountry(false)}
           />
-          <div className="absolute top-[120%] left-0 z-50 w-64 max-h-56 overflow-y-auto bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-lg shadow-xl py-1">
+          <div className="absolute top-[120%] left-0 z-50 w-64 max-h-56 overflow-y-auto bg-white dark:bg-[#0d1322] border border-stone-200 dark:border-slate-800 rounded-lg shadow-xl py-1">
             {COUNTRY_CODES.map((item) => {
               const isSelected = item.code === countryCode;
               return (
@@ -102,15 +102,15 @@ export function PhoneInput({
                   key={item.code + item.country}
                   type="button"
                   onClick={() => handleCountryChange(item.code)}
-                  className={`w-full px-3 py-1.5 text-left text-xs flex items-center gap-2.5 hover:bg-slate-50 dark:hover:bg-[#131b2e] transition-colors ${
+                  className={`w-full px-3 py-1.5 text-left text-xs flex items-center gap-2.5 hover:bg-stone-50 dark:hover:bg-[#131b2e] transition-colors ${
                     isSelected
-                      ? "bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 font-bold"
-                      : "text-slate-700 dark:text-slate-300 font-medium"
+                      ? "bg-blue-50/50 dark:bg-indigo-950/20 text-blue-600 dark:text-indigo-400 font-bold"
+                      : "text-stone-700 dark:text-slate-300 font-medium"
                   }`}
                 >
                   <span className="text-sm">{item.flag}</span>
                   <span className="font-bold w-10 shrink-0">{item.code}</span>
-                  <span className="text-slate-500 dark:text-slate-400 truncate">
+                  <span className="text-stone-500 dark:text-slate-400 truncate">
                     {item.country}
                   </span>
                 </button>

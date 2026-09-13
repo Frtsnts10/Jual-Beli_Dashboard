@@ -75,7 +75,7 @@ export default async function TenantStoreLayout({
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-slate-50 dark:bg-[#090d16] font-sans transition-colors">
+    <div className="flex h-screen flex-col overflow-hidden bg-stone-50 dark:bg-[#090d16] font-sans transition-colors">
       <DashboardHeader 
         storeId={storeId}
         profileId={profileId}

@@ -134,14 +134,14 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
       {/* Top Header Block */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{t.ordersTable.title}</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <h2 className="text-xl font-extrabold text-stone-900 dark:text-slate-100 tracking-tight">{t.ordersTable.title}</h2>
+          <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5">
             Proses transaksi checkout dan alokasikan akun digital secara real-time.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
+          <span className="text-xs font-bold px-2.5 py-1 bg-blue-50 dark:bg-indigo-950/40 text-blue-600 dark:text-indigo-400 rounded-lg border border-blue-100/40 dark:border-indigo-900/40">
             {orders.length} {t.ordersTable.totalOrders}
           </span>
           <span className="text-xs font-bold px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-lg border border-amber-100/40 dark:border-amber-900/40">
@@ -160,9 +160,9 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
       </div>
 
       {/* Interactive Sliders Filter Panel */}
-      <div className="p-4 bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-lg shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
-        <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-          <SlidersHorizontal className="w-4 h-4 text-indigo-500" />
+      <div className="p-4 bg-white dark:bg-[#0d1322] border border-stone-200/60 dark:border-slate-800/80 rounded-lg shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
+        <div className="flex items-center gap-2 text-stone-700 dark:text-slate-300">
+          <SlidersHorizontal className="w-4 h-4 text-blue-500" />
           <span className="text-xs font-extrabold uppercase">{t.ordersTable.filterTitle}</span>
         </div>
 
@@ -177,8 +177,8 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
             size="sm"
             className="sm:col-span-2"
             classNames={{
-              inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
-              input: "text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500"
+              inputWrapper: "bg-stone-50 dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500",
+              input: "text-xs font-medium text-stone-800 dark:text-slate-100 placeholder-stone-400 dark:placeholder-slate-500"
             }}
           />
 
@@ -190,8 +190,8 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
             radius="lg"
             size="sm"
             classNames={{
-              trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
-              value: "text-xs font-bold text-slate-700 dark:text-slate-300"
+              trigger: "bg-stone-50 dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500",
+              value: "text-xs font-bold text-stone-700 dark:text-slate-300"
             }}
           >
             <SelectItem key="all">{t.ordersTable.paymentAll}</SelectItem>
@@ -209,8 +209,8 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
             radius="lg"
             size="sm"
             classNames={{
-              trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500",
-              value: "text-xs font-bold text-slate-700 dark:text-slate-300"
+              trigger: "bg-stone-50 dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500",
+              value: "text-xs font-bold text-stone-700 dark:text-slate-300"
             }}
           >
             <SelectItem key="all">{t.ordersTable.fulfillmentAll}</SelectItem>
@@ -222,11 +222,11 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
       </div>
 
       {/* Main Grid View */}
-      <div className="bg-white dark:bg-[#0d1322] border border-slate-200/60 dark:border-slate-800/80 rounded-lg shadow-xs overflow-hidden transition-colors">
+      <div className="bg-white dark:bg-[#0d1322] border border-stone-200/60 dark:border-slate-800/80 rounded-lg shadow-xs overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/80 dark:bg-[#0b0f19]/80 border-b border-slate-200/60 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <tr className="bg-stone-50/80 dark:bg-[#0b0f19]/80 border-b border-stone-200/60 dark:border-slate-800 text-[10px] font-bold text-stone-400 uppercase tracking-wider">
                 <th className="px-5 py-3 min-w-[160px]">{t.ordersTable.colDetails}</th>
                 <th className="px-5 py-3 min-w-[160px]">{t.ordersTable.colCustomer}</th>
                 <th className="px-5 py-3 min-w-[140px]">{t.ordersTable.colRevenue}</th>
@@ -234,7 +234,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                 <th className="px-5 py-3 text-right min-w-[160px]">{t.ordersTable.colControl}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+            <tbody className="divide-y divide-stone-100 dark:divide-slate-800/60 text-xs">
               {items.map((o) => {
                 const isUpdating = updatingId === o.id;
                 const isExpanded = expandedOrderId === o.id;
@@ -243,18 +243,18 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
 
                 return (
                   <React.Fragment key={o.id}>
-                    <tr className="hover:bg-slate-50/40 dark:hover:bg-slate-800/10 align-middle transition-colors">
+                    <tr className="hover:bg-stone-50/40 dark:hover:bg-slate-800/10 align-middle transition-colors">
                       {/* Order Details Column */}
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
+                          <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-indigo-950/40 text-blue-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
                             <ShoppingCart className="w-4 h-4" />
                           </div>
                           <div>
-                            <p className="font-extrabold text-slate-900 dark:text-slate-100 text-xs tracking-tight uppercase">
+                            <p className="font-extrabold text-stone-900 dark:text-slate-100 text-xs tracking-tight uppercase">
                               {t.ordersTable.orderPrefix} #{o.id.startsWith("ORD-") ? o.id.slice(4, 12) : o.id.slice(0, 8)}
                             </p>
-                            <p className="text-[10px] text-slate-400 font-mono mt-0.5">{orderDate}</p>
+                            <p className="text-[10px] text-stone-400 font-mono mt-0.5">{orderDate}</p>
                           </div>
                         </div>
                       </td>
@@ -262,20 +262,20 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                       {/* Customer Toko Column */}
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-2">
-                          <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <User className="w-3.5 h-3.5 text-stone-400 shrink-0" />
                           <div>
-                            <p className="font-bold text-slate-800 dark:text-slate-200 text-xs">{o.customer_name}</p>
-                            <p className="text-[10px] text-slate-400">{o.customer_email}</p>
+                            <p className="font-bold text-stone-800 dark:text-slate-200 text-xs">{o.customer_name}</p>
+                            <p className="text-[10px] text-stone-400">{o.customer_email}</p>
                           </div>
                         </div>
                       </td>
 
                       {/* Revenue Value Column */}
                       <td className="px-5 py-4">
-                        <p className="font-extrabold text-slate-900 dark:text-slate-100 text-sm font-mono">
+                        <p className="font-extrabold text-stone-900 dark:text-slate-100 text-sm font-mono">
                           {formatPrice(o.total_amount)}
                         </p>
-                        <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                        <p className="text-[10px] text-stone-400 font-medium mt-0.5">
                           {itemsCount} {t.ordersTable.itemsBought}
                         </p>
                       </td>
@@ -297,10 +297,10 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                           {/* Fulfillment badge */}
                           <span className={`inline-flex items-center justify-center px-2 h-[22px] font-bold text-[9px] leading-none uppercase tracking-wider rounded-lg ${
                             o.fulfillment_status === "fulfilled"
-                              ? "bg-indigo-100 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-400 border border-indigo-200/30"
+                              ? "bg-blue-100 dark:bg-indigo-950/40 text-blue-800 dark:text-indigo-400 border border-blue-200/30"
                               : o.fulfillment_status === "pending"
                               ? "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-400 border border-rose-200/30 animate-pulse"
-                              : "bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200/30"
+                              : "bg-stone-100 dark:bg-slate-800 text-stone-500 border border-stone-200/30"
                           }`}>
                             {o.fulfillment_status}
                           </span>
@@ -327,14 +327,14 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                     {/* Expandable Order Details Panel */}
                     {isExpanded && (
                       <tr>
-                        <td colSpan={5} className="px-6 py-4 bg-slate-50/50 dark:bg-[#0b0f19]/40 border-t border-b border-slate-100 dark:border-slate-800/80">
+                        <td colSpan={5} className="px-6 py-4 bg-stone-50/50 dark:bg-[#0b0f19]/40 border-t border-b border-stone-100 dark:border-slate-800/80">
                           <div className="space-y-4">
-                            <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800/40 pb-2">
-                              <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                            <div className="flex items-center justify-between border-b border-stone-200/50 dark:border-slate-800/40 pb-2">
+                              <h4 className="text-[11px] font-black text-stone-400 uppercase tracking-widest">
                                 Mesin Pemenuhan Aset Pesanan
                               </h4>
                               <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-slate-500">{t.ordersTable.quickActionStatus}</span>
+                                <span className="text-[10px] text-stone-500">{t.ordersTable.quickActionStatus}</span>
                                 <Select
                                   aria-label="Change Order Status Quick Actions"
                                   placeholder={t.ordersTable.actionPlaceholder}
@@ -348,15 +348,15 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                   radius="lg"
                                   className="w-[180px]"
                                   classNames={{
-                                    trigger: "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-[28px] min-h-0",
-                                    value: "text-[10px] font-bold text-slate-700 dark:text-slate-300"
+                                    trigger: "bg-white dark:bg-slate-800 border-stone-200 dark:border-slate-700 h-[28px] min-h-0",
+                                    value: "text-[10px] font-bold text-stone-700 dark:text-slate-300"
                                   }}
                                 >
                                   <SelectItem key="paid_fulfilled">{t.ordersTable.markPaidFulfilled}</SelectItem>
                                   <SelectItem key="paid_pending">{t.ordersTable.markPaidPending}</SelectItem>
                                   <SelectItem key="refunded_cancelled">{t.ordersTable.cancelRefund}</SelectItem>
                                 </Select>
-                                {isUpdating && <Loader2 className="w-3 h-3 animate-spin text-indigo-500" />}
+                                {isUpdating && <Loader2 className="w-3 h-3 animate-spin text-blue-500" />}
                               </div>
                             </div>
 
@@ -382,32 +382,32 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                     key={idx} 
                                     className={`p-3.5 rounded-lg border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
                                       isItemFulfilled 
-                                        ? "bg-indigo-50/20 dark:bg-indigo-950/10 border-indigo-100/60 dark:border-indigo-900/20" 
-                                        : "bg-white dark:bg-[#0d1322] border-slate-200/80 dark:border-slate-800/80"
+                                        ? "bg-blue-50/20 dark:bg-indigo-950/10 border-blue-100/60 dark:border-indigo-900/20" 
+                                        : "bg-white dark:bg-[#0d1322] border-stone-200/80 dark:border-slate-800/80"
                                     }`}
                                   >
                                     {/* Item info */}
                                     <div className="flex items-start gap-2.5">
-                                      <div className={`p-1.5 rounded-xs shrink-0 mt-0.5 ${isItemFulfilled ? "bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400" : "bg-slate-100 dark:bg-slate-850 text-slate-400"}`}>
+                                      <div className={`p-1.5 rounded-xs shrink-0 mt-0.5 ${isItemFulfilled ? "bg-blue-100 dark:bg-indigo-950 text-blue-600 dark:text-indigo-400" : "bg-stone-100 dark:bg-slate-850 text-stone-400"}`}>
                                         <ShoppingCart className="w-3.5 h-3.5" />
                                       </div>
                                       <div>
                                         <div className="flex items-center gap-2">
-                                          <span className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">
+                                          <span className="font-extrabold text-stone-800 dark:text-slate-100 text-xs">
                                             {item.name}
                                           </span>
-                                          <span className="px-1.5 py-0.2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-lg text-[8px] uppercase font-black">
+                                          <span className="px-1.5 py-0.2 bg-stone-100 dark:bg-slate-800 border border-stone-200 dark:border-slate-700 text-stone-600 dark:text-slate-400 rounded-lg text-[8px] uppercase font-black">
                                             {item.variant}
                                           </span>
                                         </div>
-                                        <p className="text-[10px] text-slate-500 font-bold mt-0.5 flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
+                                        <p className="text-[10px] text-stone-500 font-bold mt-0.5 flex items-center gap-1 text-blue-600 dark:text-indigo-400">
                                           <Clock className="w-2.5 h-2.5" /> Durasi Akses {item.duration_days} Hari
                                         </p>
                                       </div>
                                     </div>
 
                                     {/* Fulfillment Action Container */}
-                                    <div className="flex-1 max-w-xl md:text-right flex flex-col md:items-end gap-1.5 md:border-l md:pl-4 border-slate-200/50 dark:border-slate-800/30">
+                                    <div className="flex-1 max-w-xl md:text-right flex flex-col md:items-end gap-1.5 md:border-l md:pl-4 border-stone-200/50 dark:border-slate-800/30">
                                       {isItemFulfilled ? (
                                         <div className="text-left w-full">
                                           <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs">
@@ -415,26 +415,26 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                             <span>{t.ordersTable.assignedSlot}</span>
                                           </div>
                                           {linkedSlot ? (
-                                            <div className="mt-1 p-2 bg-slate-100/50 dark:bg-[#0b0f19]/60 rounded-xs text-[10px] space-y-0.5 border border-slate-200/30 dark:border-slate-800/30">
+                                            <div className="mt-1 p-2 bg-stone-100/50 dark:bg-[#0b0f19]/60 rounded-xs text-[10px] space-y-0.5 border border-stone-200/30 dark:border-slate-800/30">
                                               <p className="font-mono">
-                                                <span className="text-slate-400">ID Kredensial:</span> <strong className="text-slate-700 dark:text-slate-300">{linkedSlot.email || "Tidak Ada Email"}</strong>
+                                                <span className="text-stone-400">ID Kredensial:</span> <strong className="text-stone-700 dark:text-slate-300">{linkedSlot.email || "Tidak Ada Email"}</strong>
                                               </p>
                                               <p className="font-mono">
-                                                <span className="text-slate-400">Kata Sandi:</span> <strong className="text-slate-700 dark:text-slate-300">{linkedSlot.password || "••••"}</strong>
+                                                <span className="text-stone-400">Kata Sandi:</span> <strong className="text-stone-700 dark:text-slate-300">{linkedSlot.password || "••••"}</strong>
                                               </p>
                                               {linkedSlot.pin && (
                                                 <p className="font-mono">
-                                                  <span className="text-slate-400">Alokasi Pin:</span> <strong className="text-slate-700 dark:text-slate-300">{linkedSlot.pin}</strong>
+                                                  <span className="text-stone-400">Alokasi Pin:</span> <strong className="text-stone-700 dark:text-slate-300">{linkedSlot.pin}</strong>
                                                 </p>
                                               )}
                                               {linkedSlot.group_name && (
-                                                <p className="text-[9px] font-bold text-indigo-500 uppercase mt-1">
+                                                <p className="text-[9px] font-bold text-blue-500 uppercase mt-1">
                                                   Grup Gabungan: {linkedSlot.group_name}
                                                 </p>
                                               )}
                                             </div>
                                           ) : (
-                                            <p className="text-[10px] text-slate-400 italic mt-0.5">Data inventaris tidak tertaut atau dihapus.</p>
+                                            <p className="text-[10px] text-stone-400 italic mt-0.5">Data inventaris tidak tertaut atau dihapus.</p>
                                           )}
                                         </div>
                                       ) : (
@@ -442,7 +442,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                           {matchingUnassignedSlots.length > 0 ? (
                                             <>
                                               <div className="flex-1 flex flex-col min-w-[200px]">
-                                                <label className="text-[9px] font-bold text-slate-400 uppercase mb-0.5">Pilih Slot Akun Digital</label>
+                                                <label className="text-[9px] font-bold text-stone-400 uppercase mb-0.5">Pilih Slot Akun Digital</label>
                                                 <Select
                                                   aria-label="Select Digital Warehouse Toko Slot for Fulfillment"
                                                   selectedKeys={selectedSlots[slotKey] ? [selectedSlots[slotKey]] : []}
@@ -450,8 +450,8 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                                   variant="faded"
                                                   radius="lg"
                                                   classNames={{
-                                                    trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[32px] min-h-0",
-                                                    value: "text-[11px] font-medium text-slate-800 dark:text-slate-200"
+                                                    trigger: "bg-stone-50 dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[32px] min-h-0",
+                                                    value: "text-[11px] font-medium text-stone-800 dark:text-slate-200"
                                                   }}
                                                 >
                                                   {matchingUnassignedSlots.map((slot) => (
@@ -478,12 +478,12 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                                               <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                                               <div className="flex-1">
                                                 <p className="font-bold text-[11px] text-red-700 dark:text-red-400">Tidak Ada Slot Inventaris yang Tersedia!</p>
-                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                                <p className="text-[10px] text-stone-500 dark:text-slate-400 mt-0.5">
                                                   Harap tambahkan data kredensial untuk **{item.name} ({item.variant})** untuk melanjutkan pengiriman.
                                                 </p>
                                                 <Link 
                                                   href={`/${storeId}/inventory`}
-                                                  className="inline-flex items-center gap-1.5 text-[9px] font-black text-indigo-600 dark:text-indigo-400 hover:underline mt-1.5"
+                                                  className="inline-flex items-center gap-1.5 text-[9px] font-black text-blue-600 dark:text-indigo-400 hover:underline mt-1.5"
                                                 >
                                                   <Plus className="w-3 h-3" /> Isi Ulang Stok Sekarang
                                                 </Link>
@@ -506,7 +506,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
               })}
               {items.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-16 text-center text-slate-400 italic">
+                  <td colSpan={5} className="px-5 py-16 text-center text-stone-400 italic">
                     Antrean pesanan kosong. Pembelian e-commerce yang selesai akan muncul di sini secara real-time.
                   </td>
                 </tr>
@@ -517,9 +517,9 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
         
         {/* Pagination Footer */}
         {pages > 0 && (
-          <div className="flex items-center justify-between p-4 border-t border-slate-200/60 dark:border-slate-800/80">
+          <div className="flex items-center justify-between p-4 border-t border-stone-200/60 dark:border-slate-800/80">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{t.ordersTable.rowsPerPage}</span>
+              <span className="text-xs font-medium text-stone-500 dark:text-slate-400">{t.ordersTable.rowsPerPage}</span>
               <Select
                 size="sm"
                 variant="faded"
@@ -532,7 +532,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
                 }}
                 className="w-20"
                 classNames={{ 
-                  trigger: "bg-slate-50 dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800",
+                  trigger: "bg-stone-50 dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800",
                   value: "text-xs font-bold"
                 }}
               >
@@ -551,7 +551,7 @@ export function OrdersTable({ storeId, orders, inventoryItems = [], currency = "
               classNames={{
                 wrapper: "gap-1",
                 item: "w-8 h-8 text-xs font-bold rounded-lg",
-                cursor: "bg-indigo-500 text-white rounded-lg font-bold",
+                cursor: "bg-blue-500 text-white rounded-lg font-bold",
                 prev: "w-8 h-8 rounded-lg",
                 next: "w-8 h-8 rounded-lg"
               }}

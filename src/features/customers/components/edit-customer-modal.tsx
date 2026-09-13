@@ -46,15 +46,15 @@ export function EditCustomerModal({
 
   return (
     <Modal isOpen={true} onOpenChange={(open) => !open && onClose()} size="sm" classNames={{
-      base: "bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800 rounded-lg shadow-2xl",
-      header: "bg-slate-50 dark:bg-[#0b0f19] border-b border-slate-100 dark:border-slate-800/40",
+      base: "bg-white dark:bg-[#0d1322] border border-stone-200 dark:border-slate-800 rounded-lg shadow-2xl",
+      header: "bg-stone-50 dark:bg-[#0b0f19] border-b border-stone-100 dark:border-slate-800/40",
       body: "p-5 space-y-4",
-      footer: "pt-2 border-t border-slate-100 dark:border-slate-800"
+      footer: "pt-2 border-t border-stone-100 dark:border-slate-800"
     }}>
       <ModalContent>
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <ModalHeader className="flex flex-col gap-1">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-300">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-slate-300">
               Edit Customer Identity
             </h3>
           </ModalHeader>
@@ -62,10 +62,10 @@ export function EditCustomerModal({
           <ModalBody>
             {showConfirm ? (
               <div className="py-4 text-center space-y-2">
-                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                <p className="text-sm font-bold text-stone-800 dark:text-slate-200">
                   Are you sure you want to save these changes?
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-stone-500 dark:text-slate-400">
                   This will immediately update the customer's identity across all linked segments and telemetry.
                 </p>
               </div>
@@ -82,9 +82,9 @@ export function EditCustomerModal({
                   radius="md"
                   classNames={{
                     base: "mb-2",
-                    label: "text-xs font-bold text-slate-700 dark:text-slate-300 pb-1",
-                    inputWrapper: "bg-white dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800",
-                    input: "text-sm text-slate-700 dark:text-slate-300"
+                    label: "text-xs font-bold text-stone-700 dark:text-slate-300 pb-1",
+                    inputWrapper: "bg-white dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800",
+                    input: "text-sm text-stone-700 dark:text-slate-300"
                   }}
                 />
                 <Input
@@ -97,9 +97,9 @@ export function EditCustomerModal({
                   radius="md"
                   classNames={{
                     base: "mb-2",
-                    label: "text-xs font-bold text-slate-700 dark:text-slate-300 pb-1",
-                    inputWrapper: "bg-white dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800",
-                    input: "text-sm text-slate-700 dark:text-slate-300"
+                    label: "text-xs font-bold text-stone-700 dark:text-slate-300 pb-1",
+                    inputWrapper: "bg-white dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800",
+                    input: "text-sm text-stone-700 dark:text-slate-300"
                   }}
                 />
                 <PhoneInput
@@ -112,9 +112,9 @@ export function EditCustomerModal({
                   radius="md"
                   classNames={{
                     base: "mb-2",
-                    label: "text-xs font-bold text-slate-700 dark:text-slate-300 pb-1",
-                    inputWrapper: "bg-white dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 pl-0",
-                    input: "text-sm text-slate-700 dark:text-slate-300 ml-2"
+                    label: "text-xs font-bold text-stone-700 dark:text-slate-300 pb-1",
+                    inputWrapper: "bg-white dark:bg-[#0b0f19] border-stone-200 dark:border-slate-800 pl-0",
+                    input: "text-sm text-stone-700 dark:text-slate-300 ml-2"
                   }}
                 />
               </>
@@ -124,7 +124,7 @@ export function EditCustomerModal({
           <ModalFooter>
             {showConfirm ? (
               <>
-                <Button variant="light" onPress={() => setShowConfirm(false)} radius="lg" className="text-xs font-bold text-slate-600 dark:text-slate-400 h-[28px] min-h-0">
+                <Button variant="light" onPress={() => setShowConfirm(false)} radius="lg" className="text-xs font-bold text-stone-600 dark:text-slate-400 h-[28px] min-h-0">
                   Back
                 </Button>
                 <Button type="submit" isLoading={isPending} color="success" radius="lg" className="text-xs font-bold text-white shadow-sm h-[28px] min-h-0">
@@ -133,7 +133,7 @@ export function EditCustomerModal({
               </>
             ) : (
               <>
-                <Button variant="light" onPress={onClose} radius="lg" className="text-xs font-bold text-slate-600 dark:text-slate-400 h-[28px] min-h-0">
+                <Button variant="light" onPress={onClose} radius="lg" className="text-xs font-bold text-stone-600 dark:text-slate-400 h-[28px] min-h-0">
                   Cancel
                 </Button>
                 <Button type="submit" color="primary" radius="lg" className="text-xs font-bold shadow-sm h-[28px] min-h-0">

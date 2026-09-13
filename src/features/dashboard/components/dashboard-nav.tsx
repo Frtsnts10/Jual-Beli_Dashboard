@@ -15,7 +15,8 @@ import {
   GitPullRequest,
   MonitorPlay,
   UserCog,
-  Wallet
+  Wallet,
+  GalleryHorizontal
 } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
 
@@ -45,6 +46,7 @@ export function DashboardNav() {
     { name: t.sidebar.overview, href: `/${storeId}/dashboard`, icon: LayoutDashboard },
     { name: t.sidebar.orders, href: `/${storeId}/orders`, icon: ShoppingCart },
     { name: t.sidebar.inventory, href: `/${storeId}/inventory`, icon: Package },
+    { name: "Carousel", href: `/${storeId}/carousel`, icon: GalleryHorizontal },
     { name: t.sidebar.customers, href: `/${storeId}/customers`, icon: Users },
     { name: t.payouts.title, href: `/${storeId}/payouts`, icon: Wallet },
     { name: t.sidebar.complaints, href: `/${storeId}/complaints`, icon: MessageSquareWarning },
@@ -59,10 +61,10 @@ export function DashboardNav() {
   return (
     <>
       {/* Desktop Sidebar Navigation */}
-      <aside className="w-64 h-full overflow-y-auto border-r border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-[#0b0f19] flex flex-col shrink-0 hidden md:block font-sans transition-colors antialiased">
+      <aside className="w-64 h-full overflow-y-auto border-r border-stone-200/60 dark:border-slate-800/60 bg-white dark:bg-[#0b0f19] flex flex-col shrink-0 hidden md:block font-sans transition-colors antialiased">
         <div className="flex-1 px-4 py-6 space-y-1.5">
           <div className="mb-4 px-3">
-            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
+            <p className="text-[10px] font-black text-stone-400 dark:text-slate-500 uppercase tracking-[0.15em]">
               {t.sidebar.coreModules}
             </p>
           </div>
@@ -78,13 +80,13 @@ export function DashboardNav() {
                 prefetch={false}
                 className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[11px] font-bold transition-all duration-200 ${
                   isActive
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-200/20 dark:shadow-none "
-                    : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-indigo-600 dark:hover:text-indigo-400"
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-200/20 dark:shadow-none "
+                    : "text-stone-500 dark:text-slate-400 hover:bg-stone-100 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-indigo-400"
                 }`}
               >
                 <Icon 
                   className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                    isActive ? "text-white" : "text-slate-400 group-hover:text-indigo-500 dark:text-slate-500"
+                    isActive ? "text-white" : "text-stone-400 group-hover:text-blue-500 dark:text-slate-500"
                   }`} 
                   strokeWidth={isActive ? 3 : 2.5}
                 />
@@ -97,7 +99,7 @@ export function DashboardNav() {
           })}
 
           <div className="mt-8 mb-4 px-3">
-            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
+            <p className="text-[10px] font-black text-stone-400 dark:text-slate-500 uppercase tracking-[0.15em]">
               {t.sidebar.settings}
             </p>
           </div>
@@ -113,13 +115,13 @@ export function DashboardNav() {
                 prefetch={false}
                 className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[11px] font-bold transition-all duration-200 ${
                   isActive
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-200/20 dark:shadow-none "
-                    : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-indigo-600 dark:hover:text-indigo-400"
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-200/20 dark:shadow-none "
+                    : "text-stone-500 dark:text-slate-400 hover:bg-stone-100 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-indigo-400"
                 }`}
               >
                 <Icon 
                   className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                    isActive ? "text-white" : "text-slate-400 group-hover:text-indigo-500 dark:text-slate-500"
+                    isActive ? "text-white" : "text-stone-400 group-hover:text-blue-500 dark:text-slate-500"
                   }`} 
                   strokeWidth={isActive ? 3 : 2.5}
                 />
@@ -132,12 +134,12 @@ export function DashboardNav() {
           })}
         </div>
 
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800/40">
-          <div className="bg-slate-50 dark:bg-slate-900/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800/60">
-            <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">{t.sidebar.status}</p>
+        <div className="p-4 border-t border-stone-100 dark:border-slate-800/40">
+          <div className="bg-stone-50 dark:bg-slate-900/40 rounded-lg p-3 border border-stone-100 dark:border-slate-800/60">
+            <p className="text-[9px] font-bold text-stone-400 dark:text-slate-500 uppercase mb-1">{t.sidebar.status}</p>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300">{t.sidebar.liveSync}</span>
+              <span className="text-[10px] font-bold text-stone-600 dark:text-slate-300">{t.sidebar.liveSync}</span>
             </div>
           </div>
         </div>
@@ -151,23 +153,23 @@ export function DashboardNav() {
           {/* Backdrop */}
           <div 
             onClick={() => setIsOpen(false)}
-            className={`fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity duration-300 ease-out ${
+            className={`fixed inset-0 bg-stone-950/60 backdrop-blur-xs transition-opacity duration-300 ease-out ${
               isOpen ? "opacity-100" : "opacity-0"
             }`}
           />
 
           {/* Drawer Panel */}
-          <div className={`relative w-72 h-full bg-white dark:bg-[#0b0f19] border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col p-6 space-y-6 shadow-2xl z-[9999] transition-transform duration-300 ease-in-out transform rounded-r-2xl ${
+          <div className={`relative w-72 h-full bg-white dark:bg-[#0b0f19] border-r border-stone-200/80 dark:border-slate-800/80 flex flex-col p-6 space-y-6 shadow-2xl z-[9999] transition-transform duration-300 ease-in-out transform rounded-r-2xl ${
             isOpen ? "translate-x-0" : "-translate-x-full"
           }`}>
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-slate-800">
               <div>
-                <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">{t.sidebar.console}</p>
-                <h4 className="text-sm font-black text-slate-850 dark:text-slate-100 mt-0.5">{t.sidebar.activeModules}</h4>
+                <p className="text-[10px] font-black text-blue-600 dark:text-indigo-400 uppercase tracking-widest">{t.sidebar.console}</p>
+                <h4 className="text-sm font-black text-stone-850 dark:text-slate-100 mt-0.5">{t.sidebar.activeModules}</h4>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-slate-200 hover:bg-stone-50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -175,7 +177,7 @@ export function DashboardNav() {
 
             <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
               <div className="mb-4 px-2">
-                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
+                <p className="text-[10px] font-black text-stone-400 dark:text-slate-500 uppercase tracking-[0.15em]">
                   {t.sidebar.mobileGateway}
                 </p>
               </div>
@@ -191,13 +193,13 @@ export function DashboardNav() {
                     onClick={() => setIsOpen(false)}
                     className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[11px] font-bold transition-all duration-200 ${
                       isActive
-                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-200/20"
-                        : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-indigo-600 dark:hover:text-indigo-400"
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-200/20"
+                        : "text-stone-500 dark:text-slate-400 hover:bg-stone-100 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-indigo-400"
                     }`}
                   >
                     <Icon 
                       className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                        isActive ? "text-white" : "text-slate-400 group-hover:text-indigo-500 dark:text-slate-500"
+                        isActive ? "text-white" : "text-stone-400 group-hover:text-blue-500 dark:text-slate-500"
                       }`} 
                       strokeWidth={isActive ? 3 : 2.5}
                     />
@@ -207,12 +209,12 @@ export function DashboardNav() {
               })}
             </div>
 
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-              <div className="bg-slate-50 dark:bg-slate-900/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800/60 flex items-center gap-2.5">
+            <div className="pt-4 border-t border-stone-100 dark:border-slate-800">
+              <div className="bg-stone-50 dark:bg-slate-900/40 rounded-lg p-3 border border-stone-100 dark:border-slate-800/60 flex items-center gap-2.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <div>
-                  <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">{t.sidebar.telemetry}</p>
-                  <p className="text-[10px] font-bold text-slate-650 dark:text-slate-350">{t.sidebar.mobileSession}</p>
+                  <p className="text-[9px] font-bold text-stone-400 dark:text-slate-500 uppercase">{t.sidebar.telemetry}</p>
+                  <p className="text-[10px] font-bold text-stone-650 dark:text-slate-350">{t.sidebar.mobileSession}</p>
                 </div>
               </div>
             </div>

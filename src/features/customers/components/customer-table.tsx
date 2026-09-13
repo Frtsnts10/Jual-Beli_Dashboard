@@ -403,14 +403,14 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
       {/* Top Controller Header Block */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{d.title}</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <h2 className="text-xl font-extrabold text-stone-900 dark:text-slate-100 tracking-tight">{d.title}</h2>
+          <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5">
             {d.subtitle}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100/40 dark:border-indigo-900/40">
+          <span className="h-[38px] flex items-center justify-center text-xs font-bold px-4 bg-blue-50 dark:bg-indigo-950/40 text-blue-600 dark:text-indigo-400 rounded-lg border border-blue-100/40 dark:border-indigo-900/40">
             {d.totalClients.replace("{count}", customers.length.toString())}
           </span>
           <Button 
@@ -436,7 +436,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
 
       {/* Dynamic Creation Modal Embed */}
       <Modal isOpen={isCreateModalOpen} onOpenChange={(open) => setIsCreateModalOpen(open)} size="4xl" scrollBehavior="inside" classNames={{
-        base: "bg-white dark:bg-[#0d1322] border border-slate-200/80 dark:border-slate-800/80 rounded-lg shadow-2xl",
+        base: "bg-white dark:bg-[#0d1322] border border-stone-200/80 dark:border-slate-800/80 rounded-lg shadow-2xl",
         body: "p-0"
       }}>
         <ModalContent>
@@ -454,11 +454,11 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <h3 className="text-sm font-extrabold text-stone-900 dark:text-slate-100 flex items-center gap-2">
+              <User className="w-4 h-4 text-blue-600 dark:text-indigo-400" />
               {d.matrixTitle}
             </h3>
-            <p className="text-[10px] text-slate-500 mt-0.5">{d.matrixSubtitle}</p>
+            <p className="text-[10px] text-stone-500 mt-0.5">{d.matrixSubtitle}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -466,7 +466,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               onPress={exportCustomersCsv}
               variant="bordered"
               radius="lg"
-              className="h-[34px] text-xs font-bold text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+              className="h-[34px] text-xs font-bold text-stone-700 dark:text-slate-300 border-stone-200 dark:border-slate-700"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
               {d.exportCsv}
@@ -475,7 +475,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               onPress={exportDatabaseDump}
               variant="flat"
               radius="lg"
-              className="h-[34px] text-xs font-bold bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50"
+              className="h-[34px] text-xs font-bold bg-blue-50 dark:bg-indigo-950/20 text-blue-700 dark:text-indigo-400 border border-blue-200/50 dark:border-indigo-800/50"
               startContent={<Plus className="w-3.5 h-3.5" />}
             >
               Dump JSON
@@ -488,7 +488,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               onPress={downloadCustomerTemplat}
               variant="flat"
               radius="lg"
-              className="h-[34px] text-xs font-bold bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+              className="h-[34px] text-xs font-bold bg-stone-50 dark:bg-[#0b0f19] border border-stone-200 dark:border-slate-800 text-stone-600 dark:text-slate-400"
               startContent={<Download className="w-3.5 h-3.5" />}
             >
               {d.template}
@@ -496,16 +496,16 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#0d1322] rounded-lg border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
+        <div className="bg-white dark:bg-[#0d1322] rounded-lg border border-stone-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/80 dark:bg-[#0b0f19]/80 border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <tr className="bg-stone-50/80 dark:bg-[#0b0f19]/80 border-b border-stone-100 dark:border-slate-800 text-[10px] font-bold text-stone-400 uppercase tracking-wider">
                 <th className="px-5 py-3.5 min-w-[150px]">{d.colPhone}</th>
                 <th className="px-5 py-3.5 min-w-[340px]">{d.colDetails}</th>
               </tr>
             </thead>
-            <tbody className={`divide-y divide-slate-100 dark:divide-slate-800/60 text-xs transition-all duration-150 ${isTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
+            <tbody className={`divide-y divide-stone-100 dark:divide-slate-800/60 text-xs transition-all duration-150 ${isTransitioning ? "opacity-30 blur-[1px] scale-[0.99]" : ""}`}>
               {paginatedCustomers.map((c) => {
                 const isDeleting = deletingId === c.id;
                 const isAppending = appendingId === c.id;
@@ -513,11 +513,11 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                 const products = Array.isArray(c.purchased_products) ? c.purchased_products : [];
 
                 return (
-                  <tr key={c.id} className="hover:bg-slate-50/30 dark:hover:bg-slate-800/20 align-top transition-colors">
+                  <tr key={c.id} className="hover:bg-stone-50/30 dark:hover:bg-slate-800/20 align-top transition-colors">
                     {/* Customer Profile Column */}
-                    <td className="px-5 py-4.5 bg-slate-50/20 dark:bg-[#0b0f19]/30 border-r border-slate-50 dark:border-slate-800/50 align-middle">
+                    <td className="px-5 py-4.5 bg-stone-50/20 dark:bg-[#0b0f19]/30 border-r border-stone-50 dark:border-slate-800/50 align-middle">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="font-extrabold text-slate-900 dark:text-slate-100 text-sm truncate">
+                        <p className="font-extrabold text-stone-900 dark:text-slate-100 text-sm truncate">
                           {c.phone || c.name}
                         </p>
                         <Button
@@ -526,7 +526,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                           onPress={() => handleDelete(c.id)}
                           isDisabled={isDeleting}
                           isLoading={isDeleting}
-                          className="w-7 h-7 min-w-0 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
+                          className="w-7 h-7 min-w-0 text-stone-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
                           title={d.delCustomer}
                         >
                           {!isDeleting && <Trash2 className="w-3.5 h-3.5" />}
@@ -560,25 +560,25 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                   <ShoppingBag className="w-4 h-4 text-emerald-500" />
                                   <div>
                                     <div className="flex items-center gap-1.5">
-                                      <span className="font-bold text-slate-900 dark:text-slate-200 text-sm">{p.name}</span>
-                                      <span className="px-1.5 py-0.2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-lg text-[10px] uppercase font-bold">
+                                      <span className="font-bold text-stone-900 dark:text-slate-200 text-sm">{p.name}</span>
+                                      <span className="px-1.5 py-0.2 bg-white dark:bg-slate-800 border border-stone-200 dark:border-slate-700 text-stone-600 dark:text-slate-400 rounded-lg text-[10px] uppercase font-bold">
                                         {p.variant}
                                       </span>
                                     </div>
-                                    <div className="flex flex-col mt-0.5 text-[11px] text-slate-500 font-medium">
-                                      <span className="text-slate-600 dark:text-slate-400">{email}</span>
+                                    <div className="flex flex-col mt-0.5 text-[11px] text-stone-500 font-medium">
+                                      <span className="text-stone-600 dark:text-slate-400">{email}</span>
                                       {isNetflix && profile && (
-                                          <span className="text-[10px] text-indigo-500 font-bold">{d.profilePrefix} {profile}</span>
+                                          <span className="text-[10px] text-blue-500 font-bold">{d.profilePrefix} {profile}</span>
                                       )}
                                     </div>
                                   </div>
                                 </div>
 
-                                <div className="flex flex-col sm:items-end gap-1 border-t sm:border-t-0 pt-1.5 sm:pt-0 border-slate-200/40 dark:border-slate-800/40">
-                                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                                <div className="flex flex-col sm:items-end gap-1 border-t sm:border-t-0 pt-1.5 sm:pt-0 border-stone-200/40 dark:border-slate-800/40">
+                                    <span className="text-[11px] font-bold text-stone-600 dark:text-slate-300">
                                       {d.order} {boughtDate}
                                     </span>
-                                    <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+                                    <span className="text-[11px] font-bold text-blue-600 dark:text-indigo-400">
                                       {d.duration.replace("{days}", p.duration_days.toString())}
                                     </span>
                                 </div>
@@ -587,31 +587,31 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                           })}
                         </div>
                       ) : (
-                        <p className="text-slate-400 text-xs italic py-2">{d.noOrders}</p>
+                        <p className="text-stone-400 text-xs italic py-2">{d.noOrders}</p>
                       )}
 
                       {/* Inline Appender Trigger Section */}
-                      <div className="mt-3 pt-2 border-t border-slate-100/80 dark:border-slate-800/80">
+                      <div className="mt-3 pt-2 border-t border-stone-100/80 dark:border-slate-800/80">
                         {!isFormActive ? (
                           <Button
                             onPress={() => setActiveFormId(c.id)}
                             variant="light"
                             radius="lg"
-                            className="h-[28px] text-[11px] font-bold text-indigo-600 dark:text-indigo-400"
+                            className="h-[28px] text-[11px] font-bold text-blue-600 dark:text-indigo-400"
                             startContent={<Plus className="w-3.5 h-3.5" />}
                           >
                             {d.addOrder}
                           </Button>
                         ) : (
-                          <div className="p-3 bg-slate-50 dark:bg-[#0b0f19] rounded-lg border border-slate-200 dark:border-slate-800 space-y-2.5 transition-colors">
+                          <div className="p-3 bg-stone-50 dark:bg-[#0b0f19] rounded-lg border border-stone-200 dark:border-slate-800 space-y-2.5 transition-colors">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">{d.assignProduct}</span>
+                              <span className="text-[10px] font-bold text-stone-700 dark:text-slate-300 uppercase">{d.assignProduct}</span>
                               <Button
                                 isIconOnly
                                 variant="light"
                                 size="sm"
                                 onPress={() => setActiveFormId(null)}
-                                className="text-[10px] min-w-0 h-6 text-slate-400 hover:text-slate-600 font-bold"
+                                className="text-[10px] min-w-0 h-6 text-stone-400 hover:text-stone-600 font-bold"
                               >
                                 Cancel
                               </Button>
@@ -628,9 +628,9 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 variant="faded"
                                 radius="lg"
                                 classNames={{
-                                  inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
-                                  label: "text-[9px] font-bold text-slate-400 uppercase",
-                                  input: "text-[11px] font-bold text-slate-800 dark:text-slate-200"
+                                  inputWrapper: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[26px] min-h-[26px]",
+                                  label: "text-[9px] font-bold text-stone-400 uppercase",
+                                  input: "text-[11px] font-bold text-stone-800 dark:text-slate-200"
                                 }}
                               />
                               <div className="flex flex-col w-full">
@@ -643,9 +643,9 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                   variant="faded"
                                   radius="lg"
                                   classNames={{
-                                    trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
-                                    label: "text-[9px] font-bold text-slate-400 uppercase",
-                                    value: "text-[11px] font-medium text-slate-800 dark:text-slate-200"
+                                    trigger: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[26px] min-h-[26px]",
+                                    label: "text-[9px] font-bold text-stone-400 uppercase",
+                                    value: "text-[11px] font-medium text-stone-800 dark:text-slate-200"
                                   }}
                                 >
                                   {appendVariantOptions.map((opt) => (
@@ -670,9 +670,9 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 variant="faded"
                                 radius="lg"
                                 classNames={{
-                                  trigger: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
-                                  label: "text-[9px] font-bold text-slate-400 uppercase",
-                                  value: "text-[11px] font-bold text-indigo-900 dark:text-indigo-300"
+                                  trigger: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[26px] min-h-[26px]",
+                                  label: "text-[9px] font-bold text-stone-400 uppercase",
+                                  value: "text-[11px] font-bold text-blue-900 dark:text-indigo-300"
                                 }}
                               >
                                 <SelectItem key="1">1 Day</SelectItem>
@@ -701,9 +701,9 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 variant="faded"
                                 radius="lg"
                                 classNames={{
-                                  inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
-                                  label: "text-[9px] font-bold text-slate-400 uppercase",
-                                  input: "text-[11px] text-slate-800 dark:text-slate-200"
+                                  inputWrapper: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[26px] min-h-[26px]",
+                                  label: "text-[9px] font-bold text-stone-400 uppercase",
+                                  input: "text-[11px] text-stone-800 dark:text-slate-200"
                                 }}
                               />
                               <DatePicker
@@ -715,8 +715,8 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                                 variant="faded"
                                 radius="lg"
                                 classNames={{
-                                  inputWrapper: "bg-white dark:bg-[#0d1322] border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 h-[26px] min-h-[26px]",
-                                  label: "text-[9px] font-bold text-slate-400 uppercase",
+                                  inputWrapper: "bg-white dark:bg-[#0d1322] border-stone-200 dark:border-slate-800 hover:border-blue-500/50 data-[focus=true]:border-blue-500 h-[26px] min-h-[26px]",
+                                  label: "text-[9px] font-bold text-stone-400 uppercase",
                                   input: "text-[11px] font-bold text-emerald-700 dark:text-emerald-400"
                                 }}
                               />
@@ -743,7 +743,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
               })}
               {customers.length === 0 && (
                 <tr>
-                  <td colSpan={2} className="px-5 py-12 text-center text-slate-400 italic">
+                  <td colSpan={2} className="px-5 py-12 text-center text-stone-400 italic">
                     {d.inactivePool}
                   </td>
                 </tr>
@@ -753,13 +753,13 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
         </div>
 
         {totalPages > 1 && (
-          <div className="px-5 py-3 bg-slate-50/50 dark:bg-[#0b0f19]/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-              Menampilkan <strong className="text-slate-700 dark:text-slate-200">{startIndex + 1}</strong> to{" "}
-              <strong className="text-slate-700 dark:text-slate-200">
+          <div className="px-5 py-3 bg-stone-50/50 dark:bg-[#0b0f19]/50 border-t border-stone-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs transition-colors">
+            <span className="text-[11px] font-bold text-stone-500 dark:text-slate-400">
+              Menampilkan <strong className="text-stone-700 dark:text-slate-200">{startIndex + 1}</strong> to{" "}
+              <strong className="text-stone-700 dark:text-slate-200">
                 {Math.min(startIndex + itemsPerPage, customers.length)}
               </strong>{" "}
-              dari <strong className="text-slate-700 dark:text-slate-200">{customers.length}</strong> entri
+              dari <strong className="text-stone-700 dark:text-slate-200">{customers.length}</strong> entri
             </span>
             <div className="flex items-center gap-1">
               <Button
@@ -767,7 +767,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                 radius="lg"
                 onPress={() => handlePageChange(Math.max(1, currentPage - 1))}
                 isDisabled={currentPage === 1}
-                className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+                className="h-[26px] min-w-0 px-2.5 font-bold text-stone-600 dark:text-slate-300 border-stone-200 dark:border-slate-700"
               >
                 Seb
               </Button>
@@ -779,7 +779,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                   radius="lg"
                   onPress={() => handlePageChange(page)}
                   className={`h-[26px] min-w-[26px] px-0 font-bold ${
-                    currentPage === page ? "shadow-xs" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+                    currentPage === page ? "shadow-xs" : "border-stone-200 dark:border-slate-700 text-stone-600 dark:text-slate-300"
                   }`}
                 >
                   {page}
@@ -790,7 +790,7 @@ export function CustomerTable({ storeId, customers, inventoryItems = [] }: Custo
                 radius="lg"
                 onPress={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                 isDisabled={currentPage === totalPages}
-                className="h-[26px] min-w-0 px-2.5 font-bold text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+                className="h-[26px] min-w-0 px-2.5 font-bold text-stone-600 dark:text-slate-300 border-stone-200 dark:border-slate-700"
               >
                 Lanjut
               </Button>

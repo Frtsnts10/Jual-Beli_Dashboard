@@ -4,28 +4,28 @@ import { Sparkles, Layers, ShieldCheck, Zap, ArrowRight, CheckCircle2, MonitorPl
 
 export default function MarketingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-stone-50 via-white to-stone-50 overflow-x-hidden font-sans">
       {/* Sleek top navigation */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all">
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-stone-100 transition-all">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20 text-white font-bold text-xl tracking-wider">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-blue-600 to-violet-500 flex items-center justify-center shadow-md shadow-blue-500/20 text-white font-bold text-xl tracking-wider">
               Ω
             </div>
-            <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent">
+            <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-stone-900 to-blue-950 bg-clip-text text-transparent">
               Shop Dashboard
             </span>
           </div>
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-full shadow-sm hover:shadow transition-all group overflow-hidden"
+              className="relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold text-white bg-stone-900 hover:bg-stone-800 rounded-full shadow-sm hover:shadow transition-all group overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-2">
                 Open Dashboard
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Link>
           </div>
         </div>
@@ -35,29 +35,29 @@ export default function MarketingPage() {
       <main>
         <section className="relative pt-20 pb-32 px-6 max-w-7xl mx-auto text-center">
           {/* Subtle decorative background blur balls */}
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-200/50 rounded-full blur-3xl -z-10 pointer-events-none" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-200/50 rounded-full blur-3xl -z-10 pointer-events-none" />
           <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-violet-200/40 rounded-full blur-3xl -z-10 pointer-events-none" />
 
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold mb-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold mb-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
             <span>Next-Generation Digital Subscription OS</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight max-w-5xl mx-auto leading-[1.1] mb-8 animate-in fade-in slide-in-from-bottom-3 duration-700">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-stone-900 tracking-tight max-w-5xl mx-auto leading-[1.1] mb-8 animate-in fade-in slide-in-from-bottom-3 duration-700">
             Manage Digital Subscriptions with{" "}
-            <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-600 via-violet-600 to-pink-600 bg-clip-text text-transparent">
               Supreme Agility.
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <p className="text-lg md:text-xl text-stone-600 max-w-2xl mx-auto mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-1000">
             Unify your credential streams, automate family pool partitioning, and seamlessly distribute premium slots for Netflix, Spotify, ChatGPT, and more.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-5 duration-1000">
             <Link
               href="/dashboard"
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-lg shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3 text-base"
+              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-bold rounded-lg shadow-xl shadow-blue-500/25 hover:shadow-blue-500/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3 text-base"
             >
               <Zap className="w-5 h-5 fill-white/20" />
               Launch Premium Console
@@ -65,25 +65,25 @@ export default function MarketingPage() {
           </div>
 
           {/* Premium UI Mockup Showcase */}
-          <div className="mt-16 max-w-5xl mx-auto relative rounded-lg sm:rounded-3xl p-1.5 sm:p-3 bg-slate-900/5 backdrop-blur-xl border border-slate-900/10 shadow-2xl animate-in zoom-in-95 duration-1000">
-            <div className="bg-white rounded-lg sm:rounded-lg overflow-hidden shadow-inner border border-slate-100">
-              <div className="h-12 bg-slate-50 border-b border-slate-100 flex items-center px-4 gap-2">
+          <div className="mt-16 max-w-5xl mx-auto relative rounded-lg sm:rounded-3xl p-1.5 sm:p-3 bg-stone-900/5 backdrop-blur-xl border border-stone-900/10 shadow-2xl animate-in zoom-in-95 duration-1000">
+            <div className="bg-white rounded-lg sm:rounded-lg overflow-hidden shadow-inner border border-stone-100">
+              <div className="h-12 bg-stone-50 border-b border-stone-100 flex items-center px-4 gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-400" />
                 <div className="w-3 h-3 rounded-full bg-amber-400" />
                 <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                <div className="ml-4 px-3 py-1 bg-white border border-slate-200/60 rounded-lg text-[11px] text-slate-400 font-mono w-40 sm:w-64 truncate text-left">
+                <div className="ml-4 px-3 py-1 bg-white border border-stone-200/60 rounded-lg text-[11px] text-stone-400 font-mono w-40 sm:w-64 truncate text-left">
                   shopdashboard.premium/dashboard
                 </div>
               </div>
-              <div className="p-4 sm:p-8 text-left bg-gradient-to-br from-slate-50/50 to-white">
+              <div className="p-4 sm:p-8 text-left bg-gradient-to-br from-stone-50/50 to-white">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-indigo-600/10 flex items-center justify-center text-indigo-600 font-bold shrink-0">
+                    <div className="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center text-blue-600 font-bold shrink-0">
                       🏪
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-800 text-sm">Tokyo Flagship Hub</h4>
-                      <p className="text-[11px] text-slate-400">Multi-tenant active sandbox</p>
+                      <h4 className="font-bold text-stone-800 text-sm">Tokyo Flagship Hub</h4>
+                      <p className="text-[11px] text-stone-400">Multi-tenant active sandbox</p>
                     </div>
                   </div>
                   <div className="flex">
@@ -94,22 +94,22 @@ export default function MarketingPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                  <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase">Active Subscriptions</p>
-                    <p className="text-2xl font-black text-slate-800 mt-1">1,482</p>
+                  <div className="p-4 bg-white rounded-lg border border-stone-100 shadow-sm">
+                    <p className="text-[10px] font-bold text-stone-400 uppercase">Active Subscriptions</p>
+                    <p className="text-2xl font-black text-stone-800 mt-1">1,482</p>
                   </div>
-                  <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase">Available Slots</p>
-                    <p className="text-2xl font-black text-indigo-600 mt-1">849</p>
+                  <div className="p-4 bg-white rounded-lg border border-stone-100 shadow-sm">
+                    <p className="text-[10px] font-bold text-stone-400 uppercase">Available Slots</p>
+                    <p className="text-2xl font-black text-blue-600 mt-1">849</p>
                   </div>
-                  <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase">Expiring Soon</p>
+                  <div className="p-4 bg-white rounded-lg border border-stone-100 shadow-sm">
+                    <p className="text-[10px] font-bold text-stone-400 uppercase">Expiring Soon</p>
                     <p className="text-2xl font-black text-amber-600 mt-1">12 Slots</p>
                   </div>
                 </div>
 
-                <div className="min-h-24 py-6 px-4 rounded-lg bg-gradient-to-r from-indigo-50/50 via-violet-50/50 to-pink-50/50 border border-indigo-100/40 flex items-center justify-center border-dashed">
-                  <p className="text-xs font-medium text-indigo-400 text-center">Interactive live widgets rendered securely inside tenant dashboard boundaries</p>
+                <div className="min-h-24 py-6 px-4 rounded-lg bg-gradient-to-r from-blue-50/50 via-violet-50/50 to-pink-50/50 border border-blue-100/40 flex items-center justify-center border-dashed">
+                  <p className="text-xs font-medium text-blue-400 text-center">Interactive live widgets rendered securely inside tenant dashboard boundaries</p>
                 </div>
               </div>
             </div>
@@ -117,44 +117,44 @@ export default function MarketingPage() {
         </section>
 
         {/* High-End Feature Breakdown */}
-        <section className="py-24 bg-white border-y border-slate-100 px-6">
+        <section className="py-24 bg-white border-y border-stone-100 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
+              <h2 className="text-3xl font-bold text-stone-900 tracking-tight">
                 Architected for Supreme Command
               </h2>
-              <p className="text-slate-500 mt-2 text-sm">
+              <p className="text-stone-500 mt-2 text-sm">
                 Every tool crafted specifically to elevate operations manager throughput.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="p-8 rounded-lg bg-slate-50/60 border border-slate-100 hover:border-indigo-100 transition-all group">
-                <div className="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <div className="p-8 rounded-lg bg-stone-50/60 border border-stone-100 hover:border-blue-100 transition-all group">
+                <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <Layers className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Smart Tier Partitioning</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <h3 className="text-lg font-bold text-stone-900 mb-2">Smart Tier Partitioning</h3>
+                <p className="text-sm text-stone-600 leading-relaxed">
                   Automatically split and assign credentials (e.g., 1 User, Private Upgrade, Family Slot) dynamically based on the streaming platform or digital product.
                 </p>
               </div>
 
-              <div className="p-8 rounded-lg bg-slate-50/60 border border-slate-100 hover:border-violet-100 transition-all group">
+              <div className="p-8 rounded-lg bg-stone-50/60 border border-stone-100 hover:border-violet-100 transition-all group">
                 <div className="w-12 h-12 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Secure Credential Vault</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <h3 className="text-lg font-bold text-stone-900 mb-2">Secure Credential Vault</h3>
+                <p className="text-sm text-stone-600 leading-relaxed">
                   Safely store master emails, passwords, and 4-digit PINs. Equipped with instant-copy UI interfaces for rapid customer fulfillment via WhatsApp or chat.
                 </p>
               </div>
 
-              <div className="p-8 rounded-lg bg-slate-50/60 border border-slate-100 hover:border-pink-100 transition-all group">
+              <div className="p-8 rounded-lg bg-stone-50/60 border border-stone-100 hover:border-pink-100 transition-all group">
                 <div className="w-12 h-12 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Expiry & Stock Alerts</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <h3 className="text-lg font-bold text-stone-900 mb-2">Expiry & Stock Alerts</h3>
+                <p className="text-sm text-stone-600 leading-relaxed">
                   Real-time stock counts for available profile slots and automatic, color-coded alerts for upcoming master subscription renewals.
                 </p>
               </div>
@@ -163,46 +163,46 @@ export default function MarketingPage() {
         </section>
 
         {/* Supported Platforms Showcase */}
-        <section className="py-24 bg-slate-900 px-6 overflow-hidden relative">
+        <section className="py-24 bg-stone-900 px-6 overflow-hidden relative">
           {/* Decorative background gradients */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
-          <div className="absolute top-1/4 -right-64 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+          <div className="absolute top-1/4 -right-64 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
           <div className="absolute bottom-1/4 -left-64 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
 
           <div className="max-w-7xl mx-auto">
             <div className="text-center max-w-3xl mx-auto mb-20">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-[11px] font-bold uppercase tracking-widest mb-6">
                 <Sparkles className="w-3.5 h-3.5" />
                 Intelligent Auto-Tiering Engine
               </div>
               <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-6">
                 Massive Out-of-the-Box Support
               </h2>
-              <p className="text-slate-400 text-lg leading-relaxed">
+              <p className="text-stone-400 text-lg leading-relaxed">
                 Just type the product name. Our engine instantly detects the brand and generates the exact sub-tiers and profile slots you need to resell.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
               {/* Streaming Box */}
-              <div className="p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-indigo-500/30 transition-all backdrop-blur-sm group">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-6 border border-indigo-500/20 group-hover:scale-110 transition-transform">
+              <div className="p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all backdrop-blur-sm group">
+                <div className="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform">
                   <MonitorPlay className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-4">Streaming & Media</h3>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {["Netflix", "Disney+", "HBO Max", "Prime Video", "Hulu", "Crunchyroll", "Spotify"].map(brand => (
-                    <span key={brand} className="px-2.5 py-1 rounded-md bg-white/5 text-slate-300 text-xs font-medium border border-white/5">
+                    <span key={brand} className="px-2.5 py-1 rounded-md bg-white/5 text-stone-300 text-xs font-medium border border-white/5">
                       {brand}
                     </span>
                   ))}
                 </div>
                 <div className="pt-6 border-t border-white/10">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Auto-Splits Into:</p>
+                  <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-3">Auto-Splits Into:</p>
                   <ul className="space-y-2">
-                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 1 User / 2 User Profiles</li>
-                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Semi-Private Slots</li>
-                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Private Account Upgrades</li>
+                    <li className="flex items-center gap-2 text-sm text-stone-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 1 User / 2 User Profiles</li>
+                    <li className="flex items-center gap-2 text-sm text-stone-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Semi-Private Slots</li>
+                    <li className="flex items-center gap-2 text-sm text-stone-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Private Account Upgrades</li>
                   </ul>
                 </div>
               </div>
@@ -215,17 +215,17 @@ export default function MarketingPage() {
                 <h3 className="text-xl font-bold text-white mb-4">AI & Productivity</h3>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {["ChatGPT Plus", "Canva Pro", "Grammarly", "Microsoft 365", "Google One", "Zoom", "CapCut"].map(brand => (
-                    <span key={brand} className="px-2.5 py-1 rounded-md bg-white/5 text-slate-300 text-xs font-medium border border-white/5">
+                    <span key={brand} className="px-2.5 py-1 rounded-md bg-white/5 text-stone-300 text-xs font-medium border border-white/5">
                       {brand}
                     </span>
                   ))}
                 </div>
                 <div className="pt-6 border-t border-white/10">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Auto-Splits Into:</p>
+                  <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-3">Auto-Splits Into:</p>
                   <ul className="space-y-2">
-                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Team Member Invites</li>
-                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Admin Access Seats</li>
-                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Premium Shared Workspaces</li>
+                    <li className="flex items-center gap-2 text-sm text-stone-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Team Member Invites</li>
+                    <li className="flex items-center gap-2 text-sm text-stone-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Admin Access Seats</li>
+                    <li className="flex items-center gap-2 text-sm text-stone-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Premium Shared Workspaces</li>
                   </ul>
                 </div>
               </div>
@@ -238,17 +238,17 @@ export default function MarketingPage() {
                 <h3 className="text-xl font-bold text-white mb-4">VPN & Security</h3>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {["NordVPN", "ExpressVPN", "Surfshark", "CyberGhost", "PIA"].map(brand => (
-                    <span key={brand} className="px-2.5 py-1 rounded-md bg-white/5 text-slate-300 text-xs font-medium border border-white/5">
+                    <span key={brand} className="px-2.5 py-1 rounded-md bg-white/5 text-stone-300 text-xs font-medium border border-white/5">
                       {brand}
                     </span>
                   ))}
                 </div>
                 <div className="pt-6 border-t border-white/10">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Auto-Splits Into:</p>
+                  <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-3">Auto-Splits Into:</p>
                   <ul className="space-y-2">
-                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Individual Device Slots</li>
-                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 5-Device Family Pools</li>
-                    <li className="flex items-center gap-2 text-sm text-slate-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Dedicated Private IPs</li>
+                    <li className="flex items-center gap-2 text-sm text-stone-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Individual Device Slots</li>
+                    <li className="flex items-center gap-2 text-sm text-stone-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 5-Device Family Pools</li>
+                    <li className="flex items-center gap-2 text-sm text-stone-400"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Dedicated Private IPs</li>
                   </ul>
                 </div>
               </div>
@@ -257,167 +257,167 @@ export default function MarketingPage() {
         </section>
 
         {/* Pricing/Features Comparison */}
-        <section className="py-24 bg-slate-50 px-6">
+        <section className="py-24 bg-stone-50 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
+              <h2 className="text-3xl font-bold text-stone-900 tracking-tight">
                 Simple, Scalable Plans
               </h2>
-              <p className="text-slate-500 mt-2 text-sm">
+              <p className="text-stone-500 mt-2 text-sm">
                 Choose the perfect tier for your commerce operations.
               </p>
             </div>
 
             <div className="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto">
               {/* Standard Tier */}
-              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col">
+              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-white border border-stone-200 shadow-sm flex flex-col">
                 <div className="mb-6">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold uppercase tracking-widest mb-4">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100 text-stone-600 text-[11px] font-bold uppercase tracking-widest mb-4">
                     <div className="w-2 h-2 rounded-full bg-amber-500" />
                     Standard
                   </div>
-                  <h3 className="text-4xl font-black text-slate-900">Free</h3>
-                  <p className="text-sm text-slate-500 mt-2">Perfect for single-store operations starting out.</p>
+                  <h3 className="text-4xl font-black text-stone-900">Free</h3>
+                  <p className="text-sm text-stone-500 mt-2">Perfect for single-store operations starting out.</p>
                 </div>
                 <div className="flex-1 space-y-4 mb-8">
-                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                  <div className="flex items-center gap-3 text-sm text-stone-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                     <span>Up to 1 Store Workspace</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                  <div className="flex items-center gap-3 text-sm text-stone-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                     <span>Store up to 100 Credentials</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                  <div className="flex items-center gap-3 text-sm text-stone-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                     <span>Basic Stock & Expiry Tracking</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                  <div className="flex items-center gap-3 text-sm text-stone-700">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                     <span>Copy-to-Clipboard Features</span>
                   </div>
                 </div>
-                <Link href="/dashboard" className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-center text-sm transition-colors mt-auto">
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold rounded-xl text-center text-sm transition-colors mt-auto">
                   Get Started Free
                 </Link>
               </div>
 
               {/* Weekly Tier */}
-              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden">
+              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-stone-900 border border-blue-500/30 shadow-xl shadow-blue-500/10 flex flex-col relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4">
-                  <Sparkles className="w-24 h-24 text-indigo-500/10" />
+                  <Sparkles className="w-24 h-24 text-blue-500/10" />
                 </div>
                 <div className="mb-6 relative z-10">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-4">
-                    <Sparkles className="w-3 h-3 text-indigo-400" />
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-[11px] font-bold uppercase tracking-widest mb-4">
+                    <Sparkles className="w-3 h-3 text-blue-400" />
                     Pro Weekly
                   </div>
-                  <h3 className="text-4xl font-black text-white">$9<span className="text-lg text-slate-400 font-medium">/wk</span></h3>
-                  <p className="text-sm text-indigo-200 mt-2">Short-term power for digital empires.</p>
+                  <h3 className="text-4xl font-black text-white">$9<span className="text-lg text-stone-400 font-medium">/wk</span></h3>
+                  <p className="text-sm text-blue-200 mt-2">Short-term power for digital empires.</p>
                 </div>
                 <div className="flex-1 space-y-4 mb-8 relative z-10">
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span className="text-white font-medium">Unlimited Store Workspaces</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span>Unlimited Credential Storage</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span>Automated WhatsApp Delivery (n8n)</span>
                   </div>
                 </div>
-                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-indigo-500/25 transition-all relative z-10 mt-auto">
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-blue-500/25 transition-all relative z-10 mt-auto">
                   Upgrade to Weekly
                 </Link>
               </div>
 
               {/* Monthly Tier */}
-              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden ring-2 ring-indigo-500">
+              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-stone-900 border border-blue-500/30 shadow-xl shadow-blue-500/10 flex flex-col relative overflow-hidden ring-2 ring-blue-500">
                 <div className="absolute top-0 right-0 p-4">
-                  <Sparkles className="w-24 h-24 text-indigo-500/10" />
+                  <Sparkles className="w-24 h-24 text-blue-500/10" />
                 </div>
                 <div className="mb-6 relative z-10">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-4">
-                    <Sparkles className="w-3 h-3 text-indigo-400" />
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-[11px] font-bold uppercase tracking-widest mb-4">
+                    <Sparkles className="w-3 h-3 text-blue-400" />
                     Pro Monthly
                   </div>
                   <div className="absolute -top-1 -right-1">
-                     <span className="px-2 py-1 bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-bl-lg rounded-tr-lg">Most Popular</span>
+                     <span className="px-2 py-1 bg-blue-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-bl-lg rounded-tr-lg">Most Popular</span>
                   </div>
-                  <h3 className="text-4xl font-black text-white">$29<span className="text-lg text-slate-400 font-medium">/mo</span></h3>
-                  <p className="text-sm text-indigo-200 mt-2">Unlimited power for digital empires.</p>
+                  <h3 className="text-4xl font-black text-white">$29<span className="text-lg text-stone-400 font-medium">/mo</span></h3>
+                  <p className="text-sm text-blue-200 mt-2">Unlimited power for digital empires.</p>
                 </div>
                 <div className="flex-1 space-y-4 mb-8 relative z-10">
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span className="text-white font-medium">Unlimited Store Workspaces</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span>Unlimited Credential Storage</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span>Automated WhatsApp Delivery (n8n)</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span>Smart Family Pool Automation</span>
                   </div>
                 </div>
-                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-indigo-500/25 transition-all relative z-10 mt-auto">
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-blue-500/25 transition-all relative z-10 mt-auto">
                   Upgrade to Monthly
                 </Link>
               </div>
               {/* Yearly Tier */}
-              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-indigo-500/30 shadow-xl shadow-indigo-500/10 flex flex-col relative overflow-hidden">
+              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-stone-900 border border-blue-500/30 shadow-xl shadow-blue-500/10 flex flex-col relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4">
-                  <Sparkles className="w-24 h-24 text-indigo-500/10" />
+                  <Sparkles className="w-24 h-24 text-blue-500/10" />
                 </div>
                 <div className="mb-6 relative z-10">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-4">
-                    <Sparkles className="w-3 h-3 text-indigo-400" />
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-[11px] font-bold uppercase tracking-widest mb-4">
+                    <Sparkles className="w-3 h-3 text-blue-400" />
                     Pro Yearly
                   </div>
-                  <h3 className="text-4xl font-black text-white">$59<span className="text-lg text-slate-400 font-medium">/yr</span></h3>
-                  <p className="text-sm text-indigo-200 mt-2">Save 30% on annual billing.</p>
+                  <h3 className="text-4xl font-black text-white">$59<span className="text-lg text-stone-400 font-medium">/yr</span></h3>
+                  <p className="text-sm text-blue-200 mt-2">Save 30% on annual billing.</p>
                 </div>
                 <div className="flex-1 space-y-4 mb-8 relative z-10">
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span className="text-white font-medium">Unlimited Store Workspaces</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span>Unlimited Credential Storage</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span>Automated WhatsApp Delivery (n8n)</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span>Smart Family Pool Automation</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <span>Cross-Tenant Analytics Engine</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
                     <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
                     <span className="text-emerald-400 font-medium">Priority Support Access</span>
                   </div>
                 </div>
-                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-indigo-500/25 transition-all relative z-10 mt-auto">
+                <Link href="/dashboard" className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-400 hover:to-violet-400 text-white font-bold rounded-xl text-center text-sm shadow-md shadow-blue-500/25 transition-all relative z-10 mt-auto">
                   Upgrade to Yearly
                 </Link>
               </div>
 
               {/* Lifetime Tier */}
-              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-slate-900 border border-amber-500/30 shadow-xl shadow-amber-500/10 flex flex-col relative overflow-hidden">
+              <div className="w-full sm:w-[340px] min-h-[520px] p-8 rounded-2xl bg-gradient-to-b from-[#0b0f19] to-stone-900 border border-amber-500/30 shadow-xl shadow-amber-500/10 flex flex-col relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4">
                   <Sparkles className="w-24 h-24 text-amber-500/10" />
                 </div>
@@ -426,39 +426,39 @@ export default function MarketingPage() {
                     <Sparkles className="w-3 h-3 text-amber-400" />
                     Pro Lifetime
                   </div>
-                  <h3 className="text-4xl font-black text-white">$99<span className="text-lg text-slate-400 font-medium"> once</span></h3>
+                  <h3 className="text-4xl font-black text-white">$99<span className="text-lg text-stone-400 font-medium"> once</span></h3>
                   <p className="text-sm text-amber-200 mt-2">Pay once, own forever.</p>
                 </div>
                 <div className="flex-1 space-y-4 mb-8 relative z-10">
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
                     <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
                     <span className="text-white font-medium">Unlimited Store Workspaces</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
                     <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
                     <span>Unlimited Credential Storage</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
                     <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
                     <span>Automated WhatsApp Delivery (n8n)</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
                     <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
                     <span>Smart Family Pool Automation</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
                     <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
                     <span>Cross-Tenant Analytics Engine</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
                     <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
                     <span>Priority Support Access</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
                     <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
                     <span>Lifetime Core Updates</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                  <div className="flex items-center gap-3 text-sm text-stone-300">
                     <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
                     <span>No recurring subscription</span>
                   </div>
@@ -473,9 +473,9 @@ export default function MarketingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-12 bg-slate-50 text-center text-xs text-slate-400 border-t border-slate-100">
+      <footer className="py-12 bg-stone-50 text-center text-xs text-stone-400 border-t border-stone-100">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 font-bold text-slate-700">
+          <div className="flex items-center gap-2 font-bold text-stone-700">
             <span>Shop Dashboard Premium Management Suite</span>
           </div>
           <div className="flex gap-6">

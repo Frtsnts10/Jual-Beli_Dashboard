@@ -61,25 +61,25 @@ export function ApprovalsTable({ storeId, drafts }: ApprovalsTableProps) {
 
   if (drafts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-xl">
-        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mb-4">
+      <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-[#0b0f19] border border-stone-200 dark:border-slate-800 rounded-xl">
+        <div className="w-16 h-16 bg-stone-50 dark:bg-slate-900 rounded-full flex items-center justify-center mb-4">
           <Check className="w-8 h-8 text-emerald-500" />
         </div>
-        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Semua sudah selesai!</h3>
-        <p className="text-xs text-slate-500 mt-1">Tidak ada permintaan yang tertunda dari staf.</p>
+        <h3 className="text-sm font-bold text-stone-800 dark:text-slate-200">Semua sudah selesai!</h3>
+        <p className="text-xs text-stone-500 mt-1">Tidak ada permintaan yang tertunda dari staf.</p>
       </div>
     );
   }
 
   return (
     <>
-      <div className="bg-white dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#0b0f19] border border-stone-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
         <Table 
           aria-label="Pending Approvals Table"
           classNames={{
             wrapper: "p-0 bg-transparent shadow-none border-none",
-            th: "bg-slate-50 dark:bg-[#0d1322] text-slate-500 dark:text-slate-400 font-bold text-[10px] uppercase tracking-wider py-4",
-            td: "py-4 text-sm border-b border-slate-100 dark:border-slate-800/60"
+            th: "bg-stone-50 dark:bg-[#0d1322] text-stone-500 dark:text-slate-400 font-bold text-[10px] uppercase tracking-wider py-4",
+            td: "py-4 text-sm border-b border-stone-100 dark:border-slate-800/60"
           }}
         >
           <TableHeader>
@@ -95,12 +95,12 @@ export function ApprovalsTable({ storeId, drafts }: ApprovalsTableProps) {
               <TableRow key={draft.id}>
                 <TableCell>
                   <div className="flex flex-col">
-                    <span className="font-bold text-slate-800 dark:text-slate-200">{draft.proposed_by.name}</span>
-                    <span className="text-[10px] text-slate-500">{draft.proposed_by.email}</span>
+                    <span className="font-bold text-stone-800 dark:text-slate-200">{draft.proposed_by.name}</span>
+                    <span className="text-[10px] text-stone-500">{draft.proposed_by.email}</span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="font-mono text-xs uppercase text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-950/50 px-2 py-1 rounded">
+                  <span className="font-mono text-xs uppercase text-blue-600 dark:text-indigo-400 font-bold bg-blue-50 dark:bg-indigo-950/50 px-2 py-1 rounded">
                     {draft.target_collection}
                   </span>
                 </TableCell>
@@ -110,12 +110,12 @@ export function ApprovalsTable({ storeId, drafts }: ApprovalsTableProps) {
                   </Chip>
                 </TableCell>
                 <TableCell>
-                  <span className="font-medium text-slate-700 dark:text-slate-300">
+                  <span className="font-medium text-stone-700 dark:text-slate-300">
                     {draft.payload.name || `Item ID: ${draft.target_id || 'New'}`}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-stone-500">
                     {new Date(draft.created_at).toLocaleString()}
                   </span>
                 </TableCell>
@@ -179,26 +179,26 @@ export function ApprovalsTable({ storeId, drafts }: ApprovalsTableProps) {
 
       {/* Basic Diff Viewer Modal */}
       {viewingDraft && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                <FileDiff className="w-5 h-5 text-indigo-500" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0b0f19] border border-stone-200 dark:border-slate-800 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between p-4 border-b border-stone-100 dark:border-slate-800">
+              <h3 className="font-black text-stone-800 dark:text-slate-100 flex items-center gap-2">
+                <FileDiff className="w-5 h-5 text-blue-500" />
                 Pull Request Details
               </h3>
-              <button onClick={() => setViewingDraft(null)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setViewingDraft(null)} className="text-stone-400 hover:text-stone-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-4 overflow-y-auto flex-1">
               <div className="mb-4">
-                <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Proposed Payload Data</p>
-                <div className="bg-slate-50 dark:bg-[#050811] border border-slate-100 dark:border-slate-800 p-4 rounded-lg font-mono text-[11px] text-slate-700 dark:text-slate-300 overflow-x-auto">
+                <p className="text-xs text-stone-500 font-bold uppercase tracking-wider mb-2">Proposed Payload Data</p>
+                <div className="bg-stone-50 dark:bg-[#050811] border border-stone-100 dark:border-slate-800 p-4 rounded-lg font-mono text-[11px] text-stone-700 dark:text-slate-300 overflow-x-auto">
                   <pre>{JSON.stringify(viewingDraft.payload, null, 2)}</pre>
                 </div>
               </div>
             </div>
-            <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3 bg-slate-50 dark:bg-[#0d1322]">
+            <div className="p-4 border-t border-stone-100 dark:border-slate-800 flex justify-end gap-3 bg-stone-50 dark:bg-[#0d1322]">
               <Button variant="light" onPress={() => setViewingDraft(null)} className="font-bold text-xs">
                 Close
               </Button>

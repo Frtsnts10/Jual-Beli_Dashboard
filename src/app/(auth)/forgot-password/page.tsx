@@ -40,31 +40,31 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="w-full bg-[#0d1322]/40 backdrop-blur-2xl rounded-[32px] border border-white/10 p-8 shadow-2xl transition-all">
+    <div className="w-full bg-white rounded-[32px] border border-stone-200 p-8 shadow-xl transition-all">
       <div className="mb-6">
-        <Link href="/sign-in" className="inline-flex items-center gap-2 text-xs text-slate-400 hover:text-white transition-colors">
+        <Link href="/sign-in" className="inline-flex items-center gap-2 text-xs text-stone-500 hover:text-stone-900 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Back to Login
         </Link>
       </div>
 
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-black tracking-tight text-white">Reset Password</h2>
-        <p className="text-[11px] text-indigo-300 mt-1 uppercase tracking-widest font-bold">Terminal Access Recovery</p>
+        <h2 className="text-2xl font-black tracking-tight text-stone-900">Reset Password</h2>
+        <p className="text-[11px] text-blue-600 mt-1 uppercase tracking-widest font-bold">Terminal Access Recovery</p>
       </div>
 
       {success ? (
         <div className="text-center py-6 animate-in zoom-in-95 duration-500">
-          <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
-            <MailCheck className="w-8 h-8 text-emerald-400" />
+          <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-200">
+            <MailCheck className="w-8 h-8 text-emerald-600" />
           </div>
-          <h3 className="text-white font-bold text-lg mb-2">Check your inbox</h3>
-          <p className="text-slate-400 text-sm mb-8">
+          <h3 className="text-stone-900 font-bold text-lg mb-2">Check your inbox</h3>
+          <p className="text-stone-500 text-sm mb-8">
             We've sent a secure recovery link to your email address.
           </p>
           <Link href="/sign-in">
             <Button
-              className="w-full bg-white/5 hover:bg-white/10 text-white font-bold shadow-lg border border-white/10"
+              className="w-full bg-stone-100 hover:bg-stone-200 text-stone-900 font-bold shadow-sm border border-stone-200"
             >
               Return to Sign In
             </Button>
@@ -73,13 +73,13 @@ export default function ForgotPasswordPage() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-lg text-xs text-rose-400 text-center font-medium">
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-700 text-center font-medium">
               {error}
             </div>
           )}
 
           <div className="space-y-4">
-            <p className="text-sm text-slate-400 text-center mb-6">
+            <p className="text-sm text-stone-500 text-center mb-6">
               Enter the email address associated with your dashboard account and we'll send you a link to reset your password.
             </p>
             <Input
@@ -90,9 +90,9 @@ export default function ForgotPasswordPage() {
               isRequired
               variant="faded"
               classNames={{
-                inputWrapper: "bg-black/40 border-white/10 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 data-[focus=true]:bg-black/60",
-                input: "text-white placeholder:text-slate-500",
-                label: "text-slate-300"
+                inputWrapper: "bg-white border-stone-200 hover:border-blue-400 data-[focus=true]:border-blue-600 data-[focus=true]:bg-white",
+                input: "text-stone-900 placeholder:text-stone-400",
+                label: "text-stone-600"
               }}
             />
           </div>
@@ -100,7 +100,7 @@ export default function ForgotPasswordPage() {
           <Button
             type="submit"
             isLoading={isPending}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-600/25 border-none"
+            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-lg shadow-blue-600/25 border-none"
           >
             {isPending ? "Sending Link..." : "Send Reset Link"}
           </Button>

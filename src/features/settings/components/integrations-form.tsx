@@ -33,12 +33,12 @@ export function IntegrationsForm({
   }
 
   return (
-    <div className="bg-white dark:bg-[#0d1322] rounded-xl border border-slate-200/60 dark:border-slate-800/80 shadow-sm p-6 relative overflow-hidden transition-colors">
-      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-        <Globe className="w-4 h-4 text-indigo-500" />
+    <div className="bg-white dark:bg-[#0d1322] rounded-xl border border-stone-200/60 dark:border-slate-800/80 shadow-sm p-6 relative overflow-hidden transition-colors">
+      <h3 className="text-sm font-bold text-stone-900 dark:text-slate-100 flex items-center gap-2">
+        <Globe className="w-4 h-4 text-blue-500" />
         {t.settings.integrationsTitle}
       </h3>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-5 leading-relaxed">
+      <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5 mb-5 leading-relaxed">
         {t.settings.integrationsSubtitle}
       </p>
 
@@ -46,9 +46,9 @@ export function IntegrationsForm({
         <div className="space-y-6">
           {/* Midtrans */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 pb-1">Midtrans</h4>
+            <h4 className="text-xs font-bold text-stone-800 dark:text-slate-200 border-b border-stone-200 dark:border-slate-800 pb-1">Midtrans</h4>
             <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
                 {t.settings.labelServerKey}
               </label>
               <Input 
@@ -59,13 +59,13 @@ export function IntegrationsForm({
                 type="password"
                 size="sm"
                 classNames={{
-                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
-                  input: "text-xs font-bold text-slate-800 dark:text-slate-100",
+                  inputWrapper: "bg-stone-50 dark:bg-[#0b0f19] border border-stone-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 shadow-none",
+                  input: "text-xs font-bold text-stone-800 dark:text-slate-100",
                 }}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
                 {t.settings.labelClientKey}
               </label>
               <Input 
@@ -75,8 +75,8 @@ export function IntegrationsForm({
                 placeholder="SB-Mid-client-..."
                 size="sm"
                 classNames={{
-                  inputWrapper: "bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-none",
-                  input: "text-xs font-bold text-slate-800 dark:text-slate-100",
+                  inputWrapper: "bg-stone-50 dark:bg-[#0b0f19] border border-stone-200 dark:border-slate-800 focus-within:bg-white dark:focus-within:bg-[#131b2e] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 shadow-none",
+                  input: "text-xs font-bold text-stone-800 dark:text-slate-100",
                 }}
               />
             </div>
@@ -87,7 +87,7 @@ export function IntegrationsForm({
           <Button 
             type="submit" 
             isLoading={isPending}
-            className="w-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold tracking-wide shadow-md"
+            className="w-full bg-stone-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold tracking-wide shadow-md"
           >
             {isPending ? t.settings.btnSavingApiKeys : t.settings.btnSaveApiKeys}
           </Button>

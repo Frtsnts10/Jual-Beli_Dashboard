@@ -9,24 +9,24 @@ export default function NativeSignUpPage() {
   const [state, formAction, isPending] = useActionState(signUpAction, null);
 
   return (
-    <div className="w-full max-w-md bg-[#0d1322]/40 backdrop-blur-2xl rounded-[32px] border border-white/10 p-8 shadow-2xl transition-all">
+    <div className="w-full max-w-md bg-white rounded-[32px] border border-stone-200 p-8 shadow-xl transition-all">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-500 text-white font-bold text-xl mb-4 shadow-lg shadow-violet-500/25">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-tr from-violet-600 to-blue-500 text-white font-bold text-xl mb-4 shadow-lg shadow-violet-500/25">
           ✨
         </div>
-        <h2 className="text-2xl font-black tracking-tight text-white">Create Console Toko</h2>
-        <p className="text-xs text-indigo-300 mt-1 uppercase tracking-widest font-bold">Provision Auth Profile Toko</p>
+        <h2 className="text-2xl font-black tracking-tight text-stone-900">Create Console Toko</h2>
+        <p className="text-xs text-blue-600 mt-1 uppercase tracking-widest font-bold">Provision Auth Profile Toko</p>
       </div>
 
       <form action={formAction} className="space-y-4">
         {state?.error && (
-          <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-lg text-xs text-rose-400">
+          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-700">
             {state.error}
           </div>
         )}
 
         {state?.success && state?.message && (
-          <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs text-emerald-400">
+          <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-700">
             {state.message}
           </div>
         )}
@@ -40,9 +40,9 @@ export default function NativeSignUpPage() {
             placeholder="Store Executive"
             variant="faded"
             classNames={{
-              inputWrapper: "bg-black/40 border-white/10 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 data-[focus=true]:bg-black/60",
-              input: "text-white placeholder:text-slate-500",
-              label: "text-slate-300"
+              inputWrapper: "bg-white border-stone-200 hover:border-blue-400 data-[focus=true]:border-blue-600 data-[focus=true]:bg-white",
+              input: "text-stone-900 placeholder:text-stone-400",
+              label: "text-stone-600"
             }}
           />
         </div>
@@ -56,9 +56,9 @@ export default function NativeSignUpPage() {
             placeholder="executive@premium-storefronts.com"
             variant="faded"
             classNames={{
-              inputWrapper: "bg-black/40 border-white/10 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 data-[focus=true]:bg-black/60",
-              input: "text-white placeholder:text-slate-500",
-              label: "text-slate-300"
+              inputWrapper: "bg-white border-stone-200 hover:border-blue-400 data-[focus=true]:border-blue-600 data-[focus=true]:bg-white",
+              input: "text-stone-900 placeholder:text-stone-400",
+              label: "text-stone-600"
             }}
           />
         </div>
@@ -72,9 +72,9 @@ export default function NativeSignUpPage() {
             placeholder="••••••••••••"
             variant="faded"
             classNames={{
-              inputWrapper: "bg-black/40 border-white/10 hover:border-indigo-500/50 data-[focus=true]:border-indigo-500 data-[focus=true]:bg-black/60",
-              input: "text-white placeholder:text-slate-500",
-              label: "text-slate-300"
+              inputWrapper: "bg-white border-stone-200 hover:border-blue-400 data-[focus=true]:border-blue-600 data-[focus=true]:bg-white",
+              input: "text-stone-900 placeholder:text-stone-400",
+              label: "text-stone-600"
             }}
           />
         </div>
@@ -82,7 +82,7 @@ export default function NativeSignUpPage() {
         <Button
           type="submit"
           isLoading={isPending}
-          className="w-full mt-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold shadow-md shadow-violet-500/10 hover:shadow-lg hover:shadow-violet-500/20"
+          className="w-full mt-2 bg-gradient-to-r from-violet-600 to-blue-600 text-white font-semibold shadow-md shadow-violet-500/10 hover:shadow-lg hover:shadow-violet-500/20"
           size="lg"
           radius="lg"
         >
@@ -90,10 +90,10 @@ export default function NativeSignUpPage() {
         </Button>
       </form>
 
-      <div className="mt-6 pt-6 border-t border-white/10 text-center">
-        <p className="text-xs text-slate-400">
+      <div className="mt-6 pt-6 border-t border-stone-200 text-center">
+        <p className="text-xs text-stone-500">
           Already mapped an authentication toko?{" "}
-          <Link href="/sign-in" className="text-violet-400 font-semibold hover:underline">
+          <Link href="/sign-in" className="text-blue-600 font-semibold hover:underline">
             Sign in here
           </Link>
         </p>

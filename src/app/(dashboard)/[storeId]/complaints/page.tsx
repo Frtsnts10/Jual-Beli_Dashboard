@@ -29,8 +29,8 @@ export default async function TenantComplaintsPage({
   return (
     <div className="space-y-6 font-sans transition-colors">
       <div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">SLA Support Incident Logs</h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+        <h2 className="text-xl font-bold text-stone-900 dark:text-slate-100 tracking-tight">SLA Support Incident Logs</h2>
+        <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5">
           Receive critical telemetry details and click the badge to advance the cycle status.
         </p>
       </div>
@@ -43,9 +43,9 @@ export default async function TenantComplaintsPage({
         />
       ) : (
         <>
-          <div className="p-4 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 rounded-lg">
-            <h3 className="text-xs font-bold text-indigo-900 dark:text-indigo-300">Automated Customer Telemetry Feed</h3>
-            <p className="text-[11px] text-indigo-700 dark:text-indigo-400 mt-0.5 leading-relaxed">
+          <div className="p-4 bg-blue-50/50 dark:bg-indigo-950/20 border border-blue-100 dark:border-indigo-900/40 rounded-lg">
+            <h3 className="text-xs font-bold text-blue-900 dark:text-indigo-300">Automated Customer Telemetry Feed</h3>
+            <p className="text-[11px] text-blue-700 dark:text-indigo-400 mt-0.5 leading-relaxed">
               Incidents flow automatically from the client portal. Actions like sending OTPs, credential syncing, refunds, and duration extensions are managed directly in individual customer profiles within the Customer Desk module.
             </p>
           </div>
