@@ -43,7 +43,9 @@ next-env.d.ts
 # clerk configuration (can include secrets)
 /.clerk/
 
-# private data files
+# private data files — real master-account exports must never be committed
 *.csv
+# the column template is dummy data and is intentionally tracked
+!docs/master_accounts_sample.csv
 *serviceAccount*.json
 *adminsdk*.json
