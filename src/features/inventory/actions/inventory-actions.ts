@@ -30,10 +30,10 @@ export async function getInventoryAction(storeId: string): Promise<InventoryItem
 
   const snap = await adminDb.collection("inventory")
     .where("store_id", "==", storeId)
-    .orderBy("created_at", "desc")
     .get();
 
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
+  const items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
+  return items.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
 }
 
 export async function createInventoryItemAction(storeId: string, formData: FormData) {

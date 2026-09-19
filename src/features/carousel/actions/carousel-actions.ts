@@ -23,10 +23,10 @@ export async function getCarouselSlidesAction(storeId: string): Promise<Carousel
 
   const snap = await adminDb.collection("carousel_slides")
     .where("store_id", "==", storeId)
-    .orderBy("order", "asc")
     .get();
 
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as CarouselSlide));
+  const slides = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as CarouselSlide));
+  return slides.sort((a, b) => (a.order || 0) - (b.order || 0));
 }
 
 export async function createCarouselSlideAction(storeId: string, formData: FormData) {

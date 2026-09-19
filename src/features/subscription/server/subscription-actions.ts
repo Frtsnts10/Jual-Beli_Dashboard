@@ -7,23 +7,30 @@ export async function getSubscriptionStatus() {
   const email = user?.email || "";
   const uid = user?.uid;
 
+  if (!uid) {
+    return {
+      isSubscribed: false,
+      plan: "free",
+      tier: "free",
+      status: "inactive",
+      interval: "none",
+      currentPeriodEnd: null,
+    };
+  }
+
   let isPreAuthorizedPro = 
     !!(process.env.PREAUTHORIZED_PRO_EMAILS?.includes(email));
 
   // Check the profiles collection for database-controlled is_premium toggle
-  if (user?.uid) {
-    const profileDoc = await adminDb.collection("profiles").doc(user.uid).get();
-    if (profileDoc.exists && profileDoc.data()?.is_premium) {
-      isPreAuthorizedPro = true;
-    }
+  const profileDoc = await adminDb.collection("profiles").doc(uid).get();
+  if (profileDoc.exists && profileDoc.data()?.is_premium) {
+    isPreAuthorizedPro = true;
   }
 
-  // Check subscriptions
+  // Fetch subscriptions for profile_id and filter in memory to prevent Firestore composite index errors
   const subsSnap = await adminDb
     .collection("subscriptions")
     .where("profile_id", "==", uid)
-    .where("status", "in", ["active", "trialing"])
-    .limit(1)
     .get();
 
   if (isPreAuthorizedPro) {
@@ -37,7 +44,12 @@ export async function getSubscriptionStatus() {
     };
   }
 
-  if (subsSnap.empty) {
+  const activeDoc = subsSnap.docs.find((doc) => {
+    const s = doc.data()?.status;
+    return s === "active" || s === "trialing";
+  });
+
+  if (!activeDoc) {
     return {
       isSubscribed: false,
       plan: "free",
@@ -48,7 +60,7 @@ export async function getSubscriptionStatus() {
     };
   }
 
-  const data = subsSnap.docs[0].data();
+  const data = activeDoc.data();
   const isSubscribed = data.status === "active" || data.status === "trialing";
 
   return {

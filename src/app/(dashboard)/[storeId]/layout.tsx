@@ -49,12 +49,13 @@ export default async function TenantStoreLayout({
   const [storesSnap, subscription] = await Promise.all([
     adminDb.collection("stores")
       .where("owner_id", "==", profileId)
-      .orderBy("created_at", "asc")
       .get(),
     getSubscriptionStatus()
   ]);
 
-  const stores = storesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const stores = storesSnap.docs
+    .map(doc => ({ id: doc.id, ...doc.data() as any }))
+    .sort((a, b) => (a.created_at || "").localeCompare(b.created_at || ""));
   const currentStoreIndex = stores.findIndex((s: any) => s.id === storeId);
   const currentStore = stores[currentStoreIndex];
 

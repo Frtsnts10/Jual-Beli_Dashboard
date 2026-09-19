@@ -29,9 +29,10 @@ export async function getNotificationsAction(storeId: string, lang: Language = "
     const ordersSnap = await adminDb.collection("orders")
       .where("store_id", "==", storeId)
       .where("fulfillment_status", "==", "pending")
-      .orderBy("created_at", "desc")
       .get();
-    pendingOrders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    pendingOrders = ordersSnap.docs
+      .map(d => ({ id: d.id, ...d.data() as any }))
+      .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
   } catch (err) {
     console.warn("Orders collection might not be initialized yet:", err);
   }

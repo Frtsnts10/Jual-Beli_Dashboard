@@ -29,12 +29,13 @@ export default async function DashboardRootPage() {
 
   const storesSnap = await adminDb.collection("stores")
     .where("owner_id", "==", profileId)
-    .orderBy("created_at", "asc")
-    .limit(1)
     .get();
 
-  if (!storesSnap.empty) {
-    redirect(`/${storesSnap.docs[0].id}/dashboard`);
+  const stores = storesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+  stores.sort((a, b) => (a.created_at || "").localeCompare(b.created_at || ""));
+
+  if (stores.length > 0) {
+    redirect(`/${stores[0].id}/dashboard`);
   }
 
   // If zero stores exist, present explicit provision workflow layout

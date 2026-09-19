@@ -32,10 +32,9 @@ export async function getCustomersAction(storeId: string): Promise<Customer[]> {
 
   const snap = await adminDb.collection("customers")
     .where("store_id", "==", storeId)
-    .orderBy("created_at", "desc")
     .get();
 
-  return snap.docs.map(doc => {
+  const list = snap.docs.map(doc => {
     const d = doc.data();
     return {
       id: doc.id,
@@ -43,6 +42,8 @@ export async function getCustomersAction(storeId: string): Promise<Customer[]> {
       purchased_products: Array.isArray(d.purchased_products) ? d.purchased_products : [],
     } as Customer;
   });
+
+  return list.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
 }
 
 export async function createCustomerAction(storeId: string, formData: FormData) {

@@ -23,10 +23,10 @@ export async function getComplaintsAction(storeId: string): Promise<Complaint[]>
 
   const snap = await adminDb.collection("complaints")
     .where("store_id", "==", storeId)
-    .orderBy("created_at", "desc")
     .get();
 
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Complaint));
+  const complaints = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Complaint));
+  return complaints.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
 }
 
 export async function createComplaintAction(storeId: string, formData: FormData) {
