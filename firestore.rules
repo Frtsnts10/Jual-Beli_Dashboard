@@ -1,49 +1,22 @@
 rules_version = '2';
+
+// Both the dashboard and the storefront reach Firestore exclusively through the
+// Firebase Admin SDK (src/lib/firebase/server.ts), which runs server-side and
+// bypasses these rules entirely. No browser code in either app reads or writes
+// Firestore — the client SDK is used only for Firebase Auth.
+//
+// The web API key and project id are public (they ship in every browser bundle),
+// so anything these rules allow is reachable by anyone on the internet, not just
+// by the app. Since no legitimate client request exists, the correct policy is to
+// deny every direct client request and let the server actions — which check the
+// session cookie and store ownership before touching data — be the only way in.
+//
+// If you ever add a client-side Firestore read, it will fail until you add an
+// explicit match block for that collection here.
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Profiles: Users can read/write their own profile
-    match /profiles/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Stores: Users can only read/write stores they own
-    match /stores/{storeId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.owner_id;
-      // Allow creation if the owner_id matches their uid
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.owner_id;
-    }
-
-    // Inventory: Users can only read/write inventory for stores they own
-    match /inventory/{itemId} {
-      allow read, write: if request.auth != null && 
-        request.auth.uid == get(/databases/$(database)/documents/stores/$(resource.data.store_id)).data.owner_id;
-      // Allow creation if the linked store belongs to them
-      allow create: if request.auth != null && 
-        request.auth.uid == get(/databases/$(database)/documents/stores/$(request.resource.data.store_id)).data.owner_id;
-    }
-
-    // Customers: Users can only read/write customers for stores they own
-    match /customers/{customerId} {
-      allow read, write: if request.auth != null && 
-        request.auth.uid == get(/databases/$(database)/documents/stores/$(resource.data.store_id)).data.owner_id;
-      allow create: if request.auth != null && 
-        request.auth.uid == get(/databases/$(database)/documents/stores/$(request.resource.data.store_id)).data.owner_id;
-    }
-
-    // Subscriptions: Users can only read/write subscriptions for stores they own
-    match /subscriptions/{subId} {
-      allow read, write: if request.auth != null &&
-        request.auth.uid == get(/databases/$(database)/documents/stores/$(resource.data.store_id)).data.owner_id;
-    }
-
-    // Carousel Slides: Owners manage their store's slides; anyone can read active slides for the storefront
-    match /carousel_slides/{slideId} {
-      allow read: if true;
-      allow write: if request.auth != null &&
-        request.auth.uid == get(/databases/$(database)/documents/stores/$(resource.data.store_id)).data.owner_id;
-      allow create: if request.auth != null &&
-        request.auth.uid == get(/databases/$(database)/documents/stores/$(request.resource.data.store_id)).data.owner_id;
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

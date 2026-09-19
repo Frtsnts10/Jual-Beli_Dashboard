@@ -3,20 +3,6 @@ import { createSessionCookie, adminDb } from '@/lib/firebase/server';
 import { getAuth } from 'firebase-admin/auth';
 import { cookies } from 'next/headers';
 
-export async function GET() {
-  const pk = process.env.FIREBASE_PRIVATE_KEY || '';
-  return NextResponse.json({
-    diagnostics: true,
-    hasKey: !!pk,
-    length: pk.length,
-    includesBegin: pk.includes('BEGIN PRIVATE KEY'),
-    includesEnd: pk.includes('END PRIVATE KEY'),
-    hasNewlines: pk.includes('\\n') || pk.includes('\n'),
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    email: process.env.FIREBASE_CLIENT_EMAIL,
-  });
-}
-
 export async function POST(req: NextRequest) {
   try {
     const { idToken } = await req.json();
@@ -83,10 +69,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Session creation error:', error);
-    return NextResponse.json({ 
-      error: error.message || 'Failed to create session',
-      stack: error.stack
-    }, { status: 401 });
+    return NextResponse.json({ error: 'Failed to create session' }, { status: 401 });
   }
 }
 
