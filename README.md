@@ -68,7 +68,11 @@ cp .env.example .env.local   # or: vercel env pull .env.local
 npm run dev
 ```
 
-Deploy rules and indexes from the repo (don't edit them in the console):
+Rules and indexes live in this repo (don't edit them in the console). The
+**Deploy Firestore rules & indexes** GitHub Action deploys them whenever
+`firestore.rules` / `firestore.indexes.json` change on `main` (or on demand from the
+Actions tab); it needs the repository secret `FIREBASE_SERVICE_ACCOUNT` — setup steps are
+at the top of `.github/workflows/firestore-deploy.yml`. Manual equivalent:
 
 ```bash
 npx firebase-tools deploy --only firestore --project web-store-4cf23
