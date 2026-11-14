@@ -1,6 +1,6 @@
 import "server-only";
 import { Timestamp, type DocumentSnapshot } from "firebase-admin/firestore";
-import type { Credential, Order, Product, Store, UserDoc } from "@/types/schema";
+import type { Credential, Order, Product, Store, SubscriptionPayment, SubscriptionTier, UserDoc } from "@/types/schema";
 
 export function toISO(value: unknown): string | null {
   if (!value) return null;
@@ -12,13 +12,24 @@ export function toISO(value: unknown): string | null {
 
 type Snap = DocumentSnapshot;
 
+/**
+ * A paid plan whose subscription_expiry has passed falls back to Starter. Computed on
+ * read, so expiry needs no cron job. Keep in sync with the storefront's lib/stores.ts.
+ */
+export function effectiveTier(tier: SubscriptionTier | undefined, expiry: unknown): SubscriptionTier {
+  if (!tier || tier === "starter") return "starter";
+  const iso = toISO(expiry);
+  if (iso && new Date(iso) < new Date()) return "starter";
+  return tier;
+}
+
 export function mapUser(snap: Snap): UserDoc {
   const d = snap.data() ?? {};
   return {
     uid: snap.id,
     email: d.email ?? "",
     full_name: d.full_name ?? "",
-    subscription_tier: d.subscription_tier ?? "starter",
+    subscription_tier: effectiveTier(d.subscription_tier, d.subscription_expiry),
     subscription_expiry: toISO(d.subscription_expiry),
     created_at: toISO(d.created_at) ?? "",
   };
@@ -101,8 +112,26 @@ export function mapOrder(snap: Snap): Order {
     needs_stock: d.needs_stock ?? false,
     renewal_notified: d.renewal_notified ?? false,
     referral_code: d.referral_code ?? null,
+    settlement: d.settlement ?? "PLATFORM",
+    platform_fee: d.platform_fee ?? 0,
     created_at: toISO(d.created_at) ?? "",
     paid_at: toISO(d.paid_at),
     access_expires_at: toISO(d.access_expires_at),
+  };
+}
+
+export function mapSubscriptionPayment(snap: Snap): SubscriptionPayment {
+  const d = snap.data() ?? {};
+  return {
+    id: snap.id,
+    uid: d.uid,
+    tier: d.tier,
+    period: d.period,
+    amount: d.amount ?? 0,
+    status: d.status ?? "PENDING",
+    xendit_invoice_id: d.xendit_invoice_id ?? null,
+    xendit_invoice_url: d.xendit_invoice_url ?? null,
+    created_at: toISO(d.created_at) ?? "",
+    paid_at: toISO(d.paid_at),
   };
 }

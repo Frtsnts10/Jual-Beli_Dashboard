@@ -24,8 +24,9 @@ shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · Xend
 | `/[storeId]/vault` | Credential vault — Available / Sold / Expired tabs, bulk import |
 | `/[storeId]/orders` | Orders, manual payment confirm, WhatsApp delivery, 1-click warranty replacement |
 | `/[storeId]/marketing` | Ultimate features (placeholder, phase 3) |
-| `/[storeId]/settings` | Store profile, template (tier-gated), accent colour, custom domain, WA integration |
-| `/api/webhooks/xendit` | Invoice callback → marks order PAID and allocates a vault credential |
+| `/[storeId]/billing` | Plan upgrade/renewal (monthly/yearly) paid via Xendit invoice, payment history |
+| `/[storeId]/settings` | Store profile, template (tier-gated), accent colour, custom domain, Xendit connection, WA integration |
+| `/api/webhooks/xendit` | Invoice callback: `ORD-…` → order PAID + vault credential; `SUB-…` → activate/extend plan |
 
 ## Data model
 
@@ -45,7 +46,18 @@ idempotent.
 
 `src/config/tiers.ts` — Starter (1 store, 50 stock, 2 templates), Pro (3 stores,
 unlimited stock, all templates, auto-fulfilment), Ultimate (unlimited, custom domain,
-marketing). `users.subscription_tier` is server-only; billing arrives in phase 2.
+marketing). `users.subscription_tier` is server-only and set by the webhook when a
+`subscription_payments` invoice is paid. A paid plan past `subscription_expiry` acts as
+Starter (computed on read, no cron).
+
+## Payments (XenPlatform)
+
+- **Connect Xendit** (Settings) creates a MANAGED sub-account; Xendit emails the seller to
+  finish KYC. Status is mirrored in `stores/{id}/private/integrations`.
+- Once the sub-account is **LIVE**, storefront invoices are created with `for-user-id`
+  (money goes to the seller) and `with-split-rule` (the plan's fee % goes to the platform
+  account `XENDIT_MASTER_ACCOUNT_ID`). Before that, the platform account collects
+  (`orders.settlement = "PLATFORM"`) and owes the seller `amount − platform_fee`.
 
 ## Development
 
@@ -63,7 +75,5 @@ npx firebase-tools deploy --only firestore --project web-store-4cf23
 
 ## Roadmap
 
-- **Phase 2** — Xendit XenPlatform sub-accounts + split payment (platform fee per tier),
-  subscription billing and upgrades.
 - **Phase 3** — n8n + WhatsApp auto-delivery, H-3 renewal reminders, broadcast CRM,
   flash sale / bundling / affiliate reports, custom-domain automation, Discord/Telegram bots.
