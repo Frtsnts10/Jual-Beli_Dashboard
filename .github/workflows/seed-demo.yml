@@ -1,0 +1,47 @@
+# Runs scripts/seed-demo.mjs against the real Firebase project — for when you're not at a
+# computer. Start it from the Actions tab ("Seed demo account" → Run workflow); never runs
+# on its own.
+#
+# Repository secrets it needs (Settings → Secrets and variables → Actions):
+#   FIREBASE_SERVICE_ACCOUNT  already used by the Firestore deploy
+#   VAULT_ENCRYPTION_KEY      the SAME value as on Vercel, or the dashboard can't read the demo vault
+#   DEMO_PASSWORD             the password to give demo@dionycte.com (never printed in the log)
+name: Seed demo account
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: seed-demo
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Seed
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VAULT_ENCRYPTION_KEY: ${{ secrets.VAULT_ENCRYPTION_KEY }}
+          DEMO_PASSWORD: ${{ secrets.DEMO_PASSWORD }}
+        run: |
+          for name in FIREBASE_SERVICE_ACCOUNT VAULT_ENCRYPTION_KEY DEMO_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Repository secret $name is not set (see the comment at the top of this workflow)."
+              exit 1
+            fi
+          done
+          export FIREBASE_CLIENT_EMAIL="$(jq -r .client_email <<<"$FIREBASE_SERVICE_ACCOUNT")"
+          export FIREBASE_PRIVATE_KEY="$(jq -r .private_key <<<"$FIREBASE_SERVICE_ACCOUNT")"
+          echo "::add-mask::$DEMO_PASSWORD"
+          node scripts/seed-demo.mjs
