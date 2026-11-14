@@ -1,7 +1,8 @@
 import "server-only";
+import { ratingCounts } from "@/lib/rating";
 import { decryptSecret } from "@/lib/vault-crypto";
 import { Timestamp, type DocumentSnapshot } from "firebase-admin/firestore";
-import type { Credential, Order, Product, Store, SubscriptionPayment, SubscriptionTier, UserDoc } from "@/types/schema";
+import type { Credential, Order, Product, Review, Store, SubscriptionPayment, SubscriptionTier, UserDoc } from "@/types/schema";
 
 export function toISO(value: unknown): string | null {
   if (!value) return null;
@@ -83,6 +84,7 @@ export function mapProduct(snap: Snap): Product {
     flash_sale_ends_at: toISO(d.flash_sale_ends_at),
     is_published: d.is_published ?? false,
     stock_available: d.stock_available ?? 0,
+    rating: ratingCounts(d.rating),
     created_at: toISO(d.created_at) ?? "",
     updated_at: toISO(d.updated_at) ?? "",
   };
@@ -152,5 +154,21 @@ export function mapSubscriptionPayment(snap: Snap): SubscriptionPayment {
     xendit_invoice_url: d.xendit_invoice_url ?? null,
     created_at: toISO(d.created_at) ?? "",
     paid_at: toISO(d.paid_at),
+  };
+}
+
+export function mapReview(snap: Snap): Review {
+  const d = snap.data() ?? {};
+  return {
+    id: snap.id,
+    store_id: d.store_id,
+    product_id: d.product_id ?? "",
+    customer_uid: d.customer_uid ?? null,
+    name: d.name ?? "Pembeli",
+    rating: d.rating ?? 5,
+    text: d.text ?? "",
+    hidden: !!d.hidden,
+    created_at: toISO(d.created_at) ?? "",
+    updated_at: toISO(d.updated_at) ?? "",
   };
 }

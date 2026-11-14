@@ -118,7 +118,7 @@ async function deleteWhere(col) {
   return snap.size;
 }
 const wiped = [];
-for (const col of ["orders", "credentials_vault", "products", "broadcasts"]) wiped.push(`${await deleteWhere(col)} ${col}`);
+for (const col of ["orders", "credentials_vault", "products", "broadcasts", "reviews"]) wiped.push(`${await deleteWhere(col)} ${col}`);
 const oldSubs = await db.collection("subscription_payments").where("uid", "==", uid).get();
 await Promise.all(oldSubs.docs.map((d) => d.ref.delete()));
 
@@ -381,6 +381,46 @@ for (let i = 0; i < batchOps.length + orders.length; i += 400) {
 }
 
 // ---------------------------------------------------------------------------------------
+// 6c. Reviews: most paid buyers left one (the demo buyer's orders are left for you to review)
+
+const REVIEW_TEXT = {
+  5: ["Mantap, akun langsung masuk WA kurang dari semenit!", "Udah langganan 3 bulan di sini, aman terus.", "Seller fast respon, recommended.", ""],
+  4: ["Bagus, cuma sempat nunggu 5 menit.", "Oke, sesuai deskripsi.", ""],
+  3: ["Lumayan, sempat harus relogin sekali."],
+  2: ["Akun sempat logout sendiri, tapi diganti penjual."],
+};
+const ratingByProduct = new Map();
+let reviewCount = 0;
+const reviewBatch = db.batch();
+for (const [ref, o] of orders) {
+  if (o.payment_status !== "PAID" || o.customer_contact.email === BUYER_EMAIL || rand() > 0.6) continue;
+  const r = rand();
+  const rating = r < 0.62 ? 5 : r < 0.9 ? 4 : r < 0.97 ? 3 : 2;
+  const hidden = rating === 2 && reviewCount % 2 === 0; // one moderated example
+  const handle = o.customer_contact.email.replace(/\d*@.*/, "");
+  const created = o.paid_at.toMillis() + DAY;
+  reviewBatch.set(db.collection("reviews").doc(ref.id), {
+    store_id: STORE_ID,
+    product_id: o.product_id,
+    customer_uid: null,
+    name: `${handle[0].toUpperCase()}${handle.slice(1)} ${String.fromCharCode(65 + Math.floor(rand() * 26))}.`,
+    rating,
+    text: pick(REVIEW_TEXT[rating]),
+    hidden,
+    created_at: ts(Math.min(created, now - 60_000)),
+    updated_at: ts(Math.min(created, now - 60_000)),
+  });
+  reviewCount++;
+  if (!hidden) {
+    const counts = ratingByProduct.get(o.product_id) ?? { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    counts[rating]++;
+    ratingByProduct.set(o.product_id, counts);
+  }
+}
+await reviewBatch.commit();
+await Promise.all([...ratingByProduct].map(([id, rating]) => db.collection("products").doc(id).update({ rating })));
+
+// ---------------------------------------------------------------------------------------
 // 7. Marketing + billing history
 
 await db.collection("broadcasts").doc(`${STORE_ID}-bc-1`).set({
@@ -418,6 +458,7 @@ console.log(`
 
   Store        Dionycte — slug "${SLUG}", domain ${DOMAIN}, store id ${STORE_ID}
   Products     ${PRODUCTS.length + 1} (flash sale: ChatGPT Plus, bundle: Netflix + Spotify, VPN sold out)
+  Reviews      ${reviewCount} (moderate them in dashboard → Ulasan)
   Vault        ${credSeq} credentials (encrypted)
   Orders       ${orders.length} (${paidCount} paid, 2 pending, 1 failed)
 
