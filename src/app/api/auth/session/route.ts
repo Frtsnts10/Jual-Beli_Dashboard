@@ -1,80 +1,53 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createSessionCookie, adminDb } from '@/lib/firebase/server';
-import { getAuth } from 'firebase-admin/auth';
-import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from "next/server";
+import { FieldValue } from "firebase-admin/firestore";
+import { adminAuth, adminDb } from "@/lib/firebase/admin";
+import { SESSION_COOKIE } from "@/lib/auth";
+
+const EXPIRES_IN_MS = 14 * 24 * 60 * 60 * 1000;
 
 export async function POST(req: NextRequest) {
   try {
-    const { idToken } = await req.json();
-    if (!idToken) {
-      return NextResponse.json({ error: 'Missing idToken' }, { status: 400 });
+    const { idToken, fullName } = (await req.json()) as { idToken?: string; fullName?: string };
+    if (!idToken) return NextResponse.json({ error: "Missing idToken" }, { status: 400 });
+
+    const decoded = await adminAuth.verifyIdToken(idToken);
+    // Only mint a long-lived session from a fresh sign-in.
+    if (Date.now() / 1000 - decoded.auth_time > 5 * 60) {
+      return NextResponse.json({ error: "Sign-in terlalu lama, silakan login ulang." }, { status: 401 });
     }
 
-    const { sessionCookie, expiresIn } = await createSessionCookie(idToken);
-    
-    // Strict Device Fingerprinting Logic
-    const decodedToken = await getAuth().verifyIdToken(idToken);
-    const uid = decodedToken.uid;
-    
-    const userAgent = req.headers.get('user-agent') || 'Unknown Device';
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'Unknown IP';
-    const currentFingerprint = `${userAgent} | ${ip}`;
-
-    const userRef = adminDb.collection('users').doc(uid);
-    const userDoc = await userRef.get();
-
-    if (!userDoc.exists) {
-      // First time session creation: Lock device fingerprint
-      await userRef.set({ 
-        registered_device_fingerprint: currentFingerprint,
-        registered_ip: ip,
-        registered_user_agent: userAgent,
-        created_at: new Date().toISOString()
-      }, { merge: true });
-    } else {
-      const data = userDoc.data();
-      const lockedFingerprint = data?.registered_device_fingerprint;
-      
-      // If they have a locked fingerprint and it doesn't match, block the session!
-      if (lockedFingerprint && lockedFingerprint !== currentFingerprint) {
-        console.warn(`Device mismatch blocked for user ${uid}. Locked: ${lockedFingerprint}, Attempted: ${currentFingerprint}`);
-        // Temporarily disabled blocking during development so you can switch between localhost and Vercel
-        /*
-        return NextResponse.json(
-          { error: 'Device Mismatch: This account is locked to its original device. Please contact support.' }, 
-          { status: 403 }
-        );
-        */
-      }
-      
-      // If it exists but no fingerprint yet, lock it now
-      if (!lockedFingerprint) {
-        await userRef.update({ 
-          registered_device_fingerprint: currentFingerprint,
-          registered_ip: ip,
-          registered_user_agent: userAgent,
+    const userRef = adminDb.collection("users").doc(decoded.uid);
+    await adminDb.runTransaction(async (tx) => {
+      const snap = await tx.get(userRef);
+      if (!snap.exists) {
+        tx.set(userRef, {
+          email: decoded.email ?? "",
+          full_name: fullName?.trim() || decoded.name || "",
+          subscription_tier: "starter",
+          subscription_expiry: null,
+          created_at: FieldValue.serverTimestamp(),
         });
       }
-    }
-
-    const cookieStore = await cookies();
-    cookieStore.set('session', sessionCookie, {
-      maxAge: expiresIn / 1000,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      sameSite: 'lax',
     });
 
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Session creation error:', error);
-    return NextResponse.json({ error: 'Failed to create session' }, { status: 401 });
+    const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn: EXPIRES_IN_MS });
+    const res = NextResponse.json({ success: true });
+    res.cookies.set(SESSION_COOKIE, sessionCookie, {
+      maxAge: EXPIRES_IN_MS / 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      sameSite: "lax",
+    });
+    return res;
+  } catch (error) {
+    console.error("Session creation error:", error);
+    return NextResponse.json({ error: "Gagal membuat sesi login." }, { status: 401 });
   }
 }
 
 export async function DELETE() {
-  const cookieStore = await cookies();
-  cookieStore.delete('session');
-  return NextResponse.json({ success: true });
+  const res = NextResponse.json({ success: true });
+  res.cookies.delete(SESSION_COOKIE);
+  return res;
 }

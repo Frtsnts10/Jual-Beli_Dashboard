@@ -1,67 +1,61 @@
-import React from "react";
-import { Metadata } from "next";
+import { requireStore } from "@/lib/auth";
+import { adminDb } from "@/lib/firebase/admin";
+import { formatIDR } from "@/lib/utils";
+import { DEFAULT_WA_TEMPLATE, TIERS } from "@/config/tiers";
+import { PageHeader } from "@/components/page-header";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { IntegrationsForm } from "@/features/settings/integrations-form";
+import { StoreSettingsForm } from "@/features/settings/store-settings-form";
+import type { SubscriptionTier } from "@/types/schema";
 
-export const metadata: Metadata = {
-  title: "Store Settings",
-};
+export const metadata = { title: "Pengaturan" };
 
-import { getAuthenticatedUser, adminDb } from "@/lib/firebase/server";
-import { redirect } from "next/navigation";
-import { StoreProfileForm } from "@/features/settings/components/store-settings-form";
-import { StorePreferencesForm } from "@/features/settings/components/store-preferences-form";
-import { DangerZonePanel } from "@/features/settings/components/danger-zone-panel";
-import { StoreCredentialsPanel } from "@/features/settings/components/store-credentials-panel";
-import { IntegrationsForm } from "@/features/settings/components/integrations-form";
-import { SettingsPageHeader } from "@/features/settings/components/settings-page-header";
-
-export default async function TenantSettingsPage({
-  params,
-}: {
-  params: Promise<{ storeId: string }>;
-}) {
+export default async function SettingsPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
-  const storeDoc = await adminDb.collection("stores").doc(storeId).get();
-
-  if (!storeDoc.exists) {
-    redirect("/dashboard");
-  }
-
-  const store = storeDoc.data()!;
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    redirect("/auth");
-  }
+  const { user, store } = await requireStore(storeId);
+  const tier = TIERS[user.subscription_tier];
+  const integrations = await adminDb.collection("stores").doc(storeId).collection("private").doc("integrations").get();
 
   return (
-    <div className="space-y-6 font-sans max-w-full pb-12">
-      <SettingsPageHeader />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch pt-2">
-        <div className="flex flex-col gap-6 h-full">
-          <StoreProfileForm 
-            storeId={storeId} 
-            initialName={store.name} 
-            initialLogo={store.logo_url || ""} 
-            initialEmail={store.email || ""}
-            initialInstagram={store.instagram || ""}
-            initialWhatsapp={store.whatsapp || ""}
-            initialBio={store.bio || ""}
+    <>
+      <PageHeader title="Pengaturan" description="Profil toko, tampilan etalase dan integrasi." />
+      <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
+        <div className="grid gap-6">
+          <StoreSettingsForm
+            store={store}
+            allowedTemplates={tier.templates}
+            customDomainAllowed={tier.customDomain}
+            rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN}
           />
-          <StorePreferencesForm 
-            storeId={storeId} 
-            initialCurrency={store.currency || "IDR"} 
-          />
-        </div>
-        <div className="flex flex-col gap-6 h-full">
-          <StoreCredentialsPanel storeId={storeId} />
-          <IntegrationsForm 
+          <IntegrationsForm
             storeId={storeId}
-            initialMidtransServerKey={store.api_keys?.midtrans_server_key || ""}
-            initialMidtransClientKey={store.api_keys?.midtrans_client_key || ""}
+            provider={integrations.get("wa_api_provider") ?? null}
+            hasToken={!!integrations.get("wa_api_token")}
+            template={integrations.get("wa_message_template") ?? DEFAULT_WA_TEMPLATE}
+            autoFulfillment={tier.autoFulfillment}
           />
-          <DangerZonePanel storeId={storeId} />
         </div>
+        <Card className="h-fit">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Paket <Badge>{tier.name}</Badge>
+            </CardTitle>
+            <CardDescription>Upgrade & pembayaran langganan hadir di fase berikutnya.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 text-sm">
+            {(Object.keys(TIERS) as SubscriptionTier[]).map((key) => {
+              const t = TIERS[key];
+              return (
+                <div key={key} className={key === user.subscription_tier ? "font-medium" : "text-muted-foreground"}>
+                  {t.name} — {t.priceMonthly ? `${formatIDR(t.priceMonthly)}/bln` : "Gratis"} · fee {t.feePercent}% ·{" "}
+                  {Number.isFinite(t.maxStores) ? `${t.maxStores} toko` : "toko tanpa batas"}
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </>
   );
 }
