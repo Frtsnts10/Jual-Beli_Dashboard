@@ -19,6 +19,8 @@ interface InvoiceCallback {
   status: "PAID" | "SETTLED" | "EXPIRED" | string;
   amount?: number;
   paid_amount?: number;
+  /** e.g. QRIS, OVO, DANA — the channel the buyer actually paid with. */
+  payment_channel?: string;
 }
 
 function validToken(received: string | null) {
@@ -73,6 +75,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Amount mismatch" }, { status: 400 });
     }
     const result = await fulfillOrder(body.external_id, { invoiceId: body.id });
+    await rememberChannel(orderRef, order.get("customer_uid"), body.payment_channel);
     // Pro/Ultimate: push the account to the buyer's WhatsApp via n8n, after acknowledging Xendit.
     if (result === "fulfilled") after(() => deliverOrder(body.external_id, "paid"));
     return NextResponse.json({ ok: true, result });
@@ -82,4 +85,21 @@ export async function POST(req: NextRequest) {
     await orderRef.update({ payment_status: "FAILED" });
   }
   return NextResponse.json({ ok: true });
+}
+
+/**
+ * Stores how the order was paid and, for a buyer account, remembers it so the storefront can
+ * offer "pay with OVO again" next time. Best effort: never fails the callback.
+ */
+async function rememberChannel(orderRef: FirebaseFirestore.DocumentReference, customerUid: unknown, channel: string | undefined) {
+  if (!channel || !/^[A-Z_]{2,20}$/.test(channel)) return;
+  try {
+    await orderRef.update({ payment_channel: channel });
+    if (typeof customerUid === "string" && customerUid) {
+      // update (not set): never resurrect a profile the buyer deleted.
+      await adminDb.collection("customers").doc(customerUid).update({ "saved_checkout.last_channel": channel });
+    }
+  } catch (err) {
+    console.error("Could not record payment channel:", err);
+  }
 }

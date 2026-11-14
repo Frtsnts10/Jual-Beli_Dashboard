@@ -2,16 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { getSessionUser } from "@/lib/access/auth";
 import { ordersSince, parseRange } from "@/lib/data/analytics";
+import { toCsv } from "@/lib/csv";
 
 // CSV export of a store's orders for the owner and its admins. Contains buyer contact
 // details (needed for bookkeeping/CRM) but never vault credentials.
-
-/** Neutralises spreadsheet formula injection ("=HYPERLINK(...)" in a buyer-typed field). */
-function cell(value: unknown) {
-  let s = value == null ? "" : String(value);
-  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
-  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
@@ -41,8 +35,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ stor
     o.referral_code ?? "",
     o.access_expires_at ?? "",
   ]);
-  // BOM so Excel opens UTF-8 (product names with accents/emoji) correctly.
-  const csv = "﻿" + [header, ...rows].map((r) => r.map(cell).join(",")).join("\r\n");
+  const csv = toCsv([header, ...rows]);
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",

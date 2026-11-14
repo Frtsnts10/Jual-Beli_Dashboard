@@ -6,7 +6,7 @@ import { formatPrivateKey } from "./private-key";
 
 // Not a secret; pinned so a stale FIREBASE_PROJECT_ID env var can't point the
 // Admin SDK at another project.
-const FIREBASE_PROJECT_ID = "web-store-dashboard";
+export const FIREBASE_PROJECT_ID = "web-store-dashboard";
 
 function getAdminApp() {
   if (getApps().length > 0) return getApp();
@@ -36,3 +36,10 @@ function lazy<T extends object>(resolve: () => T): T {
 
 export const adminDb = lazy(() => getFirestore(getAdminApp()));
 export const adminAuth = lazy(() => getAuth(getAdminApp()));
+
+/** OAuth access token of the service account, for Google APIs the Admin SDK doesn't wrap. */
+export async function adminAccessToken(): Promise<string> {
+  const credential = getAdminApp().options.credential;
+  if (!credential) throw new Error("No service account credential configured");
+  return (await credential.getAccessToken()).access_token;
+}

@@ -7,6 +7,7 @@ import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { TIERS } from "@/config/tiers";
 import { addDomain, inspectDomain, removeDomain, vercelDomainsEnabled } from "@/lib/integrations/vercel-domains";
+import { domainHosts, updateAuthorizedDomains } from "@/lib/integrations/firebase-auth-domains";
 
 const DOMAIN_RE = /^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
 
@@ -54,6 +55,8 @@ export async function connectDomain(storeId: string, raw: string): Promise<Actio
     if (err instanceof Error && err.message === "DOMAIN_TAKEN") return fail("Domain ini sudah dipakai toko lain.");
     throw err;
   }
+  // Lets buyers use "Lanjut dengan Google" on the store's own domain.
+  await updateAuthorizedDomains({ add: domainHosts(domain) }).catch((err) => console.error("Authorized-domain add failed:", err));
   revalidatePath(`/${storeId}/settings`);
   return { ok: true };
 }
@@ -64,6 +67,7 @@ export async function disconnectDomain(storeId: string): Promise<ActionResult> {
   if (vercelDomainsEnabled()) {
     await removeDomain(store.custom_domain).catch((err) => console.error("Vercel domain removal failed:", err));
   }
+  await updateAuthorizedDomains({ remove: domainHosts(store.custom_domain) }).catch((err) => console.error("Authorized-domain removal failed:", err));
   const batch = adminDb.batch();
   batch.delete(adminDb.collection("store_domains").doc(store.custom_domain));
   batch.update(adminDb.collection("stores").doc(storeId), { custom_domain: null, custom_domain_status: FieldValue.delete() });
@@ -128,6 +132,8 @@ export async function checkDomain(storeId: string): Promise<ActionResult<{ activ
     else if (state.misconfigured) message = "Record DNS belum mengarah ke kami (bisa butuh 5 menit–24 jam).";
   }
   const live = attached && dns ? await liveCheck(domain, storeId) : { ok: false, message: null };
+  // Idempotent: also covers domains connected before Google sign-in existed on storefronts.
+  await updateAuthorizedDomains({ add: domainHosts(domain) }).catch((err) => console.error("Authorized-domain add failed:", err));
   if (!message) message = live.message;
 
   const active = attached && dns && live.ok;
