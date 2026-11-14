@@ -3,10 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { requireStore } from "@/lib/auth";
+import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { TIERS } from "@/config/tiers";
-import { addDomain, inspectDomain, removeDomain, vercelDomainsEnabled } from "@/lib/vercel-domains";
+import { addDomain, inspectDomain, removeDomain, vercelDomainsEnabled } from "@/lib/integrations/vercel-domains";
 
 const DOMAIN_RE = /^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
 

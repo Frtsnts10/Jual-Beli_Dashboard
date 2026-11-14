@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { requirePlatformAdmin } from "@/lib/platform";
+import { requirePlatformAdmin } from "@/lib/access/platform";
 import { fail, type ActionResult } from "@/lib/action-result";
 import type { SubscriptionTier } from "@/types/schema";
 

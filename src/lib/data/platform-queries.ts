@@ -1,7 +1,7 @@
 import "server-only";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { effectiveTier, mapOrder, mapStore, toISO } from "@/lib/firestore-mappers";
+import { effectiveTier, mapOrder, mapStore, toISO } from "@/lib/data/mappers";
 import type { SubscriptionTier } from "@/types/schema";
 
 export function monthStart() {

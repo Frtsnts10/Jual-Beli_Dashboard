@@ -2,7 +2,7 @@
 // storefront repo's src/types/schema.ts.
 //
 // Timestamps are stored as Firestore Timestamps and converted to ISO strings
-// at the server boundary (lib/firestore-mappers.ts) so they can cross into
+// at the server boundary (lib/data/mappers.ts) so they can cross into
 // Client Components.
 
 export type SubscriptionTier = "starter" | "pro" | "ultimate";

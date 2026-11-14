@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { adminDb } from "@/lib/firebase/admin";
-import { requireStore } from "@/lib/auth";
+import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { createManagedAccount, getAccount, XenditError } from "@/lib/xendit";
+import { createManagedAccount, getAccount, XenditError } from "@/lib/payments/xendit";
 
 const integrationsRef = (storeId: string) => adminDb.collection("stores").doc(storeId).collection("private").doc("integrations");
 

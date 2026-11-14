@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getOwnedStores, requireUser } from "@/lib/auth";
+import { getOwnedStores, requireUser } from "@/lib/access/auth";
 import { TIERS } from "@/config/tiers";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateStoreForm } from "@/features/stores/create-store-form";

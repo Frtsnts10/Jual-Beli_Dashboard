@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { getOwnedStores, requireStore, requireUser } from "@/lib/auth";
+import { getOwnedStores, requireStore, requireUser } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { DEFAULT_WA_TEMPLATE, TEMPLATES, TIERS } from "@/config/tiers";
 import type { LayoutTemplate, WaProvider } from "@/types/schema";

@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { fulfillOrder, replaceCredential } from "@/lib/fulfillment";
+import { fulfillOrder, replaceCredential } from "@/lib/payments/fulfillment";
 
 const emulator = !!process.env.FIRESTORE_EMULATOR_HOST;
 const d = emulator ? describe : describe.skip;

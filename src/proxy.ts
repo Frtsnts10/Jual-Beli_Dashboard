@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const PUBLIC_PATHS = ["/sign-in", "/sign-up", "/forgot-password"];
 
 // Cheap optimistic gate: bounce visitors without a session cookie to sign-in.
-// The cookie is verified for real in lib/auth.ts on every page and action.
+// The cookie is verified for real in lib/access/auth.ts on every page and action.
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasSession = request.cookies.has("session");

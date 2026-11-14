@@ -1,12 +1,12 @@
 import { ExternalLink } from "lucide-react";
-import { getAccessibleStores, requireStore } from "@/lib/auth";
-import { countOpenClaims } from "@/lib/queries";
+import { getAccessibleStores, requireStore } from "@/lib/access/auth";
+import { countOpenClaims } from "@/lib/data/queries";
 import { storefrontUrl } from "@/lib/store-url";
 import { TIERS } from "@/config/tiers";
 import { SidebarNav } from "@/features/dashboard/sidebar-nav";
 import { StoreSwitcher } from "@/features/stores/store-switcher";
 import { UserMenu } from "@/features/auth/user-menu";
-import { isPlatformAdmin } from "@/lib/platform";
+import { isPlatformAdmin } from "@/lib/access/platform";
 
 export default async function StoreLayout({ children, params }: { children: React.ReactNode; params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;

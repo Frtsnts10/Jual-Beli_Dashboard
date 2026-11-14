@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
-import { requireStore } from "@/lib/auth";
-import { countCredentials, countOpenClaims, listOrders, listProducts } from "@/lib/queries";
+import { requireStore } from "@/lib/access/auth";
+import { countCredentials, countOpenClaims, listOrders, listProducts } from "@/lib/data/queries";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";

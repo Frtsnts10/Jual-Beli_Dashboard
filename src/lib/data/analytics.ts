@@ -1,7 +1,7 @@
 import "server-only";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { mapOrder } from "@/lib/firestore-mappers";
+import { mapOrder } from "@/lib/data/mappers";
 import type { Order } from "@/types/schema";
 
 export const RANGES = [7, 30, 90] as const;

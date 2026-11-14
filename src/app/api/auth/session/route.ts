@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
-import { SESSION_COOKIE } from "@/lib/auth";
-import { acceptPendingInvites } from "@/lib/team";
+import { SESSION_COOKIE } from "@/lib/access/auth";
+import { acceptPendingInvites } from "@/lib/access/team";
 
 const EXPIRES_IN_MS = 14 * 24 * 60 * 60 * 1000;
 

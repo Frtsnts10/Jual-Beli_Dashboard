@@ -1,9 +1,9 @@
 import { timingSafeEqual } from "node:crypto";
 import { after, NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
-import { fulfillOrder } from "@/lib/fulfillment";
-import { deliverOrder } from "@/lib/automation";
-import { applySubscriptionPayment } from "@/lib/subscriptions";
+import { fulfillOrder } from "@/lib/payments/fulfillment";
+import { deliverOrder } from "@/lib/integrations/automation";
+import { applySubscriptionPayment } from "@/lib/payments/subscriptions";
 
 // Xendit Invoice callback. Configure in Xendit Dashboard → Settings → Webhooks →
 // "Invoices paid", pointing at https://<dashboard-domain>/api/webhooks/xendit.

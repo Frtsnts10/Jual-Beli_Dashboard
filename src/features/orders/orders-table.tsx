@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn, formatDate, formatIDR } from "@/lib/utils";
-import { deliveryMessage, waNumber } from "@/lib/whatsapp";
+import { deliveryMessage, waNumber } from "@/lib/integrations/whatsapp";
 import type { Credential, Order } from "@/types/schema";
 import { confirmPayment, markDelivered, rejectWarranty, replaceWarranty, resendDelivery } from "./actions";
 

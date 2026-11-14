@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { botCatalog, botSecrets, catalogText, TELEGRAM_API } from "@/lib/bots";
+import { botCatalog, botSecrets, catalogText, TELEGRAM_API } from "@/lib/integrations/bots";
 
 // Telegram webhook for one store's bot. Registered by "Hubungkan Telegram" with a random
 // secret_token, which Telegram echoes in X-Telegram-Bot-Api-Secret-Token.

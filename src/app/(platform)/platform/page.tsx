@@ -1,4 +1,4 @@
-import { platformOverview, owedPayouts } from "@/lib/platform-queries";
+import { platformOverview, owedPayouts } from "@/lib/data/platform-queries";
 import { formatIDR } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

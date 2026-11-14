@@ -1,4 +1,4 @@
-import { owedPayouts } from "@/lib/platform-queries";
+import { owedPayouts } from "@/lib/data/platform-queries";
 import { formatIDR } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";

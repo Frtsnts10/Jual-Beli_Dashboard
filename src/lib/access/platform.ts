@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { notFound } from "next/navigation";
-import { requireUser, getSessionUser } from "@/lib/auth";
+import { requireUser, getSessionUser } from "@/lib/access/auth";
 
 // Platform administration (the SaaS operator, not store owners). Access is granted by
 // email in PLATFORM_ADMIN_EMAILS (comma-separated) and requires a verified email, so the

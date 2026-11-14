@@ -2,10 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { adminDb } from "@/lib/firebase/admin";
-import { requireStore } from "@/lib/auth";
+import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { fulfillOrder, replaceCredential } from "@/lib/fulfillment";
-import { deliverOrder } from "@/lib/automation";
+import { fulfillOrder, replaceCredential } from "@/lib/payments/fulfillment";
+import { deliverOrder } from "@/lib/integrations/automation";
 
 async function ownedOrder(storeId: string, orderId: string) {
   const ref = adminDb.collection("orders").doc(orderId);

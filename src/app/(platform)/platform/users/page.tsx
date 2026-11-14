@@ -1,4 +1,4 @@
-import { allUsers } from "@/lib/platform-queries";
+import { allUsers } from "@/lib/data/platform-queries";
 import { formatDate } from "@/lib/utils";
 import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";

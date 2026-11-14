@@ -3,7 +3,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
-import { effectiveTier, mapStore, mapUser } from "@/lib/firestore-mappers";
+import { effectiveTier, mapStore, mapUser } from "@/lib/data/mappers";
 import type { Store, SubscriptionTier, UserDoc } from "@/types/schema";
 
 export const SESSION_COOKIE = "session";

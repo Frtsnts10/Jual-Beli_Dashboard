@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getAccessibleStores, requireUser } from "@/lib/auth";
+import { getAccessibleStores, requireUser } from "@/lib/access/auth";
 
 export default async function DashboardIndex() {
   const user = await requireUser();

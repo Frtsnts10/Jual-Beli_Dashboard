@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { remindRenewal } from "@/lib/automation";
+import { remindRenewal } from "@/lib/integrations/automation";
 import { storefrontUrl } from "@/lib/store-url";
 
 // Auto-renewal reminders (Pro & Ultimate, plan §3): once a day, message buyers whose

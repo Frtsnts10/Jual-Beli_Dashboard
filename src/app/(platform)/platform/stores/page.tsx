@@ -1,4 +1,4 @@
-import { allStores } from "@/lib/platform-queries";
+import { allStores } from "@/lib/data/platform-queries";
 import { storefrontUrl } from "@/lib/store-url";
 import { formatDate } from "@/lib/utils";
 import { TIERS } from "@/config/tiers";
