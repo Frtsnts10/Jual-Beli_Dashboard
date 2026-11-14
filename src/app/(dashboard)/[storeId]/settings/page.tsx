@@ -40,8 +40,8 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
   return (
     <>
       <PageHeader title="Pengaturan" description="Profil toko, tampilan etalase dan integrasi." />
-      <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
-        <div className="grid gap-6">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] [&>*]:min-w-0">
+        <div className="grid min-w-0 gap-6 [&>*]:min-w-0">
           {isOwner && (
           <DomainCard
             storeId={storeId}

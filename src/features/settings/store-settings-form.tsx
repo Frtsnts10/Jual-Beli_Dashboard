@@ -45,13 +45,13 @@ export function StoreSettingsForm({
           else toast.error(res.error);
         });
       }}
-      className="grid gap-6"
+      className="grid gap-6 [&>*]:min-w-0"
     >
       <Card>
         <CardHeader>
           <CardTitle>Profil toko</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
+        <CardContent className="grid gap-4 md:grid-cols-2 [&>*]:min-w-0">
           <div className="grid gap-2">
             <Label htmlFor="store_name">Nama toko</Label>
             <Input id="store_name" value={form.store_name} onChange={(e) => set("store_name", e.target.value)} />
@@ -87,8 +87,8 @@ export function StoreSettingsForm({
           <CardTitle>Tampilan etalase</CardTitle>
           <CardDescription>Pilih salah satu dari 5 template.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <CardContent className="grid gap-4 [&>*]:min-w-0">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 [&>*]:min-w-0">
             {TEMPLATES.map((t) => {
               const locked = !allowedTemplates.includes(t.id) && t.id !== store.storefront_config.layout_template;
               const selected = form.layout_template === t.id;
@@ -112,7 +112,7 @@ export function StoreSettingsForm({
               );
             })}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Label htmlFor="accent">Warna aksen</Label>
             <input id="accent" type="color" value={form.accent_color} onChange={(e) => set("accent_color", e.target.value)} className="h-9 w-12 rounded border" />
             <Input value={form.accent_color} onChange={(e) => set("accent_color", e.target.value)} className="w-28 font-mono" />

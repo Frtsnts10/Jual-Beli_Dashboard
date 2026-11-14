@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
 import type { CustomDomainStatus } from "@/types/schema";
 import type { DnsRecord } from "@/lib/integrations/vercel-domains";
@@ -94,7 +93,7 @@ export function DomainCard({
 
         {domain && (
           <>
-            <div className="flex flex-wrap items-center gap-2 text-base font-semibold">
+            <div className="flex flex-wrap items-center gap-2 text-base font-semibold break-all">
               {domain}
               {active && (
                 <a href={`https://${domain}`} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground">
@@ -114,41 +113,36 @@ export function DomainCard({
                 Buka pengaturan DNS (Niagahoster, Rumahweb, Cloudflare, dll.), tambahkan record berikut, lalu tunggu 5 menit–24 jam. Di Cloudflare, set proxy
                 ke <em>DNS only</em> (awan abu-abu).
               </p>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tipe</TableHead>
-                    <TableHead>Nama / Host</TableHead>
-                    <TableHead>Nilai</TableHead>
-                    <TableHead />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {records.map((r) => (
-                    <TableRow key={`${r.type}-${r.name}-${r.value}`}>
-                      <TableCell className="font-mono">{r.type}</TableCell>
-                      <TableCell className="font-mono">{r.name}</TableCell>
-                      <TableCell className="max-w-64 truncate font-mono" title={r.value}>
-                        {r.value}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          aria-label="Salin nilai"
-                          onClick={async () => {
-                            await navigator.clipboard.writeText(r.value);
-                            toast.success("Disalin");
-                          }}
-                        >
-                          <Copy />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="grid gap-2">
+                {records.map((r) => (
+                  <div key={`${r.type}-${r.name}-${r.value}`} className="flex items-center gap-3 rounded-md border px-3 py-2">
+                    <div className="min-w-0 flex-1 text-xs">
+                      <div className="flex flex-wrap items-baseline gap-x-2">
+                        <span className="font-mono font-semibold">{r.type}</span>
+                        <span className="text-muted-foreground">Nama/Host</span>
+                        <span className="font-mono">{r.name}</span>
+                      </div>
+                      <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2">
+                        <span className="text-muted-foreground">Nilai</span>
+                        <span className="min-w-0 font-mono [overflow-wrap:anywhere]">{r.value}</span>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0"
+                      aria-label={`Salin nilai ${r.type}`}
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(r.value);
+                        toast.success("Disalin");
+                      }}
+                    >
+                      <Copy />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </Step>
 
             <Step done={checks.live} title={`3. Toko terbuka di https://${domain} dengan SSL`}>
@@ -162,7 +156,7 @@ export function DomainCard({
       </CardContent>
 
       {domain && (
-        <CardFooter className="justify-between gap-2">
+        <CardFooter className="flex-wrap justify-between gap-2">
           <Button
             type="button"
             variant="ghost"
