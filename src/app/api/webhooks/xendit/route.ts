@@ -2,9 +2,13 @@ import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { fulfillOrder } from "@/lib/fulfillment";
+import { applySubscriptionPayment } from "@/lib/subscriptions";
 
 // Xendit Invoice callback. Configure in Xendit Dashboard → Settings → Webhooks →
 // "Invoices paid", pointing at https://<dashboard-domain>/api/webhooks/xendit.
+// Handles both storefront orders (external_id ORD-…) and plan purchases (SUB-…).
+// Invoices created on behalf of a seller's sub-account (for-user-id) are reported to
+// the platform (master) account's callback URL with the master's verification token.
 // Xendit authenticates callbacks with the account's verification token, sent in the
 // x-callback-token header; it must equal XENDIT_WEBHOOK_TOKEN.
 
@@ -30,8 +34,25 @@ export async function POST(req: NextRequest) {
   }
 
   const body = (await req.json()) as InvoiceCallback;
+
+  if (body?.external_id?.startsWith("SUB-")) {
+    if (body.status === "PAID" || body.status === "SETTLED") {
+      const result = await applySubscriptionPayment(body.external_id, body.id, body.paid_amount ?? body.amount ?? -1);
+      const status = result === "not_found" ? 404 : result.endsWith("mismatch") ? 400 : 200;
+      return NextResponse.json({ ok: status === 200, result }, { status });
+    }
+    if (body.status === "EXPIRED") {
+      const ref = adminDb.collection("subscription_payments").doc(body.external_id);
+      await adminDb.runTransaction(async (tx) => {
+        const snap = await tx.get(ref);
+        if (snap.exists && snap.get("status") === "PENDING") tx.update(ref, { status: "EXPIRED" });
+      });
+    }
+    return NextResponse.json({ ok: true });
+  }
+
   if (!body?.external_id?.startsWith("ORD-")) {
-    return NextResponse.json({ ok: true, ignored: "not an order invoice" });
+    return NextResponse.json({ ok: true, ignored: "unknown invoice" });
   }
 
   const orderRef = adminDb.collection("orders").doc(body.external_id);

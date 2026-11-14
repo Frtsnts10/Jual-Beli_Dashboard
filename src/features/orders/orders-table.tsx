@@ -114,7 +114,12 @@ export function OrdersTable({
                     <div className="text-xs">{o.customer_contact.email}</div>
                     <div className="text-muted-foreground text-xs">{o.customer_contact.phone}</div>
                   </TableCell>
-                  <TableCell className="text-right">{formatIDR(o.amount)}</TableCell>
+                  <TableCell className="text-right">
+                    {formatIDR(o.amount)}
+                    <div className="text-muted-foreground text-xs" title={o.settlement === "SPLIT" ? "Dibayar ke akun Xendit Anda, fee dipotong otomatis" : "Ditampung platform"}>
+                      fee {formatIDR(o.platform_fee)} · {o.settlement === "SPLIT" ? "split" : o.settlement === "MANUAL" ? "manual" : "via platform"}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Badge variant={o.payment_status === "PAID" ? "success" : o.payment_status === "FAILED" ? "destructive" : "warning"}>
                       {o.payment_status}
