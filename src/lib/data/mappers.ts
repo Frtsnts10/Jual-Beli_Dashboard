@@ -15,7 +15,7 @@ type Snap = DocumentSnapshot;
 
 /**
  * A paid plan whose subscription_expiry has passed falls back to Starter. Computed on
- * read, so expiry needs no cron job. Keep in sync with the storefront's lib/stores.ts.
+ * read, so expiry needs no cron job. Keep in sync with the storefront repo (Shop-Website/src/lib/stores.ts).
  */
 export function effectiveTier(tier: SubscriptionTier | undefined, expiry: unknown): SubscriptionTier {
   if (!tier || tier === "starter") return "starter";

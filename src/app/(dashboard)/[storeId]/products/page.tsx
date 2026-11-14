@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
-import { requireStore } from "@/lib/auth";
+import { requireStore } from "@/lib/access/auth";
 import { adminDb } from "@/lib/firebase/admin";
-import { listProducts, stockByProduct } from "@/lib/queries";
+import { listProducts, stockByProduct } from "@/lib/data/queries";
 import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";

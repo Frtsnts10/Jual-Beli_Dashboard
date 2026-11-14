@@ -5,9 +5,9 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { requireStore } from "@/lib/auth";
+import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { DISCORD_API, TELEGRAM_API } from "@/lib/bots";
+import { DISCORD_API, TELEGRAM_API } from "@/lib/integrations/bots";
 import { TIERS } from "@/config/tiers";
 
 const integrationsRef = (storeId: string) => adminDb.collection("stores").doc(storeId).collection("private").doc("integrations");

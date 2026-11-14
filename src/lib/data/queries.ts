@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { adminDb } from "@/lib/firebase/admin";
-import { mapCredential, mapOrder, mapProduct } from "@/lib/firestore-mappers";
+import { mapCredential, mapOrder, mapProduct } from "@/lib/data/mappers";
 import type { CredentialStatus } from "@/types/schema";
 
 // All queries filter by store_id; callers must have passed requireStore(storeId) first.

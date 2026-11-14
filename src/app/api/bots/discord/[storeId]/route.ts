@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { botCatalog, botSecrets, catalogText, verifyDiscordSignature } from "@/lib/bots";
+import { botCatalog, botSecrets, catalogText, verifyDiscordSignature } from "@/lib/integrations/bots";
 
 // Discord "Interactions Endpoint URL" for one store's application. Discord signs every
 // request with the application's Ed25519 key and refuses the URL unless PINGs verify.

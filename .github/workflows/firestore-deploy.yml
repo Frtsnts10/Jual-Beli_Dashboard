@@ -31,7 +31,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      PROJECT_ID: web-store-4cf23
+      PROJECT_ID: web-store-dashboard
     steps:
       - uses: actions/checkout@v4
 

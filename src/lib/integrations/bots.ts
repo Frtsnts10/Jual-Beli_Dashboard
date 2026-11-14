@@ -1,7 +1,7 @@
 import "server-only";
 import { createPublicKey, verify } from "node:crypto";
 import { adminDb } from "@/lib/firebase/admin";
-import { effectiveTier, mapProduct, mapStore } from "@/lib/firestore-mappers";
+import { effectiveTier, mapProduct, mapStore } from "@/lib/data/mappers";
 import { storefrontUrl } from "@/lib/store-url";
 import { formatIDR } from "@/lib/utils";
 import { TIERS } from "@/config/tiers";

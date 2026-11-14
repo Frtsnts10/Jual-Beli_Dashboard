@@ -1,6 +1,6 @@
-import { requireStore } from "@/lib/auth";
+import { requireStore } from "@/lib/access/auth";
 import { adminDb } from "@/lib/firebase/admin";
-import { getCredentialsByIds, listOrders, listProducts } from "@/lib/queries";
+import { getCredentialsByIds, listOrders, listProducts } from "@/lib/data/queries";
 import { DEFAULT_WA_TEMPLATE } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { OrdersTable } from "@/features/orders/orders-table";

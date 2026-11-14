@@ -3,10 +3,10 @@
 import { headers } from "next/headers";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { requireStore } from "@/lib/auth";
+import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { randomId } from "@/lib/ids";
-import { createInvoice } from "@/lib/xendit";
+import { createInvoice } from "@/lib/payments/xendit";
 import { TIERS } from "@/config/tiers";
 import type { BillingPeriod, SubscriptionTier } from "@/types/schema";
 

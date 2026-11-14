@@ -1,8 +1,8 @@
 import { Lock } from "lucide-react";
-import { requireStore } from "@/lib/auth";
+import { requireStore } from "@/lib/access/auth";
 import { adminDb } from "@/lib/firebase/admin";
-import { toISO } from "@/lib/firestore-mappers";
-import { listProducts } from "@/lib/queries";
+import { toISO } from "@/lib/data/mappers";
+import { listProducts } from "@/lib/data/queries";
 import { storefrontUrl } from "@/lib/store-url";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { TIERS } from "@/config/tiers";

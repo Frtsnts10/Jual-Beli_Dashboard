@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
 import type { CustomDomainStatus } from "@/types/schema";
-import type { DnsRecord } from "@/lib/vercel-domains";
+import type { DnsRecord } from "@/lib/integrations/vercel-domains";
 import { checkDomain, connectDomain, disconnectDomain } from "./actions";
 
 function Step({ done, title, children }: { done: boolean; title: string; children?: React.ReactNode }) {

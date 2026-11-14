@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
-import { requireStore } from "@/lib/auth";
-import { ordersSince, parseRange, RANGES, summarize } from "@/lib/analytics";
+import { requireStore } from "@/lib/access/auth";
+import { ordersSince, parseRange, RANGES, summarize } from "@/lib/data/analytics";
 import { cn, formatIDR } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";

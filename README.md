@@ -31,6 +31,29 @@ shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · Xend
 | `/api/cron/renewal-reminders` | Daily (vercel.json): H-3 renewal reminders via n8n |
 | `/api/webhooks/xendit` | Invoice callback: `ORD-…` → order PAID + vault credential; `SUB-…` → activate/extend plan |
 
+## Project layout
+
+```
+src/
+  app/                 routes — (auth), (dashboard)/[storeId]/…, (platform)/platform, api/
+  components/ui/       shadcn/ui primitives
+  config/tiers.ts      plans, templates, limits
+  features/<area>/     UI + server actions per area (products, vault, orders, payouts, team, bots…)
+  lib/
+    access/            session, store access (requireStore), platform admins, team
+    data/              Firestore mappers and read queries (incl. analytics)
+    payments/          Xendit client, order fulfilment, plan subscriptions
+    integrations/      n8n automation, WhatsApp text, Telegram/Discord bots, Vercel domains
+    firebase/          Admin + client SDK setup
+    vault-crypto.ts    encryption at rest for vault secrets
+  types/schema.ts      Firestore data model (copied in the storefront repo)
+tests/                 Vitest (unit + Firestore emulator)
+docs/n8n.md            automation webhook contract
+```
+
+Firestore rules and indexes live **only in this repo** and are deployed by
+`.github/workflows/firestore-deploy.yml`.
+
 ## Data model
 
 See `src/types/schema.ts`. Root collections: `users`, `stores`, `products`,
@@ -41,7 +64,7 @@ All reads/writes go through server code using the Admin SDK; every store-scoped 
 calls `requireStore(storeId)` (ownership check). `firestore.rules` is defence in depth
 and is tested against the emulator.
 
-Fulfilment (`src/lib/fulfillment.ts`) runs in a Firestore transaction: an order gets
+Fulfilment (`src/lib/payments/fulfillment.ts`) runs in a Firestore transaction: an order gets
 exactly one AVAILABLE credential even under concurrent webhooks, and the webhook is
 idempotent.
 
@@ -82,7 +105,7 @@ Actions tab); it needs the repository secret `FIREBASE_SERVICE_ACCOUNT` — setu
 at the top of `.github/workflows/firestore-deploy.yml`. Manual equivalent:
 
 ```bash
-npx firebase-tools deploy --only firestore --project web-store-4cf23
+npx firebase-tools deploy --only firestore --project web-store-dashboard
 ```
 
 ## Automation (n8n)

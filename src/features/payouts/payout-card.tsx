@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { connectXendit, refreshXenditStatus } from "./payment-actions";
+import { connectXendit, refreshXenditStatus } from "./actions";
 
 const STATUS_TEXT: Record<string, string> = {
   INVITED: "Undangan terkirim — cek email dari Xendit untuk mengaktifkan akun.",

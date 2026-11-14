@@ -1,4 +1,4 @@
-import { requireStore } from "@/lib/auth";
+import { requireStore } from "@/lib/access/auth";
 import { adminDb } from "@/lib/firebase/admin";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { DEFAULT_WA_TEMPLATE, TIERS } from "@/config/tiers";
@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IntegrationsForm } from "@/features/settings/integrations-form";
-import { PaymentCard } from "@/features/settings/payment-card";
-import { inspectDomain, routingRecords, vercelDomainsEnabled } from "@/lib/vercel-domains";
+import { PaymentCard } from "@/features/payouts/payout-card";
+import { inspectDomain, routingRecords, vercelDomainsEnabled } from "@/lib/integrations/vercel-domains";
 import { storefrontUrl } from "@/lib/store-url";
 import { DomainCard } from "@/features/domains/domain-card";
 import { StoreSettingsForm } from "@/features/settings/store-settings-form";

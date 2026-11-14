@@ -2,10 +2,10 @@ import "server-only";
 import { createHmac } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { deliveryMessage, fillTemplate, waNumber } from "@/lib/whatsapp";
+import { deliveryMessage, fillTemplate, waNumber } from "@/lib/integrations/whatsapp";
 import { formatDate } from "@/lib/utils";
 import { DEFAULT_WA_TEMPLATE, TIERS } from "@/config/tiers";
-import { effectiveTier } from "@/lib/firestore-mappers";
+import { effectiveTier } from "@/lib/data/mappers";
 import { decryptSecret } from "@/lib/vault-crypto";
 
 // Automation bridge to n8n (plan-dashboard.md §2/§4). The dashboard decides *what* to send;

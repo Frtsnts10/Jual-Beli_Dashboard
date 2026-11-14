@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
-import { getSessionUser } from "@/lib/auth";
-import { ordersSince, parseRange } from "@/lib/analytics";
+import { getSessionUser } from "@/lib/access/auth";
+import { ordersSince, parseRange } from "@/lib/data/analytics";
 
 // CSV export of a store's orders for the owner and its admins. Contains buyer contact
 // details (needed for bookkeeping/CRM) but never vault credentials.

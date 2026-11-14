@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { requireStore } from "@/lib/auth";
-import { countCredentials, listCredentials, listProducts } from "@/lib/queries";
+import { requireStore } from "@/lib/access/auth";
+import { countCredentials, listCredentials, listProducts } from "@/lib/data/queries";
 import { cn } from "@/lib/utils";
 import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";

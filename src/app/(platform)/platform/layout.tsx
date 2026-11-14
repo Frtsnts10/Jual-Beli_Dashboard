@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Shield } from "lucide-react";
-import { requirePlatformAdmin } from "@/lib/platform";
+import { requirePlatformAdmin } from "@/lib/access/platform";
 
 export const metadata = { title: { template: "%s · Platform", default: "Platform" }, robots: { index: false } };
 

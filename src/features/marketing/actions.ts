@@ -3,10 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { requireStore } from "@/lib/auth";
+import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { postToN8n } from "@/lib/automation";
-import { fillTemplate, waNumber } from "@/lib/whatsapp";
+import { postToN8n } from "@/lib/integrations/automation";
+import { fillTemplate, waNumber } from "@/lib/integrations/whatsapp";
 import { TIERS } from "@/config/tiers";
 
 const COOLDOWN_MS = 60 * 60 * 1000;
