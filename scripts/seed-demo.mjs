@@ -343,6 +343,37 @@ const pendingId = order(PRODUCTS[3], { daysAgo: 0, status: "PENDING" });
 order(PRODUCTS[2], { daysAgo: 2, status: "PENDING" });
 order(PRODUCTS[4], { daysAgo: 6, status: "FAILED" });
 
+
+// ---------------------------------------------------------------------------------------
+// 6b. A buyer account: signs in on the storefront and sees their orders, profile and claim
+
+const claimOrder = orders.find(([ref]) => ref.id === claimId)[1];
+const BUYER_EMAIL = claimOrder.customer_contact.email;
+let buyerUid;
+try {
+  buyerUid = (await auth.getUserByEmail(BUYER_EMAIL)).uid;
+  await auth.updateUser(buyerUid, { password, emailVerified: true, displayName: "Indra Pembeli" });
+} catch (err) {
+  if (err?.code !== "auth/user-not-found") throw err;
+  buyerUid = (await auth.createUser({ email: BUYER_EMAIL, password, emailVerified: true, displayName: "Indra Pembeli" })).uid;
+}
+await db.collection("customers").doc(buyerUid).set({
+  email: BUYER_EMAIL,
+  name: "Indra Pembeli",
+  phone: claimOrder.customer_contact.phone,
+  saved_checkout: { last_channel: "OVO" },
+  created_at: ts(now - 20 * DAY),
+});
+// Give them a realistic history: three more paid orders become theirs.
+for (const [, o] of orders.filter(([ref, o]) => ref.id !== claimId && o.payment_status === "PAID" && !o.needs_stock && !o.delivery_error).slice(0, 3)) {
+  o.customer_contact = { ...claimOrder.customer_contact };
+}
+// Half of their orders were placed signed in; the rest get linked on first visit (verified email).
+let linkedCount = 0;
+for (const [, o] of orders) {
+  if (o.customer_contact.email === BUYER_EMAIL && linkedCount++ % 2 === 0) o.customer_uid = buyerUid;
+}
+
 for (let i = 0; i < batchOps.length + orders.length; i += 400) {
   const batch = db.batch();
   [...batchOps, ...orders].slice(i, i + 400).forEach(([ref, data]) => batch.set(ref, data));
@@ -389,6 +420,8 @@ console.log(`
   Products     ${PRODUCTS.length + 1} (flash sale: ChatGPT Plus, bundle: Netflix + Spotify, VPN sold out)
   Vault        ${credSeq} credentials (encrypted)
   Orders       ${orders.length} (${paidCount} paid, 2 pending, 1 failed)
+
+  Buyer login  ${BUYER_EMAIL} (same password) — storefront /masuk
 
   Try these:
     Storefront (local)   http://localhost:3001/${SLUG}

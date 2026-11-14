@@ -148,9 +148,13 @@ export interface Order {
   /** All allocated credentials — one per bundle component. */
   credential_ids: string[];
   customer_contact: { email: string; phone: string };
+  /** Buyer account (customers/{uid}) when the order was placed signed in, or linked after email verification. */
+  customer_uid: string | null;
   payment_status: PaymentStatus;
   xendit_invoice_id: string | null;
   xendit_invoice_url: string | null;
+  /** QRIS / OVO / DANA … as reported by the paid-invoice callback. */
+  payment_channel: string | null;
   delivery_status: DeliveryStatus;
   /** Last automatic-delivery failure (n8n unreachable, WA not configured…), cleared on success. */
   delivery_error: string | null;
@@ -175,6 +179,14 @@ export interface Order {
 }
 
 export type BillingPeriod = "monthly" | "yearly";
+
+/** customers/{uid} — a buyer account, shared by every storefront on the platform. */
+export interface CustomerProfile {
+  uid: string;
+  email: string;
+  name: string;
+  phone: string;
+}
 
 /** subscription_payments/{SUB-XXXXXXXX} — plan purchases, paid to the platform's master account */
 export interface SubscriptionPayment {

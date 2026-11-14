@@ -2,7 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { adminDb } from "@/lib/firebase/admin";
 import { mapCredential, mapOrder, mapProduct } from "@/lib/data/mappers";
-import type { CredentialStatus } from "@/types/schema";
+import type { CredentialStatus, CustomerProfile } from "@/types/schema";
+import { aggregateCustomers } from "./customers";
 
 // All queries filter by store_id; callers must have passed requireStore(storeId) first.
 
@@ -65,4 +66,23 @@ export async function getCredentialsByIds(ids: string[]) {
   const refs = ids.map((id) => adminDb.collection("credentials_vault").doc(id));
   const snaps = await adminDb.getAll(...refs);
   return Object.fromEntries(snaps.filter((s) => s.exists).map((s) => [s.id, mapCredential(s)]));
+}
+
+/** customers/{uid} profiles for the given buyer accounts (missing/deleted ones are skipped). */
+export async function getCustomerProfiles(uids: string[]): Promise<Map<string, CustomerProfile>> {
+  const unique = [...new Set(uids)].filter(Boolean);
+  if (unique.length === 0) return new Map();
+  const snaps = await adminDb.getAll(...unique.map((uid) => adminDb.collection("customers").doc(uid)));
+  return new Map(
+    snaps
+      .filter((s) => s.exists)
+      .map((s) => [s.id, { uid: s.id, email: s.get("email") ?? "", name: s.get("name") ?? "", phone: s.get("phone") ?? "" }])
+  );
+}
+
+/** A store's customers, grouped from its most recent orders. */
+export async function listCustomers(storeId: string) {
+  const orders = await listOrders(storeId, 2000);
+  const profiles = await getCustomerProfiles(orders.map((o) => o.customer_uid ?? ""));
+  return { orders, customers: aggregateCustomers(orders, profiles) };
 }
