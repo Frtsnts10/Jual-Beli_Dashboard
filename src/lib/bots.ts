@@ -29,7 +29,7 @@ export async function botCatalog(storeId: string, ref: "telegram" | "discord") {
   const store = mapStore(storeSnap);
   const owner = await adminDb.collection("users").doc(store.owner_uid).get();
   const tier = effectiveTier(owner.get("subscription_tier"), owner.get("subscription_expiry"));
-  if (!TIERS[tier].marketing || !store.is_active) return null;
+  if (!TIERS[tier].marketing || !store.is_active || store.suspended) return null;
 
   // All products, so bundle components that are unpublished still count for bundle stock.
   const snap = await adminDb.collection("products").where("store_id", "==", storeId).get();

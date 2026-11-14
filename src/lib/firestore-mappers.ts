@@ -55,6 +55,7 @@ export function mapStore(snap: Snap): Store {
       logo_url: d.storefront_config?.logo_url ?? "",
     },
     is_active: d.is_active ?? true,
+    suspended: d.suspended ?? false,
     created_at: toISO(d.created_at) ?? "",
   };
 }
@@ -123,6 +124,7 @@ export function mapOrder(snap: Snap): Order {
     referral_code: d.referral_code ?? null,
     settlement: d.settlement ?? "PLATFORM",
     platform_fee: d.platform_fee ?? 0,
+    payout_status: d.payout_status ?? null,
     created_at: toISO(d.created_at) ?? "",
     paid_at: toISO(d.paid_at),
     access_expires_at: toISO(d.access_expires_at),

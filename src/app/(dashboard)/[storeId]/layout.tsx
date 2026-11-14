@@ -6,6 +6,7 @@ import { TIERS } from "@/config/tiers";
 import { SidebarNav } from "@/features/dashboard/sidebar-nav";
 import { StoreSwitcher } from "@/features/stores/store-switcher";
 import { UserMenu } from "@/features/auth/user-menu";
+import { isPlatformAdmin } from "@/lib/platform";
 
 export default async function StoreLayout({ children, params }: { children: React.ReactNode; params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
@@ -33,10 +34,15 @@ export default async function StoreLayout({ children, params }: { children: Reac
             Lihat toko <ExternalLink className="size-3.5" />
           </a>
           <div className="ml-auto">
-            <UserMenu name={user.full_name} email={user.email} tier={TIERS[user.subscription_tier].name} />
+            <UserMenu name={user.full_name} email={user.email} tier={TIERS[user.subscription_tier].name} platformAdmin={await isPlatformAdmin()} />
           </div>
         </header>
         <SidebarNav storeId={storeId} openClaims={openClaims} isOwner={role === "owner"} className="overflow-x-auto border-b px-2 py-1 md:hidden" />
+        {store.suspended && (
+          <div className="bg-destructive/10 text-destructive border-b px-6 py-2 text-sm">
+            Toko ini disuspend oleh admin platform — etalase dan checkout ditutup. Hubungi support platform.
+          </div>
+        )}
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
     </div>

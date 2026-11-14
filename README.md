@@ -23,6 +23,8 @@ shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · Xend
 | `/[storeId]/products` | Catalogue CRUD, publish toggle |
 | `/[storeId]/vault` | Credential vault — Available / Sold / Expired tabs, bulk import |
 | `/[storeId]/orders` | Orders, manual payment confirm, WhatsApp delivery, 1-click warranty replacement |
+| `/[storeId]/analytics` | Revenue, conversion, daily chart, top products/referrals; CSV export (`/analytics/export`) |
+| `/platform` | Platform admin (emails in `PLATFORM_ADMIN_EMAILS`): totals, stores (suspend), users (set plan), seller payouts |
 | `/[storeId]/marketing` | Ultimate: WhatsApp broadcast, affiliate report + link builder, flash sale |
 | `/[storeId]/billing` | Plan upgrade/renewal (monthly/yearly) paid via Xendit invoice, payment history |
 | `/[storeId]/settings` | Store profile, template (tier-gated), accent colour, custom domain, Xendit connection, WA integration |
@@ -136,3 +138,12 @@ Settings → **Bot komunitas**:
 Checkout links carry `?ref=telegram` / `?ref=discord`, so bot sales appear in the
 affiliate report. Set `DASHBOARD_PUBLIC_URL` if the dashboard sits behind a proxy that
 rewrites the Host header.
+
+## Platform admin
+
+`/platform` is for the SaaS operator, not sellers. Access: the signed-in email must be in
+`PLATFORM_ADMIN_EMAILS` **and** verified (everyone else gets a 404). It shows GMV, platform
+fees and subscription revenue for the month; lets you suspend a store (storefront, checkout
+and bots close, the seller sees a banner), set any user's plan by hand, and settle what the
+platform owes sellers for orders it collected (`settlement = PLATFORM`). Every action is
+written to `platform_audit`.
