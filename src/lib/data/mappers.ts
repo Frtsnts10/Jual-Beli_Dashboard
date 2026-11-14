@@ -56,6 +56,12 @@ export function mapStore(snap: Snap): Store {
     },
     is_active: d.is_active ?? true,
     suspended: d.suspended ?? false,
+    store_info: {
+      about: d.store_info?.about ?? "",
+      faq: Array.isArray(d.store_info?.faq) ? d.store_info.faq : [],
+      warranty_policy: d.store_info?.warranty_policy ?? "",
+      whatsapp: d.store_info?.whatsapp ?? "",
+    },
     created_at: toISO(d.created_at) ?? "",
   };
 }

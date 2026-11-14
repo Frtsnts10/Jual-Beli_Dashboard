@@ -6,7 +6,8 @@ import { adminDb } from "@/lib/firebase/admin";
 import { getOwnedStores, requireStore, requireUser } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { DEFAULT_WA_TEMPLATE, TEMPLATES, TIERS } from "@/config/tiers";
-import type { LayoutTemplate, WaProvider } from "@/types/schema";
+import { waNumber } from "@/lib/integrations/whatsapp";
+import type { LayoutTemplate, StoreInfo, WaProvider } from "@/types/schema";
 
 const RESERVED_SLUGS = new Set(["www", "app", "api", "admin", "dashboard", "mail", "static", "assets", "track", "checkout"]);
 const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$/;
@@ -120,6 +121,30 @@ export async function updateStoreSettings(storeId: string, input: StoreSettingsI
     throw err;
   }
   revalidatePath(`/${storeId}`, "layout");
+  return { ok: true };
+}
+
+const MAX_FAQ = 20;
+
+/** Saves the storefront's info pages (Tentang, FAQ, Kebijakan garansi) and the WhatsApp chat number. */
+export async function updateStoreInfo(storeId: string, input: StoreInfo): Promise<ActionResult> {
+  await requireStore(storeId);
+  const about = input.about.trim().slice(0, 4000);
+  const warranty = input.warranty_policy.trim().slice(0, 4000);
+  const faq = input.faq
+    .map((f) => ({ q: f.q.trim().slice(0, 200), a: f.a.trim().slice(0, 1500) }))
+    .filter((f) => f.q && f.a);
+  if (faq.length > MAX_FAQ) return fail(`Maksimal ${MAX_FAQ} pertanyaan FAQ.`);
+
+  let whatsapp = "";
+  if (input.whatsapp.trim()) {
+    const digits = waNumber(input.whatsapp);
+    if (!/^628\d{7,12}$/.test(digits)) return fail("Nomor WhatsApp tidak valid (contoh: 0812xxxxxxx).");
+    whatsapp = `+${digits}`;
+  }
+
+  await adminDb.collection("stores").doc(storeId).update({ store_info: { about, faq, warranty_policy: warranty, whatsapp } });
+  revalidatePath(`/${storeId}/settings`);
   return { ok: true };
 }
 
