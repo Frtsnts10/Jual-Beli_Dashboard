@@ -1,4 +1,5 @@
 import "server-only";
+import { decryptSecret } from "@/lib/vault-crypto";
 import { Timestamp, type DocumentSnapshot } from "firebase-admin/firestore";
 import type { Credential, Order, Product, Store, SubscriptionPayment, SubscriptionTier, UserDoc } from "@/types/schema";
 
@@ -54,6 +55,7 @@ export function mapStore(snap: Snap): Store {
       logo_url: d.storefront_config?.logo_url ?? "",
     },
     is_active: d.is_active ?? true,
+    suspended: d.suspended ?? false,
     created_at: toISO(d.created_at) ?? "",
   };
 }
@@ -87,8 +89,8 @@ export function mapCredential(snap: Snap): Credential {
     store_id: d.store_id,
     product_id: d.product_id,
     account_email: d.account_email ?? "",
-    account_password: d.account_password ?? "",
-    profile_pin: d.profile_pin ?? "",
+    account_password: decryptSecret(d.account_password),
+    profile_pin: decryptSecret(d.profile_pin),
     status: d.status ?? "AVAILABLE",
     expiry_date: toISO(d.expiry_date),
     order_id: d.order_id ?? null,
@@ -122,6 +124,7 @@ export function mapOrder(snap: Snap): Order {
     referral_code: d.referral_code ?? null,
     settlement: d.settlement ?? "PLATFORM",
     platform_fee: d.platform_fee ?? 0,
+    payout_status: d.payout_status ?? null,
     created_at: toISO(d.created_at) ?? "",
     paid_at: toISO(d.paid_at),
     access_expires_at: toISO(d.access_expires_at),

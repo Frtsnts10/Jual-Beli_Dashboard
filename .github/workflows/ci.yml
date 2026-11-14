@@ -1,0 +1,46 @@
+# Typecheck, lint, unit + emulator tests and a production build on every pull request
+# and push to main. Needs no secrets: the Firebase Admin SDK initialises lazily and the
+# tests run against the local Firestore emulator.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4 # the Firestore emulator runs on the JVM
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - name: Unit + Firestore emulator tests (fulfilment, races, bundles, security rules)
+        run: npx --yes firebase-tools@15.36.0 emulators:exec --only firestore --project web-store-4cf23 "npx vitest run"

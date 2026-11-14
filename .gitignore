@@ -50,3 +50,6 @@ next-env.d.ts
 !docs/master_accounts_sample.csv
 *serviceAccount*.json
 *adminsdk*.json
+
+# Firebase emulator logs
+*-debug.log

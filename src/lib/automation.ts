@@ -6,6 +6,7 @@ import { deliveryMessage, fillTemplate, waNumber } from "@/lib/whatsapp";
 import { formatDate } from "@/lib/utils";
 import { DEFAULT_WA_TEMPLATE, TIERS } from "@/config/tiers";
 import { effectiveTier } from "@/lib/firestore-mappers";
+import { decryptSecret } from "@/lib/vault-crypto";
 
 // Automation bridge to n8n (plan-dashboard.md §2/§4). The dashboard decides *what* to send;
 // an n8n workflow listening on N8N_WEBHOOK_URL does the *sending* through the store's
@@ -80,8 +81,8 @@ export async function deliverOrder(orderId: string, reason: "paid" | "warranty_r
     credentials.map((c, i) => ({
       product: credentials.length > 1 ? components[i].get("title") : order.get("product_title"),
       email: c.get("account_email"),
-      password: c.get("account_password"),
-      pin: c.get("profile_pin") ?? "",
+      password: decryptSecret(c.get("account_password")),
+      pin: decryptSecret(c.get("profile_pin")),
     }))
   );
 

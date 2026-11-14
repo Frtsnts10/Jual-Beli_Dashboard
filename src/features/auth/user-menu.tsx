@@ -1,7 +1,8 @@
 "use client";
 
 import { signOut } from "firebase/auth";
-import { LogOut, User } from "lucide-react";
+import Link from "next/link";
+import { LogOut, Shield, User } from "lucide-react";
 import { auth } from "@/lib/firebase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function UserMenu({ name, email, tier }: { name: string; email: string; tier: string }) {
+export function UserMenu({ name, email, tier, platformAdmin = false }: { name: string; email: string; tier: string; platformAdmin?: boolean }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,6 +29,13 @@ export function UserMenu({ name, email, tier }: { name: string; email: string; t
           <div className="text-muted-foreground mt-1 text-xs font-normal">Paket: {tier}</div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {platformAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/platform">
+              <Shield /> Admin platform
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem
           onSelect={async () => {
             await fetch("/api/auth/session", { method: "DELETE" });

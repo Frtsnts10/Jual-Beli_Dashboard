@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCard, KeyRound, LayoutDashboard, Megaphone, Package, Settings, ShoppingBag } from "lucide-react";
+import { BarChart3, CreditCard, KeyRound, LayoutDashboard, Megaphone, Package, Settings, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function SidebarNav({ storeId, openClaims, isOwner, className }: { storeId: string; openClaims: number; isOwner: boolean; className?: string }) {
@@ -12,6 +12,7 @@ export function SidebarNav({ storeId, openClaims, isOwner, className }: { storeI
     { href: `/${storeId}/products`, label: "Produk", icon: Package },
     { href: `/${storeId}/vault`, label: "Brankas Stok", icon: KeyRound },
     { href: `/${storeId}/orders`, label: "Pesanan", icon: ShoppingBag, badge: openClaims },
+    { href: `/${storeId}/analytics`, label: "Analitik", icon: BarChart3 },
     { href: `/${storeId}/marketing`, label: "Marketing", icon: Megaphone },
     ...(isOwner ? [{ href: `/${storeId}/billing`, label: "Langganan", icon: CreditCard }] : []),
     { href: `/${storeId}/settings`, label: "Pengaturan", icon: Settings },
