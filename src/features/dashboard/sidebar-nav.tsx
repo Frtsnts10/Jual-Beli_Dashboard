@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { CreditCard, KeyRound, LayoutDashboard, Megaphone, Package, Settings, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function SidebarNav({ storeId, openClaims, className }: { storeId: string; openClaims: number; className?: string }) {
+export function SidebarNav({ storeId, openClaims, isOwner, className }: { storeId: string; openClaims: number; isOwner: boolean; className?: string }) {
   const pathname = usePathname();
   const items = [
     { href: `/${storeId}`, label: "Ringkasan", icon: LayoutDashboard, exact: true },
@@ -13,7 +13,7 @@ export function SidebarNav({ storeId, openClaims, className }: { storeId: string
     { href: `/${storeId}/vault`, label: "Brankas Stok", icon: KeyRound },
     { href: `/${storeId}/orders`, label: "Pesanan", icon: ShoppingBag, badge: openClaims },
     { href: `/${storeId}/marketing`, label: "Marketing", icon: Megaphone },
-    { href: `/${storeId}/billing`, label: "Langganan", icon: CreditCard },
+    ...(isOwner ? [{ href: `/${storeId}/billing`, label: "Langganan", icon: CreditCard }] : []),
     { href: `/${storeId}/settings`, label: "Pengaturan", icon: Settings },
   ];
 

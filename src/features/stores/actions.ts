@@ -74,8 +74,8 @@ export interface StoreSettingsInput {
 }
 
 export async function updateStoreSettings(storeId: string, input: StoreSettingsInput): Promise<ActionResult> {
-  const { user, store } = await requireStore(storeId);
-  const tier = TIERS[user.subscription_tier];
+  const { store, tier: plan } = await requireStore(storeId);
+  const tier = TIERS[plan];
 
   const storeName = input.store_name.trim();
   if (storeName.length < 2) return fail("Nama toko terlalu pendek.");

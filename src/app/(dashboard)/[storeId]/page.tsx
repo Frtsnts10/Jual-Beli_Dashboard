@@ -12,14 +12,14 @@ export const metadata = { title: "Ringkasan" };
 
 export default async function OverviewPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
-  const { user, store } = await requireStore(storeId);
+  const { store, tier: plan } = await requireStore(storeId);
   const [orders, products, available, claims] = await Promise.all([
     listOrders(storeId, 500),
     listProducts(storeId),
     countCredentials(storeId, "AVAILABLE"),
     countOpenClaims(storeId),
   ]);
-  const tier = TIERS[user.subscription_tier];
+  const tier = TIERS[plan];
 
   const monthStart = new Date();
   monthStart.setDate(1);

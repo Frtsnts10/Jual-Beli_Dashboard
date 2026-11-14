@@ -61,6 +61,7 @@ export const countOpenClaims = cache(async (storeId: string) => {
 
 export async function getCredentialsByIds(ids: string[]) {
   if (ids.length === 0) return {};
+  ids = [...new Set(ids)];
   const refs = ids.map((id) => adminDb.collection("credentials_vault").doc(id));
   const snaps = await adminDb.getAll(...refs);
   return Object.fromEntries(snaps.filter((s) => s.exists).map((s) => [s.id, mapCredential(s)]));

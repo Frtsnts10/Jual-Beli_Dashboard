@@ -20,7 +20,7 @@ export default async function BillingPage({
 }) {
   const { storeId } = await params;
   const { paid } = await searchParams;
-  const { user } = await requireStore(storeId);
+  const { user } = await requireStore(storeId, { ownerOnly: true });
   const payments = await adminDb.collection("subscription_payments").where("uid", "==", user.uid).get();
   const history = payments.docs
     .map(mapSubscriptionPayment)

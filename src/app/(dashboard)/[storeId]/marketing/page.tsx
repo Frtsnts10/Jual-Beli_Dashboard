@@ -17,9 +17,9 @@ export const metadata = { title: "Marketing" };
 
 export default async function MarketingPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
-  const { user, store } = await requireStore(storeId);
+  const { store, tier } = await requireStore(storeId);
 
-  if (!TIERS[user.subscription_tier].marketing) {
+  if (!TIERS[tier].marketing) {
     return (
       <>
         <PageHeader title="Marketing" description="Growth engine paket Ultimate." />

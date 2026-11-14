@@ -20,6 +20,7 @@ const empty: ProductInput = {
   platform_type: "Media",
   price: 25000,
   duration_days: 30,
+  bundle_items: null,
   is_flash_sale: false,
   flash_sale_price: null,
   flash_sale_ends_at: null,
@@ -38,7 +39,10 @@ export function ProductDialog({
   product,
   trigger,
   flashSalePricing = false,
+  bundleCandidates = [],
 }: {
+  /** Non-bundle products that can go into a bundle (Ultimate). Empty hides bundling. */
+  bundleCandidates?: { id: string; title: string }[];
   storeId: string;
   product?: Product;
   trigger: React.ReactNode;
@@ -101,6 +105,37 @@ export function ProductDialog({
               <Input id="price" type="number" min={1000} step={500} value={form.price} onChange={(e) => set("price", Number(e.target.value))} required />
             </div>
           </div>
+          {flashSalePricing && bundleCandidates.length >= 2 && (
+            <div className="grid gap-2 rounded-md border p-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="is_bundle">Bundle (paket beberapa produk)</Label>
+                <Switch
+                  id="is_bundle"
+                  checked={!!form.bundle_items}
+                  onCheckedChange={(v) => set("bundle_items", v ? [] : null)}
+                />
+              </div>
+              {form.bundle_items && (
+                <div className="grid gap-1.5">
+                  {bundleCandidates
+                    .filter((c) => c.id !== product?.id)
+                    .map((c) => (
+                      <label key={c.id} className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={form.bundle_items!.includes(c.id)}
+                          onChange={(e) =>
+                            set("bundle_items", e.target.checked ? [...form.bundle_items!, c.id] : form.bundle_items!.filter((id) => id !== c.id))
+                          }
+                        />
+                        {c.title}
+                      </label>
+                    ))}
+                  <p className="text-muted-foreground text-xs">Setiap pembelian mengambil 1 akun dari masing-masing produk. Stok bundle = stok terkecil.</p>
+                </div>
+              )}
+            </div>
+          )}
           <div className="grid gap-2">
             <Label htmlFor="duration">Masa aktif (hari)</Label>
             <Input id="duration" type="number" min={1} value={form.duration_days} onChange={(e) => set("duration_days", Number(e.target.value))} required />

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { SESSION_COOKIE } from "@/lib/auth";
+import { acceptPendingInvites } from "@/lib/team";
 
 const EXPIRES_IN_MS = 14 * 24 * 60 * 60 * 1000;
 
@@ -29,6 +30,10 @@ export async function POST(req: NextRequest) {
         });
       }
     });
+
+    // Invitations only count for a verified address (password sign-ups verify by email link;
+    // Google accounts are verified), so nobody can claim an invite by typing someone's email.
+    if (decoded.email_verified) await acceptPendingInvites(decoded.uid, decoded.email);
 
     const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn: EXPIRES_IN_MS });
     const res = NextResponse.json({ success: true });

@@ -17,9 +17,10 @@ export interface CredentialLine {
 const MAX_BATCH = 400; // Firestore batch limit is 500 writes
 
 export async function addCredentials(storeId: string, productId: string, lines: CredentialLine[]): Promise<ActionResult<{ added: number }>> {
-  const { user } = await requireStore(storeId);
+  const { tier: plan } = await requireStore(storeId);
   const product = await adminDb.collection("products").doc(productId).get();
   if (!product.exists || product.get("store_id") !== storeId) return fail("Produk tidak ditemukan.");
+  if ((product.get("bundle_items") as string[] | null)?.length) return fail("Stok bundle diambil dari produk isinya — tambahkan stok ke produk-produk tersebut.");
 
   const rows = lines
     .map((l) => ({ ...l, account_email: l.account_email.trim(), account_password: l.account_password.trim() }))
@@ -33,7 +34,7 @@ export async function addCredentials(storeId: string, productId: string, lines: 
     }
   }
 
-  const tier = TIERS[user.subscription_tier];
+  const tier = TIERS[plan];
   if (Number.isFinite(tier.maxCredentials)) {
     const current = await adminDb
       .collection("credentials_vault")

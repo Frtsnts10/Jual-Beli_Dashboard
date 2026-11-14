@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +24,8 @@ export default function SignUpPage() {
     try {
       const cred = await createUserWithEmailAndPassword(auth, String(form.get("email")), String(form.get("password")));
       await updateProfile(cred.user, { displayName: fullName });
+      // Needed before team invitations sent to this address can be accepted.
+      await sendEmailVerification(cred.user).catch(() => {});
       await startSession(cred, fullName, "/onboarding");
     } catch (err) {
       setError(authErrorMessage(err));
