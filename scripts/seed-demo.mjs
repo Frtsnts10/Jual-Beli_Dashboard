@@ -149,6 +149,18 @@ await storeRef.set({
   },
   is_active: true,
   suspended: false,
+  store_info: {
+    about:
+      "Dionycte menjual akun premium resmi sejak 2024. Semua akun dicek sebelum dikirim, dan dikirim otomatis ke WhatsApp Anda begitu pembayaran masuk — 24 jam.",
+    faq: [
+      { q: "Berapa lama akun dikirim?", a: "Otomatis dalam 1–2 menit setelah pembayaran berhasil, langsung ke WhatsApp." },
+      { q: "Apakah akunnya bergaransi?", a: "Ya, bergaransi penuh selama masa aktif. Klaim lewat halaman Lacak pesanan." },
+      { q: "Pembayaran pakai apa saja?", a: "QRIS, OVO, DANA, ShopeePay dan transfer virtual account." },
+    ],
+    warranty_policy:
+      "Garansi penuh selama masa aktif akun. Jika akun tidak bisa dipakai, klaim lewat halaman Lacak pesanan atau menu Akun → Pesanan. Akun pengganti dikirim maksimal 1×24 jam. Garansi tidak berlaku jika password atau profil diubah oleh pembeli.",
+    whatsapp: "+6281234567890",
+  },
   created_at: ts(now - 44 * DAY),
 });
 await storeRef.collection("private").doc("integrations").set({

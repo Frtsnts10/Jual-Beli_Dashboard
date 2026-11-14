@@ -13,6 +13,7 @@ import { inspectDomain, routingRecords, vercelDomainsEnabled } from "@/lib/integ
 import { storefrontUrl } from "@/lib/store-url";
 import { DomainCard } from "@/features/domains/domain-card";
 import { StoreSettingsForm } from "@/features/settings/store-settings-form";
+import { StoreInfoForm } from "@/features/settings/store-info-form";
 import { TeamCard } from "@/features/team/team-card";
 import { BotsCard } from "@/features/bots/bots-card";
 import { headers } from "next/headers";
@@ -54,6 +55,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
           />
           )}
           <StoreSettingsForm store={store} allowedTemplates={tier.templates} rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN} />
+          <StoreInfoForm storeId={storeId} info={store.store_info} />
           {isOwner && <PaymentCard storeId={storeId} status={integrations.get("xendit_account_status") ?? null} feePercent={tier.feePercent} />}
           <IntegrationsForm
             storeId={storeId}

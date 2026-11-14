@@ -34,6 +34,15 @@ export interface StorefrontConfig {
   logo_url?: string;
 }
 
+/** Public "about this store" content shown on the storefront's info pages and footer. */
+export interface StoreInfo {
+  about: string;
+  faq: { q: string; a: string }[];
+  warranty_policy: string;
+  /** Seller's WhatsApp for the floating chat button, normalised to +62… (empty = hidden). */
+  whatsapp: string;
+}
+
 export interface CustomDomainStatus {
   state: "pending" | "active";
   /** attached: on the storefront's Vercel project · dns: points at it · live: https://domain serves this store */
@@ -55,6 +64,7 @@ export interface Store {
   custom_domain: string | null;
   /** Result of the last "Cek sekarang" run for custom_domain (dashboard only). */
   custom_domain_status?: CustomDomainStatus | null;
+  store_info: StoreInfo;
   storefront_config: StorefrontConfig;
   is_active: boolean;
   /** Set by a platform admin; the storefront and bots treat it like a closed store. */
