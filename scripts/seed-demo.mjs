@@ -183,7 +183,8 @@ const PRODUCTS = [
 const BUNDLE = { key: "bundle", title: "Paket Hiburan: Netflix + Spotify", type: "Media", price: 62_000, days: 30,
   description: "Hemat Rp 8.000 dibanding beli terpisah. Satu order, dua akun.", items: ["netflix", "spotify"] };
 
-const productId = (key) => `${STORE_ID}-${key}`;
+// Letters and digits only, like Firestore auto-ids: the storefront rejects anything else in /checkout/<id>.
+const productId = (key) => `demoDionycte${key[0].toUpperCase()}${key.slice(1)}`;
 const writes = [];
 for (const p of PRODUCTS) {
   writes.push(db.collection("products").doc(productId(p.key)).set({
@@ -237,7 +238,7 @@ const FEE_PERCENT = 1; // Ultimate
 const batchOps = [];
 let credSeq = 0;
 function credential(productKey, { status, orderId = null, soldAt = null, expiry }) {
-  const id = `${STORE_ID}-cred-${String(++credSeq).padStart(3, "0")}`;
+  const id = `demoDionycteCred${String(++credSeq).padStart(3, "0")}`;
   const n = credSeq;
   batchOps.push([db.collection("credentials_vault").doc(id), {
     store_id: STORE_ID,
