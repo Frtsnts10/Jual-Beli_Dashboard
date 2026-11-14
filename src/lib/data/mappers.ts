@@ -132,6 +132,8 @@ export function mapOrder(snap: Snap): Order {
     needs_stock: d.needs_stock ?? false,
     renewal_notified: d.renewal_notified ?? false,
     referral_code: d.referral_code ?? null,
+    voucher_code: d.voucher_code ?? null,
+    discount: d.discount ?? 0,
     settlement: d.settlement ?? "PLATFORM",
     platform_fee: d.platform_fee ?? 0,
     payout_status: d.payout_status ?? null,

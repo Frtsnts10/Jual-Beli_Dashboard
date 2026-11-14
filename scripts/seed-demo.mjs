@@ -118,7 +118,7 @@ async function deleteWhere(col) {
   return snap.size;
 }
 const wiped = [];
-for (const col of ["orders", "credentials_vault", "products", "broadcasts", "reviews"]) wiped.push(`${await deleteWhere(col)} ${col}`);
+for (const col of ["orders", "credentials_vault", "products", "broadcasts", "reviews", "vouchers"]) wiped.push(`${await deleteWhere(col)} ${col}`);
 const oldSubs = await db.collection("subscription_payments").where("uid", "==", uid).get();
 await Promise.all(oldSubs.docs.map((d) => d.ref.delete()));
 
@@ -374,6 +374,40 @@ for (const [, o] of orders) {
   if (o.customer_contact.email === BUYER_EMAIL && linkedCount++ % 2 === 0) o.customer_uid = buyerUid;
 }
 
+// Vouchers: HEMAT10 was used on a few paid orders; DIONYCTE5K is fresh; LEBARAN expired.
+const VOUCHERS = [
+  { code: "HEMAT10", type: "percent", value: 10, max_discount: 20_000, min_amount: 0, max_uses: 100, expires: now + 30 * DAY },
+  { code: "DIONYCTE5K", type: "fixed", value: 5_000, min_amount: 40_000, max_uses: null, expires: null },
+  { code: "LEBARAN", type: "percent", value: 25, max_discount: null, min_amount: 0, max_uses: 50, expires: now - 3 * DAY },
+];
+const hemat = orders.filter(([, o]) => o.payment_status === "PAID" && o.customer_contact.email !== BUYER_EMAIL).slice(0, 4);
+for (const [, o] of hemat) {
+  o.voucher_code = "HEMAT10";
+  o.discount = Math.min(Math.floor(o.amount / 10), 20_000);
+  o.amount -= o.discount;
+  o.platform_fee = Math.round((o.amount * FEE_PERCENT) / 100);
+}
+for (const [, o] of orders) {
+  o.voucher_code ??= null;
+  o.discount ??= 0;
+}
+for (const v of VOUCHERS) {
+  batchOps.push([db.collection("vouchers").doc(`${STORE_ID}_${v.code}`), {
+    store_id: STORE_ID,
+    code: v.code,
+    type: v.type,
+    value: v.value,
+    max_discount: v.max_discount ?? null,
+    min_amount: v.min_amount,
+    max_uses: v.max_uses,
+    used_count: v.code === "HEMAT10" ? hemat.length : v.code === "LEBARAN" ? 31 : 0,
+    expires_at: v.expires ? ts(v.expires) : null,
+    product_ids: null,
+    active: true,
+    created_at: ts(now - 10 * DAY),
+  }]);
+}
+
 for (let i = 0; i < batchOps.length + orders.length; i += 400) {
   const batch = db.batch();
   [...batchOps, ...orders].slice(i, i + 400).forEach(([ref, data]) => batch.set(ref, data));
@@ -459,6 +493,7 @@ console.log(`
   Store        Dionycte — slug "${SLUG}", domain ${DOMAIN}, store id ${STORE_ID}
   Products     ${PRODUCTS.length + 1} (flash sale: ChatGPT Plus, bundle: Netflix + Spotify, VPN sold out)
   Reviews      ${reviewCount} (moderate them in dashboard → Ulasan)
+  Vouchers     HEMAT10 (10%, maks 20rb), DIONYCTE5K (Rp 5.000, min. 40rb), LEBARAN (expired)
   Vault        ${credSeq} credentials (encrypted)
   Orders       ${orders.length} (${paidCount} paid, 2 pending, 1 failed)
 

@@ -26,6 +26,8 @@ function order(p: Partial<Order> & { email: string; at: string }): Order {
     needs_stock: false,
     renewal_notified: false,
     referral_code: null,
+    voucher_code: null,
+    discount: 0,
     settlement: "PLATFORM",
     platform_fee: 500,
     payout_status: null,
