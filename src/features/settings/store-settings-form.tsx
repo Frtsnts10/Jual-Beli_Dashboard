@@ -11,23 +11,15 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { TEMPLATES } from "@/config/tiers";
 import type { LayoutTemplate, Store } from "@/types/schema";
-import type { DomainStatus } from "@/lib/vercel-domains";
-import { Badge } from "@/components/ui/badge";
 import { updateStoreSettings, type StoreSettingsInput } from "@/features/stores/actions";
 
 export function StoreSettingsForm({
   store,
   allowedTemplates,
-  customDomainAllowed,
   rootDomain,
-  domainStatus,
-  domainAutomation,
 }: {
-  domainStatus: DomainStatus | null;
-  domainAutomation: boolean;
   store: Store;
   allowedTemplates: LayoutTemplate[];
-  customDomainAllowed: boolean;
   rootDomain?: string;
 }) {
   const [form, setForm] = useState<StoreSettingsInput>({
@@ -39,7 +31,6 @@ export function StoreSettingsForm({
     tagline: store.storefront_config.tagline ?? "",
     banner_url: store.storefront_config.banner_url ?? "",
     logo_url: store.storefront_config.logo_url ?? "",
-    custom_domain: store.custom_domain ?? "",
   });
   const [pending, start] = useTransition();
   const set = <K extends keyof StoreSettingsInput>(k: K, v: StoreSettingsInput[K]) => setForm((f) => ({ ...f, [k]: v }));
@@ -127,51 +118,13 @@ export function StoreSettingsForm({
             <Input value={form.accent_color} onChange={(e) => set("accent_color", e.target.value)} className="w-28 font-mono" />
           </div>
         </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">Custom domain {!customDomainAllowed && <Lock className="size-4" />}</CardTitle>
-          <CardDescription>
-            Paket Ultimate.{" "}
-            {domainAutomation
-              ? "Domain otomatis didaftarkan ke Vercel saat disimpan; lalu buat record DNS di bawah."
-              : "Setelah disimpan, tambahkan domain ini di Vercel project etalase dan arahkan DNS ke Vercel."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Input
-            value={form.custom_domain}
-            disabled={!customDomainAllowed && !store.custom_domain}
-            onChange={(e) => set("custom_domain", e.target.value)}
-            placeholder="namatoko.com"
-          />
-          {store.custom_domain && domainStatus && (
-            <div className="mt-3 grid gap-2 rounded-md border p-3 text-sm">
-              <div className="flex items-center gap-2">
-                Status:{" "}
-                {domainStatus.verified && !domainStatus.misconfigured ? (
-                  <Badge variant="success">Aktif</Badge>
-                ) : (
-                  <Badge variant="warning">Menunggu DNS</Badge>
-                )}
-              </div>
-              {(domainStatus.misconfigured || !domainStatus.verified) && (
-                <div className="text-muted-foreground">
-                  Buat record <code className="text-foreground">{domainStatus.record.type}</code> dengan nama{" "}
-                  <code className="text-foreground">{domainStatus.record.name}</code> → <code className="text-foreground">{domainStatus.record.value}</code> di
-                  pengelola DNS domain Anda.
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
         <CardFooter className="justify-end">
           <Button type="submit" disabled={pending}>
             {pending ? "Menyimpan…" : "Simpan pengaturan"}
           </Button>
         </CardFooter>
       </Card>
+
     </form>
   );
 }

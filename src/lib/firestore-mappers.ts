@@ -43,6 +43,9 @@ export function mapStore(snap: Snap): Store {
     store_name: d.store_name ?? "",
     slug: d.slug ?? "",
     custom_domain: d.custom_domain ?? null,
+    custom_domain_status: d.custom_domain_status
+      ? { ...d.custom_domain_status, checked_at: toISO(d.custom_domain_status.checked_at) }
+      : null,
     storefront_config: {
       layout_template: d.storefront_config?.layout_template ?? "template_c_hero",
       accent_color: d.storefront_config?.accent_color ?? "#10B981",

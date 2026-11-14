@@ -9,7 +9,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IntegrationsForm } from "@/features/settings/integrations-form";
 import { PaymentCard } from "@/features/settings/payment-card";
-import { getDomainStatus, vercelDomainsEnabled } from "@/lib/vercel-domains";
+import { inspectDomain, routingRecords, vercelDomainsEnabled } from "@/lib/vercel-domains";
+import { storefrontUrl } from "@/lib/store-url";
+import { DomainCard } from "@/features/domains/domain-card";
 import { StoreSettingsForm } from "@/features/settings/store-settings-form";
 import type { SubscriptionTier } from "@/types/schema";
 
@@ -19,24 +21,30 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
   const { storeId } = await params;
   const { user, store } = await requireStore(storeId);
   const tier = TIERS[user.subscription_tier];
-  const [integrations, domainStatus] = await Promise.all([
+  const [integrations, vercelState] = await Promise.all([
     adminDb.collection("stores").doc(storeId).collection("private").doc("integrations").get(),
-    store.custom_domain && vercelDomainsEnabled() ? getDomainStatus(store.custom_domain).catch(() => null) : null,
+    store.custom_domain && vercelDomainsEnabled() && store.custom_domain_status?.state !== "active"
+      ? inspectDomain(store.custom_domain).catch(() => null)
+      : null,
   ]);
+  // Routing records, plus any TXT ownership challenge Vercel is asking for.
+  const dnsRecords = store.custom_domain ? [...(vercelState?.verification ?? []), ...routingRecords(store.custom_domain)] : [];
 
   return (
     <>
       <PageHeader title="Pengaturan" description="Profil toko, tampilan etalase dan integrasi." />
       <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
         <div className="grid gap-6">
-          <StoreSettingsForm
-            store={store}
-            allowedTemplates={tier.templates}
-            customDomainAllowed={tier.customDomain}
-            domainStatus={domainStatus}
-            domainAutomation={vercelDomainsEnabled()}
-            rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN}
+          <DomainCard
+            storeId={storeId}
+            defaultUrl={storefrontUrl({ slug: store.slug, custom_domain: null })}
+            allowed={tier.customDomain}
+            domain={store.custom_domain}
+            status={store.custom_domain_status ?? null}
+            records={dnsRecords}
+            automated={vercelDomainsEnabled()}
           />
+          <StoreSettingsForm store={store} allowedTemplates={tier.templates} rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN} />
           <PaymentCard storeId={storeId} status={integrations.get("xendit_account_status") ?? null} feePercent={tier.feePercent} />
           <IntegrationsForm
             storeId={storeId}

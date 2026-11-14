@@ -82,11 +82,22 @@ a reminder 3 days before access ends. Ultimate stores can broadcast promos. All 
 go through one signed n8n webhook — see `docs/n8n.md`. Failures are shown on the order
 with a "Kirim ulang otomatis" action.
 
-## Custom domains
+## Custom domains (Ultimate)
 
-With `VERCEL_TOKEN` + `VERCEL_STOREFRONT_PROJECT_ID`, saving an Ultimate custom domain
-adds it to the storefront's Vercel project and Settings shows the DNS record to create and
-the verification status. Without them, add the domain in Vercel by hand.
+Settings → **Alamat toko** walks the seller through it:
+
+1. Type the domain (`tokoku.com` or `shop.tokoku.com`) → it is reserved for the store
+   (`store_domains`) and, with `VERCEL_TOKEN` + `VERCEL_STOREFRONT_PROJECT_ID`, added to the
+   storefront's Vercel project (apex domains also get `www` → apex redirect).
+2. The card lists the exact DNS records to create (A `76.76.21.21` / CNAME
+   `cname.vercel-dns.com`, plus any TXT ownership record Vercel asks for).
+3. **Cek sekarang** asks Vercel to verify, checks the DNS config, then opens
+   `https://<domain>/.well-known/store-check` and requires it to answer with this store's id —
+   proving DNS, TLS and routing end to end. Only then is the domain marked active and used in
+   links (Lihat toko, renewal reminders, affiliate links).
+
+Without the Vercel env vars, the platform admin adds each domain in Vercel by hand; the
+live check still runs.
 
 ## Not built yet
 

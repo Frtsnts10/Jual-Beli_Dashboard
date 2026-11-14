@@ -35,7 +35,10 @@ export async function GET(req: NextRequest) {
       const storeId = order.get("store_id") as string;
       if (!stores.has(storeId)) {
         const store = await adminDb.collection("stores").doc(storeId).get();
-        stores.set(storeId, storefrontUrl({ slug: store.get("slug"), custom_domain: store.get("custom_domain") ?? null }));
+        stores.set(
+          storeId,
+          storefrontUrl({ slug: store.get("slug"), custom_domain: store.get("custom_domain") ?? null, custom_domain_status: store.get("custom_domain_status") ?? null })
+        );
       }
       const link = `${stores.get(storeId)}/checkout/${order.get("product_id")}`;
       if (await remindRenewal(order.id, link)) sent++;
