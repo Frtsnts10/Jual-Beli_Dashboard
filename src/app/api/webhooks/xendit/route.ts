@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { after, NextRequest, NextResponse } from "next/server";
+import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { fulfillOrder } from "@/lib/payments/fulfillment";
 import { deliverOrder } from "@/lib/integrations/automation";
@@ -82,9 +83,27 @@ export async function POST(req: NextRequest) {
   }
 
   if (body.status === "EXPIRED" && order.get("payment_status") === "PENDING") {
-    await orderRef.update({ payment_status: "FAILED" });
+    await failOrderReleasingVoucher(orderRef);
   }
   return NextResponse.json({ ok: true });
+}
+
+/**
+ * An unpaid order gives its voucher use back, so expired invoices don't eat the quota.
+ * One transaction, so a retried callback can't release twice.
+ */
+async function failOrderReleasingVoucher(orderRef: FirebaseFirestore.DocumentReference) {
+  await adminDb.runTransaction(async (tx) => {
+    const order = await tx.get(orderRef);
+    if (order.get("payment_status") !== "PENDING") return;
+    const code = order.get("voucher_code") as string | null;
+    const voucherRef = code ? adminDb.collection("vouchers").doc(`${order.get("store_id")}_${code}`) : null;
+    const voucher = voucherRef ? await tx.get(voucherRef) : null;
+    tx.update(orderRef, { payment_status: "FAILED" });
+    if (voucherRef && voucher?.exists && (voucher.get("used_count") ?? 0) > 0) {
+      tx.update(voucherRef, { used_count: FieldValue.increment(-1) });
+    }
+  });
 }
 
 /**

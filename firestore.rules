@@ -70,6 +70,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Voucher codes: checked and consumed only inside the storefront's checkout transaction.
+    match /vouchers/{voucherId} {
+      allow read, write: if false;
+    }
+
     // store_slugs, store_domains and anything else: server-only.
     match /{document=**} {
       allow read, write: if false;

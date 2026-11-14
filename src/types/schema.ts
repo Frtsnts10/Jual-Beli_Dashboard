@@ -186,6 +186,9 @@ export interface Order {
   needs_stock: boolean;
   renewal_notified: boolean;
   referral_code: string | null;
+  /** Voucher used at checkout; `amount` is already after `discount`. */
+  voucher_code: string | null;
+  discount: number;
   /**
    * SPLIT: paid into the seller's Xendit sub-account with the platform fee split off.
    * PLATFORM: paid into the platform's master account (seller not connected yet);
