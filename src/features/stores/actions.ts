@@ -1,0 +1,160 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { FieldValue } from "firebase-admin/firestore";
+import { adminDb } from "@/lib/firebase/admin";
+import { getOwnedStores, requireStore, requireUser } from "@/lib/auth";
+import { fail, type ActionResult } from "@/lib/action-result";
+import { DEFAULT_WA_TEMPLATE, TEMPLATES, TIERS } from "@/config/tiers";
+import type { LayoutTemplate, WaProvider } from "@/types/schema";
+
+const RESERVED_SLUGS = new Set(["www", "app", "api", "admin", "dashboard", "mail", "static", "assets", "track", "checkout"]);
+const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$/;
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+const DOMAIN_RE = /^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
+
+function validateSlug(slug: string) {
+  if (!SLUG_RE.test(slug)) return "Slug 3–40 karakter: huruf kecil, angka dan tanda hubung.";
+  if (RESERVED_SLUGS.has(slug)) return "Slug ini dipakai sistem, pilih yang lain.";
+  return null;
+}
+
+export async function createStore(input: { store_name: string; slug: string }): Promise<ActionResult<{ storeId: string }>> {
+  const user = await requireUser();
+  const storeName = input.store_name.trim();
+  const slug = input.slug.trim().toLowerCase();
+  if (storeName.length < 2) return fail("Nama toko terlalu pendek.");
+  const slugError = validateSlug(slug);
+  if (slugError) return fail(slugError);
+
+  const tier = TIERS[user.subscription_tier];
+  const owned = await getOwnedStores(user.uid);
+  if (owned.length >= tier.maxStores) {
+    return fail(`Paket ${tier.name} maksimal ${tier.maxStores} toko. Upgrade untuk menambah toko.`);
+  }
+
+  const storeRef = adminDb.collection("stores").doc();
+  const slugRef = adminDb.collection("store_slugs").doc(slug);
+  try {
+    await adminDb.runTransaction(async (tx) => {
+      if ((await tx.get(slugRef)).exists) throw new Error("SLUG_TAKEN");
+      tx.create(slugRef, { store_id: storeRef.id });
+      tx.create(storeRef, {
+        owner_uid: user.uid,
+        store_name: storeName,
+        slug,
+        custom_domain: null,
+        storefront_config: { layout_template: "template_c_hero", accent_color: "#10B981", tagline: "" },
+        is_active: true,
+        created_at: FieldValue.serverTimestamp(),
+      });
+      tx.create(storeRef.collection("private").doc("integrations"), {
+        xendit_sub_account_id: null,
+        wa_api_provider: null,
+        wa_api_token: null,
+        wa_message_template: DEFAULT_WA_TEMPLATE,
+      });
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message === "SLUG_TAKEN") return fail("Slug sudah dipakai toko lain.");
+    throw err;
+  }
+  revalidatePath("/", "layout");
+  return { ok: true, data: { storeId: storeRef.id } };
+}
+
+export interface StoreSettingsInput {
+  store_name: string;
+  slug: string;
+  is_active: boolean;
+  layout_template: LayoutTemplate;
+  accent_color: string;
+  tagline: string;
+  banner_url: string;
+  logo_url: string;
+  custom_domain: string;
+}
+
+export async function updateStoreSettings(storeId: string, input: StoreSettingsInput): Promise<ActionResult> {
+  const { user, store } = await requireStore(storeId);
+  const tier = TIERS[user.subscription_tier];
+
+  const storeName = input.store_name.trim();
+  if (storeName.length < 2) return fail("Nama toko terlalu pendek.");
+  const slug = input.slug.trim().toLowerCase();
+  const slugError = validateSlug(slug);
+  if (slugError) return fail(slugError);
+  if (!TEMPLATES.some((t) => t.id === input.layout_template)) return fail("Template tidak dikenal.");
+  if (input.layout_template !== store.storefront_config.layout_template && !tier.templates.includes(input.layout_template)) {
+    return fail(`Template ini tidak tersedia di paket ${tier.name}.`);
+  }
+  if (!HEX_RE.test(input.accent_color)) return fail("Warna aksen harus format hex, mis. #10B981.");
+  for (const url of [input.banner_url, input.logo_url]) {
+    if (url && !/^https:\/\//.test(url)) return fail("URL gambar harus diawali https://");
+  }
+
+  const domain = input.custom_domain.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "") || null;
+  if (domain !== store.custom_domain) {
+    if (domain && !tier.customDomain) return fail("Custom domain hanya untuk paket Ultimate.");
+    if (domain && !DOMAIN_RE.test(domain)) return fail("Format domain tidak valid.");
+  }
+
+  const storeRef = adminDb.collection("stores").doc(storeId);
+  try {
+    await adminDb.runTransaction(async (tx) => {
+      const newSlugRef = adminDb.collection("store_slugs").doc(slug);
+      const newDomainRef = domain ? adminDb.collection("store_domains").doc(domain) : null;
+      const slugSnap = slug !== store.slug ? await tx.get(newSlugRef) : null;
+      const domainSnap = newDomainRef && domain !== store.custom_domain ? await tx.get(newDomainRef) : null;
+      if (slugSnap?.exists) throw new Error("SLUG_TAKEN");
+      if (domainSnap?.exists) throw new Error("DOMAIN_TAKEN");
+
+      if (slug !== store.slug) {
+        tx.delete(adminDb.collection("store_slugs").doc(store.slug));
+        tx.create(newSlugRef, { store_id: storeId });
+      }
+      if (domain !== store.custom_domain) {
+        if (store.custom_domain) tx.delete(adminDb.collection("store_domains").doc(store.custom_domain));
+        if (newDomainRef) tx.create(newDomainRef, { store_id: storeId });
+      }
+      tx.update(storeRef, {
+        store_name: storeName,
+        slug,
+        custom_domain: domain,
+        is_active: input.is_active,
+        storefront_config: {
+          layout_template: input.layout_template,
+          accent_color: input.accent_color,
+          tagline: input.tagline.trim().slice(0, 160),
+          banner_url: input.banner_url.trim(),
+          logo_url: input.logo_url.trim(),
+        },
+      });
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message === "SLUG_TAKEN") return fail("Slug sudah dipakai toko lain.");
+    if (err instanceof Error && err.message === "DOMAIN_TAKEN") return fail("Domain sudah dipakai toko lain.");
+    throw err;
+  }
+  revalidatePath(`/${storeId}`, "layout");
+  return { ok: true };
+}
+
+export async function updateIntegrations(
+  storeId: string,
+  input: { wa_api_provider: WaProvider | ""; wa_api_token: string; wa_message_template: string }
+): Promise<ActionResult> {
+  await requireStore(storeId);
+  const ref = adminDb.collection("stores").doc(storeId).collection("private").doc("integrations");
+  await ref.set(
+    {
+      wa_api_provider: input.wa_api_provider || null,
+      // An empty token field means "keep the saved one" — the form never receives it back.
+      ...(input.wa_api_token.trim() ? { wa_api_token: input.wa_api_token.trim() } : {}),
+      wa_message_template: input.wa_message_template.trim() || DEFAULT_WA_TEMPLATE,
+    },
+    { merge: true }
+  );
+  revalidatePath(`/${storeId}/settings`);
+  return { ok: true };
+}

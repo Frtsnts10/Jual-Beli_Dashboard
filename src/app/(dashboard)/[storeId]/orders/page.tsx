@@ -1,39 +1,31 @@
-import React from "react";
-import { Metadata } from "next";
+import { requireStore } from "@/lib/auth";
+import { adminDb } from "@/lib/firebase/admin";
+import { getCredentialsByIds, listOrders } from "@/lib/queries";
+import { DEFAULT_WA_TEMPLATE } from "@/config/tiers";
+import { PageHeader } from "@/components/page-header";
+import { OrdersTable } from "@/features/orders/orders-table";
 
-export const metadata: Metadata = {
-  title: "Orders",
-};
+export const metadata = { title: "Pesanan" };
 
-
-import { getOrdersAction } from "@/features/orders/actions/order-actions";
-import { getInventoryAction } from "@/features/inventory/actions/inventory-actions";
-import { OrdersTable } from "@/features/orders/components/orders-table";
-import { adminDb } from "@/lib/firebase/server";
-
-export default async function TenantOrdersPage({
-  params,
-}: {
-  params: Promise<{ storeId: string }>;
-}) {
+export default async function OrdersPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
-
-  const [storeDoc, orders, inventoryItems] = await Promise.all([
-    adminDb.collection("stores").doc(storeId).get(),
-    getOrdersAction(storeId),
-    getInventoryAction(storeId),
+  const { store } = await requireStore(storeId);
+  const [orders, integrations] = await Promise.all([
+    listOrders(storeId),
+    adminDb.collection("stores").doc(storeId).collection("private").doc("integrations").get(),
   ]);
-
-  const currency = storeDoc.data()?.currency || "IDR";
+  const credentials = await getCredentialsByIds(orders.map((o) => o.credential_id).filter((id): id is string => !!id));
 
   return (
-    <div className="space-y-6 font-sans transition-colors pt-2">
-      <OrdersTable 
-        storeId={storeId} 
-        orders={orders} 
-        inventoryItems={inventoryItems} 
-        currency={currency} 
+    <>
+      <PageHeader title="Pesanan" description="Transaksi, pengiriman akun dan klaim garansi." />
+      <OrdersTable
+        storeId={storeId}
+        storeName={store.store_name}
+        orders={orders}
+        credentials={credentials}
+        waTemplate={integrations.get("wa_message_template") ?? DEFAULT_WA_TEMPLATE}
       />
-    </div>
+    </>
   );
 }
