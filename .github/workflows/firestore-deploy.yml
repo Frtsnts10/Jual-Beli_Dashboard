@@ -5,6 +5,8 @@
 # One-time setup — repository secret FIREBASE_SERVICE_ACCOUNT:
 #   1. Google Cloud Console → IAM → Service Accounts → Create (e.g. "github-firestore-deploy")
 #      with roles "Firebase Rules Admin" and "Cloud Datastore Index Admin".
+#      (The deploy uses scripts/deploy-firestore.mjs, which calls the Rules and Firestore
+#      Admin APIs directly, so no Service Usage role is needed.)
 #   2. Keys → Add key → JSON, download it.
 #   3. GitHub → Settings → Secrets and variables → Actions → New repository secret,
 #      name FIREBASE_SERVICE_ACCOUNT, paste the whole JSON. Then delete the local file.
@@ -17,6 +19,7 @@ on:
       - firestore.rules
       - firestore.indexes.json
       - firebase.json
+      - scripts/deploy-firestore.mjs
   workflow_dispatch:
 
 # Never let two deploys race each other.
@@ -51,7 +54,7 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
 
       - name: Deploy
-        run: npx --yes firebase-tools@15.36.0 deploy --only firestore --project "$PROJECT_ID" --non-interactive
+        run: node scripts/deploy-firestore.mjs
 
       - name: Remove credentials
         if: always()
