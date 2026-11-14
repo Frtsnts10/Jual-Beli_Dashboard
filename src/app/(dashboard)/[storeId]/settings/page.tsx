@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IntegrationsForm } from "@/features/settings/integrations-form";
 import { PaymentCard } from "@/features/settings/payment-card";
+import { getDomainStatus, vercelDomainsEnabled } from "@/lib/vercel-domains";
 import { StoreSettingsForm } from "@/features/settings/store-settings-form";
 import type { SubscriptionTier } from "@/types/schema";
 
@@ -18,7 +19,10 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
   const { storeId } = await params;
   const { user, store } = await requireStore(storeId);
   const tier = TIERS[user.subscription_tier];
-  const integrations = await adminDb.collection("stores").doc(storeId).collection("private").doc("integrations").get();
+  const [integrations, domainStatus] = await Promise.all([
+    adminDb.collection("stores").doc(storeId).collection("private").doc("integrations").get(),
+    store.custom_domain && vercelDomainsEnabled() ? getDomainStatus(store.custom_domain).catch(() => null) : null,
+  ]);
 
   return (
     <>
@@ -29,6 +33,8 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
             store={store}
             allowedTemplates={tier.templates}
             customDomainAllowed={tier.customDomain}
+            domainStatus={domainStatus}
+            domainAutomation={vercelDomainsEnabled()}
             rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN}
           />
           <PaymentCard storeId={storeId} status={integrations.get("xendit_account_status") ?? null} feePercent={tier.feePercent} />

@@ -6,6 +6,7 @@ import { adminDb } from "@/lib/firebase/admin";
 import { getOwnedStores, requireStore, requireUser } from "@/lib/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { DEFAULT_WA_TEMPLATE, TEMPLATES, TIERS } from "@/config/tiers";
+import { addProjectDomain, removeProjectDomain, vercelDomainsEnabled } from "@/lib/vercel-domains";
 import type { LayoutTemplate, WaProvider } from "@/types/schema";
 
 const RESERVED_SLUGS = new Set(["www", "app", "api", "admin", "dashboard", "mail", "static", "assets", "track", "checkout"]);
@@ -99,6 +100,16 @@ export async function updateStoreSettings(storeId: string, input: StoreSettingsI
     if (domain && !DOMAIN_RE.test(domain)) return fail("Format domain tidak valid.");
   }
 
+  // Attach the new domain to the storefront's Vercel project before claiming it, so a
+  // domain Vercel refuses (owned by another account, invalid TLD…) is never saved.
+  if (domain && domain !== store.custom_domain && vercelDomainsEnabled()) {
+    try {
+      await addProjectDomain(domain);
+    } catch (err) {
+      return fail(`Vercel menolak domain: ${err instanceof Error ? err.message : "unknown"}`);
+    }
+  }
+
   const storeRef = adminDb.collection("stores").doc(storeId);
   try {
     await adminDb.runTransaction(async (tx) => {
@@ -135,6 +146,9 @@ export async function updateStoreSettings(storeId: string, input: StoreSettingsI
     if (err instanceof Error && err.message === "SLUG_TAKEN") return fail("Slug sudah dipakai toko lain.");
     if (err instanceof Error && err.message === "DOMAIN_TAKEN") return fail("Domain sudah dipakai toko lain.");
     throw err;
+  }
+  if (store.custom_domain && store.custom_domain !== domain && vercelDomainsEnabled()) {
+    await removeProjectDomain(store.custom_domain).catch((err) => console.error("Vercel domain removal failed:", err));
   }
   revalidatePath(`/${storeId}`, "layout");
   return { ok: true };

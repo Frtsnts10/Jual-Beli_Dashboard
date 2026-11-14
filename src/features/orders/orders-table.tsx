@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { cn, formatDate, formatIDR } from "@/lib/utils";
 import { fillTemplate, waNumber } from "@/lib/whatsapp";
 import type { Credential, Order } from "@/types/schema";
-import { confirmPayment, markDelivered, rejectWarranty, replaceWarranty } from "./actions";
+import { confirmPayment, markDelivered, rejectWarranty, replaceWarranty, resendDelivery } from "./actions";
 
 type Filter = "all" | "action" | "claims";
 
@@ -130,6 +130,11 @@ export function OrdersTable({
                     <Badge variant={o.delivery_status === "SENT_VIA_WA" ? "success" : "secondary"}>
                       {o.delivery_status === "SENT_VIA_WA" ? "Terkirim" : "Belum"}
                     </Badge>
+                    {o.delivery_error && o.delivery_status !== "SENT_VIA_WA" && (
+                      <div className="text-destructive mt-1 max-w-40 truncate text-xs" title={o.delivery_error}>
+                        Auto-kirim gagal
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="max-w-56 whitespace-normal">
                     <Badge variant={o.warranty_status === "CLAIMED" ? "destructive" : o.warranty_status === "REPLACED" ? "secondary" : "outline"}>
@@ -162,6 +167,11 @@ export function OrdersTable({
                         {o.payment_status === "PAID" && o.credential_id && (
                           <DropdownMenuItem onSelect={() => sendViaWhatsApp(o)}>
                             <MessageCircle /> Kirim akun via WhatsApp
+                          </DropdownMenuItem>
+                        )}
+                        {o.credential_id && o.delivery_error && (
+                          <DropdownMenuItem onSelect={() => run(() => resendDelivery(storeId, o.id), "Terkirim otomatis")}>
+                            <RefreshCw /> Kirim ulang otomatis
                           </DropdownMenuItem>
                         )}
                         {o.credential_id && o.delivery_status === "PENDING" && (

@@ -23,9 +23,10 @@ shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · Xend
 | `/[storeId]/products` | Catalogue CRUD, publish toggle |
 | `/[storeId]/vault` | Credential vault — Available / Sold / Expired tabs, bulk import |
 | `/[storeId]/orders` | Orders, manual payment confirm, WhatsApp delivery, 1-click warranty replacement |
-| `/[storeId]/marketing` | Ultimate features (placeholder, phase 3) |
+| `/[storeId]/marketing` | Ultimate: WhatsApp broadcast, affiliate report + link builder, flash sale |
 | `/[storeId]/billing` | Plan upgrade/renewal (monthly/yearly) paid via Xendit invoice, payment history |
 | `/[storeId]/settings` | Store profile, template (tier-gated), accent colour, custom domain, Xendit connection, WA integration |
+| `/api/cron/renewal-reminders` | Daily (vercel.json): H-3 renewal reminders via n8n |
 | `/api/webhooks/xendit` | Invoice callback: `ORD-…` → order PAID + vault credential; `SUB-…` → activate/extend plan |
 
 ## Data model
@@ -73,7 +74,21 @@ Deploy rules and indexes from the repo (don't edit them in the console):
 npx firebase-tools deploy --only firestore --project web-store-4cf23
 ```
 
-## Roadmap
+## Automation (n8n)
 
-- **Phase 3** — n8n + WhatsApp auto-delivery, H-3 renewal reminders, broadcast CRM,
-  flash sale / bundling / affiliate reports, custom-domain automation, Discord/Telegram bots.
+Pro & Ultimate stores with a WhatsApp provider configured get the account delivered
+automatically after payment, after a warranty replacement and after a restock; buyers get
+a reminder 3 days before access ends. Ultimate stores can broadcast promos. All messages
+go through one signed n8n webhook — see `docs/n8n.md`. Failures are shown on the order
+with a "Kirim ulang otomatis" action.
+
+## Custom domains
+
+With `VERCEL_TOKEN` + `VERCEL_STOREFRONT_PROJECT_ID`, saving an Ultimate custom domain
+adds it to the storefront's Vercel project and Settings shows the DNS record to create and
+the verification status. Without them, add the domain in Vercel by hand.
+
+## Not built yet
+
+Bundling, multi-user store admins and Discord/Telegram checkout bots (deep links
+`/checkout?item=<id>` already work for bots).
