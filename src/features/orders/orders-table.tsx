@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn, formatDate, formatIDR } from "@/lib/utils";
-import { fillTemplate, waNumber } from "@/lib/whatsapp";
+import { deliveryMessage, waNumber } from "@/lib/whatsapp";
 import type { Credential, Order } from "@/types/schema";
 import { confirmPayment, markDelivered, rejectWarranty, replaceWarranty, resendDelivery } from "./actions";
 
@@ -22,8 +22,10 @@ export function OrdersTable({
   storeName,
   orders,
   credentials,
+  productTitles,
   waTemplate,
 }: {
+  productTitles: Record<string, string>;
   storeId: string;
   storeName: string;
   orders: Order[];
@@ -47,17 +49,18 @@ export function OrdersTable({
     });
 
   function sendViaWhatsApp(o: Order) {
-    const cred = o.credential_id ? credentials[o.credential_id] : undefined;
-    if (!cred) return toast.error("Akun belum dialokasikan.");
-    const text = fillTemplate(waTemplate, {
-      product: o.product_title,
-      store: storeName,
-      email: cred.account_email,
-      password: cred.account_password,
-      pin: cred.profile_pin || "-",
-      expiry: formatDate(o.access_expires_at),
-      order_id: o.id,
-    });
+    const creds = o.credential_ids.map((id) => credentials[id]).filter(Boolean);
+    if (creds.length === 0) return toast.error("Akun belum dialokasikan.");
+    const text = deliveryMessage(
+      waTemplate,
+      { store: storeName, order_id: o.id, expiry: formatDate(o.access_expires_at) },
+      creds.map((c) => ({
+        product: creds.length > 1 ? (productTitles[c.product_id] ?? o.product_title) : o.product_title,
+        email: c.account_email,
+        password: c.account_password,
+        pin: c.profile_pin,
+      }))
+    );
     window.open(`https://wa.me/${waNumber(o.customer_contact.phone)}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
     run(() => markDelivered(storeId, o.id), "Ditandai terkirim");
   }

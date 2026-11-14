@@ -18,8 +18,8 @@ const MAX_RECIPIENTS = 1000;
  * One broadcast per hour per store to protect the seller's WhatsApp number from bans.
  */
 export async function sendBroadcast(storeId: string, input: { message: string; productId: string | null }): Promise<ActionResult<{ recipients: number }>> {
-  const { user, store } = await requireStore(storeId);
-  if (!TIERS[user.subscription_tier].marketing) return fail("Broadcast hanya untuk paket Ultimate.");
+  const { store, tier } = await requireStore(storeId);
+  if (!TIERS[tier].marketing) return fail("Broadcast hanya untuk paket Ultimate.");
   const message = input.message.trim();
   if (message.length < 10) return fail("Pesan terlalu pendek.");
   if (message.length > 1000) return fail("Pesan maksimal 1000 karakter.");

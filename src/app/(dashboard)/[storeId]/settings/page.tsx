@@ -13,19 +13,26 @@ import { inspectDomain, routingRecords, vercelDomainsEnabled } from "@/lib/verce
 import { storefrontUrl } from "@/lib/store-url";
 import { DomainCard } from "@/features/domains/domain-card";
 import { StoreSettingsForm } from "@/features/settings/store-settings-form";
+import { TeamCard } from "@/features/team/team-card";
+import { BotsCard } from "@/features/bots/bots-card";
+import { headers } from "next/headers";
 import type { SubscriptionTier } from "@/types/schema";
 
 export const metadata = { title: "Pengaturan" };
 
 export default async function SettingsPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
-  const { user, store } = await requireStore(storeId);
-  const tier = TIERS[user.subscription_tier];
-  const [integrations, vercelState] = await Promise.all([
+  const { user, store, role, tier: plan } = await requireStore(storeId);
+  const tier = TIERS[plan];
+  const isOwner = role === "owner";
+  const storeRef = adminDb.collection("stores").doc(storeId);
+  const [integrations, vercelState, members, invites] = await Promise.all([
     adminDb.collection("stores").doc(storeId).collection("private").doc("integrations").get(),
     store.custom_domain && vercelDomainsEnabled() && store.custom_domain_status?.state !== "active"
       ? inspectDomain(store.custom_domain).catch(() => null)
       : null,
+    isOwner ? storeRef.collection("members").get() : null,
+    isOwner ? adminDb.collection("store_invites").where("store_id", "==", storeId).get() : null,
   ]);
   // Routing records, plus any TXT ownership challenge Vercel is asking for.
   const dnsRecords = store.custom_domain ? [...(vercelState?.verification ?? []), ...routingRecords(store.custom_domain)] : [];
@@ -35,6 +42,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
       <PageHeader title="Pengaturan" description="Profil toko, tampilan etalase dan integrasi." />
       <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
         <div className="grid gap-6">
+          {isOwner && (
           <DomainCard
             storeId={storeId}
             defaultUrl={storefrontUrl({ slug: store.slug, custom_domain: null })}
@@ -44,8 +52,9 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
             records={dnsRecords}
             automated={vercelDomainsEnabled()}
           />
+          )}
           <StoreSettingsForm store={store} allowedTemplates={tier.templates} rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN} />
-          <PaymentCard storeId={storeId} status={integrations.get("xendit_account_status") ?? null} feePercent={tier.feePercent} />
+          {isOwner && <PaymentCard storeId={storeId} status={integrations.get("xendit_account_status") ?? null} feePercent={tier.feePercent} />}
           <IntegrationsForm
             storeId={storeId}
             provider={integrations.get("wa_api_provider") ?? null}
@@ -53,7 +62,24 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
             template={integrations.get("wa_message_template") ?? DEFAULT_WA_TEMPLATE}
             autoFulfillment={tier.autoFulfillment}
           />
+          <BotsCard
+            storeId={storeId}
+            allowed={tier.marketing}
+            telegramUsername={integrations.get("telegram_bot_username") ?? null}
+            discordConnected={!!integrations.get("discord_public_key")}
+            discordEndpoint={`${process.env.DASHBOARD_PUBLIC_URL ?? `https://${(await headers()).get("host")}`}/api/bots/discord/${storeId}`}
+          />
+          {isOwner && (
+            <TeamCard
+              storeId={storeId}
+              ownerEmail={user.email}
+              allowed={tier.multiAdmin}
+              members={members?.docs.map((m) => ({ uid: m.id, email: m.get("email") as string })) ?? []}
+              invites={invites?.docs.map((i) => ({ id: i.id, email: i.get("email") as string })) ?? []}
+            />
+          )}
         </div>
+        {isOwner ? (
         <Card className="h-fit">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -78,6 +104,16 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
             </Button>
           </CardContent>
         </Card>
+        ) : (
+          <Card className="h-fit">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Anda admin <Badge variant="secondary">{tier.name}</Badge>
+              </CardTitle>
+              <CardDescription>Langganan, pencairan dana, domain dan tim dikelola pemilik toko.</CardDescription>
+            </CardHeader>
+          </Card>
+        )}
       </div>
     </>
   );

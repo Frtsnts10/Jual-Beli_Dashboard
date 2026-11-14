@@ -20,8 +20,8 @@ function normalise(raw: string) {
  * "Cek sekarang" step (checkDomain) confirms every link of that chain.
  */
 export async function connectDomain(storeId: string, raw: string): Promise<ActionResult> {
-  const { user, store } = await requireStore(storeId);
-  if (!TIERS[user.subscription_tier].customDomain) return fail("Domain sendiri adalah fitur paket Ultimate.");
+  const { store, tier } = await requireStore(storeId, { ownerOnly: true });
+  if (!TIERS[tier].customDomain) return fail("Domain sendiri adalah fitur paket Ultimate.");
   if (store.custom_domain) return fail("Hapus domain yang sekarang dulu sebelum menambah yang baru.");
 
   const domain = normalise(raw);
@@ -59,7 +59,7 @@ export async function connectDomain(storeId: string, raw: string): Promise<Actio
 }
 
 export async function disconnectDomain(storeId: string): Promise<ActionResult> {
-  const { store } = await requireStore(storeId);
+  const { store } = await requireStore(storeId, { ownerOnly: true });
   if (!store.custom_domain) return { ok: true };
   if (vercelDomainsEnabled()) {
     await removeDomain(store.custom_domain).catch((err) => console.error("Vercel domain removal failed:", err));

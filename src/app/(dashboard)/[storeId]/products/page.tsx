@@ -12,14 +12,17 @@ export const metadata = { title: "Produk" };
 
 export default async function ProductsPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
-  const { user } = await requireStore(storeId);
+  const { tier } = await requireStore(storeId);
   const [products, stock] = await Promise.all([listProducts(storeId), stockByProduct(storeId)]);
 
   // The storefront shows products.stock_available; resync it if it ever drifted from the vault.
-  const drifted = products.filter((p) => p.stock_available !== (stock[p.id] ?? 0));
+  // Bundles have no vault stock of their own: they count as their scarcest component.
+  const expected = (p: (typeof products)[number]) =>
+    p.bundle_items ? Math.min(...p.bundle_items.map((id) => stock[id] ?? 0)) : (stock[p.id] ?? 0);
+  const drifted = products.filter((p) => p.stock_available !== expected(p));
   if (drifted.length) {
     const batch = adminDb.batch();
-    for (const p of drifted) batch.update(adminDb.collection("products").doc(p.id), { stock_available: stock[p.id] ?? 0 });
+    for (const p of drifted) batch.update(adminDb.collection("products").doc(p.id), { stock_available: expected(p) });
     await batch.commit();
   }
 
@@ -28,7 +31,8 @@ export default async function ProductsPage({ params }: { params: Promise<{ store
       <PageHeader title="Produk" description="Katalog yang tampil di etalase toko.">
         <ProductDialog
           storeId={storeId}
-          flashSalePricing={TIERS[user.subscription_tier].marketing}
+          flashSalePricing={TIERS[tier].marketing}
+          bundleCandidates={products.filter((p) => !p.bundle_items).map((p) => ({ id: p.id, title: p.title }))}
           trigger={
             <Button>
               <Plus /> Produk baru
@@ -36,7 +40,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ store
           }
         />
       </PageHeader>
-      <ProductsTable storeId={storeId} products={products} stock={stock} flashSalePricing={TIERS[user.subscription_tier].marketing} />
+      <ProductsTable storeId={storeId} products={products} stock={stock} flashSalePricing={TIERS[tier].marketing} />
     </>
   );
 }

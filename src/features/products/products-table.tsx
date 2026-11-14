@@ -14,6 +14,8 @@ import { effectivePrice, type Product } from "@/types/schema";
 import { deleteProduct, setProductPublished } from "./actions";
 import { ProductDialog } from "./product-dialog";
 
+const bundleStock = (items: string[], stock: Record<string, number>) => Math.min(...items.map((id) => stock[id] ?? 0));
+
 export function ProductsTable({
   storeId,
   products,
@@ -49,6 +51,7 @@ export function ProductsTable({
             <TableRow key={p.id}>
               <TableCell className="font-medium">
                 {p.title} {p.is_flash_sale && <Badge variant="warning">Flash sale</Badge>}
+                {p.bundle_items && <Badge variant="secondary">Bundle · {p.bundle_items.length} produk</Badge>}
               </TableCell>
               <TableCell>{p.platform_type}</TableCell>
               <TableCell className="text-right">
@@ -62,9 +65,15 @@ export function ProductsTable({
                 )}
               </TableCell>
               <TableCell className="text-right">
-                <Link href={`/${storeId}/vault?product=${p.id}`} className={stock[p.id] ? "" : "text-destructive"}>
-                  {stock[p.id] ?? 0}
-                </Link>
+                {p.bundle_items ? (
+                  <span className={bundleStock(p.bundle_items, stock) ? "" : "text-destructive"} title="Stok terkecil dari isi bundle">
+                    {bundleStock(p.bundle_items, stock)}
+                  </span>
+                ) : (
+                  <Link href={`/${storeId}/vault?product=${p.id}`} className={stock[p.id] ? "" : "text-destructive"}>
+                    {stock[p.id] ?? 0}
+                  </Link>
+                )}
               </TableCell>
               <TableCell>
                 <Switch
@@ -90,6 +99,7 @@ export function ProductsTable({
                       storeId={storeId}
                       product={p}
                       flashSalePricing={flashSalePricing}
+                      bundleCandidates={products.filter((x) => !x.bundle_items).map((x) => ({ id: x.id, title: x.title }))}
                       trigger={
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                           <Pencil /> Edit

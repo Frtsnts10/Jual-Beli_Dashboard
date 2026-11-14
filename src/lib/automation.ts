@@ -2,7 +2,7 @@ import "server-only";
 import { createHmac } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { fillTemplate, waNumber } from "@/lib/whatsapp";
+import { deliveryMessage, fillTemplate, waNumber } from "@/lib/whatsapp";
 import { formatDate } from "@/lib/utils";
 import { DEFAULT_WA_TEMPLATE, TIERS } from "@/config/tiers";
 import { effectiveTier } from "@/lib/firestore-mappers";
@@ -66,22 +66,24 @@ export async function postToN8n(payload: Record<string, unknown>) {
 export async function deliverOrder(orderId: string, reason: "paid" | "warranty_replacement" | "restock"): Promise<"sent" | "skipped" | "failed"> {
   const orderRef = adminDb.collection("orders").doc(orderId);
   const order = await orderRef.get();
-  const credentialId = order.get("credential_id") as string | null;
-  if (!order.exists || order.get("payment_status") !== "PAID" || !credentialId) return "skipped";
+  const credentialIds = ((order.get("credential_ids") as string[] | undefined) ?? [order.get("credential_id")]).filter(Boolean) as string[];
+  if (!order.exists || order.get("payment_status") !== "PAID" || credentialIds.length === 0) return "skipped";
 
   const ctx = await storeContext(order.get("store_id"));
   if (!TIERS[ctx.tier].autoFulfillment || !ctx.wa.provider || !ctx.wa.token) return "skipped";
 
-  const credential = await adminDb.collection("credentials_vault").doc(credentialId).get();
-  const message = fillTemplate(ctx.wa.template, {
-    product: order.get("product_title"),
-    store: ctx.storeName,
-    email: credential.get("account_email"),
-    password: credential.get("account_password"),
-    pin: credential.get("profile_pin") || "-",
-    expiry: formatDate(order.get("access_expires_at")?.toDate?.().toISOString()),
-    order_id: orderId,
-  });
+  const credentials = await adminDb.getAll(...credentialIds.map((id) => adminDb.collection("credentials_vault").doc(id)));
+  const components = await adminDb.getAll(...credentials.map((c) => adminDb.collection("products").doc(c.get("product_id"))));
+  const message = deliveryMessage(
+    ctx.wa.template,
+    { store: ctx.storeName, order_id: orderId, expiry: formatDate(order.get("access_expires_at")?.toDate?.().toISOString()) },
+    credentials.map((c, i) => ({
+      product: credentials.length > 1 ? components[i].get("title") : order.get("product_title"),
+      email: c.get("account_email"),
+      password: c.get("account_password"),
+      pin: c.get("profile_pin") ?? "",
+    }))
+  );
 
   try {
     await postToN8n({

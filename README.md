@@ -68,7 +68,11 @@ cp .env.example .env.local   # or: vercel env pull .env.local
 npm run dev
 ```
 
-Deploy rules and indexes from the repo (don't edit them in the console):
+Rules and indexes live in this repo (don't edit them in the console). The
+**Deploy Firestore rules & indexes** GitHub Action deploys them whenever
+`firestore.rules` / `firestore.indexes.json` change on `main` (or on demand from the
+Actions tab); it needs the repository secret `FIREBASE_SERVICE_ACCOUNT` — setup steps are
+at the top of `.github/workflows/firestore-deploy.yml`. Manual equivalent:
 
 ```bash
 npx firebase-tools deploy --only firestore --project web-store-4cf23
@@ -99,7 +103,31 @@ Settings → **Alamat toko** walks the seller through it:
 Without the Vercel env vars, the platform admin adds each domain in Vercel by hand; the
 live check still runs.
 
-## Not built yet
+## Team (Ultimate)
 
-Bundling, multi-user store admins and Discord/Telegram checkout bots (deep links
-`/checkout?item=<id>` already work for bots).
+Settings → **Tim admin**: the owner invites admins by email. A verified existing account
+gets access at once; otherwise the invitation (`store_invites`) is accepted the first time
+that address signs in with a verified email. Admins (`stores.admin_uids`) manage products,
+vault, orders, marketing, bots and storefront settings; billing, payouts (Xendit),
+domains and the team stay owner-only. Plan limits always follow the **owner's** plan.
+
+## Bundles (Ultimate)
+
+A product can be a bundle of other products (`products.bundle_items`). A sale allocates
+one credential from every component in the same transaction; delivery sends all accounts
+in one WhatsApp message; a warranty replacement swaps all of them. Bundle stock = its
+scarcest component.
+
+## Community bots (Ultimate)
+
+Settings → **Bot komunitas**:
+- **Telegram** — paste a @BotFather token; the dashboard validates it and registers the
+  webhook `/api/bots/telegram/<storeId>` with a random secret. `/katalog` replies with
+  products and checkout buttons, `/lacak` with the tracking page.
+- **Discord** — paste Application ID, Public Key and Bot Token (used once to register
+  `/katalog` and `/lacak`, not stored), then set the Interactions Endpoint URL shown in the
+  card. Requests are verified with Ed25519.
+
+Checkout links carry `?ref=telegram` / `?ref=discord`, so bot sales appear in the
+affiliate report. Set `DASHBOARD_PUBLIC_URL` if the dashboard sits behind a proxy that
+rewrites the Host header.

@@ -26,7 +26,7 @@ export default async function VaultPage({
   const { storeId } = await params;
   const { status: rawStatus, product } = await searchParams;
   const status = TABS.find((t) => t.status === rawStatus)?.status ?? "AVAILABLE";
-  const { user } = await requireStore(storeId);
+  const { tier: plan } = await requireStore(storeId);
 
   const [products, items, ...counts] = await Promise.all([
     listProducts(storeId),
@@ -35,7 +35,7 @@ export default async function VaultPage({
   ]);
   const productTitles = Object.fromEntries(products.map((p) => [p.id, p.title]));
   const filtered = product ? items.filter((c) => c.product_id === product) : items;
-  const tier = TIERS[user.subscription_tier];
+  const tier = TIERS[plan];
 
   return (
     <>
@@ -47,7 +47,11 @@ export default async function VaultPage({
             : "Gudang akun premium yang siap dikirim ke pembeli."
         }
       >
-        <AddStockDialog storeId={storeId} products={products.map((p) => ({ id: p.id, title: p.title }))} defaultProductId={product} />
+        <AddStockDialog
+          storeId={storeId}
+          products={products.filter((p) => !p.bundle_items).map((p) => ({ id: p.id, title: p.title }))}
+          defaultProductId={product}
+        />
       </PageHeader>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">

@@ -1,6 +1,6 @@
 import { requireStore } from "@/lib/auth";
 import { adminDb } from "@/lib/firebase/admin";
-import { getCredentialsByIds, listOrders } from "@/lib/queries";
+import { getCredentialsByIds, listOrders, listProducts } from "@/lib/queries";
 import { DEFAULT_WA_TEMPLATE } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { OrdersTable } from "@/features/orders/orders-table";
@@ -14,7 +14,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ storeId
     listOrders(storeId),
     adminDb.collection("stores").doc(storeId).collection("private").doc("integrations").get(),
   ]);
-  const credentials = await getCredentialsByIds(orders.map((o) => o.credential_id).filter((id): id is string => !!id));
+  const [credentials, products] = await Promise.all([getCredentialsByIds(orders.flatMap((o) => o.credential_ids)), listProducts(storeId)]);
 
   return (
     <>
@@ -24,6 +24,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ storeId
         storeName={store.store_name}
         orders={orders}
         credentials={credentials}
+        productTitles={Object.fromEntries(products.map((p) => [p.id, p.title]))}
         waTemplate={integrations.get("wa_message_template") ?? DEFAULT_WA_TEMPLATE}
       />
     </>

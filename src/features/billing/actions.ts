@@ -16,7 +16,7 @@ export async function startSubscription(
   tier: Exclude<SubscriptionTier, "starter">,
   period: BillingPeriod
 ): Promise<ActionResult<{ url: string }>> {
-  const { user } = await requireStore(storeId);
+  const { user } = await requireStore(storeId, { ownerOnly: true });
   if (!(tier === "pro" || tier === "ultimate")) return fail("Paket tidak dikenal.");
   if (!(period === "monthly" || period === "yearly")) return fail("Periode tidak dikenal.");
   if (!process.env.XENDIT_SECRET_KEY) return fail("Pembayaran langganan belum dikonfigurasi (XENDIT_SECRET_KEY).");

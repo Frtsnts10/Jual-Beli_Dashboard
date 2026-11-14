@@ -14,7 +14,7 @@ const integrationsRef = (storeId: string) => adminDb.collection("stores").doc(st
  * into it and the platform fee is split to the master account.
  */
 export async function connectXendit(storeId: string): Promise<ActionResult> {
-  const { user, store } = await requireStore(storeId);
+  const { user, store } = await requireStore(storeId, { ownerOnly: true });
   if (!process.env.XENDIT_SECRET_KEY) return fail("Integrasi Xendit platform belum dikonfigurasi.");
 
   const existing = await integrationsRef(storeId).get();
@@ -38,7 +38,7 @@ export async function connectXendit(storeId: string): Promise<ActionResult> {
 }
 
 export async function refreshXenditStatus(storeId: string): Promise<ActionResult> {
-  await requireStore(storeId);
+  await requireStore(storeId, { ownerOnly: true });
   const id = (await integrationsRef(storeId).get()).get("xendit_sub_account_id");
   if (!id) return fail("Toko belum terhubung ke Xendit.");
   try {

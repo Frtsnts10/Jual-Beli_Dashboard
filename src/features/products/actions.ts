@@ -16,6 +16,8 @@ export interface ProductInput {
   price: number;
   duration_days: number;
   is_flash_sale: boolean;
+  /** Ultimate only: component product ids for a bundle, or null for a normal product. */
+  bundle_items: string[] | null;
   /** Ultimate only. ISO timestamp for the end of the sale; both null for a plain label. */
   flash_sale_price: number | null;
   flash_sale_ends_at: string | null;
@@ -46,6 +48,7 @@ function clean(input: ProductInput) {
     platform_type: input.platform_type,
     price: input.price,
     duration_days: input.duration_days,
+    bundle_items: input.bundle_items?.length ? input.bundle_items : null,
     is_flash_sale: input.is_flash_sale,
     flash_sale_price: input.is_flash_sale ? input.flash_sale_price : null,
     flash_sale_ends_at:
@@ -57,11 +60,25 @@ function clean(input: ProductInput) {
 }
 
 export async function saveProduct(storeId: string, productId: string | null, input: ProductInput): Promise<ActionResult> {
-  const { user } = await requireStore(storeId);
+  const { tier } = await requireStore(storeId);
   const error = validate(input);
   if (error) return fail(error);
-  if (input.flash_sale_price != null && !TIERS[user.subscription_tier].marketing) {
+  if (input.flash_sale_price != null && !TIERS[tier].marketing) {
     return fail("Harga & timer flash sale adalah fitur paket Ultimate.");
+  }
+  if (input.bundle_items?.length) {
+    if (!TIERS[tier].marketing) return fail("Bundling adalah fitur paket Ultimate.");
+    const items = [...new Set(input.bundle_items)];
+    if (items.length < 2) return fail("Bundle butuh minimal 2 produk.");
+    if (productId && items.includes(productId)) return fail("Bundle tidak bisa berisi dirinya sendiri.");
+    const parts = await adminDb.getAll(...items.map((id) => adminDb.collection("products").doc(id)));
+    if (parts.some((p) => !p.exists || p.get("store_id") !== storeId)) return fail("Isi bundle harus produk dari toko ini.");
+    if (parts.some((p) => (p.get("bundle_items") as string[] | null)?.length)) return fail("Bundle tidak bisa berisi bundle lain.");
+    if (productId) {
+      const usedIn = await adminDb.collection("products").where("bundle_items", "array-contains", productId).limit(1).get();
+      if (!usedIn.empty) return fail("Produk ini sudah jadi isi bundle lain, jadi tidak bisa dijadikan bundle.");
+    }
+    input = { ...input, bundle_items: items };
   }
 
   if (productId) {
@@ -99,10 +116,12 @@ export async function deleteProduct(storeId: string, productId: string): Promise
   if (!snap.exists || snap.get("store_id") !== storeId) return fail("Produk tidak ditemukan.");
 
   // Orders keep a product_id reference, so a product with sales history is only unpublished.
-  const [vault, orders] = await Promise.all([
+  const [vault, orders, bundles] = await Promise.all([
     adminDb.collection("credentials_vault").where("product_id", "==", productId).limit(1).get(),
     adminDb.collection("orders").where("product_id", "==", productId).limit(1).get(),
+    adminDb.collection("products").where("bundle_items", "array-contains", productId).limit(1).get(),
   ]);
+  if (!bundles.empty) return fail("Produk ini dipakai di bundle. Keluarkan dari bundle dulu.");
   if (!vault.empty || !orders.empty) {
     return fail("Produk punya stok atau riwayat pesanan. Sembunyikan (unpublish) saja.");
   }
