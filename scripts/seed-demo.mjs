@@ -13,6 +13,8 @@
 //
 //   npm run seed:demo
 //
+// or, without a computer, from GitHub: Actions → "Seed demo account" → Run workflow.
+//
 // Safe to re-run: every run first deletes the previous demo data (everything belonging to
 // store id "demo-dionycte"), then writes it fresh. It never touches other stores.
 
@@ -367,7 +369,7 @@ console.log(`
 ✔ Demo ready  (removed old: ${wiped.join(", ")})
 
   Login        ${EMAIL}
-  Password     ${password}
+  Password     ${process.env.DEMO_PASSWORD ? "(the DEMO_PASSWORD you set)" : password}
   Plan         Ultimate (1 year)
 
   Store        Dionycte — slug "${SLUG}", domain ${DOMAIN}, store id ${STORE_ID}
