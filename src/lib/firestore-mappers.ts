@@ -43,6 +43,9 @@ export function mapStore(snap: Snap): Store {
     store_name: d.store_name ?? "",
     slug: d.slug ?? "",
     custom_domain: d.custom_domain ?? null,
+    custom_domain_status: d.custom_domain_status
+      ? { ...d.custom_domain_status, checked_at: toISO(d.custom_domain_status.checked_at) }
+      : null,
     storefront_config: {
       layout_template: d.storefront_config?.layout_template ?? "template_c_hero",
       accent_color: d.storefront_config?.accent_color ?? "#10B981",
@@ -67,6 +70,8 @@ export function mapProduct(snap: Snap): Product {
     price: d.price ?? 0,
     duration_days: d.duration_days ?? 30,
     is_flash_sale: d.is_flash_sale ?? false,
+    flash_sale_price: d.flash_sale_price ?? null,
+    flash_sale_ends_at: toISO(d.flash_sale_ends_at),
     is_published: d.is_published ?? false,
     stock_available: d.stock_available ?? 0,
     created_at: toISO(d.created_at) ?? "",
@@ -105,6 +110,7 @@ export function mapOrder(snap: Snap): Order {
     xendit_invoice_id: d.xendit_invoice_id ?? null,
     xendit_invoice_url: d.xendit_invoice_url ?? null,
     delivery_status: d.delivery_status ?? "PENDING",
+    delivery_error: d.delivery_error ?? null,
     warranty_status: d.warranty_status ?? "VALID",
     warranty_claim: d.warranty_claim
       ? { reason: d.warranty_claim.reason ?? "", claimed_at: toISO(d.warranty_claim.claimed_at) ?? "" }

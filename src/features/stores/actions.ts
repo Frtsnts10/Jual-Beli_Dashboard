@@ -11,7 +11,6 @@ import type { LayoutTemplate, WaProvider } from "@/types/schema";
 const RESERVED_SLUGS = new Set(["www", "app", "api", "admin", "dashboard", "mail", "static", "assets", "track", "checkout"]);
 const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$/;
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
-const DOMAIN_RE = /^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
 
 function validateSlug(slug: string) {
   if (!SLUG_RE.test(slug)) return "Slug 3–40 karakter: huruf kecil, angka dan tanda hubung.";
@@ -72,7 +71,6 @@ export interface StoreSettingsInput {
   tagline: string;
   banner_url: string;
   logo_url: string;
-  custom_domain: string;
 }
 
 export async function updateStoreSettings(storeId: string, input: StoreSettingsInput): Promise<ActionResult> {
@@ -93,34 +91,20 @@ export async function updateStoreSettings(storeId: string, input: StoreSettingsI
     if (url && !/^https:\/\//.test(url)) return fail("URL gambar harus diawali https://");
   }
 
-  const domain = input.custom_domain.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "") || null;
-  if (domain !== store.custom_domain) {
-    if (domain && !tier.customDomain) return fail("Custom domain hanya untuk paket Ultimate.");
-    if (domain && !DOMAIN_RE.test(domain)) return fail("Format domain tidak valid.");
-  }
-
   const storeRef = adminDb.collection("stores").doc(storeId);
   try {
     await adminDb.runTransaction(async (tx) => {
       const newSlugRef = adminDb.collection("store_slugs").doc(slug);
-      const newDomainRef = domain ? adminDb.collection("store_domains").doc(domain) : null;
       const slugSnap = slug !== store.slug ? await tx.get(newSlugRef) : null;
-      const domainSnap = newDomainRef && domain !== store.custom_domain ? await tx.get(newDomainRef) : null;
       if (slugSnap?.exists) throw new Error("SLUG_TAKEN");
-      if (domainSnap?.exists) throw new Error("DOMAIN_TAKEN");
 
       if (slug !== store.slug) {
         tx.delete(adminDb.collection("store_slugs").doc(store.slug));
         tx.create(newSlugRef, { store_id: storeId });
       }
-      if (domain !== store.custom_domain) {
-        if (store.custom_domain) tx.delete(adminDb.collection("store_domains").doc(store.custom_domain));
-        if (newDomainRef) tx.create(newDomainRef, { store_id: storeId });
-      }
       tx.update(storeRef, {
         store_name: storeName,
         slug,
-        custom_domain: domain,
         is_active: input.is_active,
         storefront_config: {
           layout_template: input.layout_template,
@@ -133,7 +117,6 @@ export async function updateStoreSettings(storeId: string, input: StoreSettingsI
     });
   } catch (err) {
     if (err instanceof Error && err.message === "SLUG_TAKEN") return fail("Slug sudah dipakai toko lain.");
-    if (err instanceof Error && err.message === "DOMAIN_TAKEN") return fail("Domain sudah dipakai toko lain.");
     throw err;
   }
   revalidatePath(`/${storeId}`, "layout");

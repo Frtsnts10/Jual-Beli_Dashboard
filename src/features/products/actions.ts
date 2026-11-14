@@ -1,11 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { FieldValue } from "firebase-admin/firestore";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { PLATFORM_TYPES } from "@/config/tiers";
+import { PLATFORM_TYPES, TIERS } from "@/config/tiers";
 import type { PlatformType } from "@/types/schema";
 
 export interface ProductInput {
@@ -16,6 +16,9 @@ export interface ProductInput {
   price: number;
   duration_days: number;
   is_flash_sale: boolean;
+  /** Ultimate only. ISO timestamp for the end of the sale; both null for a plain label. */
+  flash_sale_price: number | null;
+  flash_sale_ends_at: string | null;
   is_published: boolean;
 }
 
@@ -27,6 +30,11 @@ function validate(input: ProductInput): string | null {
     return "Durasi 1–3650 hari.";
   }
   if (input.image_url && !/^https:\/\//.test(input.image_url)) return "URL gambar harus diawali https://";
+  if (input.flash_sale_price != null) {
+    if (!Number.isInteger(input.flash_sale_price) || input.flash_sale_price < 1000) return "Harga flash sale minimal Rp 1.000.";
+    if (input.flash_sale_price >= input.price) return "Harga flash sale harus lebih murah dari harga normal.";
+    if (!input.flash_sale_ends_at || Number.isNaN(Date.parse(input.flash_sale_ends_at))) return "Isi waktu berakhir flash sale.";
+  }
   return null;
 }
 
@@ -39,14 +47,22 @@ function clean(input: ProductInput) {
     price: input.price,
     duration_days: input.duration_days,
     is_flash_sale: input.is_flash_sale,
+    flash_sale_price: input.is_flash_sale ? input.flash_sale_price : null,
+    flash_sale_ends_at:
+      input.is_flash_sale && input.flash_sale_price != null && input.flash_sale_ends_at
+        ? Timestamp.fromDate(new Date(input.flash_sale_ends_at))
+        : null,
     is_published: input.is_published,
   };
 }
 
 export async function saveProduct(storeId: string, productId: string | null, input: ProductInput): Promise<ActionResult> {
-  await requireStore(storeId);
+  const { user } = await requireStore(storeId);
   const error = validate(input);
   if (error) return fail(error);
+  if (input.flash_sale_price != null && !TIERS[user.subscription_tier].marketing) {
+    return fail("Harga & timer flash sale adalah fitur paket Ultimate.");
+  }
 
   if (productId) {
     const ref = adminDb.collection("products").doc(productId);

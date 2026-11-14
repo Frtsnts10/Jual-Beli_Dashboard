@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { requireStore } from "@/lib/auth";
 import { adminDb } from "@/lib/firebase/admin";
 import { listProducts, stockByProduct } from "@/lib/queries";
+import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { ProductDialog } from "@/features/products/product-dialog";
@@ -11,7 +12,7 @@ export const metadata = { title: "Produk" };
 
 export default async function ProductsPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
-  await requireStore(storeId);
+  const { user } = await requireStore(storeId);
   const [products, stock] = await Promise.all([listProducts(storeId), stockByProduct(storeId)]);
 
   // The storefront shows products.stock_available; resync it if it ever drifted from the vault.
@@ -27,6 +28,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ store
       <PageHeader title="Produk" description="Katalog yang tampil di etalase toko.">
         <ProductDialog
           storeId={storeId}
+          flashSalePricing={TIERS[user.subscription_tier].marketing}
           trigger={
             <Button>
               <Plus /> Produk baru
@@ -34,7 +36,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ store
           }
         />
       </PageHeader>
-      <ProductsTable storeId={storeId} products={products} stock={stock} />
+      <ProductsTable storeId={storeId} products={products} stock={stock} flashSalePricing={TIERS[user.subscription_tier].marketing} />
     </>
   );
 }

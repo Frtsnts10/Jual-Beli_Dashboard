@@ -10,11 +10,21 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatIDR } from "@/lib/utils";
-import type { Product } from "@/types/schema";
+import { effectivePrice, type Product } from "@/types/schema";
 import { deleteProduct, setProductPublished } from "./actions";
 import { ProductDialog } from "./product-dialog";
 
-export function ProductsTable({ storeId, products, stock }: { storeId: string; products: Product[]; stock: Record<string, number> }) {
+export function ProductsTable({
+  storeId,
+  products,
+  stock,
+  flashSalePricing,
+}: {
+  storeId: string;
+  products: Product[];
+  stock: Record<string, number>;
+  flashSalePricing: boolean;
+}) {
   const [pending, start] = useTransition();
 
   if (products.length === 0) {
@@ -41,7 +51,16 @@ export function ProductsTable({ storeId, products, stock }: { storeId: string; p
                 {p.title} {p.is_flash_sale && <Badge variant="warning">Flash sale</Badge>}
               </TableCell>
               <TableCell>{p.platform_type}</TableCell>
-              <TableCell className="text-right">{formatIDR(p.price)}</TableCell>
+              <TableCell className="text-right">
+                {effectivePrice(p).original ? (
+                  <>
+                    <span className="text-muted-foreground mr-1 text-xs line-through">{formatIDR(p.price)}</span>
+                    {formatIDR(effectivePrice(p).price)}
+                  </>
+                ) : (
+                  formatIDR(p.price)
+                )}
+              </TableCell>
               <TableCell className="text-right">
                 <Link href={`/${storeId}/vault?product=${p.id}`} className={stock[p.id] ? "" : "text-destructive"}>
                   {stock[p.id] ?? 0}
@@ -70,6 +89,7 @@ export function ProductsTable({ storeId, products, stock }: { storeId: string; p
                     <ProductDialog
                       storeId={storeId}
                       product={p}
+                      flashSalePricing={flashSalePricing}
                       trigger={
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                           <Pencil /> Edit

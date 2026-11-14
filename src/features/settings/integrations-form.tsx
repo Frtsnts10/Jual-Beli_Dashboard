@@ -35,7 +35,7 @@ export function IntegrationsForm({
         <CardTitle>WhatsApp</CardTitle>
         <CardDescription>
           {autoFulfillment
-            ? "Token API dipakai bot untuk mengirim akun otomatis setelah pembayaran (segera hadir)."
+            ? "Token API dipakai n8n untuk mengirim akun otomatis ke WhatsApp pembeli setelah pembayaran, setelah ganti garansi, dan untuk pengingat H-3."
             : "Paket Starter: kirim akun manual lewat tombol “Kirim via WhatsApp” di halaman Pesanan. Template di bawah dipakai untuk pesan tersebut."}
         </CardDescription>
       </CardHeader>

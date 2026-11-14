@@ -1,7 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { fulfillOrder } from "@/lib/fulfillment";
+import { deliverOrder } from "@/lib/automation";
 import { applySubscriptionPayment } from "@/lib/subscriptions";
 
 // Xendit Invoice callback. Configure in Xendit Dashboard → Settings → Webhooks →
@@ -72,7 +73,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Amount mismatch" }, { status: 400 });
     }
     const result = await fulfillOrder(body.external_id, { invoiceId: body.id });
-    // Phase 3: on "fulfilled" for Pro/Ultimate stores, trigger the n8n WhatsApp delivery webhook here.
+    // Pro/Ultimate: push the account to the buyer's WhatsApp via n8n, after acknowledging Xendit.
+    if (result === "fulfilled") after(() => deliverOrder(body.external_id, "paid"));
     return NextResponse.json({ ok: true, result });
   }
 
