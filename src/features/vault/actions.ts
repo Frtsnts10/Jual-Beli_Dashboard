@@ -1,12 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { TIERS } from "@/config/tiers";
 import { encryptSecret } from "@/lib/vault-crypto";
+import { notifyRestock } from "@/lib/integrations/automation";
 
 export interface CredentialLine {
   account_email: string;
@@ -71,6 +73,8 @@ export async function addCredentials(storeId: string, productId: string, lines: 
   batch.update(product.ref, { stock_available: FieldValue.increment(rows.length) });
   await batch.commit();
   revalidatePath(`/${storeId}`, "layout");
+  // Buyers who tapped "Kabari saya" while it was sold out get a WhatsApp, after responding.
+  after(() => notifyRestock(storeId, [productId]));
   return { ok: true, data: { added: rows.length } };
 }
 

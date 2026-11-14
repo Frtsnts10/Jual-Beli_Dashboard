@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { requireStore } from "@/lib/access/auth";
 import { adminDb } from "@/lib/firebase/admin";
-import { listProducts, stockByProduct } from "@/lib/data/queries";
+import { listProducts, stockByProduct, waitingForRestock } from "@/lib/data/queries";
 import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ export const metadata = { title: "Produk" };
 export default async function ProductsPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
   const { tier } = await requireStore(storeId);
-  const [products, stock] = await Promise.all([listProducts(storeId), stockByProduct(storeId)]);
+  const [products, stock, waiting] = await Promise.all([listProducts(storeId), stockByProduct(storeId), waitingForRestock(storeId)]);
 
   // The storefront shows products.stock_available; resync it if it ever drifted from the vault.
   // Bundles have no vault stock of their own: they count as their scarcest component.
@@ -40,7 +40,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ store
           }
         />
       </PageHeader>
-      <ProductsTable storeId={storeId} products={products} stock={stock} flashSalePricing={TIERS[tier].marketing} />
+      <ProductsTable storeId={storeId} products={products} stock={stock} waiting={waiting} flashSalePricing={TIERS[tier].marketing} />
     </>
   );
 }

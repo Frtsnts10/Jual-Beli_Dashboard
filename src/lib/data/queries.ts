@@ -92,3 +92,11 @@ export async function listReviews(storeId: string, limit = 300) {
   const snap = await adminDb.collection("reviews").where("store_id", "==", storeId).orderBy("created_at", "desc").limit(limit).get();
   return snap.docs.map(mapReview);
 }
+
+/** Open "Kabari saya" requests per product (not yet notified). */
+export async function waitingForRestock(storeId: string): Promise<Record<string, number>> {
+  const snap = await adminDb.collection("restock_requests").where("store_id", "==", storeId).where("notified_at", "==", null).select("product_id").get();
+  const out: Record<string, number> = {};
+  for (const d of snap.docs) out[d.get("product_id")] = (out[d.get("product_id")] ?? 0) + 1;
+  return out;
+}
