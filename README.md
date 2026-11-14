@@ -68,6 +68,11 @@ cp .env.example .env.local   # or: vercel env pull .env.local
 npm run dev
 ```
 
+Tests (Vitest): `npm test` runs unit tests; `npm run test:emulator` also runs the
+Firestore-emulator suites — fulfilment (incl. concurrent orders and bundles), warranty
+replacement and the security rules. Needs Java and `firebase-tools`. CI
+(`.github/workflows/ci.yml`) runs typecheck, lint, build and all tests on every PR.
+
 Rules and indexes live in this repo (don't edit them in the console). The
 **Deploy Firestore rules & indexes** GitHub Action deploys them whenever
 `firestore.rules` / `firestore.indexes.json` change on `main` (or on demand from the

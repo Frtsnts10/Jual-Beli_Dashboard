@@ -6,6 +6,7 @@ import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { TIERS } from "@/config/tiers";
+import { encryptSecret } from "@/lib/vault-crypto";
 
 export interface CredentialLine {
   account_email: string;
@@ -47,14 +48,19 @@ export async function addCredentials(storeId: string, productId: string, lines: 
     }
   }
 
+  try {
+    encryptSecret("probe"); // fail fast, before any write, if production has no key
+  } catch {
+    return fail("Brankas belum dikonfigurasi (VAULT_ENCRYPTION_KEY). Hubungi admin platform.");
+  }
   const batch = adminDb.batch();
   for (const row of rows) {
     batch.create(adminDb.collection("credentials_vault").doc(), {
       store_id: storeId,
       product_id: productId,
       account_email: row.account_email,
-      account_password: row.account_password,
-      profile_pin: row.profile_pin.trim(),
+      account_password: encryptSecret(row.account_password),
+      profile_pin: encryptSecret(row.profile_pin.trim()),
       status: "AVAILABLE",
       expiry_date: row.expiry_date ? Timestamp.fromDate(new Date(`${row.expiry_date}T23:59:59+07:00`)) : null,
       order_id: null,

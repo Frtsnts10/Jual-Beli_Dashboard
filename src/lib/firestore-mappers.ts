@@ -1,4 +1,5 @@
 import "server-only";
+import { decryptSecret } from "@/lib/vault-crypto";
 import { Timestamp, type DocumentSnapshot } from "firebase-admin/firestore";
 import type { Credential, Order, Product, Store, SubscriptionPayment, SubscriptionTier, UserDoc } from "@/types/schema";
 
@@ -87,8 +88,8 @@ export function mapCredential(snap: Snap): Credential {
     store_id: d.store_id,
     product_id: d.product_id,
     account_email: d.account_email ?? "",
-    account_password: d.account_password ?? "",
-    profile_pin: d.profile_pin ?? "",
+    account_password: decryptSecret(d.account_password),
+    profile_pin: decryptSecret(d.profile_pin),
     status: d.status ?? "AVAILABLE",
     expiry_date: toISO(d.expiry_date),
     order_id: d.order_id ?? null,
