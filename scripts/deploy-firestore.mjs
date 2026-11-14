@@ -54,8 +54,11 @@ async function api(method, url, body) {
 
 function fail(step, r) {
   console.error(`::error::${step} failed (HTTP ${r.status}): ${r.data?.error?.message ?? JSON.stringify(r.data)}`);
+  if (r.data?.error?.details) console.error(JSON.stringify(r.data.error.details, null, 2));
   process.exit(1);
 }
+
+console.log(`Deploying to ${projectId} as ${sa.client_email}`);
 
 // --- Security rules ---------------------------------------------------------------
 const rulesBase = `https://firebaserules.googleapis.com/v1/projects/${projectId}`;
