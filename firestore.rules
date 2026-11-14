@@ -64,6 +64,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Product reviews: written by the storefront server (buyer of a paid order), moderated
+    // through dashboard server actions. No client access.
+    match /reviews/{orderId} {
+      allow read, write: if false;
+    }
+
     // store_slugs, store_domains and anything else: server-only.
     match /{document=**} {
       allow read, write: if false;

@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { adminDb } from "@/lib/firebase/admin";
-import { mapCredential, mapOrder, mapProduct } from "@/lib/data/mappers";
+import { mapCredential, mapOrder, mapProduct, mapReview } from "@/lib/data/mappers";
 import type { CredentialStatus, CustomerProfile } from "@/types/schema";
 import { aggregateCustomers } from "./customers";
 
@@ -85,4 +85,10 @@ export async function listCustomers(storeId: string) {
   const orders = await listOrders(storeId, 2000);
   const profiles = await getCustomerProfiles(orders.map((o) => o.customer_uid ?? ""));
   return { orders, customers: aggregateCustomers(orders, profiles) };
+}
+
+/** The store's newest reviews (visible and hidden) for moderation. */
+export async function listReviews(storeId: string, limit = 300) {
+  const snap = await adminDb.collection("reviews").where("store_id", "==", storeId).orderBy("created_at", "desc").limit(limit).get();
+  return snap.docs.map(mapReview);
 }
