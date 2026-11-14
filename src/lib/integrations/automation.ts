@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/utils";
 import { DEFAULT_WA_TEMPLATE, TIERS } from "@/config/tiers";
 import { effectiveTier } from "@/lib/data/mappers";
 import { decryptSecret } from "@/lib/vault-crypto";
+import { storefrontUrl } from "@/lib/store-url";
 
 // Automation bridge to n8n (plan-dashboard.md §2/§4). The dashboard decides *what* to send;
 // an n8n workflow listening on N8N_WEBHOOK_URL does the *sending* through the store's
@@ -132,4 +133,63 @@ export async function remindRenewal(orderId: string, storefrontLink: string) {
   // Flag only after n8n accepted it, so a failed run is retried by the next cron.
   await orderRef.update({ renewal_notified: true });
   return true;
+}
+
+const RESTOCK_TEMPLATE = "Halo! {product} di {store} sudah tersedia lagi. Stok terbatas, amankan sekarang: {link}";
+
+/**
+ * "Kabari saya" (Pro & Ultimate, WhatsApp configured): when stock comes back for these
+ * products, every buyer still waiting on them — or on a bundle they complete — gets one
+ * WhatsApp message through n8n. Requests are marked notified only after n8n accepts the
+ * batch, so a failed send is retried on the next restock. Never throws.
+ */
+export async function notifyRestock(storeId: string, restockedIds: string[]): Promise<number> {
+  try {
+    const ctx = await storeContext(storeId);
+    if (!TIERS[ctx.tier].autoFulfillment || !ctx.wa.provider || !ctx.wa.token) return 0;
+
+    // Products to announce: the restocked ones, plus bundles that are now complete again.
+    const products = await adminDb.collection("products").where("store_id", "==", storeId).get();
+    const byId = new Map(products.docs.map((d) => [d.id, d]));
+    const stockOf = (id: string): number => {
+      const p = byId.get(id);
+      if (!p) return 0;
+      const items = p.get("bundle_items") as string[] | null;
+      return items?.length ? Math.min(...items.map((c) => byId.get(c)?.get("stock_available") ?? 0)) : (p.get("stock_available") ?? 0);
+    };
+    const candidates = products.docs
+      .filter((p) => restockedIds.includes(p.id) || (p.get("bundle_items") as string[] | null)?.some((c) => restockedIds.includes(c)))
+      .filter((p) => p.get("is_published") && stockOf(p.id) > 0);
+
+    const store = await adminDb.collection("stores").doc(storeId).get();
+    const base = storefrontUrl({ slug: store.get("slug"), custom_domain: store.get("custom_domain") ?? null, custom_domain_status: store.get("custom_domain_status") ?? null });
+    let sent = 0;
+    for (const p of candidates) {
+      const waiting = await adminDb
+        .collection("restock_requests")
+        .where("store_id", "==", storeId)
+        .where("product_id", "==", p.id)
+        .where("notified_at", "==", null)
+        .limit(500)
+        .get();
+      const recipients = [...new Set(waiting.docs.map((d) => waNumber(d.get("phone") ?? "")).filter(Boolean))];
+      if (!recipients.length) continue;
+      await postToN8n({
+        event: "product.restock",
+        store_id: storeId,
+        product_id: p.id,
+        recipients,
+        message: fillTemplate(RESTOCK_TEMPLATE, { product: p.get("title"), store: ctx.storeName, link: `${base}/p/${p.id}` }),
+        wa: { provider: ctx.wa.provider, token: ctx.wa.token },
+      });
+      const batch = adminDb.batch();
+      waiting.docs.forEach((d) => batch.update(d.ref, { notified_at: FieldValue.serverTimestamp() }));
+      await batch.commit();
+      sent += recipients.length;
+    }
+    return sent;
+  } catch (err) {
+    console.error(`Restock notification failed for ${storeId}:`, err);
+    return 0;
+  }
 }

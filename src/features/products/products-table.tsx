@@ -20,11 +20,14 @@ export function ProductsTable({
   storeId,
   products,
   stock,
+  waiting = {},
   flashSalePricing,
 }: {
   storeId: string;
   products: Product[];
   stock: Record<string, number>;
+  /** Buyers waiting for a restock WhatsApp ("Kabari saya"), per product. */
+  waiting?: Record<string, number>;
   flashSalePricing: boolean;
 }) {
   const [pending, start] = useTransition();
@@ -45,7 +48,17 @@ export function ProductsTable({
     );
   };
 
-  const stockLink = (p: Product) =>
+  const stockLink = (p: Product) => (
+    <>
+      {stockCount(p)}
+      {waiting[p.id] ? (
+        <span className="ml-1.5 text-xs whitespace-nowrap text-amber-600" title="Pembeli menunggu kabar restock via WhatsApp">
+          · {waiting[p.id]} menunggu
+        </span>
+      ) : null}
+    </>
+  );
+  const stockCount = (p: Product) =>
     p.bundle_items ? (
       <span className={bundleStock(p.bundle_items, stock) ? "" : "text-destructive"} title="Stok terkecil dari isi bundle">
         {bundleStock(p.bundle_items, stock)}

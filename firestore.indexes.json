@@ -109,6 +109,38 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "restock_requests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "store_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "product_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "notified_at",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "restock_requests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "store_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "notified_at",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

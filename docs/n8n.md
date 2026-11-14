@@ -50,6 +50,16 @@ Daily cron (`/api/cron/renewal-reminders`, 09:00 WIB) for accounts expiring with
 Send with a delay between recipients (e.g. *Split In Batches* + *Wait* 5–10 s) to avoid
 the number being flagged as spam.
 
+### `product.restock` (Pro & Ultimate)
+Sent right after the seller adds stock to a product that buyers asked to be told about
+("Kabari saya" on the storefront), including bundles the new stock completes. Same shape as
+`broadcast` — handle it in the same branch (with the same delay between recipients):
+```json
+{ "event": "product.restock", "store_id": "…", "product_id": "…", "recipients": ["62812…"], "message": "Halo! Netflix … sudah tersedia lagi … https://toko.com/p/…", "wa": {…} }
+```
+Requests are marked notified only when n8n answers 2xx; on an error they stay pending and
+are sent with the next restock.
+
 ## Provider calls (examples)
 
 - **Fonnte**: `POST https://api.fonnte.com/send`, header `Authorization: <token>`, form

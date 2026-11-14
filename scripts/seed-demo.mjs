@@ -118,7 +118,7 @@ async function deleteWhere(col) {
   return snap.size;
 }
 const wiped = [];
-for (const col of ["orders", "credentials_vault", "products", "broadcasts", "reviews", "vouchers"]) wiped.push(`${await deleteWhere(col)} ${col}`);
+for (const col of ["orders", "credentials_vault", "products", "broadcasts", "reviews", "vouchers", "restock_requests"]) wiped.push(`${await deleteWhere(col)} ${col}`);
 const oldSubs = await db.collection("subscription_payments").where("uid", "==", uid).get();
 await Promise.all(oldSubs.docs.map((d) => d.ref.delete()));
 
@@ -454,6 +454,20 @@ for (const [ref, o] of orders) {
 await reviewBatch.commit();
 await Promise.all([...ratingByProduct].map(([id, rating]) => db.collection("products").doc(id).update({ rating })));
 
+// "Kabari saya" on the sold-out VPN: adding NordVPN stock in Brankas sends them a WhatsApp.
+const VPN = productId("vpn");
+for (const [i, phone] of ["+6281311110001", "+6281311110002", claimOrder.customer_contact.phone].entries()) {
+  await db.collection("restock_requests").doc(`${STORE_ID}_${VPN}_${phone.replace(/\D/g, "")}`).set({
+    store_id: STORE_ID,
+    product_id: VPN,
+    phone,
+    email: i === 2 ? BUYER_EMAIL : null,
+    customer_uid: i === 2 ? buyerUid : null,
+    notified_at: null,
+    created_at: ts(now - (i + 1) * 3_600_000),
+  });
+}
+
 // ---------------------------------------------------------------------------------------
 // 7. Marketing + billing history
 
@@ -493,6 +507,7 @@ console.log(`
   Store        Dionycte — slug "${SLUG}", domain ${DOMAIN}, store id ${STORE_ID}
   Products     ${PRODUCTS.length + 1} (flash sale: ChatGPT Plus, bundle: Netflix + Spotify, VPN sold out)
   Reviews      ${reviewCount} (moderate them in dashboard → Ulasan)
+  Restock      3 buyers waiting for NordVPN (add stock in Brankas → WhatsApp via n8n)
   Vouchers     HEMAT10 (10%, maks 20rb), DIONYCTE5K (Rp 5.000, min. 40rb), LEBARAN (expired)
   Vault        ${credSeq} credentials (encrypted)
   Orders       ${orders.length} (${paidCount} paid, 2 pending, 1 failed)
