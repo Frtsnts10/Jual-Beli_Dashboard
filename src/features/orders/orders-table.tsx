@@ -65,11 +65,64 @@ export function OrdersTable({
     run(() => markDelivered(storeId, o.id), "Ditandai terkirim");
   }
 
+  const actionsMenu = (o: Order) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" aria-label="Aksi" disabled={pending}>
+          <MoreHorizontal />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {o.payment_status !== "PAID" && (
+          <DropdownMenuItem
+            onSelect={() => confirm(`Konfirmasi pembayaran ${formatIDR(o.amount)} untuk ${o.id} secara manual?`) && run(() => confirmPayment(storeId, o.id), "Pesanan lunas")}
+          >
+            <CheckCircle2 /> Konfirmasi lunas manual
+          </DropdownMenuItem>
+        )}
+        {o.payment_status === "PAID" && o.needs_stock && (
+          <DropdownMenuItem onSelect={() => run(() => confirmPayment(storeId, o.id), "Stok dialokasikan")}>
+            <PackagePlus /> Alokasikan stok
+          </DropdownMenuItem>
+        )}
+        {o.payment_status === "PAID" && o.credential_id && (
+          <DropdownMenuItem onSelect={() => sendViaWhatsApp(o)}>
+            <MessageCircle /> Kirim akun via WhatsApp
+          </DropdownMenuItem>
+        )}
+        {o.credential_id && o.delivery_error && (
+          <DropdownMenuItem onSelect={() => run(() => resendDelivery(storeId, o.id), "Terkirim otomatis")}>
+            <RefreshCw /> Kirim ulang otomatis
+          </DropdownMenuItem>
+        )}
+        {o.credential_id && o.delivery_status === "PENDING" && (
+          <DropdownMenuItem onSelect={() => run(() => markDelivered(storeId, o.id), "Ditandai terkirim")}>
+            <Send /> Tandai terkirim
+          </DropdownMenuItem>
+        )}
+        {o.warranty_status === "CLAIMED" && (
+          <>
+            <DropdownMenuItem onSelect={() => run(() => replaceWarranty(storeId, o.id), "Akun diganti")}>
+              <RefreshCw /> Ganti akun (1-klik)
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => run(() => rejectWarranty(storeId, o.id), "Klaim ditolak")}>
+              <XCircle /> Tolak klaim
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  const payBadge = (o: Order) => (
+    <Badge variant={o.payment_status === "PAID" ? "success" : o.payment_status === "FAILED" ? "destructive" : "warning"}>{o.payment_status}</Badge>
+  );
+
   const counts = { all: orders.length, action: orders.filter(needsAction).length, claims: orders.filter((o) => o.warranty_status === "CLAIMED").length };
 
   return (
     <>
-      <div className="bg-muted mb-4 inline-flex h-9 items-center rounded-lg p-[3px]">
+      <div className="bg-muted mb-4 inline-flex h-9 max-w-full items-center overflow-x-auto rounded-lg p-[3px]">
         {(
           [
             ["all", "Semua"],
@@ -81,7 +134,7 @@ export function OrdersTable({
             key={key}
             type="button"
             onClick={() => setFilter(key)}
-            className={cn("rounded-md px-3 py-1 text-sm font-medium", filter === key ? "bg-background shadow-sm" : "text-muted-foreground")}
+            className={cn("shrink-0 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap", filter === key ? "bg-background shadow-sm" : "text-muted-foreground")}
           >
             {label} ({counts[key]})
           </button>
@@ -91,115 +144,114 @@ export function OrdersTable({
       {visible.length === 0 ? (
         <p className="text-muted-foreground rounded-lg border border-dashed p-10 text-center text-sm">Tidak ada pesanan.</p>
       ) : (
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Pesanan</TableHead>
-                <TableHead>Pembeli</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead>Bayar</TableHead>
-                <TableHead>Kirim</TableHead>
-                <TableHead>Garansi</TableHead>
-                <TableHead className="w-10" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {visible.map((o) => (
-                <TableRow key={o.id}>
-                  <TableCell>
+        <>
+          {/* Phone: one card per order. */}
+          <div className="grid gap-2 md:hidden">
+            {visible.map((o) => (
+              <div key={o.id} className="rounded-lg border p-3 text-sm">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
                     <div className="font-medium">{o.product_title}</div>
                     <div className="text-muted-foreground font-mono text-xs">
                       {o.id} · {formatDate(o.created_at, true)}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-xs">{o.customer_contact.email}</div>
-                    <div className="text-muted-foreground text-xs">{o.customer_contact.phone}</div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {formatIDR(o.amount)}
-                    <div className="text-muted-foreground text-xs" title={o.settlement === "SPLIT" ? "Dibayar ke akun Xendit Anda, fee dipotong otomatis" : "Ditampung platform"}>
-                      fee {formatIDR(o.platform_fee)} · {o.settlement === "SPLIT" ? "split" : o.settlement === "MANUAL" ? "manual" : "via platform"}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={o.payment_status === "PAID" ? "success" : o.payment_status === "FAILED" ? "destructive" : "warning"}>
-                      {o.payment_status}
-                    </Badge>
-                    {o.needs_stock && <div className="text-destructive mt-1 text-xs">Stok kosong</div>}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={o.delivery_status === "SENT_VIA_WA" ? "success" : "secondary"}>
-                      {o.delivery_status === "SENT_VIA_WA" ? "Terkirim" : "Belum"}
-                    </Badge>
-                    {o.delivery_error && o.delivery_status !== "SENT_VIA_WA" && (
-                      <div className="text-destructive mt-1 max-w-40 truncate text-xs" title={o.delivery_error}>
-                        Auto-kirim gagal
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="max-w-56 whitespace-normal">
-                    <Badge variant={o.warranty_status === "CLAIMED" ? "destructive" : o.warranty_status === "REPLACED" ? "secondary" : "outline"}>
-                      {o.warranty_status}
-                    </Badge>
-                    {o.warranty_status === "CLAIMED" && o.warranty_claim && (
-                      <div className="text-muted-foreground mt-1 text-xs">“{o.warranty_claim.reason}”</div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" aria-label="Aksi" disabled={pending}>
-                          <MoreHorizontal />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {o.payment_status !== "PAID" && (
-                          <DropdownMenuItem
-                            onSelect={() => confirm(`Konfirmasi pembayaran ${formatIDR(o.amount)} untuk ${o.id} secara manual?`) && run(() => confirmPayment(storeId, o.id), "Pesanan lunas")}
-                          >
-                            <CheckCircle2 /> Konfirmasi lunas manual
-                          </DropdownMenuItem>
-                        )}
-                        {o.payment_status === "PAID" && o.needs_stock && (
-                          <DropdownMenuItem onSelect={() => run(() => confirmPayment(storeId, o.id), "Stok dialokasikan")}>
-                            <PackagePlus /> Alokasikan stok
-                          </DropdownMenuItem>
-                        )}
-                        {o.payment_status === "PAID" && o.credential_id && (
-                          <DropdownMenuItem onSelect={() => sendViaWhatsApp(o)}>
-                            <MessageCircle /> Kirim akun via WhatsApp
-                          </DropdownMenuItem>
-                        )}
-                        {o.credential_id && o.delivery_error && (
-                          <DropdownMenuItem onSelect={() => run(() => resendDelivery(storeId, o.id), "Terkirim otomatis")}>
-                            <RefreshCw /> Kirim ulang otomatis
-                          </DropdownMenuItem>
-                        )}
-                        {o.credential_id && o.delivery_status === "PENDING" && (
-                          <DropdownMenuItem onSelect={() => run(() => markDelivered(storeId, o.id), "Ditandai terkirim")}>
-                            <Send /> Tandai terkirim
-                          </DropdownMenuItem>
-                        )}
-                        {o.warranty_status === "CLAIMED" && (
-                          <>
-                            <DropdownMenuItem onSelect={() => run(() => replaceWarranty(storeId, o.id), "Akun diganti")}>
-                              <RefreshCw /> Ganti akun (1-klik)
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => run(() => rejectWarranty(storeId, o.id), "Klaim ditolak")}>
-                              <XCircle /> Tolak klaim
-                            </DropdownMenuItem>
-                          </>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                  </div>
+                  <div className="-mt-1 -mr-1 shrink-0">{actionsMenu(o)}</div>
+                </div>
+                <div className="mt-2 flex items-end justify-between gap-2">
+                  <div className="min-w-0 text-xs">
+                    <div className="break-all">{o.customer_contact.email}</div>
+                    <div className="text-muted-foreground">{o.customer_contact.phone}</div>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <div className="font-medium tabular-nums">{formatIDR(o.amount)}</div>
+                    <div className="text-muted-foreground text-xs">fee {formatIDR(o.platform_fee)}</div>
+                  </div>
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  {payBadge(o)}
+                  <Badge variant={o.delivery_status === "SENT_VIA_WA" ? "success" : "secondary"}>{o.delivery_status === "SENT_VIA_WA" ? "Terkirim" : "Belum dikirim"}</Badge>
+                  {o.warranty_status !== "VALID" && (
+                    <Badge variant={o.warranty_status === "CLAIMED" ? "destructive" : "secondary"}>Garansi {o.warranty_status}</Badge>
+                  )}
+                  {o.needs_stock && <span className="text-destructive text-xs">Stok kosong</span>}
+                  {o.delivery_error && o.delivery_status !== "SENT_VIA_WA" && <span className="text-destructive text-xs">Auto-kirim gagal</span>}
+                </div>
+                {o.warranty_status === "CLAIMED" && o.warranty_claim && <p className="text-muted-foreground mt-2 text-xs">“{o.warranty_claim.reason}”</p>}
+              </div>
+            ))}
+          </div>
+
+          {/* Tablet and up; buyer + warranty fold into other columns below xl. */}
+          <div className="hidden rounded-lg border md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Pesanan</TableHead>
+                  <TableHead className="hidden xl:table-cell">Pembeli</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead>Bayar</TableHead>
+                  <TableHead>Kirim</TableHead>
+                  <TableHead className="hidden xl:table-cell">Garansi</TableHead>
+                  <TableHead className="w-10" />
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {visible.map((o) => (
+                  <TableRow key={o.id}>
+                    <TableCell>
+                      <div className="font-medium">{o.product_title}</div>
+                      <div className="text-muted-foreground font-mono text-xs">
+                        {o.id} · {formatDate(o.created_at, true)}
+                      </div>
+                      <div className="text-muted-foreground text-xs xl:hidden">{o.customer_contact.email}</div>
+                    </TableCell>
+                    <TableCell className="hidden xl:table-cell">
+                      <div className="text-xs">{o.customer_contact.email}</div>
+                      <div className="text-muted-foreground text-xs">{o.customer_contact.phone}</div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {formatIDR(o.amount)}
+                      <div className="text-muted-foreground text-xs" title={o.settlement === "SPLIT" ? "Dibayar ke akun Xendit Anda, fee dipotong otomatis" : "Ditampung platform"}>
+                        fee {formatIDR(o.platform_fee)} · {o.settlement === "SPLIT" ? "split" : o.settlement === "MANUAL" ? "manual" : "via platform"}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {payBadge(o)}
+                      {o.needs_stock && <div className="text-destructive mt-1 text-xs">Stok kosong</div>}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={o.delivery_status === "SENT_VIA_WA" ? "success" : "secondary"}>
+                        {o.delivery_status === "SENT_VIA_WA" ? "Terkirim" : "Belum"}
+                      </Badge>
+                      {o.delivery_error && o.delivery_status !== "SENT_VIA_WA" && (
+                        <div className="text-destructive mt-1 max-w-40 truncate text-xs" title={o.delivery_error}>
+                          Auto-kirim gagal
+                        </div>
+                      )}
+                      {o.warranty_status !== "VALID" && (
+                        <div className="mt-1 xl:hidden">
+                          <Badge variant={o.warranty_status === "CLAIMED" ? "destructive" : "secondary"}>Garansi {o.warranty_status}</Badge>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="hidden max-w-56 whitespace-normal xl:table-cell">
+                      <Badge variant={o.warranty_status === "CLAIMED" ? "destructive" : o.warranty_status === "REPLACED" ? "secondary" : "outline"}>
+                        {o.warranty_status}
+                      </Badge>
+                      {o.warranty_status === "CLAIMED" && o.warranty_claim && (
+                        <div className="text-muted-foreground mt-1 text-xs">“{o.warranty_claim.reason}”</div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {actionsMenu(o)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       )}
     </>
   );

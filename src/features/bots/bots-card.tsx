@@ -43,12 +43,12 @@ export function BotsCard({
           sebagai referral <code>telegram</code>/<code>discord</code>.
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-6 text-sm">
+      <CardContent className="grid gap-6 text-sm [&>*]:min-w-0">
         {!allowed ? (
           <p className="text-muted-foreground">Tersedia di paket Ultimate.</p>
         ) : (
           <>
-            <div className="grid gap-2">
+            <div className="grid gap-2 [&>*]:min-w-0">
               <div className="flex items-center gap-2 font-medium">
                 Telegram {telegramUsername && <Badge variant="success">@{telegramUsername}</Badge>}
               </div>
@@ -69,13 +69,13 @@ export function BotsCard({
               )}
             </div>
 
-            <div className="grid gap-2 border-t pt-4">
+            <div className="grid gap-2 border-t pt-4 [&>*]:min-w-0">
               <div className="flex items-center gap-2 font-medium">Discord {discordConnected && <Badge variant="success">Terhubung</Badge>}</div>
               <p className="text-muted-foreground">
                 Di Discord Developer Portal → aplikasi Anda → General Information, isi <em>Interactions Endpoint URL</em> dengan:
               </p>
               <div className="flex items-center gap-2">
-                <code className="bg-muted flex-1 truncate rounded px-2 py-1 text-xs">{discordEndpoint}</code>
+                <code className="bg-muted min-w-0 flex-1 truncate rounded px-2 py-1 text-xs">{discordEndpoint}</code>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -93,7 +93,7 @@ export function BotsCard({
                   Lepas Discord
                 </Button>
               ) : (
-                <div className="grid gap-2 md:grid-cols-3">
+                <div className="grid gap-2 md:grid-cols-3 [&>*]:min-w-0">
                   <div className="grid gap-1">
                     <Label htmlFor="dc_app">Application ID</Label>
                     <Input id="dc_app" value={dc.applicationId} onChange={(e) => setDc({ ...dc, applicationId: e.target.value })} />

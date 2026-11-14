@@ -23,19 +23,19 @@ export function PlanPicker({ storeId, currentTier }: { storeId: string; currentT
 
   return (
     <>
-      <div className="bg-muted mb-6 inline-flex h-9 items-center rounded-lg p-[3px]">
+      <div className="bg-muted mb-6 inline-flex h-9 max-w-full items-center overflow-x-auto rounded-lg p-[3px]">
         {(["monthly", "yearly"] as const).map((p) => (
           <button
             key={p}
             type="button"
             onClick={() => setPeriod(p)}
-            className={cn("rounded-md px-3 py-1 text-sm font-medium", period === p ? "bg-background shadow-sm" : "text-muted-foreground")}
+            className={cn("shrink-0 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap", period === p ? "bg-background shadow-sm" : "text-muted-foreground")}
           >
             {p === "monthly" ? "Bulanan" : "Tahunan (gratis 2 bulan)"}
           </button>
         ))}
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 [&>*]:min-w-0">
         {(Object.keys(TIERS) as SubscriptionTier[]).map((key) => {
           const t = TIERS[key];
           const price = period === "yearly" ? t.priceYearly : t.priceMonthly;
@@ -43,7 +43,7 @@ export function PlanPicker({ storeId, currentTier }: { storeId: string; currentT
           return (
             <Card key={key} className={current ? "border-primary" : ""}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex flex-wrap items-center gap-2">
                   {t.name} {current && <Badge>Paket aktif</Badge>}
                 </CardTitle>
                 <CardDescription className="text-foreground text-2xl font-semibold">

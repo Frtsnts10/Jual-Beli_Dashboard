@@ -53,3 +53,6 @@ next-env.d.ts
 
 # Firebase emulator logs
 *-debug.log
+
+# written by `next dev` (Next.js agent hints); regenerated on every run
+AGENTS.md

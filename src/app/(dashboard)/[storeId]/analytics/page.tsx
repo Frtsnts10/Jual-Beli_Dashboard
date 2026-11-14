@@ -27,9 +27,9 @@ export default async function AnalyticsPage({ params, searchParams }: { params: 
   return (
     <>
       <PageHeader title="Analitik" description={`${days} hari terakhir`}>
-        <div className="bg-muted inline-flex h-9 items-center rounded-lg p-[3px]">
+        <div className="bg-muted inline-flex h-9 max-w-full items-center overflow-x-auto rounded-lg p-[3px]">
           {RANGES.map((r) => (
-            <Link key={r} href={`?days=${r}`} className={cn("rounded-md px-3 py-1 text-sm font-medium", r === days ? "bg-background shadow-sm" : "text-muted-foreground")}>
+            <Link key={r} href={`?days=${r}`} className={cn("shrink-0 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap", r === days ? "bg-background shadow-sm" : "text-muted-foreground")}>
               {r} hari
             </Link>
           ))}
@@ -41,14 +41,14 @@ export default async function AnalyticsPage({ params, searchParams }: { params: 
         </Button>
       </PageHeader>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         {stats.map((x) => (
-          <Card key={x.label} className="gap-2">
-            <CardHeader>
-              <CardDescription>{x.label}</CardDescription>
-              <CardTitle className="text-2xl">{x.value}</CardTitle>
+          <Card key={x.label} className="min-w-0 gap-1 py-4 sm:gap-2 sm:py-6">
+            <CardHeader className="px-4 sm:px-6">
+              <CardDescription className="text-xs sm:text-sm">{x.label}</CardDescription>
+              <CardTitle className="text-base tabular-nums [overflow-wrap:anywhere] sm:text-2xl">{x.value}</CardTitle>
             </CardHeader>
-            <CardContent className="text-muted-foreground text-xs">{x.hint}</CardContent>
+            <CardContent className="text-muted-foreground px-4 text-xs sm:px-6">{x.hint}</CardContent>
           </Card>
         ))}
       </div>
@@ -62,7 +62,7 @@ export default async function AnalyticsPage({ params, searchParams }: { params: 
         </CardContent>
       </Card>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid gap-6 xl:grid-cols-2 [&>*]:min-w-0">
         <Card>
           <CardHeader>
             <CardTitle>Produk terlaris</CardTitle>

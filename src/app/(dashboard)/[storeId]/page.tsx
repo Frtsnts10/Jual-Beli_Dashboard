@@ -53,14 +53,14 @@ export default async function OverviewPage({ params }: { params: Promise<{ store
           </CardContent>
         </Card>
       )}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         {stats.map((s) => (
-          <Card key={s.label} className="gap-2">
-            <CardHeader>
-              <CardDescription>{s.label}</CardDescription>
-              <CardTitle className="text-2xl">{s.value}</CardTitle>
+          <Card key={s.label} className="min-w-0 gap-1 py-4 sm:gap-2 sm:py-6">
+            <CardHeader className="px-4 sm:px-6">
+              <CardDescription className="text-xs sm:text-sm">{s.label}</CardDescription>
+              <CardTitle className="text-base tabular-nums [overflow-wrap:anywhere] sm:text-2xl">{s.value}</CardTitle>
             </CardHeader>
-            <CardContent className="text-muted-foreground text-xs">{s.hint}</CardContent>
+            <CardContent className="text-muted-foreground px-4 text-xs sm:px-6">{s.hint}</CardContent>
           </Card>
         ))}
       </div>
@@ -68,21 +68,19 @@ export default async function OverviewPage({ params }: { params: Promise<{ store
         <CardHeader>
           <CardTitle>Pesanan terbaru</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-3">
+        <CardContent className="flex flex-col gap-4">
           {orders.length === 0 && <p className="text-muted-foreground text-sm">Belum ada pesanan.</p>}
           {orders.slice(0, 8).map((o) => (
-            <div key={o.id} className="flex items-center justify-between gap-4 text-sm">
+            <div key={o.id} className="flex items-start justify-between gap-3 text-sm">
               <div className="min-w-0">
                 <div className="truncate font-medium">{o.product_title}</div>
-                <div className="text-muted-foreground text-xs">
-                  {o.id} · {formatDate(o.created_at, true)}
+                <div className="text-muted-foreground truncate text-xs">
+                  <span className="font-mono">{o.id}</span> · {formatDate(o.created_at, true)}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Badge variant={o.payment_status === "PAID" ? "success" : o.payment_status === "FAILED" ? "destructive" : "warning"}>
-                  {o.payment_status}
-                </Badge>
-                <span className="w-24 text-right">{formatIDR(o.amount)}</span>
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                <span className="font-medium whitespace-nowrap tabular-nums">{formatIDR(o.amount)}</span>
+                <Badge variant={o.payment_status === "PAID" ? "success" : o.payment_status === "FAILED" ? "destructive" : "warning"}>{o.payment_status}</Badge>
               </div>
             </div>
           ))}

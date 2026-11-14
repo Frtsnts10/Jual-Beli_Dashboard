@@ -55,13 +55,13 @@ export default async function VaultPage({
       </PageHeader>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div className="bg-muted inline-flex h-9 items-center rounded-lg p-[3px]">
+        <div className="bg-muted inline-flex h-9 max-w-full items-center overflow-x-auto rounded-lg p-[3px]">
           {TABS.map((t, i) => (
             <Link
               key={t.status}
               href={`?status=${t.status}${product ? `&product=${product}` : ""}`}
               className={cn(
-                "rounded-md px-3 py-1 text-sm font-medium",
+                "shrink-0 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap",
                 t.status === status ? "bg-background shadow-sm" : "text-muted-foreground"
               )}
             >

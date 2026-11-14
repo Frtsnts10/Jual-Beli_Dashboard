@@ -72,6 +72,25 @@ export async function disconnectDomain(storeId: string): Promise<ActionResult> {
   return { ok: true };
 }
 
+/** Turns a failed identity probe into something the seller can act on. */
+function liveCheckProblem(domain: string, res: Response, isJson: boolean, foundStoreId: string | null | undefined) {
+  let landed = domain;
+  try {
+    landed = new URL(res.url).hostname;
+  } catch {}
+  if (landed && landed !== domain && landed !== `www.${domain}` && `www.${landed}` !== domain) {
+    return `Domain dialihkan ke ${landed}. Hapus pengalihan (forwarding/redirect) di tempat Anda membeli domain.`;
+  }
+  if (isJson && foundStoreId) return "Domain ini mengarah ke toko lain di platform.";
+  if (isJson) {
+    return "Domain sudah sampai ke etalase kami, tapi belum dikenali sebagai toko ini. Pastikan paket Ultimate aktif, lalu cek lagi dalam 1 menit.";
+  }
+  if (res.status === 404) {
+    return "Domain mengarah ke Vercel, tapi belum dipasang di project etalase. Tambahkan domain ini ke project etalase (bukan project dashboard).";
+  }
+  return `Domain menampilkan halaman lain (HTTP ${res.status}), bukan etalase kami — biasanya halaman parkir dari penyedia domain. Hapus record A/AAAA atau forwarding lama, sisakan record di atas.`;
+}
+
 /** Fetches the storefront's identity endpoint through the seller's domain, over HTTPS. */
 async function liveCheck(domain: string, storeId: string) {
   // Tests point this at a local storefront; production always goes through real DNS + TLS.
@@ -79,9 +98,10 @@ async function liveCheck(domain: string, storeId: string) {
   const url = base ? `${base}/.well-known/store-check?host=${encodeURIComponent(domain)}` : `https://${domain}/.well-known/store-check`;
   try {
     const res = await fetch(url, { cache: "no-store", redirect: "follow", signal: AbortSignal.timeout(8000) });
-    const data = (await res.json().catch(() => ({}))) as { store_id?: string };
+    const isJson = (res.headers.get("content-type") ?? "").includes("application/json");
+    const data = (isJson ? await res.json().catch(() => ({})) : {}) as { store_id?: string | null };
     if (data.store_id === storeId) return { ok: true, message: null };
-    return { ok: false, message: res.ok ? "Domain terbuka, tapi menampilkan situs lain." : `Situs merespons ${res.status}.` };
+    return { ok: false, message: liveCheckProblem(domain, res, isJson, data.store_id) };
   } catch {
     return { ok: false, message: "Belum bisa dibuka lewat HTTPS (DNS belum aktif atau sertifikat SSL masih diproses)." };
   }
