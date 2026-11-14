@@ -105,7 +105,7 @@ Actions tab); it needs the repository secret `FIREBASE_SERVICE_ACCOUNT` — setu
 at the top of `.github/workflows/firestore-deploy.yml`. Manual equivalent:
 
 ```bash
-npx firebase-tools deploy --only firestore --project web-store-4cf23
+npx firebase-tools deploy --only firestore --project web-store-dashboard
 ```
 
 ## Automation (n8n)

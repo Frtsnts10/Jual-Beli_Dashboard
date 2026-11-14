@@ -13,7 +13,7 @@ d("firestore.rules", () => {
   beforeAll(async () => {
     const [h, port] = host!.split(":");
     env = await initializeTestEnvironment({
-      projectId: "web-store-4cf23",
+      projectId: "web-store-dashboard",
       firestore: { rules: readFileSync("firestore.rules", "utf8"), host: h, port: Number(port) },
     });
     await env.withSecurityRulesDisabled(async (ctx) => {

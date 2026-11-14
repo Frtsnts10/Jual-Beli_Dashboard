@@ -43,4 +43,4 @@ jobs:
           java-version: 21
       - run: npm ci
       - name: Unit + Firestore emulator tests (fulfilment, races, bundles, security rules)
-        run: npx --yes firebase-tools@15.36.0 emulators:exec --only firestore --project web-store-4cf23 "npx vitest run"
+        run: npx --yes firebase-tools@15.36.0 emulators:exec --only firestore --project web-store-dashboard "npx vitest run"

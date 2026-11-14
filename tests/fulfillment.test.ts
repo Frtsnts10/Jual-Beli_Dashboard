@@ -8,7 +8,7 @@ const emulator = !!process.env.FIRESTORE_EMULATOR_HOST;
 const d = emulator ? describe : describe.skip;
 
 async function clear() {
-  const res = await fetch(`http://${process.env.FIRESTORE_EMULATOR_HOST}/emulator/v1/projects/web-store-4cf23/databases/(default)/documents`, { method: "DELETE" });
+  const res = await fetch(`http://${process.env.FIRESTORE_EMULATOR_HOST}/emulator/v1/projects/web-store-dashboard/databases/(default)/documents`, { method: "DELETE" });
   if (!res.ok) throw new Error(`emulator clear failed: ${res.status}`);
 }
 
