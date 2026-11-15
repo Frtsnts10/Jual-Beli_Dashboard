@@ -30,7 +30,6 @@ const jakartaDay = (iso: string) => new Date(iso).toLocaleDateString("en-CA", { 
 export function summarize(orders: Order[], days: number) {
   const paid = orders.filter((o) => o.payment_status === "PAID");
   const revenue = paid.reduce((s, o) => s + o.amount, 0);
-  const fees = paid.reduce((s, o) => s + o.platform_fee, 0);
 
   // One bucket per day, including days without sales.
   const daily = new Map<string, number>();
@@ -61,7 +60,7 @@ export function summarize(orders: Order[], days: number) {
     paid: paid.length,
     failed: orders.filter((o) => o.payment_status === "FAILED").length,
     revenue,
-    net: revenue - fees,
+    discounts: paid.reduce((s, o) => s + o.discount, 0),
     aov: paid.length ? Math.round(revenue / paid.length) : 0,
     conversion: orders.length ? paid.length / orders.length : 0,
     claims: paid.filter((o) => o.warranty_status !== "VALID").length,

@@ -18,7 +18,7 @@ export default async function AnalyticsPage({ params, searchParams }: { params: 
   const s = summarize(await ordersSince(storeId, days), days);
 
   const stats = [
-    { label: "Pendapatan", value: formatIDR(s.revenue), hint: `Bersih setelah fee ${formatIDR(s.net)}` },
+    { label: "Pendapatan", value: formatIDR(s.revenue), hint: s.discounts ? `Setelah diskon voucher ${formatIDR(s.discounts)}` : "Semua masuk langsung ke QRIS Anda" },
     { label: "Pesanan lunas", value: String(s.paid), hint: `${s.created} checkout dibuat · ${s.failed} gagal/kedaluwarsa` },
     { label: "Konversi checkout", value: `${Math.round(s.conversion * 100)}%`, hint: "Lunas ÷ checkout dibuat" },
     { label: "Rata-rata pesanan", value: formatIDR(s.aov), hint: `${s.claims} pesanan pernah klaim garansi` },

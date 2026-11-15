@@ -44,7 +44,7 @@ export default function LandingPage() {
                   <span className="text-muted-foreground text-sm font-normal">/bulan</span>
                 </CardDescription>
                 <p className="text-muted-foreground text-xs">
-                  {t.priceYearly ? `${formatIDR(t.priceYearly)}/tahun (gratis 2 bulan) · ` : ""}fee transaksi {t.feePercent}%
+                  {t.priceYearly ? `${formatIDR(t.priceYearly)}/tahun (gratis 2 bulan) · ` : ""}tanpa fee transaksi
                 </p>
               </CardHeader>
               <CardContent className="grid gap-2 text-sm">

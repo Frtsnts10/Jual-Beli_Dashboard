@@ -1,6 +1,6 @@
 import { ExternalLink } from "lucide-react";
 import { getAccessibleStores, requireStore } from "@/lib/access/auth";
-import { countOpenClaims } from "@/lib/data/queries";
+import { countAwaitingConfirmation, countOpenClaims } from "@/lib/data/queries";
 import { storefrontUrl } from "@/lib/store-url";
 import { TIERS } from "@/config/tiers";
 import { SidebarNav } from "@/features/dashboard/sidebar-nav";
@@ -11,7 +11,9 @@ import { isPlatformAdmin } from "@/lib/access/platform";
 export default async function StoreLayout({ children, params }: { children: React.ReactNode; params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
   const { user, store, role } = await requireStore(storeId);
-  const [stores, openClaims] = await Promise.all([getAccessibleStores(user.uid), countOpenClaims(storeId)]);
+  const [stores, claims, awaiting] = await Promise.all([getAccessibleStores(user.uid), countOpenClaims(storeId), countAwaitingConfirmation(storeId)]);
+  // Pesanan badge: warranty claims + QRIS payments waiting for the seller's confirmation.
+  const openClaims = claims + awaiting;
   const switcherStores = stores.map((s) => ({ id: s.id, store_name: s.store_name }));
 
   return (

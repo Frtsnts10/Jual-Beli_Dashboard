@@ -3,8 +3,10 @@ import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { remindRenewal } from "@/lib/integrations/automation";
 import { storefrontUrl } from "@/lib/store-url";
+import { expireUnpaidOrders } from "@/lib/payments/manual";
 
-// Auto-renewal reminders (Pro & Ultimate, plan §3): once a day, message buyers whose
+// Auto-renewal reminders (Pro & Ultimate, plan §3) + expiry of unpaid QRIS orders:
+// once a day, message buyers whose
 // account access ends within 3 days. Scheduled in vercel.json; Vercel Cron sends
 // "Authorization: Bearer $CRON_SECRET". renewal_notified prevents duplicate messages.
 
@@ -48,5 +50,8 @@ export async function GET(req: NextRequest) {
       console.error(`Renewal reminder failed for ${order.id}:`, err);
     }
   }
-  return NextResponse.json({ due: due.size, sent, skipped, failed });
+  // Nightly housekeeping: QRIS orders never paid (no proof by their pay-by time) fail, so
+  // their voucher uses come back even in stores whose seller didn't open Pesanan.
+  const expired = await expireUnpaidOrders();
+  return NextResponse.json({ due: due.size, sent, skipped, failed, expired });
 }

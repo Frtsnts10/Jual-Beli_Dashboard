@@ -44,12 +44,12 @@ export async function createStore(input: { store_name: string; slug: string }): 
         store_name: storeName,
         slug,
         custom_domain: null,
+        payment: null,
         storefront_config: { layout_template: "template_c_hero", accent_color: "#10B981", tagline: "" },
         is_active: true,
         created_at: FieldValue.serverTimestamp(),
       });
       tx.create(storeRef.collection("private").doc("integrations"), {
-        xendit_sub_account_id: null,
         wa_api_provider: null,
         wa_api_token: null,
         wa_message_template: DEFAULT_WA_TEMPLATE,

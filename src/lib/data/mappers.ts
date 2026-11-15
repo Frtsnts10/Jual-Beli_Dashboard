@@ -63,6 +63,14 @@ export function mapStore(snap: Snap): Store {
       warranty_policy: d.store_info?.warranty_policy ?? "",
       whatsapp: d.store_info?.whatsapp ?? "",
     },
+    payment: d.payment?.qris_payload
+      ? {
+          qris_payload: d.payment.qris_payload,
+          merchant_name: d.payment.merchant_name ?? "",
+          nmid: d.payment.nmid ?? null,
+          updated_at: toISO(d.payment.updated_at) ?? "",
+        }
+      : null,
     created_at: toISO(d.created_at) ?? "",
   };
 }
@@ -120,9 +128,10 @@ export function mapOrder(snap: Snap): Order {
     customer_contact: { email: d.customer_contact?.email ?? "", phone: d.customer_contact?.phone ?? "" },
     customer_uid: d.customer_uid ?? null,
     payment_status: d.payment_status ?? "PENDING",
-    xendit_invoice_id: d.xendit_invoice_id ?? null,
-    xendit_invoice_url: d.xendit_invoice_url ?? null,
-    payment_channel: d.payment_channel ?? null,
+    unique_code: d.unique_code ?? 0,
+    pay_by: toISO(d.pay_by),
+    proof_uploaded_at: toISO(d.proof_uploaded_at),
+    rejected_reason: d.rejected_reason ?? null,
     delivery_status: d.delivery_status ?? "PENDING",
     delivery_error: d.delivery_error ?? null,
     warranty_status: d.warranty_status ?? "VALID",
@@ -134,9 +143,6 @@ export function mapOrder(snap: Snap): Order {
     referral_code: d.referral_code ?? null,
     voucher_code: d.voucher_code ?? null,
     discount: d.discount ?? 0,
-    settlement: d.settlement ?? "PLATFORM",
-    platform_fee: d.platform_fee ?? 0,
-    payout_status: d.payout_status ?? null,
     created_at: toISO(d.created_at) ?? "",
     paid_at: toISO(d.paid_at),
     access_expires_at: toISO(d.access_expires_at),

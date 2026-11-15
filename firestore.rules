@@ -80,6 +80,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Buyers' QRIS payment screenshots: written by the storefront server, shown to the seller
+    // by dashboard server actions only.
+    match /payment_proofs/{orderId} {
+      allow read, write: if false;
+    }
+
     // store_slugs, store_domains and anything else: server-only.
     match /{document=**} {
       allow read, write: if false;

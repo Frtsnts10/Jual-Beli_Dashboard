@@ -1,4 +1,4 @@
-import { platformOverview, owedPayouts } from "@/lib/data/platform-queries";
+import { platformOverview } from "@/lib/data/platform-queries";
 import { formatIDR } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,13 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export const metadata = { title: "Ringkasan" };
 
 export default async function PlatformOverviewPage() {
-  const [o, payouts] = await Promise.all([platformOverview(), owedPayouts()]);
-  const owed = payouts.reduce((s, p) => s + p.gross - p.fees, 0);
+  const o = await platformOverview();
   const stats = [
-    { label: "GMV bulan ini", value: formatIDR(o.gmv), hint: `${o.ordersPaid} pesanan lunas` },
-    { label: "Fee platform bulan ini", value: formatIDR(o.fees), hint: "Dari split & penampungan" },
+    { label: "GMV bulan ini", value: formatIDR(o.gmv), hint: `${o.ordersPaid} pesanan lunas, dibayar langsung ke QRIS seller` },
     { label: "Pendapatan langganan bulan ini", value: formatIDR(o.subscriptionRevenue), hint: "Pro & Ultimate" },
-    { label: "Hutang ke seller", value: formatIDR(owed), hint: `${payouts.length} toko menunggu pencairan` },
     { label: "Toko", value: String(o.stores), hint: `${o.users} pengguna` },
     { label: "Paket aktif", value: `${o.tiers.pro} Pro · ${o.tiers.ultimate} Ultimate`, hint: `${o.tiers.starter} Starter` },
   ];

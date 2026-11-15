@@ -60,6 +60,18 @@ export const countOpenClaims = cache(async (storeId: string) => {
   return snap.data().count;
 });
 
+/** Paid-by-QRIS orders whose buyer uploaded a proof, waiting for the seller to confirm. */
+export const countAwaitingConfirmation = cache(async (storeId: string) => {
+  const snap = await adminDb
+    .collection("orders")
+    .where("store_id", "==", storeId)
+    .where("payment_status", "==", "PENDING")
+    .where("proof_uploaded_at", "!=", null)
+    .count()
+    .get();
+  return snap.data().count;
+});
+
 export async function getCredentialsByIds(ids: string[]) {
   if (ids.length === 0) return {};
   ids = [...new Set(ids)];
