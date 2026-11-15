@@ -70,7 +70,7 @@ export interface StoreAccess {
 /**
  * Loads a store and asserts the signed-in user may manage it (owner, or an admin the owner
  * added). Every store-scoped page and server action goes through this, which is what keeps
- * tenants isolated. Pass { ownerOnly: true } for billing, team, payouts and domains.
+ * tenants isolated. Pass { ownerOnly: true } for billing, team, the store QRIS and domains.
  */
 export const requireStore = cache(async (storeId: string, opts?: { ownerOnly?: boolean }): Promise<StoreAccess> => {
   const user = await requireUser();
