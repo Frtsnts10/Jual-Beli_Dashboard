@@ -3,7 +3,7 @@ import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { remindRenewal } from "@/lib/integrations/automation";
 import { storefrontUrl } from "@/lib/store-url";
-import { expireUnpaidOrders } from "@/lib/payments/manual";
+import { expireUnpaidOrders, pruneOldProofs } from "@/lib/payments/manual";
 
 // Auto-renewal reminders (Pro & Ultimate, plan §3) + expiry of unpaid QRIS orders:
 // once a day, message buyers whose
@@ -53,5 +53,6 @@ export async function GET(req: NextRequest) {
   // Nightly housekeeping: QRIS orders never paid (no proof by their pay-by time) fail, so
   // their voucher uses come back even in stores whose seller didn't open Pesanan.
   const expired = await expireUnpaidOrders();
-  return NextResponse.json({ due: due.size, sent, skipped, failed, expired });
+  const proofsPruned = await pruneOldProofs();
+  return NextResponse.json({ due: due.size, sent, skipped, failed, expired, proofsPruned });
 }

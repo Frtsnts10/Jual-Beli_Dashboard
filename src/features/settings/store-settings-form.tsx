@@ -88,7 +88,7 @@ export function StoreSettingsForm({
           <CardDescription>Pilih salah satu dari 5 template.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 [&>*]:min-w-0">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 [&>*]:min-w-0">
+          <div className="grid gap-2 [&>*]:min-w-0" role="radiogroup" aria-label="Template etalase">
             {TEMPLATES.map((t) => {
               const locked = !allowedTemplates.includes(t.id) && t.id !== store.storefront_config.layout_template;
               const selected = form.layout_template === t.id;
@@ -96,10 +96,12 @@ export function StoreSettingsForm({
                 <button
                   key={t.id}
                   type="button"
+                  role="radio"
+                  aria-checked={selected}
                   disabled={locked}
                   onClick={() => set("layout_template", t.id)}
                   className={cn(
-                    "rounded-lg border p-4 text-left transition",
+                    "rounded-lg border px-4 py-3 text-left transition",
                     selected ? "border-primary ring-primary/30 ring-2" : "hover:border-foreground/30",
                     locked && "cursor-not-allowed opacity-50"
                   )}

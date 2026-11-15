@@ -39,3 +39,22 @@ export async function expireUnpaidOrders(storeId?: string): Promise<number> {
   }
   return n;
 }
+
+/**
+ * Proof screenshots are only needed while a payment is being checked (and for a while after,
+ * in case of disputes). Deletes proofs older than `days` whose order / plan purchase is no
+ * longer pending, so the payment_proofs collection doesn't grow forever. Run by the nightly cron.
+ */
+export async function pruneOldProofs(days = 90): Promise<number> {
+  const cutoff = Timestamp.fromMillis(Date.now() - days * 86_400_000);
+  const snap = await adminDb.collection("payment_proofs").where("uploaded_at", "<", cutoff).limit(400).get();
+  let n = 0;
+  for (const d of snap.docs) {
+    const parent = await adminDb.collection(d.id.startsWith("SUB-") ? "subscription_payments" : "orders").doc(d.id).get();
+    const status = parent.get(d.id.startsWith("SUB-") ? "status" : "payment_status");
+    if (parent.exists && status === "PENDING") continue;
+    await d.ref.delete();
+    n++;
+  }
+  return n;
+}

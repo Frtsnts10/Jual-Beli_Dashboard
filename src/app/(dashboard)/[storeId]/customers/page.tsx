@@ -6,6 +6,7 @@ import type { CustomerRow } from "@/lib/data/customers";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
+import { PayBadge } from "@/components/pay-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -102,7 +103,7 @@ export default async function CustomersPage({
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1">
                       <span className="tabular-nums">{formatIDR(o.amount)}</span>
-                      <Badge variant={o.payment_status === "PAID" ? "success" : o.payment_status === "FAILED" ? "destructive" : "warning"}>{o.payment_status}</Badge>
+                      <PayBadge order={o} />
                     </div>
                   </div>
                 ))}

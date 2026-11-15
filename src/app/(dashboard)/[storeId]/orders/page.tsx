@@ -24,7 +24,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ storeId
       <PageHeader title="Pesanan" description="Konfirmasi pembayaran QRIS, pengiriman akun dan klaim garansi." />
       {!store.payment && (
         <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
-          Pembeli belum bisa checkout: upload QRIS toko Anda di <a href={`/${storeId}/settings#pembayaran`} className="font-medium underline">Pengaturan → Pembayaran</a>.
+          Pembeli belum bisa checkout: upload QRIS toko Anda di <a href={`/${storeId}/settings?tab=pembayaran`} className="font-medium underline">Pengaturan → Pembayaran</a>.
         </p>
       )}
       <OrdersTable
