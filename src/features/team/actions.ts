@@ -14,7 +14,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
  * Multi-user admin (Ultimate). An existing account gets access immediately; otherwise an
  * invitation waits in store_invites and is accepted when that email first signs in.
  * Admins manage products, vault, orders, marketing and storefront settings — but not
- * billing, payouts, domains or the team (owner only).
+ * billing, the store QRIS, domains or the team (owner only).
  */
 export async function inviteAdmin(storeId: string, rawEmail: string): Promise<ActionResult<{ pending: boolean }>> {
   const { user, store, tier } = await requireStore(storeId, { ownerOnly: true });

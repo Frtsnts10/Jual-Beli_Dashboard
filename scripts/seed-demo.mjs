@@ -6,7 +6,7 @@
 //   • store  "Dionycte"  — slug dionycte, custom domain dionycte.com, Bento template
 //   • 7 products (one flash sale, one bundle), ~60 vault credentials (encrypted),
 //     ~40 orders over the last 30 days (paid / pending / failed, a warranty claim, an
-//     order waiting for stock, affiliate codes, payouts owed and paid), a broadcast,
+//     order waiting for stock, affiliate codes, QRIS proofs), a broadcast,
 //     and the Ultimate subscription payment.
 //
 // Run from the dashboard folder (needs the same .env.local the app uses):
