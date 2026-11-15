@@ -107,7 +107,7 @@ export function BotsCard({
                     <Input id="dc_token" type="password" autoComplete="off" value={dc.botToken} onChange={(e) => setDc({ ...dc, botToken: e.target.value })} />
                   </div>
                   <Button
-                    className="w-fit md:col-span-3"
+                    className="w-fit justify-self-end md:col-span-3"
                     disabled={pending || !dc.applicationId || !dc.publicKey || !dc.botToken}
                     onClick={() => run(() => connectDiscord(storeId, dc), "Perintah /katalog terdaftar di Discord", () => setDc({ applicationId: "", publicKey: "", botToken: "" }))}
                   >

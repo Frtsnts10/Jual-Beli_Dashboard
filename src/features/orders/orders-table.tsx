@@ -12,6 +12,7 @@ import { deliveryMessage, waNumber } from "@/lib/integrations/whatsapp";
 import type { Credential, Order } from "@/types/schema";
 import { confirmPayment, markDelivered, rejectWarranty, replaceWarranty, resendDelivery } from "./actions";
 import { PaymentReview } from "./payment-review";
+import { PayBadge } from "@/components/pay-badge";
 import { segment, segmented } from "@/components/segmented";
 
 type Filter = "all" | "confirm" | "action" | "claims";
@@ -120,14 +121,7 @@ export function OrdersTable({
     </DropdownMenu>
   );
 
-  const payBadge = (o: Order) =>
-    o.payment_status === "PENDING" ? (
-      <Badge variant={o.proof_uploaded_at ? "warning" : "secondary"}>{o.proof_uploaded_at ? "Menunggu konfirmasi" : "Belum bayar"}</Badge>
-    ) : (
-      <Badge variant={o.payment_status === "PAID" ? "success" : "destructive"} title={o.rejected_reason ?? undefined}>
-        {o.payment_status === "PAID" ? "Lunas" : o.rejected_reason ? "Ditolak/batal" : "Gagal"}
-      </Badge>
-    );
+  const payBadge = (o: Order) => <PayBadge order={o} />;
   const amount = (o: Order) => (
     <>
       <span className="font-medium tabular-nums">{formatIDR(o.amount)}</span>

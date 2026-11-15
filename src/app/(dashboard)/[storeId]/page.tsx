@@ -5,7 +5,7 @@ import { countCredentials, countOpenClaims, listOrders, listProducts } from "@/l
 import { formatDate, formatIDR } from "@/lib/utils";
 import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
-import { Badge } from "@/components/ui/badge";
+import { PayBadge } from "@/components/pay-badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata = { title: "Ringkasan" };
@@ -80,7 +80,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ store
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <span className="font-medium whitespace-nowrap tabular-nums">{formatIDR(o.amount)}</span>
-                <Badge variant={o.payment_status === "PAID" ? "success" : o.payment_status === "FAILED" ? "destructive" : "warning"}>{o.payment_status}</Badge>
+                <PayBadge order={o} />
               </div>
             </div>
           ))}

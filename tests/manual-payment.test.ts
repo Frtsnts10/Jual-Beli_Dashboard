@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { expireUnpaidOrders, failOrder } from "@/lib/payments/manual";
+import { expireUnpaidOrders, failOrder, pruneOldProofs } from "@/lib/payments/manual";
 
 const emulator = !!process.env.FIRESTORE_EMULATOR_HOST;
 const d = emulator ? describe : describe.skip;
@@ -44,5 +44,19 @@ d("manual QRIS payments", () => {
     expect((await get("orders", "ORD-OTHER")).payment_status).toBe("PENDING");
     expect(await expireUnpaidOrders()).toBe(1);
     expect((await get("orders", "ORD-OTHER")).payment_status).toBe("FAILED");
+  });
+
+  it("prunes old proofs except for payments still being checked", async () => {
+    const days = (n: number) => Timestamp.fromMillis(Date.now() - n * 86_400_000);
+    await order("ORD-OLD", { payment_status: "PAID" });
+    await order("ORD-WAIT", { proof_uploaded_at: days(100) });
+    await order("ORD-NEW", { payment_status: "PAID" });
+    await adminDb.collection("subscription_payments").doc("SUB-OLD").set({ status: "PAID" });
+    for (const [id, age] of [["ORD-OLD", 100], ["ORD-WAIT", 100], ["ORD-NEW", 10], ["SUB-OLD", 120]] as const) {
+      await adminDb.collection("payment_proofs").doc(id).set({ image: "data:", uploaded_at: days(age) });
+    }
+    expect(await pruneOldProofs(90)).toBe(2);
+    const left = (await adminDb.collection("payment_proofs").get()).docs.map((d) => d.id).sort();
+    expect(left).toEqual(["ORD-NEW", "ORD-WAIT"]);
   });
 });
