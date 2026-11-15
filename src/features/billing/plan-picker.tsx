@@ -7,10 +7,11 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn, formatIDR } from "@/lib/utils";
+import { formatIDR } from "@/lib/utils";
 import { TIERS } from "@/config/tiers";
 import type { BillingPeriod, SubscriptionTier } from "@/types/schema";
 import { startSubscription } from "./actions";
+import { segment, segmented } from "@/components/segmented";
 
 const PERKS: Record<SubscriptionTier, string[]> = {
   starter: ["1 toko", "50 stok tersedia", "2 template", "Kirim akun manual via WA", "Bayar via QRIS toko, tanpa fee transaksi"],
@@ -25,13 +26,13 @@ export function PlanPicker({ storeId, currentTier }: { storeId: string; currentT
 
   return (
     <>
-      <div className="bg-muted mb-6 inline-flex h-9 max-w-full items-center overflow-x-auto rounded-lg p-[3px]">
+      <div className={segmented("mb-6")}>
         {(["monthly", "yearly"] as const).map((p) => (
           <button
             key={p}
             type="button"
             onClick={() => setPeriod(p)}
-            className={cn("shrink-0 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap", period === p ? "bg-background shadow-sm" : "text-muted-foreground")}
+            className={segment(period === p)}
           >
             {p === "monthly" ? "Bulanan" : "Tahunan (gratis 2 bulan)"}
           </button>

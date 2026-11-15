@@ -15,7 +15,7 @@ export function PlanEditor({ uid, tier }: { uid: string; tier: SubscriptionTier 
   return (
     <div className="flex items-center justify-end gap-2">
       <Select value={value} onValueChange={(v) => setValue(v as SubscriptionTier)}>
-        <SelectTrigger className="h-8 w-28">
+        <SelectTrigger className="w-28">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -24,9 +24,8 @@ export function PlanEditor({ uid, tier }: { uid: string; tier: SubscriptionTier 
           <SelectItem value="ultimate">Ultimate</SelectItem>
         </SelectContent>
       </Select>
-      {value !== "starter" && <Input type="number" className="h-8 w-20" min={1} value={days} onChange={(e) => setDays(Number(e.target.value))} aria-label="Hari" />}
+      {value !== "starter" && <Input type="number" className="w-20" min={1} value={days} onChange={(e) => setDays(Number(e.target.value))} aria-label="Hari" />}
       <Button
-        size="sm"
         variant="outline"
         disabled={pending}
         onClick={() =>

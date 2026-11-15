@@ -23,7 +23,7 @@ export function GoogleButton({ next, disabled, onError }: { next?: string; disab
           setBusy(false);
         }
       }}
-      className="flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-300 bg-white py-2.5 text-sm font-medium text-neutral-900 transition hover:bg-neutral-50 disabled:opacity-50"
+      className="flex h-9 w-full items-center justify-center gap-2 rounded-md border border-neutral-300 bg-white text-sm font-medium text-neutral-900 transition hover:bg-neutral-50 disabled:opacity-50"
     >
       {busy ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />} Lanjut dengan Google
     </button>

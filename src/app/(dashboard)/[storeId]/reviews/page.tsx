@@ -7,6 +7,7 @@ import { cn, formatDate } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { ReviewToggle } from "@/features/reviews/review-toggle";
+import { segment, segmented } from "@/components/segmented";
 
 export const metadata = { title: "Ulasan" };
 
@@ -62,26 +63,26 @@ export default async function ReviewsPage({
         description={`Rating toko ${avg} dari ${totals.count} ulasan yang tampil. Ulasan hanya bisa ditulis pembeli yang login dan pesanannya lunas.`}
       />
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className={segmented("mb-3")}>
         {FILTERS.map((x) => (
           <Link
             key={x.key}
             href={qs({ f: x.key })}
-            className={cn("rounded-full border px-3 py-1 text-sm", f === x.key ? "bg-primary text-primary-foreground border-primary" : "hover:bg-muted")}
+            className={segment(f === x.key)}
           >
             {x.label}
           </Link>
         ))}
       </div>
       {rated.length > 1 && (
-        <div className="mb-4 flex flex-wrap gap-2 text-xs">
-          <Link href={qs({ p: undefined })} className={cn("rounded-md border px-2 py-1", !p ? "bg-muted font-medium" : "hover:bg-muted")}>
+        <div className={segmented("mb-4 flex")}>
+          <Link href={qs({ p: undefined })} className={segment(!p)}>
             Semua produk
           </Link>
           {rated.map((x) => {
             const s = ratingSummary(x.rating);
             return (
-              <Link key={x.id} href={qs({ p: x.id })} className={cn("rounded-md border px-2 py-1", p === x.id ? "bg-muted font-medium" : "hover:bg-muted")}>
+              <Link key={x.id} href={qs({ p: x.id })} className={segment(p === x.id)}>
                 {x.title} · ★ {s.avg.toFixed(1)} ({s.count})
               </Link>
             );

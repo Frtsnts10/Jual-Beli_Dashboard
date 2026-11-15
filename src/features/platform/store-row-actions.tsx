@@ -9,7 +9,6 @@ export function SuspendButton({ storeId, suspended }: { storeId: string; suspend
   const [pending, start] = useTransition();
   return (
     <Button
-      size="sm"
       variant={suspended ? "outline" : "destructive"}
       disabled={pending}
       onClick={() => {

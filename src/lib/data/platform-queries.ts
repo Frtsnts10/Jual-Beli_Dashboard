@@ -70,3 +70,28 @@ export async function subscriptionPaymentsForReview() {
   const recent = recentSnap.docs.map(withEmail).filter((p) => p.status !== "PENDING");
   return { pending, recent };
 }
+
+/** Buyers' pending account-deletion requests, oldest first, with what deleting would touch. */
+export async function accountDeletionRequests() {
+  const snap = await adminDb.collection("account_deletion_requests").where("status", "==", "PENDING").get();
+  const rows = await Promise.all(
+    snap.docs.map(async (d) => {
+      const [orders, seller, store] = await Promise.all([
+        adminDb.collection("orders").where("customer_uid", "==", d.id).count().get(),
+        adminDb.collection("users").doc(d.id).get(),
+        d.get("store_id") ? adminDb.collection("stores").doc(d.get("store_id")).get() : null,
+      ]);
+      return {
+        uid: d.id,
+        email: (d.get("email") as string) ?? "",
+        name: (d.get("name") as string) ?? "",
+        reason: (d.get("reason") as string) ?? "",
+        store: (store?.get("store_name") as string | undefined) ?? null,
+        requested_at: toISO(d.get("requested_at")) ?? "",
+        orders: orders.data().count,
+        isSeller: seller.exists,
+      };
+    })
+  );
+  return rows.sort((a, b) => a.requested_at.localeCompare(b.requested_at));
+}

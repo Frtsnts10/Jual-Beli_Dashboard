@@ -10,7 +10,6 @@ export function ReviewToggle({ storeId, reviewId, hidden }: { storeId: string; r
   const [pending, start] = useTransition();
   return (
     <Button
-      size="sm"
       variant="outline"
       disabled={pending}
       onClick={() =>

@@ -49,7 +49,7 @@ export function SubscriptionReview({ p }: { p: PendingPurchase }) {
       }}
     >
       <DialogTrigger asChild>
-        <Button size="sm" variant={p.proofAt ? "default" : "outline"}>
+        <Button variant={p.proofAt ? "default" : "outline"}>
           <ReceiptText /> {p.proofAt ? "Cek bukti" : "Belum ada bukti"}
         </Button>
       </DialogTrigger>

@@ -2,12 +2,13 @@ import Link from "next/link";
 import { Download } from "lucide-react";
 import { requireStore } from "@/lib/access/auth";
 import { ordersSince, parseRange, RANGES, summarize } from "@/lib/data/analytics";
-import { cn, formatIDR } from "@/lib/utils";
+import { formatIDR } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RevenueChart } from "@/features/analytics/revenue-chart";
+import { segment, segmented } from "@/components/segmented";
 
 export const metadata = { title: "Analitik" };
 
@@ -27,9 +28,9 @@ export default async function AnalyticsPage({ params, searchParams }: { params: 
   return (
     <>
       <PageHeader title="Analitik" description={`${days} hari terakhir`}>
-        <div className="bg-muted inline-flex h-9 max-w-full items-center overflow-x-auto rounded-lg p-[3px]">
+        <div className={segmented()}>
           {RANGES.map((r) => (
-            <Link key={r} href={`?days=${r}`} className={cn("shrink-0 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap", r === days ? "bg-background shadow-sm" : "text-muted-foreground")}>
+            <Link key={r} href={`?days=${r}`} className={segment(r === days)}>
               {r} hari
             </Link>
           ))}
