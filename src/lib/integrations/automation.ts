@@ -23,7 +23,19 @@ export type AutomationEvent =
 interface WaConfig {
   provider: string | null;
   token: string | null;
+  phone_number_id: string | null;
+  server: string | null;
   template: string;
+}
+
+/** What n8n needs to send through the store's own provider (see docs/n8n.md). */
+export function waPayload(integrations: FirebaseFirestore.DocumentSnapshot) {
+  return {
+    provider: (integrations.get("wa_api_provider") as string | undefined) ?? null,
+    token: (integrations.get("wa_api_token") as string | undefined) ?? null,
+    phone_number_id: (integrations.get("wa_phone_number_id") as string | undefined) ?? null,
+    server: (integrations.get("wa_server") as string | undefined) ?? null,
+  };
 }
 
 async function storeContext(storeId: string) {
@@ -34,8 +46,7 @@ async function storeContext(storeId: string) {
   const owner = await adminDb.collection("users").doc(store.get("owner_uid")).get();
   const tier = effectiveTier(owner.get("subscription_tier"), owner.get("subscription_expiry"));
   const wa: WaConfig = {
-    provider: integrations.get("wa_api_provider") ?? null,
-    token: integrations.get("wa_api_token") ?? null,
+    ...waPayload(integrations),
     template: integrations.get("wa_message_template") ?? DEFAULT_WA_TEMPLATE,
   };
   return { storeName: store.get("store_name") as string, tier, wa };
@@ -95,7 +106,7 @@ export async function deliverOrder(orderId: string, reason: "paid" | "warranty_r
       store_id: order.get("store_id"),
       to: waNumber(order.get("customer_contact.phone")),
       message,
-      wa: { provider: ctx.wa.provider, token: ctx.wa.token },
+      wa: { provider: ctx.wa.provider, token: ctx.wa.token, phone_number_id: ctx.wa.phone_number_id, server: ctx.wa.server },
     });
     await orderRef.update({ delivery_status: "SENT_VIA_WA", delivery_error: null, delivered_at: FieldValue.serverTimestamp() });
     return "sent";
@@ -128,7 +139,7 @@ export async function remindRenewal(orderId: string, storefrontLink: string) {
       expiry: formatDate(order.get("access_expires_at")?.toDate?.().toISOString()),
       link: storefrontLink,
     }),
-    wa: { provider: ctx.wa.provider, token: ctx.wa.token },
+    wa: { provider: ctx.wa.provider, token: ctx.wa.token, phone_number_id: ctx.wa.phone_number_id, server: ctx.wa.server },
   });
   // Flag only after n8n accepted it, so a failed run is retried by the next cron.
   await orderRef.update({ renewal_notified: true });
@@ -180,7 +191,7 @@ export async function notifyRestock(storeId: string, restockedIds: string[]): Pr
         product_id: p.id,
         recipients,
         message: fillTemplate(RESTOCK_TEMPLATE, { product: p.get("title"), store: ctx.storeName, link: `${base}/p/${p.id}` }),
-        wa: { provider: ctx.wa.provider, token: ctx.wa.token },
+        wa: { provider: ctx.wa.provider, token: ctx.wa.token, phone_number_id: ctx.wa.phone_number_id, server: ctx.wa.server },
       });
       const batch = adminDb.batch();
       waiting.docs.forEach((d) => batch.update(d.ref, { notified_at: FieldValue.serverTimestamp() }));

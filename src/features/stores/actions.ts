@@ -150,15 +150,21 @@ export async function updateStoreInfo(storeId: string, input: StoreInfo): Promis
 
 export async function updateIntegrations(
   storeId: string,
-  input: { wa_api_provider: WaProvider | ""; wa_api_token: string; wa_message_template: string }
+  input: { wa_api_provider: WaProvider | ""; wa_api_token: string; wa_phone_number_id?: string; wa_server?: string; wa_message_template: string }
 ): Promise<ActionResult> {
   await requireStore(storeId);
+  const phoneNumberId = (input.wa_phone_number_id ?? "").trim();
+  const server = (input.wa_server ?? "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  if (input.wa_api_provider === "meta" && !/^\d{6,20}$/.test(phoneNumberId)) return fail("Isi Phone Number ID dari Meta (angka, lihat WhatsApp → API Setup).");
+  if (input.wa_api_provider === "wablas" && !/^[a-z0-9-]+\.wablas\.com$/.test(server)) return fail("Isi server Wablas Anda, mis. tegal.wablas.com.");
   const ref = adminDb.collection("stores").doc(storeId).collection("private").doc("integrations");
   await ref.set(
     {
       wa_api_provider: input.wa_api_provider || null,
       // An empty token field means "keep the saved one" — the form never receives it back.
       ...(input.wa_api_token.trim() ? { wa_api_token: input.wa_api_token.trim() } : {}),
+      wa_phone_number_id: input.wa_api_provider === "meta" ? phoneNumberId : null,
+      wa_server: input.wa_api_provider === "wablas" ? server : null,
       wa_message_template: input.wa_message_template.trim() || DEFAULT_WA_TEMPLATE,
     },
     { merge: true }

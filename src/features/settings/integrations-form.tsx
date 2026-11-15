@@ -15,17 +15,23 @@ export function IntegrationsForm({
   storeId,
   provider,
   hasToken,
+  phoneNumberId,
+  server,
   template,
   autoFulfillment,
 }: {
   storeId: string;
   provider: WaProvider | null;
   hasToken: boolean;
+  phoneNumberId: string | null;
+  server: string | null;
   template: string;
   autoFulfillment: boolean;
 }) {
   const [waProvider, setWaProvider] = useState<WaProvider | "">(provider ?? "");
   const [token, setToken] = useState("");
+  const [pnid, setPnid] = useState(phoneNumberId ?? "");
+  const [host, setHost] = useState(server ?? "");
   const [message, setMessage] = useState(template);
   const [pending, start] = useTransition();
 
@@ -59,7 +65,26 @@ export function IntegrationsForm({
             <Label htmlFor="token">API token</Label>
             <Input id="token" type="password" value={token} onChange={(e) => setToken(e.target.value)} placeholder={hasToken ? "•••••• (tersimpan — isi untuk mengganti)" : ""} autoComplete="off" />
           </div>
+          {waProvider === "meta" && (
+            <div className="grid gap-2">
+              <Label htmlFor="pnid">Phone Number ID</Label>
+              <Input id="pnid" inputMode="numeric" value={pnid} onChange={(e) => setPnid(e.target.value.replace(/\D/g, ""))} placeholder="mis. 106540352242922" />
+              <p className="text-muted-foreground text-xs">Meta for Developers → aplikasi Anda → WhatsApp → API Setup. Token: buat System User permanen di Business Settings.</p>
+            </div>
+          )}
+          {waProvider === "wablas" && (
+            <div className="grid gap-2">
+              <Label htmlFor="wserver">Server Wablas</Label>
+              <Input id="wserver" value={host} onChange={(e) => setHost(e.target.value)} placeholder="mis. tegal.wablas.com" />
+              <p className="text-muted-foreground text-xs">Lihat di dashboard Wablas Anda (alamat server/domain API).</p>
+            </div>
+          )}
         </div>
+        {waProvider === "meta" && (
+          <p className="rounded-md bg-amber-500/10 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
+            Meta hanya mengizinkan pesan bebas dalam 24 jam setelah pembeli mengirim pesan ke nomor Anda. Di luar itu pesan harus memakai template yang disetujui Meta — atur di workflow n8n Anda (lihat docs/n8n.md). Untuk pengiriman akun otomatis tanpa repot, Fonnte/Wablas lebih praktis.
+          </p>
+        )}
         <div className="grid gap-2">
           <Label htmlFor="template">Template pesan</Label>
           <Textarea id="template" rows={7} value={message} onChange={(e) => setMessage(e.target.value)} className="font-mono text-xs" />
@@ -71,7 +96,7 @@ export function IntegrationsForm({
           disabled={pending}
           onClick={() =>
             start(async () => {
-              const res = await updateIntegrations(storeId, { wa_api_provider: waProvider, wa_api_token: token, wa_message_template: message });
+              const res = await updateIntegrations(storeId, { wa_api_provider: waProvider, wa_api_token: token, wa_phone_number_id: pnid, wa_server: host, wa_message_template: message });
               if (!res.ok) return void toast.error(res.error);
               setToken("");
               toast.success("Integrasi disimpan");

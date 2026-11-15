@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { CheckCircle2, MessageCircle, MoreHorizontal, PackagePlus, RefreshCw, Send, XCircle } from "lucide-react";
+import { CheckCircle2, Copy, MessageCircle, MoreHorizontal, PackagePlus, RefreshCw, Send, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { deliveryMessage, waNumber } from "@/lib/integrations/whatsapp";
@@ -117,6 +117,14 @@ export function OrdersTable({
             </DropdownMenuItem>
           </>
         )}
+        {/* Always there, so the menu is never empty (e.g. an order still waiting for payment). */}
+        <DropdownMenuSeparator className="first:hidden" />
+        <DropdownMenuItem onSelect={() => window.open(`https://wa.me/${waNumber(o.customer_contact.phone)}`, "_blank", "noopener")}>
+          <MessageCircle /> Chat pembeli di WhatsApp
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => void navigator.clipboard.writeText(o.id).then(() => toast.success("ID pesanan disalin"))}>
+          <Copy /> Salin ID pesanan
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
