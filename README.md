@@ -10,7 +10,7 @@ Spec: `plan-dashboard.md` (phase 1 implemented — see *Roadmap*).
 ## Stack
 
 Next.js 16 (App Router, Server Components + Server Actions) · Tailwind CSS 4 ·
-shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · QRIS (each seller's own) · Xendit (plan billing only, being replaced).
+shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · QRIS (each seller's own for orders, the platform's for plans) — no payment gateway.
 
 ## Routes
 
@@ -24,12 +24,11 @@ shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · QRIS
 | `/[storeId]/vault` | Credential vault — Available / Sold / Expired tabs, bulk import |
 | `/[storeId]/orders` | Orders, manual payment confirm, WhatsApp delivery, 1-click warranty replacement |
 | `/[storeId]/analytics` | Revenue, conversion, daily chart, top products/referrals; CSV export (`/analytics/export`) |
-| `/platform` | Platform admin (emails in `PLATFORM_ADMIN_EMAILS`): totals, stores (suspend), users (set plan) |
+| `/platform` | Platform admin (emails in `PLATFORM_ADMIN_EMAILS`): totals, stores (suspend), users (set plan), plan payments (platform QRIS, confirm proofs) |
 | `/[storeId]/marketing` | Ultimate: WhatsApp broadcast, affiliate report + link builder, flash sale |
-| `/[storeId]/billing` | Plan upgrade/renewal (monthly/yearly) paid via Xendit invoice, payment history |
+| `/[storeId]/billing` | Plan upgrade/renewal (monthly/yearly) paid to the platform QRIS with proof upload, payment history |
 | `/[storeId]/settings` | Store QRIS (Pembayaran), store profile, template (tier-gated), accent colour, custom domain, WA integration |
 | `/api/cron/renewal-reminders` | Daily (vercel.json): H-3 renewal reminders via n8n |
-| `/api/webhooks/xendit` | Plan-purchase invoice callback (`SUB-…` → activate/extend plan) |
 
 ## Project layout
 
@@ -72,8 +71,10 @@ idempotent.
 
 `src/config/tiers.ts` — Starter (1 store, 50 stock, 2 templates), Pro (3 stores,
 unlimited stock, all templates, auto-fulfilment), Ultimate (unlimited, custom domain,
-marketing). `users.subscription_tier` is server-only and set by the webhook when a
-`subscription_payments` invoice is paid. A paid plan past `subscription_expiry` acts as
+marketing). `users.subscription_tier` is server-only. Plans are bought on **Langganan**: the seller
+pays the platform's QRIS (set in `/platform/payments`, stored in `platform/settings`) for the
+exact amount with a kode unik and uploads a proof; a platform admin confirms it there, which
+activates or extends the plan (`subscription_payments`). A paid plan past `subscription_expiry` acts as
 Starter (computed on read, no cron).
 
 ## Payments (seller's own QRIS)

@@ -158,8 +158,10 @@ export function mapSubscriptionPayment(snap: Snap): SubscriptionPayment {
     period: d.period,
     amount: d.amount ?? 0,
     status: d.status ?? "PENDING",
-    xendit_invoice_id: d.xendit_invoice_id ?? null,
-    xendit_invoice_url: d.xendit_invoice_url ?? null,
+    unique_code: d.unique_code ?? 0,
+    pay_by: toISO(d.pay_by),
+    proof_uploaded_at: toISO(d.proof_uploaded_at),
+    rejected_reason: d.rejected_reason ?? null,
     created_at: toISO(d.created_at) ?? "",
     paid_at: toISO(d.paid_at),
   };

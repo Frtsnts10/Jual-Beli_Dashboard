@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -12,14 +13,15 @@ import type { BillingPeriod, SubscriptionTier } from "@/types/schema";
 import { startSubscription } from "./actions";
 
 const PERKS: Record<SubscriptionTier, string[]> = {
-  starter: ["1 toko", "50 stok tersedia", "2 template", "Kirim akun manual via WA", "Fee transaksi 5%"],
-  pro: ["3 toko", "Stok tanpa batas", "Semua 5 template", "Auto-kirim WhatsApp (segera)", "Fee transaksi 3%"],
-  ultimate: ["Toko tanpa batas", "Custom domain", "Marketing & CRM (segera)", "Fee transaksi 1%"],
+  starter: ["1 toko", "50 stok tersedia", "2 template", "Kirim akun manual via WA", "Bayar via QRIS toko, tanpa fee transaksi"],
+  pro: ["3 toko", "Stok tanpa batas", "Semua 5 template", "Auto-kirim akun via WhatsApp", "Voucher & pengingat perpanjang", "Tanpa fee transaksi"],
+  ultimate: ["Toko tanpa batas", "Custom domain", "Flash sale, broadcast & affiliate", "Multi-admin & bot Telegram/Discord", "Tanpa fee transaksi"],
 };
 
 export function PlanPicker({ storeId, currentTier }: { storeId: string; currentTier: SubscriptionTier }) {
   const [period, setPeriod] = useState<BillingPeriod>("monthly");
   const [pending, start] = useTransition();
+  const router = useRouter();
 
   return (
     <>
@@ -68,7 +70,8 @@ export function PlanPicker({ storeId, currentTier }: { storeId: string; currentT
                       start(async () => {
                         const res = await startSubscription(storeId, key, period);
                         if (!res.ok) return void toast.error(res.error);
-                        window.location.assign(res.data!.url);
+                        router.refresh();
+                        document.getElementById("bayar")?.scrollIntoView({ behavior: "smooth" });
                       })
                     }
                   >

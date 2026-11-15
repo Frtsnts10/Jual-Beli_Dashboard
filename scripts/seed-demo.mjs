@@ -188,8 +188,6 @@ await storeRef.set({
   created_at: ts(now - 44 * DAY),
 });
 await storeRef.collection("private").doc("integrations").set({
-  xendit_sub_account_id: null,
-  xendit_account_status: null,
   wa_api_provider: null,
   wa_api_token: null,
   wa_message_template:
@@ -528,8 +526,11 @@ await db.collection("subscription_payments").doc(`SUB-${code(8)}`).set({
   period: "yearly",
   amount: 2_490_000,
   status: "PAID",
-  xendit_invoice_id: null,
-  xendit_invoice_url: null,
+  email: EMAIL,
+  unique_code: 0,
+  pay_by: null,
+  proof_uploaded_at: ts(now - 44 * DAY),
+  rejected_reason: null,
   created_at: ts(now - 44 * DAY),
   paid_at: ts(now - 44 * DAY),
 });

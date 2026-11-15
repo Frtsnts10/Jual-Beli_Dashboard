@@ -1,7 +1,7 @@
 import "server-only";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { effectiveTier, mapStore, toISO } from "@/lib/data/mappers";
+import { effectiveTier, mapStore, mapSubscriptionPayment, toISO } from "@/lib/data/mappers";
 import type { SubscriptionTier } from "@/types/schema";
 
 export function monthStart() {
@@ -53,4 +53,20 @@ export async function allUsers() {
       stores: storeCount.get(u.id) ?? 0,
     }))
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
+}
+
+/** Plan purchases still open (proof uploaded, or inside their pay window), proofs first, plus recent closed ones. */
+export async function subscriptionPaymentsForReview() {
+  const [pendingSnap, recentSnap] = await Promise.all([
+    adminDb.collection("subscription_payments").where("status", "==", "PENDING").get(),
+    adminDb.collection("subscription_payments").orderBy("created_at", "desc").limit(30).get(),
+  ]);
+  const withEmail = (d: FirebaseFirestore.QueryDocumentSnapshot) => ({ ...mapSubscriptionPayment(d), email: (d.get("email") as string) ?? d.get("uid") });
+  const now = Date.now();
+  const pending = pendingSnap.docs
+    .map(withEmail)
+    .filter((p) => p.proof_uploaded_at || (p.pay_by && new Date(p.pay_by).getTime() > now))
+    .sort((a, b) => Number(!!b.proof_uploaded_at) - Number(!!a.proof_uploaded_at) || b.created_at.localeCompare(a.created_at));
+  const recent = recentSnap.docs.map(withEmail).filter((p) => p.status !== "PENDING");
+  return { pending, recent };
 }
