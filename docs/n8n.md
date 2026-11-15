@@ -25,8 +25,9 @@ marks orders as delivered (or reminders as sent) based on that status.
 
 ## Events
 
-All events include `wa: { provider: "fonnte" | "wablas" | "meta", token }` — the seller's
-own provider credentials from *Pengaturan → WhatsApp*. Phone numbers are international
+All events include `wa: { provider: "fonnte" | "wablas" | "meta", token, phone_number_id, server }`
+— the seller's own provider credentials from *Pengaturan → WhatsApp & Bot*. `phone_number_id` is
+set for Meta, `server` (e.g. `tegal.wablas.com`) for Wablas; both are `null` otherwise. Phone numbers are international
 digits without `+` (e.g. `6281234567890`).
 
 ### `order.delivery` (Pro & Ultimate)
@@ -64,8 +65,12 @@ are sent with the next restock.
 
 - **Fonnte**: `POST https://api.fonnte.com/send`, header `Authorization: <token>`, form
   fields `target=<to>`, `message=<message>`.
-- **Wablas**: `POST https://<your-server>.wablas.com/api/send-message`, header
+- **Wablas**: `POST https://<wa.server>/api/send-message`, header
   `Authorization: <token>`, JSON `{ "phone": "<to>", "message": "<message>" }`.
-- **Meta Cloud API**: `POST https://graph.facebook.com/v20.0/<phone-number-id>/messages`,
-  `Authorization: Bearer <token>`; free-form text only inside the 24-hour window,
-  otherwise use an approved template.
+- **Meta Cloud API**: `POST https://graph.facebook.com/v20.0/<wa.phone_number_id>/messages`,
+  `Authorization: Bearer <token>`. Free-form text (`type: "text"`) is only delivered inside the
+  24-hour window after the buyer last messaged the number. Order deliveries usually fall outside
+  it, so send an approved **utility template** instead (`type: "template"`), e.g. a template
+  `pengiriman_akun` whose body has one variable `{{1}}`, and pass the message as that parameter.
+  Template parameters may not contain line breaks or more than 4 spaces in a row, so replace
+  `\n` with ` · ` before sending.

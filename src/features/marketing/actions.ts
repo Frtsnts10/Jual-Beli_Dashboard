@@ -5,7 +5,7 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { postToN8n } from "@/lib/integrations/automation";
+import { postToN8n, waPayload } from "@/lib/integrations/automation";
 import { fillTemplate, waNumber } from "@/lib/integrations/whatsapp";
 import { TIERS } from "@/config/tiers";
 
@@ -43,7 +43,7 @@ export async function sendBroadcast(storeId: string, input: { message: string; p
   const text = fillTemplate(message, { store: store.store_name });
   let error: string | null = null;
   try {
-    await postToN8n({ event: "broadcast", broadcast_id: ref.id, store_id: storeId, recipients: phones, message: text, wa: { provider, token } });
+    await postToN8n({ event: "broadcast", broadcast_id: ref.id, store_id: storeId, recipients: phones, message: text, wa: waPayload(integrations) });
   } catch (err) {
     error = err instanceof Error ? err.message : "n8n error";
   }

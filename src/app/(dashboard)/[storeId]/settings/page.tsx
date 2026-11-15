@@ -143,6 +143,8 @@ export default async function SettingsPage({
                 storeId={storeId}
                 provider={integrations.get("wa_api_provider") ?? null}
                 hasToken={!!integrations.get("wa_api_token")}
+                phoneNumberId={integrations.get("wa_phone_number_id") ?? null}
+                server={integrations.get("wa_server") ?? null}
                 template={
                   integrations.get("wa_message_template") ?? DEFAULT_WA_TEMPLATE
                 }
