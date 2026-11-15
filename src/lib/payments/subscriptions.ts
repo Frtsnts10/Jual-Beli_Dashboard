@@ -1,13 +1,15 @@
 import "server-only";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-
-const DAY_MS = 24 * 60 * 60 * 1000;
+import { effectiveTier, toISO } from "@/lib/data/mappers";
+import { newExpiry } from "@/lib/billing/plan-change";
+import type { SubscriptionTier } from "@/types/schema";
 
 /**
  * Activates a paid plan purchase once a platform admin has seen the money in the platform's
- * QRIS mutations. Renewing the same plan before it lapses extends from the current expiry;
- * anything else (new plan, lapsed plan) starts today. Idempotent.
+ * QRIS mutations. Renewing the same plan extends it; switching up or down starts today and
+ * converts what's left of the current plan into bonus days (lib/billing/plan-change.ts).
+ * Idempotent.
  */
 export async function applySubscriptionPayment(paymentId: string) {
   const paymentRef = adminDb.collection("subscription_payments").doc(paymentId);
@@ -18,15 +20,13 @@ export async function applySubscriptionPayment(paymentId: string) {
 
     const userRef = adminDb.collection("users").doc(payment.get("uid"));
     const user = await tx.get(userRef);
-    const now = Date.now();
-    const currentExpiry = (user.get("subscription_expiry") as Timestamp | null)?.toMillis() ?? 0;
-    const sameTierActive = user.get("subscription_tier") === payment.get("tier") && currentExpiry > now;
+    const current = effectiveTier(user.get("subscription_tier"), user.get("subscription_expiry"));
+    const expiry = toISO(user.get("subscription_expiry"));
     const days = payment.get("period") === "yearly" ? 365 : 30;
-    const start = sameTierActive ? currentExpiry : now;
 
     tx.update(userRef, {
       subscription_tier: payment.get("tier"),
-      subscription_expiry: Timestamp.fromMillis(start + days * DAY_MS),
+      subscription_expiry: Timestamp.fromMillis(newExpiry(current, expiry, payment.get("tier") as SubscriptionTier, days)),
     });
     tx.update(paymentRef, { status: "PAID", paid_at: Timestamp.now(), rejected_reason: null });
     return "activated" as const;

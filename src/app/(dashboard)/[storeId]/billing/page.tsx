@@ -101,7 +101,14 @@ export default async function BillingPage({ params }: { params: Promise<{ storeI
           </CardContent>
         </Card>
       )}
-      <PlanPicker storeId={storeId} currentTier={user.subscription_tier} />
+      {!platformQris && (
+        <Card className="mb-6 border-amber-300 py-4 dark:border-amber-800">
+          <CardContent className="text-sm text-amber-900 dark:text-amber-200">
+            Pembelian paket sedang ditutup sementara — admin platform belum memasang QRIS pembayaran. Paket Anda saat ini tetap berjalan seperti biasa.
+          </CardContent>
+        </Card>
+      )}
+      <PlanPicker storeId={storeId} currentTier={user.subscription_tier} expiry={user.subscription_expiry} canBuy={!!platformQris} />
       {history.length > 0 && (
         <Card className="mt-8">
           <CardHeader>
