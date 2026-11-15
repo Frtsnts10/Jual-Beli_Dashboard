@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { requireStore } from "@/lib/access/auth";
 import { countCredentials, listCredentials, listProducts } from "@/lib/data/queries";
-import { cn } from "@/lib/utils";
 import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { AddStockDialog } from "@/features/vault/add-stock-dialog";
 import { VaultTable } from "@/features/vault/vault-table";
 import type { CredentialStatus } from "@/types/schema";
+import { segment, segmented } from "@/components/segmented";
 
 export const metadata = { title: "Brankas Stok" };
 
@@ -55,15 +55,12 @@ export default async function VaultPage({
       </PageHeader>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div className="bg-muted inline-flex h-9 max-w-full items-center overflow-x-auto rounded-lg p-[3px]">
+        <div className={segmented()}>
           {TABS.map((t, i) => (
             <Link
               key={t.status}
               href={`?status=${t.status}${product ? `&product=${product}` : ""}`}
-              className={cn(
-                "shrink-0 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap",
-                t.status === status ? "bg-background shadow-sm" : "text-muted-foreground"
-              )}
+              className={segment(t.status === status)}
             >
               {t.label} ({counts[i]})
             </Link>

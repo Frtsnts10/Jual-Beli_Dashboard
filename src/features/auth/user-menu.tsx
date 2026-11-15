@@ -18,7 +18,7 @@ export function UserMenu({ name, email, tier, platformAdmin = false }: { name: s
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Akun">
+        <Button variant="outline" size="icon" aria-label="Akun">
           <User />
         </Button>
       </DropdownMenuTrigger>

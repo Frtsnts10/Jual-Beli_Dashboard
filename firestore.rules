@@ -86,6 +86,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Buyers' account-deletion requests: written by the storefront server, reviewed by a
+    // platform admin through dashboard server actions.
+    match /account_deletion_requests/{uid} {
+      allow read, write: if false;
+    }
+
     // store_slugs, store_domains and anything else: server-only.
     match /{document=**} {
       allow read, write: if false;

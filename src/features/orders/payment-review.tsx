@@ -12,7 +12,7 @@ import type { Order } from "@/types/schema";
 import { confirmPayment, getPaymentProof, rejectPayment } from "./actions";
 
 /** "Cek bukti": the buyer's screenshot next to the exact amount to look for in the QRIS mutations. */
-export function PaymentReview({ storeId, order, compact = false }: { storeId: string; order: Order; compact?: boolean }) {
+export function PaymentReview({ storeId, order, className }: { storeId: string; order: Order; className?: string }) {
   const [open, setOpen] = useState(false);
   const [proof, setProof] = useState<{ image: string; uploadedAt: string | null } | null | "none">(null);
   const [rejecting, setRejecting] = useState(false);
@@ -43,7 +43,7 @@ export function PaymentReview({ storeId, order, compact = false }: { storeId: st
       }}
     >
       <DialogTrigger asChild>
-        <Button size="sm" variant={hasProof ? "default" : "outline"} className={compact ? "h-7 px-2 text-xs" : undefined}>
+        <Button variant={hasProof ? "default" : "outline"} className={className}>
           <ReceiptText /> {hasProof ? "Cek bukti" : "Belum ada bukti"}
         </Button>
       </DialogTrigger>

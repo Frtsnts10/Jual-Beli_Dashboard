@@ -7,11 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { cn, formatDate, formatIDR } from "@/lib/utils";
+import { formatDate, formatIDR } from "@/lib/utils";
 import { deliveryMessage, waNumber } from "@/lib/integrations/whatsapp";
 import type { Credential, Order } from "@/types/schema";
 import { confirmPayment, markDelivered, rejectWarranty, replaceWarranty, resendDelivery } from "./actions";
 import { PaymentReview } from "./payment-review";
+import { segment, segmented } from "@/components/segmented";
 
 type Filter = "all" | "confirm" | "action" | "claims";
 
@@ -121,7 +122,7 @@ export function OrdersTable({
 
   const payBadge = (o: Order) =>
     o.payment_status === "PENDING" ? (
-      <PaymentReview storeId={storeId} order={o} compact />
+      <Badge variant={o.proof_uploaded_at ? "warning" : "secondary"}>{o.proof_uploaded_at ? "Menunggu konfirmasi" : "Belum bayar"}</Badge>
     ) : (
       <Badge variant={o.payment_status === "PAID" ? "success" : "destructive"} title={o.rejected_reason ?? undefined}>
         {o.payment_status === "PAID" ? "Lunas" : o.rejected_reason ? "Ditolak/batal" : "Gagal"}
@@ -145,7 +146,7 @@ export function OrdersTable({
 
   return (
     <>
-      <div className="bg-muted mb-4 inline-flex h-9 max-w-full items-center overflow-x-auto rounded-lg p-[3px]">
+      <div className={segmented("mb-4")}>
         {(
           [
             ["confirm", "Cek pembayaran"],
@@ -158,7 +159,7 @@ export function OrdersTable({
             key={key}
             type="button"
             onClick={() => setFilter(key)}
-            className={cn("shrink-0 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap", filter === key ? "bg-background shadow-sm" : "text-muted-foreground")}
+            className={segment(filter === key)}
           >
             {label} ({counts[key]})
           </button>
@@ -199,6 +200,7 @@ export function OrdersTable({
                   {o.delivery_error && o.delivery_status !== "SENT_VIA_WA" && <span className="text-destructive text-xs">Auto-kirim gagal</span>}
                 </div>
                 {o.warranty_status === "CLAIMED" && o.warranty_claim && <p className="text-muted-foreground mt-2 text-xs">“{o.warranty_claim.reason}”</p>}
+                {o.payment_status === "PENDING" && <PaymentReview storeId={storeId} order={o} className="mt-3 w-full" />}
               </div>
             ))}
           </div>
@@ -233,7 +235,7 @@ export function OrdersTable({
                     </TableCell>
                     <TableCell className="text-right">{amount(o)}</TableCell>
                     <TableCell>
-                      {payBadge(o)}
+                      {o.payment_status === "PENDING" ? <PaymentReview storeId={storeId} order={o} /> : payBadge(o)}
                       {o.needs_stock && <div className="text-destructive mt-1 text-xs">Stok kosong</div>}
                     </TableCell>
                     <TableCell>

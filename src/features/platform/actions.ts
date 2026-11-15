@@ -6,6 +6,7 @@ import { adminDb } from "@/lib/firebase/admin";
 import { requirePlatformAdmin } from "@/lib/access/platform";
 import { inspectQris } from "@/lib/qris";
 import { applySubscriptionPayment, rejectSubscriptionPayment } from "@/lib/payments/subscriptions";
+import { deleteCustomerAccount } from "@/lib/customers/account-deletion";
 import { fail, type ActionResult } from "@/lib/action-result";
 import type { SubscriptionTier } from "@/types/schema";
 
@@ -87,6 +88,32 @@ export async function rejectSubscription(paymentId: string, reason: string): Pro
   if (why.length < 3) return fail("Tulis alasan singkat.");
   if (!(await rejectSubscriptionPayment(paymentId, why))) return fail("Pembayaran ini sudah tidak menunggu konfirmasi.");
   await audit("subscription.reject", paymentId, admin.email, { reason: why });
+  revalidatePath("/platform", "layout");
+  return { ok: true };
+}
+
+/** Approves a buyer's deletion request: deletes their login + profile (see deleteCustomerAccount). */
+export async function approveAccountDeletion(uid: string): Promise<ActionResult<{ loginDeleted: boolean }>> {
+  const admin = await requirePlatformAdmin();
+  const ref = adminDb.collection("account_deletion_requests").doc(uid);
+  const req = await ref.get();
+  if (!req.exists || req.get("status") !== "PENDING") return fail("Pengajuan tidak ditemukan atau sudah diproses.");
+  const res = await deleteCustomerAccount(uid);
+  // The audit keeps the uid only — the point of the request is that the email goes.
+  await audit("customer.delete", uid, admin.email, { loginDeleted: res.loginDeleted });
+  revalidatePath("/platform", "layout");
+  return { ok: true, data: res };
+}
+
+export async function rejectAccountDeletion(uid: string, reason: string): Promise<ActionResult> {
+  const admin = await requirePlatformAdmin();
+  const why = reason.trim().slice(0, 300);
+  if (why.length < 5) return fail("Tulis alasan penolakan (min. 5 karakter) — pembeli akan melihatnya.");
+  const ref = adminDb.collection("account_deletion_requests").doc(uid);
+  const req = await ref.get();
+  if (!req.exists || req.get("status") !== "PENDING") return fail("Pengajuan tidak ditemukan atau sudah diproses.");
+  await ref.update({ status: "REJECTED", rejected_reason: why, reviewed_at: FieldValue.serverTimestamp() });
+  await audit("customer.delete_rejected", uid, admin.email, { reason: why });
   revalidatePath("/platform", "layout");
   return { ok: true };
 }
