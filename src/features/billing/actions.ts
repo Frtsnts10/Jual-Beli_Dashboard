@@ -23,7 +23,7 @@ export async function startSubscription(storeId: string, tier: Exclude<Subscript
   const { user } = await requireStore(storeId, { ownerOnly: true });
   if (!(tier === "pro" || tier === "ultimate")) return fail("Paket tidak dikenal.");
   if (!(period === "monthly" || period === "yearly")) return fail("Periode tidak dikenal.");
-  if (!(await getPlatformQris())) return fail("Pembayaran paket belum dibuka. Hubungi admin platform.");
+  if (!(await getPlatformQris())) return fail("Pembelian paket sedang ditutup sementara (admin platform belum memasang QRIS pembayaran). Coba lagi nanti.");
 
   const base = period === "yearly" ? TIERS[tier].priceYearly : TIERS[tier].priceMonthly;
   const pending = await adminDb.collection("subscription_payments").where("status", "==", "PENDING").get();
@@ -81,5 +81,16 @@ export async function cancelSubscriptionPayment(storeId: string, paymentId: stri
   if (!snap.exists || snap.get("uid") !== user.uid || snap.get("status") !== "PENDING") return fail("Pembayaran tidak ditemukan.");
   await ref.update({ status: "EXPIRED" });
   revalidatePath(`/${storeId}/billing`);
+  return { ok: true };
+}
+
+/**
+ * Back to Starter right away (the remaining paid days are given up — the page says so and asks
+ * to confirm). Waiting for the expiry date does the same without losing anything.
+ */
+export async function switchToStarter(storeId: string): Promise<ActionResult> {
+  const { user } = await requireStore(storeId, { ownerOnly: true });
+  await adminDb.collection("users").doc(user.uid).update({ subscription_tier: "starter", subscription_expiry: null });
+  revalidatePath("/", "layout");
   return { ok: true };
 }

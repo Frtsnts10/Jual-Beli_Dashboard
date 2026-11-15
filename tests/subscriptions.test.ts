@@ -36,4 +36,13 @@ d("plan purchases (platform QRIS)", () => {
     expect((await get("subscription_payments", "SUB-2")).status).toBe("REJECTED");
     expect((await get("users", "u1")).subscription_tier).toBe("starter");
   });
+
+  it("downgrading converts the unused Ultimate days into extra Pro days", async () => {
+    await adminDb.collection("users").doc("u1").set({ subscription_tier: "ultimate", subscription_expiry: Timestamp.fromMillis(Date.now() + 10 * DAY + 60_000) });
+    await adminDb.collection("subscription_payments").doc("SUB-3").set({ uid: "u1", tier: "pro", period: "monthly", amount: 99001, status: "PENDING" });
+    expect(await applySubscriptionPayment("SUB-3")).toBe("activated");
+    const u = await get("users", "u1");
+    expect(u.subscription_tier).toBe("pro");
+    expect(Math.round((u.subscription_expiry.toMillis() - Date.now()) / DAY)).toBe(55);
+  });
 });
