@@ -6,6 +6,7 @@ import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { fulfillOrder, replaceCredential } from "@/lib/payments/fulfillment";
 import { deliverOrder } from "@/lib/integrations/automation";
+import { failOrder } from "@/lib/payments/manual";
 
 async function ownedOrder(storeId: string, orderId: string) {
   const ref = adminDb.collection("orders").doc(orderId);
@@ -14,7 +15,10 @@ async function ownedOrder(storeId: string, orderId: string) {
   return { ref, snap };
 }
 
-/** Manual payment confirmation (e.g. bank transfer) — also used to allocate stock to a paid order after restocking. */
+/**
+ * The seller checked their QRIS mutations and the money is there: PAID, allocate and deliver.
+ * Also allocates stock to a paid order that was waiting for a restock.
+ */
 export async function confirmPayment(storeId: string, orderId: string): Promise<ActionResult> {
   await requireStore(storeId);
   const found = await ownedOrder(storeId, orderId);
@@ -65,5 +69,27 @@ export async function resendDelivery(storeId: string, orderId: string): Promise<
   revalidatePath(`/${storeId}/orders`);
   if (result === "skipped") return fail("Pengiriman otomatis butuh paket Pro/Ultimate dan provider WhatsApp di Pengaturan.");
   if (result === "failed") return fail("Pengiriman otomatis gagal lagi. Cek koneksi n8n / token WhatsApp.");
+  return { ok: true };
+}
+
+/** The buyer's payment screenshot, for the seller's "Cek bukti" dialog. */
+export async function getPaymentProof(storeId: string, orderId: string): Promise<ActionResult<{ image: string; uploadedAt: string | null }>> {
+  await requireStore(storeId);
+  const found = await ownedOrder(storeId, orderId);
+  if (!found) return fail("Pesanan tidak ditemukan.");
+  const proof = await adminDb.collection("payment_proofs").doc(orderId).get();
+  if (!proof.exists) return fail("Pembeli belum mengunggah bukti pembayaran.");
+  return { ok: true, data: { image: proof.get("image") as string, uploadedAt: proof.get("uploaded_at")?.toDate?.().toISOString() ?? null } };
+}
+
+/** The transfer isn't in the seller's mutations (or doesn't match): the order fails, its voucher use is freed. */
+export async function rejectPayment(storeId: string, orderId: string, reason: string): Promise<ActionResult> {
+  await requireStore(storeId);
+  const found = await ownedOrder(storeId, orderId);
+  if (!found) return fail("Pesanan tidak ditemukan.");
+  const why = reason.trim().slice(0, 200);
+  if (why.length < 3) return fail("Tulis alasan singkat, mis. \"Dana tidak masuk\".");
+  if (!(await failOrder(orderId, why))) return fail("Pesanan ini sudah tidak menunggu pembayaran.");
+  revalidatePath(`/${storeId}`, "layout");
   return { ok: true };
 }

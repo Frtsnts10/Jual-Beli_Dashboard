@@ -17,17 +17,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ stor
 
   const days = parseRange(req.nextUrl.searchParams.get("days") ?? undefined);
   const orders = await ordersSince(storeId, days);
-  const header = ["order_id", "dibuat", "dibayar", "produk", "total", "fee_platform", "bersih", "pembayaran", "settlement", "pengiriman", "garansi", "email", "whatsapp", "referral", "aktif_sampai"];
+  const header = ["order_id", "dibuat", "dibayar", "produk", "total", "voucher", "diskon", "kode_unik", "pembayaran", "pengiriman", "garansi", "email", "whatsapp", "referral", "aktif_sampai"];
   const rows = orders.map((o) => [
     o.id,
     o.created_at,
     o.paid_at ?? "",
     o.product_title,
     o.amount,
-    o.platform_fee,
-    o.payment_status === "PAID" ? o.amount - o.platform_fee : 0,
+    o.voucher_code ?? "",
+    o.discount,
+    o.unique_code,
     o.payment_status,
-    o.settlement,
     o.delivery_status,
     o.warranty_status,
     o.customer_contact.email,

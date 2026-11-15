@@ -11,11 +11,14 @@ import { cn, formatDate, formatIDR } from "@/lib/utils";
 import { deliveryMessage, waNumber } from "@/lib/integrations/whatsapp";
 import type { Credential, Order } from "@/types/schema";
 import { confirmPayment, markDelivered, rejectWarranty, replaceWarranty, resendDelivery } from "./actions";
+import { PaymentReview } from "./payment-review";
 
-type Filter = "all" | "action" | "claims";
+type Filter = "all" | "confirm" | "action" | "claims";
 
+/** QRIS payment the buyer says they made: the seller checks the proof and confirms or rejects. */
+const awaitingConfirmation = (o: Order) => o.payment_status === "PENDING" && !!o.proof_uploaded_at;
 const needsAction = (o: Order) =>
-  o.warranty_status === "CLAIMED" || (o.payment_status === "PAID" && (o.needs_stock || o.delivery_status === "PENDING"));
+  awaitingConfirmation(o) || o.warranty_status === "CLAIMED" || (o.payment_status === "PAID" && (o.needs_stock || o.delivery_status === "PENDING"));
 
 export function OrdersTable({
   storeId,
@@ -32,12 +35,14 @@ export function OrdersTable({
   credentials: Record<string, Credential>;
   waTemplate: string;
 }) {
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<Filter>(() => (orders.some(awaitingConfirmation) ? "confirm" : "all"));
   const [pending, start] = useTransition();
 
   const visible = useMemo(
     () =>
-      orders.filter((o) => (filter === "all" ? true : filter === "claims" ? o.warranty_status === "CLAIMED" : needsAction(o))),
+      orders.filter((o) =>
+        filter === "all" ? true : filter === "confirm" ? awaitingConfirmation(o) : filter === "claims" ? o.warranty_status === "CLAIMED" : needsAction(o)
+      ),
     [orders, filter]
   );
 
@@ -73,11 +78,11 @@ export function OrdersTable({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {o.payment_status !== "PAID" && (
+        {o.payment_status === "FAILED" && (
           <DropdownMenuItem
-            onSelect={() => confirm(`Konfirmasi pembayaran ${formatIDR(o.amount)} untuk ${o.id} secara manual?`) && run(() => confirmPayment(storeId, o.id), "Pesanan lunas")}
+            onSelect={() => confirm(`Pesanan ${o.id} sudah gagal/ditolak. Tandai lunas karena dana ${formatIDR(o.amount)} ternyata masuk?`) && run(() => confirmPayment(storeId, o.id), "Pesanan lunas")}
           >
-            <CheckCircle2 /> Konfirmasi lunas manual
+            <CheckCircle2 /> Ternyata sudah dibayar
           </DropdownMenuItem>
         )}
         {o.payment_status === "PAID" && o.needs_stock && (
@@ -114,17 +119,36 @@ export function OrdersTable({
     </DropdownMenu>
   );
 
-  const payBadge = (o: Order) => (
-    <Badge variant={o.payment_status === "PAID" ? "success" : o.payment_status === "FAILED" ? "destructive" : "warning"}>{o.payment_status}</Badge>
+  const payBadge = (o: Order) =>
+    o.payment_status === "PENDING" ? (
+      <PaymentReview storeId={storeId} order={o} compact />
+    ) : (
+      <Badge variant={o.payment_status === "PAID" ? "success" : "destructive"} title={o.rejected_reason ?? undefined}>
+        {o.payment_status === "PAID" ? "Lunas" : o.rejected_reason ? "Ditolak/batal" : "Gagal"}
+      </Badge>
+    );
+  const amount = (o: Order) => (
+    <>
+      <span className="font-medium tabular-nums">{formatIDR(o.amount)}</span>
+      <div className="text-muted-foreground text-xs">
+        {[o.unique_code ? `kode unik ${o.unique_code}` : null, o.voucher_code ? `voucher ${o.voucher_code}` : null].filter(Boolean).join(" · ") || "QRIS"}
+      </div>
+    </>
   );
 
-  const counts = { all: orders.length, action: orders.filter(needsAction).length, claims: orders.filter((o) => o.warranty_status === "CLAIMED").length };
+  const counts = {
+    all: orders.length,
+    confirm: orders.filter(awaitingConfirmation).length,
+    action: orders.filter(needsAction).length,
+    claims: orders.filter((o) => o.warranty_status === "CLAIMED").length,
+  };
 
   return (
     <>
       <div className="bg-muted mb-4 inline-flex h-9 max-w-full items-center overflow-x-auto rounded-lg p-[3px]">
         {(
           [
+            ["confirm", "Cek pembayaran"],
             ["all", "Semua"],
             ["action", "Perlu tindakan"],
             ["claims", "Klaim garansi"],
@@ -163,10 +187,7 @@ export function OrdersTable({
                     <div className="break-all">{o.customer_contact.email}</div>
                     <div className="text-muted-foreground">{o.customer_contact.phone}</div>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <div className="font-medium tabular-nums">{formatIDR(o.amount)}</div>
-                    <div className="text-muted-foreground text-xs">fee {formatIDR(o.platform_fee)}</div>
-                  </div>
+                  <div className="shrink-0 text-right">{amount(o)}</div>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
                   {payBadge(o)}
@@ -210,12 +231,7 @@ export function OrdersTable({
                       <div className="text-xs">{o.customer_contact.email}</div>
                       <div className="text-muted-foreground text-xs">{o.customer_contact.phone}</div>
                     </TableCell>
-                    <TableCell className="text-right">
-                      {formatIDR(o.amount)}
-                      <div className="text-muted-foreground text-xs" title={o.settlement === "SPLIT" ? "Dibayar ke akun Xendit Anda, fee dipotong otomatis" : "Ditampung platform"}>
-                        fee {formatIDR(o.platform_fee)} · {o.settlement === "SPLIT" ? "split" : o.settlement === "MANUAL" ? "manual" : "via platform"}
-                      </div>
-                    </TableCell>
+                    <TableCell className="text-right">{amount(o)}</TableCell>
                     <TableCell>
                       {payBadge(o)}
                       {o.needs_stock && <div className="text-destructive mt-1 text-xs">Stok kosong</div>}

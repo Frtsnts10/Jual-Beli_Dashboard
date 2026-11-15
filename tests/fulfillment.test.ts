@@ -36,12 +36,11 @@ d("fulfillOrder", () => {
     await product("p1");
     await stock("p1", 2);
     await order("ORD-1", "p1");
-    expect(await fulfillOrder("ORD-1", { invoiceId: "inv_1" })).toBe("fulfilled");
+    expect(await fulfillOrder("ORD-1")).toBe("fulfilled");
 
     const o = await get("orders", "ORD-1");
     expect(o.payment_status).toBe("PAID");
     expect(o.credential_ids).toHaveLength(1);
-    expect(o.xendit_invoice_id).toBe("inv_1");
     const days = (o.access_expires_at.toMillis() - Date.now()) / 86_400_000;
     expect(days).toBeGreaterThan(29.9);
     expect((await get("credentials_vault", o.credential_id)).status).toBe("SOLD");

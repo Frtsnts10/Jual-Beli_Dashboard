@@ -141,6 +141,56 @@
           "order": "ASCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "store_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "payment_status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "proof_uploaded_at",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "payment_status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "store_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pay_by",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "payment_status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pay_by",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

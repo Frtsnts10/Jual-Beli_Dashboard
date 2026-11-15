@@ -38,32 +38,3 @@ export async function setUserPlan(uid: string, tier: SubscriptionTier, days: num
   return { ok: true };
 }
 
-/**
- * Records that the platform transferred a seller's balance for orders it collected
- * (settlement PLATFORM: seller had no LIVE Xendit sub-account). Marks exactly the orders
- * that were owed when the admin opened the page, so newer sales stay owed.
- */
-export async function markPayoutDone(storeId: string, orderIds: string[], reference: string): Promise<ActionResult<{ amount: number }>> {
-  const admin = await requirePlatformAdmin();
-  if (orderIds.length === 0) return fail("Tidak ada pesanan.");
-  if (reference.trim().length < 3) return fail("Isi referensi transfer (mis. nomor bukti transfer).");
-
-  const refs = orderIds.map((id) => adminDb.collection("orders").doc(id));
-  const amount = await adminDb.runTransaction(async (tx) => {
-    const snaps = await tx.getAll(...refs);
-    let total = 0;
-    for (const s of snaps) {
-      if (!s.exists || s.get("store_id") !== storeId || s.get("settlement") !== "PLATFORM" || s.get("payment_status") !== "PAID" || s.get("payout_status") === "PAID_OUT") {
-        throw new Error(`Order ${s.id} is not an owed payout for this store`);
-      }
-      total += (s.get("amount") as number) - ((s.get("platform_fee") as number) ?? 0);
-      tx.update(s.ref, { payout_status: "PAID_OUT", payout_reference: reference.trim(), payout_at: FieldValue.serverTimestamp() });
-    }
-    return total;
-  }).catch((err: Error) => err);
-  if (amount instanceof Error) return fail("Daftar pesanan berubah. Muat ulang halaman lalu coba lagi.");
-
-  await audit("payout.mark_paid", storeId, admin.email, { orderIds, amount, reference });
-  revalidatePath("/platform", "layout");
-  return { ok: true, data: { amount } };
-}

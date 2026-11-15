@@ -8,7 +8,6 @@ const NAV = [
   { href: "/platform", label: "Ringkasan" },
   { href: "/platform/stores", label: "Toko" },
   { href: "/platform/users", label: "Pengguna" },
-  { href: "/platform/payouts", label: "Pencairan" },
 ];
 
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {

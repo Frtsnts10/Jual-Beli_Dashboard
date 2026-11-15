@@ -76,6 +76,29 @@ const pick = (list) => list[Math.floor(rand() * list.length)];
 const ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
 const code = (n) => Array.from({ length: n }, () => ALPHABET[Math.floor(rand() * ALPHABET.length)]).join("");
 const ts = (ms) => Timestamp.fromMillis(ms);
+
+// A well-formed (but fictional) static QRIS for the demo store, same format sellers upload.
+const tlv = (id, v) => `${id}${String(v.length).padStart(2, "0")}${v}`;
+function crc16(input) {
+  let crc = 0xffff;
+  for (let i = 0; i < input.length; i++) {
+    crc ^= input.charCodeAt(i) << 8;
+    for (let b = 0; b < 8; b++) crc = crc & 0x8000 ? ((crc << 1) ^ 0x1021) & 0xffff : (crc << 1) & 0xffff;
+  }
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+const QRIS_BODY =
+  tlv("00", "01") + tlv("01", "11") +
+  tlv("26", tlv("00", "ID.CO.QRIS.WWW") + tlv("01", "936009150000000001") + tlv("02", "ID1020099999999")) +
+  tlv("51", tlv("00", "ID.CO.QRIS.WWW") + tlv("02", "ID1020099999999") + tlv("03", "UMI")) +
+  tlv("52", "5815") + tlv("53", "360") + tlv("58", "ID") + tlv("59", "DIONYCTE STORE") + tlv("60", "JAKARTA") + "6304";
+const DEMO_QRIS = QRIS_BODY + crc16(QRIS_BODY);
+/** A stand-in "payment successful" screenshot for demo orders. */
+const proofImage = (amount, at) =>
+  "data:image/svg+xml;base64," +
+  Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="520"><rect width="360" height="520" fill="#f6f7f9"/><rect x="20" y="20" width="320" height="480" rx="16" fill="#fff"/><circle cx="180" cy="110" r="38" fill="#10b981"/><path d="M162 110l12 12 24-26" stroke="#fff" stroke-width="7" fill="none"/><text x="180" y="190" font-family="sans-serif" font-size="20" text-anchor="middle" font-weight="700">Pembayaran Berhasil</text><text x="180" y="240" font-family="sans-serif" font-size="30" text-anchor="middle" font-weight="700">Rp ${String(amount).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</text><text x="180" y="290" font-family="sans-serif" font-size="15" text-anchor="middle" fill="#555">ke DIONYCTE STORE (QRIS)</text><text x="180" y="320" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#888">${new Date(at).toISOString().slice(0, 16).replace("T", " ")} UTC</text></svg>`
+  ).toString("base64");
 const now = Date.now();
 
 // ---------------------------------------------------------------------------------------
@@ -118,7 +141,7 @@ async function deleteWhere(col) {
   return snap.size;
 }
 const wiped = [];
-for (const col of ["orders", "credentials_vault", "products", "broadcasts", "reviews", "vouchers", "restock_requests"]) wiped.push(`${await deleteWhere(col)} ${col}`);
+for (const col of ["orders", "credentials_vault", "products", "broadcasts", "reviews", "vouchers", "restock_requests", "payment_proofs"]) wiped.push(`${await deleteWhere(col)} ${col}`);
 const oldSubs = await db.collection("subscription_payments").where("uid", "==", uid).get();
 await Promise.all(oldSubs.docs.map((d) => d.ref.delete()));
 
@@ -149,13 +172,14 @@ await storeRef.set({
   },
   is_active: true,
   suspended: false,
+  payment: { qris_payload: DEMO_QRIS, merchant_name: "DIONYCTE STORE", nmid: "ID1020099999999", updated_at: ts(now - 40 * DAY) },
   store_info: {
     about:
       "Dionycte menjual akun premium resmi sejak 2024. Semua akun dicek sebelum dikirim, dan dikirim otomatis ke WhatsApp Anda begitu pembayaran masuk — 24 jam.",
     faq: [
       { q: "Berapa lama akun dikirim?", a: "Otomatis dalam 1–2 menit setelah pembayaran berhasil, langsung ke WhatsApp." },
       { q: "Apakah akunnya bergaransi?", a: "Ya, bergaransi penuh selama masa aktif. Klaim lewat halaman Lacak pesanan." },
-      { q: "Pembayaran pakai apa saja?", a: "QRIS, OVO, DANA, ShopeePay dan transfer virtual account." },
+      { q: "Pembayaran pakai apa saja?", a: "QRIS — bisa dibayar dari semua e-wallet (GoPay, OVO, DANA, ShopeePay) dan m-banking. Unggah bukti bayar, akun dikirim setelah kami konfirmasi." },
     ],
     warranty_policy:
       "Garansi penuh selama masa aktif akun. Jika akun tidak bisa dipakai, klaim lewat halaman Lacak pesanan atau menu Akun → Pesanan. Akun pengganti dikirim maksimal 1×24 jam. Garansi tidak berlaku jika password atau profil diubah oleh pembeli.",
@@ -245,7 +269,6 @@ const CUSTOMERS = [
   ["kirana", "Kirana"], ["lestari", "Lestari"], ["maya", "Maya"], ["nanda", "Nanda"], ["putri", "Putri"],
 ];
 const REFERRALS = ["ANDIREF", "PROMOKAMPUS", "TIKTOK10"];
-const FEE_PERCENT = 1; // Ultimate
 
 const batchOps = [];
 let credSeq = 0;
@@ -279,6 +302,7 @@ await db.collection("products").doc(productId("netflix")).update({ stock_availab
 await db.collection("products").doc(productId("spotify")).update({ stock_available: PRODUCTS[1].stock + 3 });
 
 const orders = [];
+const proofs = [];
 const usedIds = new Set();
 function orderId() {
   let id;
@@ -287,13 +311,14 @@ function orderId() {
   return id;
 }
 
-function order(product, { daysAgo, status = "PAID", settlement, warranty = null, needsStock = false, deliveryError = null }) {
+function order(product, { daysAgo, status = "PAID", warranty = null, needsStock = false, deliveryError = null, proof = status === "PAID", rejected = null }) {
   const id = orderId();
   const [handle] = pick(CUSTOMERS);
   const created = now - daysAgo * DAY - Math.floor(rand() * 10) * 3_600_000;
   const paid = status === "PAID" ? created + 4 * 60_000 : null;
   const isBundle = !!product.items;
-  const amount = product.flash && daysAgo < 3 ? product.flash.price : product.price;
+  const uniqueCode = 1 + Math.floor(rand() * 499);
+  const amount = (product.flash && daysAgo < 3 ? product.flash.price : product.price) + uniqueCode;
   const access = paid ? paid + product.days * DAY : null;
 
   const credentialIds = [];
@@ -302,8 +327,8 @@ function order(product, { daysAgo, status = "PAID", settlement, warranty = null,
       credentialIds.push(credential(key, { status: "SOLD", orderId: id, soldAt: paid, expiry: access }));
     }
   }
-  const fee = Math.round((amount * FEE_PERCENT) / 100);
-  const settle = status === "PAID" ? (settlement ?? (daysAgo > 7 ? "PLATFORM" : pick(["PLATFORM", "MANUAL"]))) : "PLATFORM";
+  const proofAt = proof ? created + 3 * 60_000 : null;
+  if (proofAt) proofs.push([id, amount, proofAt]);
   orders.push([db.collection("orders").doc(id), {
     store_id: STORE_ID,
     product_id: productId(product.key),
@@ -313,8 +338,11 @@ function order(product, { daysAgo, status = "PAID", settlement, warranty = null,
     credential_ids: credentialIds,
     customer_contact: { email: `${handle}${Math.floor(rand() * 90 + 10)}@example.com`, phone: `62812${String(10_000_000 + Math.floor(rand() * 89_999_999))}` },
     payment_status: status,
-    xendit_invoice_id: null,
-    xendit_invoice_url: null,
+    payment_method: "QRIS",
+    unique_code: uniqueCode,
+    pay_by: ts(created + 60 * 60_000),
+    proof_uploaded_at: proofAt ? ts(proofAt) : null,
+    rejected_reason: rejected,
     delivery_status: status === "PAID" && !needsStock && !deliveryError ? "SENT_VIA_WA" : "PENDING",
     delivery_error: deliveryError,
     warranty_status: warranty ? "CLAIMED" : "VALID",
@@ -322,9 +350,6 @@ function order(product, { daysAgo, status = "PAID", settlement, warranty = null,
     needs_stock: needsStock,
     renewal_notified: !!access && access - now < 3 * DAY,
     referral_code: rand() < 0.25 ? pick(REFERRALS) : null,
-    settlement: settle,
-    platform_fee: status === "PAID" ? fee : 0,
-    payout_status: status === "PAID" && settle === "PLATFORM" ? (daysAgo > 7 ? "PAID_OUT" : "OWED") : null,
     created_at: ts(created),
     paid_at: paid ? ts(paid) : null,
     access_expires_at: access ? ts(access) : null,
@@ -339,16 +364,29 @@ for (let i = 0; i < 3; i++) order({ ...BUNDLE }, { daysAgo: Math.floor(rand() * 
 const claimId = order(PRODUCTS[0], { daysAgo: 5, warranty: "Password tidak bisa dipakai login sejak kemarin." });
 const needsStockId = order(PRODUCTS[5], { daysAgo: 1, needsStock: true }); // VPN sold out after payment
 const deliveryErrorId = order(PRODUCTS[1], { daysAgo: 0, deliveryError: "WhatsApp belum dikonfigurasi di Pengaturan." });
-const pendingId = order(PRODUCTS[3], { daysAgo: 0, status: "PENDING" });
-order(PRODUCTS[2], { daysAgo: 2, status: "PENDING" });
-order(PRODUCTS[4], { daysAgo: 6, status: "FAILED" });
+// Buyer paid and uploaded proof — waiting for the seller's "Cek bukti" confirmation.
+const pendingId = order(PRODUCTS[3], { daysAgo: 0, status: "PENDING", proof: true });
+order(PRODUCTS[2], { daysAgo: 2, status: "FAILED", rejected: "Tidak dibayar sebelum batas waktu" });
+order(PRODUCTS[4], { daysAgo: 6, status: "FAILED", proof: true, rejected: "Dana tidak masuk" });
 
 
 // ---------------------------------------------------------------------------------------
 // 6b. A buyer account: signs in on the storefront and sees their orders, profile and claim
 
+// Fixed, easy-to-remember login (same password as the seller). The warranty-claim order and
+// the payment waiting for confirmation are theirs, so both sides of every flow can be tried.
+const BUYER_EMAIL = "pembeli@dionycte.com";
 const claimOrder = orders.find(([ref]) => ref.id === claimId)[1];
-const BUYER_EMAIL = claimOrder.customer_contact.email;
+claimOrder.customer_contact = { email: BUYER_EMAIL, phone: "6281311112222" };
+orders.find(([ref]) => ref.id === pendingId)[1].customer_contact = { ...claimOrder.customer_contact };
+// Earlier versions of this script used a random example.com buyer; remove it.
+for (const old of ["indra42@example.com"]) {
+  const u = await auth.getUserByEmail(old).catch(() => null);
+  if (u && !(await db.collection("users").doc(u.uid).get()).exists) {
+    await db.collection("customers").doc(u.uid).delete();
+    await auth.deleteUser(u.uid);
+  }
+}
 let buyerUid;
 try {
   buyerUid = (await auth.getUserByEmail(BUYER_EMAIL)).uid;
@@ -361,7 +399,6 @@ await db.collection("customers").doc(buyerUid).set({
   email: BUYER_EMAIL,
   name: "Indra Pembeli",
   phone: claimOrder.customer_contact.phone,
-  saved_checkout: { last_channel: "OVO" },
   created_at: ts(now - 20 * DAY),
 });
 // Give them a realistic history: three more paid orders become theirs.
@@ -370,8 +407,8 @@ for (const [, o] of orders.filter(([ref, o]) => ref.id !== claimId && o.payment_
 }
 // Half of their orders were placed signed in; the rest get linked on first visit (verified email).
 let linkedCount = 0;
-for (const [, o] of orders) {
-  if (o.customer_contact.email === BUYER_EMAIL && linkedCount++ % 2 === 0) o.customer_uid = buyerUid;
+for (const [ref, o] of orders) {
+  if (o.customer_contact.email === BUYER_EMAIL && (ref.id === pendingId || linkedCount++ % 2 === 0)) o.customer_uid = buyerUid;
 }
 
 // Vouchers: HEMAT10 was used on a few paid orders; DIONYCTE5K is fresh; LEBARAN expired.
@@ -385,7 +422,6 @@ for (const [, o] of hemat) {
   o.voucher_code = "HEMAT10";
   o.discount = Math.min(Math.floor(o.amount / 10), 20_000);
   o.amount -= o.discount;
-  o.platform_fee = Math.round((o.amount * FEE_PERCENT) / 100);
 }
 for (const [, o] of orders) {
   o.voucher_code ??= null;
@@ -406,6 +442,11 @@ for (const v of VOUCHERS) {
     active: true,
     created_at: ts(now - 10 * DAY),
   }]);
+}
+
+for (const [id, , at] of proofs) {
+  const o = orders.find(([ref]) => ref.id === id)[1];
+  batchOps.push([db.collection("payment_proofs").doc(id), { store_id: STORE_ID, image: proofImage(o.amount, at), uploaded_at: ts(at) }]);
 }
 
 for (let i = 0; i < batchOps.length + orders.length; i += 400) {
@@ -510,14 +551,16 @@ console.log(`
   Restock      3 buyers waiting for NordVPN (add stock in Brankas → WhatsApp via n8n)
   Vouchers     HEMAT10 (10%, maks 20rb), DIONYCTE5K (Rp 5.000, min. 40rb), LEBARAN (expired)
   Vault        ${credSeq} credentials (encrypted)
-  Orders       ${orders.length} (${paidCount} paid, 2 pending, 1 failed)
+  Orders       ${orders.length} (${paidCount} paid, 1 awaiting confirmation, 2 failed)
 
-  Buyer login  ${BUYER_EMAIL} (same password) — storefront /masuk
+  Buyer login  ${BUYER_EMAIL} (same password) — on the storefront: /masuk
+               Has paid orders, a warranty claim and a payment awaiting confirmation;
+               shows up as "Indra Pembeli" in dashboard → Pelanggan.
 
   Try these:
     Storefront (local)   http://localhost:3001/${SLUG}
     Track a claim        order ${claimId} + email ${claimEmail}
-    Pending payment      ${pendingId}
+    Awaiting your OK     ${pendingId}   (Pesanan → "Cek bukti")
     Waiting for stock    ${needsStockId}   (add NordVPN stock in Brankas to fulfil it)
     Delivery failed      ${deliveryErrorId}
 `);

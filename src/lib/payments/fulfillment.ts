@@ -32,7 +32,7 @@ async function pickCredentials(tx: Transaction, componentIds: string[]) {
  * that already has credentials is left alone. A paid order without enough stock is flagged
  * `needs_stock`; calling this again after the seller restocks allocates it.
  */
-export async function fulfillOrder(orderId: string, opts: { invoiceId?: string } = {}): Promise<FulfillResult> {
+export async function fulfillOrder(orderId: string): Promise<FulfillResult> {
   const orderRef = adminDb.collection("orders").doc(orderId);
 
   return adminDb.runTransaction(async (tx) => {
@@ -47,7 +47,6 @@ export async function fulfillOrder(orderId: string, opts: { invoiceId?: string }
     const paidFields = {
       payment_status: "PAID",
       paid_at: order.get("paid_at") ?? now,
-      ...(opts.invoiceId ? { xendit_invoice_id: opts.invoiceId } : {}),
     };
     if (!picks) {
       tx.update(orderRef, { ...paidFields, needs_stock: true });

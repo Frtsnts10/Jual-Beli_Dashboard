@@ -1,16 +1,11 @@
 import { timingSafeEqual } from "node:crypto";
-import { after, NextRequest, NextResponse } from "next/server";
-import { FieldValue } from "firebase-admin/firestore";
+import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
-import { fulfillOrder } from "@/lib/payments/fulfillment";
-import { deliverOrder } from "@/lib/integrations/automation";
 import { applySubscriptionPayment } from "@/lib/payments/subscriptions";
 
 // Xendit Invoice callback. Configure in Xendit Dashboard → Settings → Webhooks →
 // "Invoices paid", pointing at https://<dashboard-domain>/api/webhooks/xendit.
-// Handles both storefront orders (external_id ORD-…) and plan purchases (SUB-…).
-// Invoices created on behalf of a seller's sub-account (for-user-id) are reported to
-// the platform (master) account's callback URL with the master's verification token.
+// Only plan purchases (external_id SUB-…) use Xendit; store orders are paid by QRIS.
 // Xendit authenticates callbacks with the account's verification token, sent in the
 // x-callback-token header; it must equal XENDIT_WEBHOOK_TOKEN.
 
@@ -55,70 +50,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  if (!body?.external_id?.startsWith("ORD-")) {
-    return NextResponse.json({ ok: true, ignored: "unknown invoice" });
-  }
-
-  const orderRef = adminDb.collection("orders").doc(body.external_id);
-  const order = await orderRef.get();
-  if (!order.exists) return NextResponse.json({ error: "Order not found" }, { status: 404 });
-
-  // The invoice must be the one this order created, for the amount the order expects.
-  const expectedInvoice = order.get("xendit_invoice_id");
-  if (expectedInvoice && expectedInvoice !== body.id) {
-    return NextResponse.json({ error: "Invoice mismatch" }, { status: 400 });
-  }
-
-  if (body.status === "PAID" || body.status === "SETTLED") {
-    const paid = body.paid_amount ?? body.amount;
-    if (paid !== order.get("amount")) {
-      console.error(`Amount mismatch on ${body.external_id}: paid ${paid}, expected ${order.get("amount")}`);
-      return NextResponse.json({ error: "Amount mismatch" }, { status: 400 });
-    }
-    const result = await fulfillOrder(body.external_id, { invoiceId: body.id });
-    await rememberChannel(orderRef, order.get("customer_uid"), body.payment_channel);
-    // Pro/Ultimate: push the account to the buyer's WhatsApp via n8n, after acknowledging Xendit.
-    if (result === "fulfilled") after(() => deliverOrder(body.external_id, "paid"));
-    return NextResponse.json({ ok: true, result });
-  }
-
-  if (body.status === "EXPIRED" && order.get("payment_status") === "PENDING") {
-    await failOrderReleasingVoucher(orderRef);
-  }
-  return NextResponse.json({ ok: true });
-}
-
-/**
- * An unpaid order gives its voucher use back, so expired invoices don't eat the quota.
- * One transaction, so a retried callback can't release twice.
- */
-async function failOrderReleasingVoucher(orderRef: FirebaseFirestore.DocumentReference) {
-  await adminDb.runTransaction(async (tx) => {
-    const order = await tx.get(orderRef);
-    if (order.get("payment_status") !== "PENDING") return;
-    const code = order.get("voucher_code") as string | null;
-    const voucherRef = code ? adminDb.collection("vouchers").doc(`${order.get("store_id")}_${code}`) : null;
-    const voucher = voucherRef ? await tx.get(voucherRef) : null;
-    tx.update(orderRef, { payment_status: "FAILED" });
-    if (voucherRef && voucher?.exists && (voucher.get("used_count") ?? 0) > 0) {
-      tx.update(voucherRef, { used_count: FieldValue.increment(-1) });
-    }
-  });
-}
-
-/**
- * Stores how the order was paid and, for a buyer account, remembers it so the storefront can
- * offer "pay with OVO again" next time. Best effort: never fails the callback.
- */
-async function rememberChannel(orderRef: FirebaseFirestore.DocumentReference, customerUid: unknown, channel: string | undefined) {
-  if (!channel || !/^[A-Z_]{2,20}$/.test(channel)) return;
-  try {
-    await orderRef.update({ payment_channel: channel });
-    if (typeof customerUid === "string" && customerUid) {
-      // update (not set): never resurrect a profile the buyer deleted.
-      await adminDb.collection("customers").doc(customerUid).update({ "saved_checkout.last_channel": channel });
-    }
-  } catch (err) {
-    console.error("Could not record payment channel:", err);
-  }
+  // Store orders are paid to each seller's own QRIS and confirmed in the dashboard;
+  // only plan purchases still come through Xendit.
+  return NextResponse.json({ ok: true, ignored: "not a plan purchase" });
 }

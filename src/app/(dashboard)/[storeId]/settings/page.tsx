@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IntegrationsForm } from "@/features/settings/integrations-form";
-import { PaymentCard } from "@/features/payouts/payout-card";
+import { QrisCard } from "@/features/payments/qris-card";
 import { inspectDomain, routingRecords, vercelDomainsEnabled } from "@/lib/integrations/vercel-domains";
 import { storefrontUrl } from "@/lib/store-url";
 import { DomainCard } from "@/features/domains/domain-card";
@@ -43,6 +43,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
       <PageHeader title="Pengaturan" description="Profil toko, tampilan etalase dan integrasi." />
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] [&>*]:min-w-0">
         <div className="grid min-w-0 gap-6 [&>*]:min-w-0">
+          {isOwner && <QrisCard storeId={storeId} payment={store.payment} />}
           {isOwner && (
           <DomainCard
             storeId={storeId}
@@ -56,7 +57,6 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
           )}
           <StoreSettingsForm store={store} allowedTemplates={tier.templates} rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN} />
           <StoreInfoForm storeId={storeId} info={store.store_info} />
-          {isOwner && <PaymentCard storeId={storeId} status={integrations.get("xendit_account_status") ?? null} feePercent={tier.feePercent} />}
           <IntegrationsForm
             storeId={storeId}
             provider={integrations.get("wa_api_provider") ?? null}
@@ -96,7 +96,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
               const t = TIERS[key];
               return (
                 <div key={key} className={key === user.subscription_tier ? "font-medium" : "text-muted-foreground"}>
-                  {t.name} — {t.priceMonthly ? `${formatIDR(t.priceMonthly)}/bln` : "Gratis"} · fee {t.feePercent}% ·{" "}
+                  {t.name} — {t.priceMonthly ? `${formatIDR(t.priceMonthly)}/bln` : "Gratis"} ·{" "}
                   {Number.isFinite(t.maxStores) ? `${t.maxStores} toko` : "toko tanpa batas"}
                 </div>
               );
@@ -112,7 +112,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
               <CardTitle className="flex items-center gap-2">
                 Anda admin <Badge variant="secondary">{tier.name}</Badge>
               </CardTitle>
-              <CardDescription>Langganan, pencairan dana, domain dan tim dikelola pemilik toko.</CardDescription>
+              <CardDescription>Langganan, QRIS pembayaran, domain dan tim dikelola pemilik toko.</CardDescription>
             </CardHeader>
           </Card>
         )}

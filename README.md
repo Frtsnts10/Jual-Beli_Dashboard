@@ -10,7 +10,7 @@ Spec: `plan-dashboard.md` (phase 1 implemented — see *Roadmap*).
 ## Stack
 
 Next.js 16 (App Router, Server Components + Server Actions) · Tailwind CSS 4 ·
-shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · Xendit.
+shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · QRIS (each seller's own) · Xendit (plan billing only, being replaced).
 
 ## Routes
 
@@ -24,12 +24,12 @@ shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · Xend
 | `/[storeId]/vault` | Credential vault — Available / Sold / Expired tabs, bulk import |
 | `/[storeId]/orders` | Orders, manual payment confirm, WhatsApp delivery, 1-click warranty replacement |
 | `/[storeId]/analytics` | Revenue, conversion, daily chart, top products/referrals; CSV export (`/analytics/export`) |
-| `/platform` | Platform admin (emails in `PLATFORM_ADMIN_EMAILS`): totals, stores (suspend), users (set plan), seller payouts |
+| `/platform` | Platform admin (emails in `PLATFORM_ADMIN_EMAILS`): totals, stores (suspend), users (set plan) |
 | `/[storeId]/marketing` | Ultimate: WhatsApp broadcast, affiliate report + link builder, flash sale |
 | `/[storeId]/billing` | Plan upgrade/renewal (monthly/yearly) paid via Xendit invoice, payment history |
-| `/[storeId]/settings` | Store profile, template (tier-gated), accent colour, custom domain, Xendit connection, WA integration |
+| `/[storeId]/settings` | Store QRIS (Pembayaran), store profile, template (tier-gated), accent colour, custom domain, WA integration |
 | `/api/cron/renewal-reminders` | Daily (vercel.json): H-3 renewal reminders via n8n |
-| `/api/webhooks/xendit` | Invoice callback: `ORD-…` → order PAID + vault credential; `SUB-…` → activate/extend plan |
+| `/api/webhooks/xendit` | Plan-purchase invoice callback (`SUB-…` → activate/extend plan) |
 
 ## Project layout
 
@@ -38,11 +38,11 @@ src/
   app/                 routes — (auth), (dashboard)/[storeId]/…, (platform)/platform, api/
   components/ui/       shadcn/ui primitives
   config/tiers.ts      plans, templates, limits
-  features/<area>/     UI + server actions per area (products, vault, orders, payouts, team, bots…)
+  features/<area>/     UI + server actions per area (products, vault, orders, payments, team, bots…)
   lib/
     access/            session, store access (requireStore), platform admins, team
     data/              Firestore mappers and read queries (incl. analytics)
-    payments/          Xendit client, order fulfilment, plan subscriptions
+    payments/          order fulfilment, manual QRIS confirmation/expiry, plan subscriptions
     integrations/      n8n automation, WhatsApp text, Telegram/Discord bots, Vercel domains
     firebase/          Admin + client SDK setup
     vault-crypto.ts    encryption at rest for vault secrets
@@ -76,14 +76,21 @@ marketing). `users.subscription_tier` is server-only and set by the webhook when
 `subscription_payments` invoice is paid. A paid plan past `subscription_expiry` acts as
 Starter (computed on read, no cron).
 
-## Payments (XenPlatform)
+## Payments (seller's own QRIS)
 
-- **Connect Xendit** (Settings) creates a MANAGED sub-account; Xendit emails the seller to
-  finish KYC. Status is mirrored in `stores/{id}/private/integrations`.
-- Once the sub-account is **LIVE**, storefront invoices are created with `for-user-id`
-  (money goes to the seller) and `with-split-rule` (the plan's fee % goes to the platform
-  account `XENDIT_MASTER_ACCOUNT_ID`). Before that, the platform account collects
-  (`orders.settlement = "PLATFORM"`) and owes the seller `amount − platform_fee`.
+Store orders are paid straight to each seller's own QRIS — the platform never holds buyers'
+money and charges no transaction fee.
+
+- **Settings → Pembayaran**: the owner uploads their static QRIS image; it is decoded in the
+  browser (`jsqr`), validated (`lib/qris.ts`: format, CRC, Rupiah) and only the payload is
+  stored on `stores.payment`.
+- **Checkout** (storefront) adds a 1–499 rupiah *kode unik* and shows that QRIS with the
+  exact amount filled in. The buyer must upload a payment screenshot within 60 minutes
+  (`payment_proofs/{orderId}`).
+- **Pesanan → Cek pembayaran**: the seller compares the proof with their mutations and
+  confirms (PAID → vault credential → WhatsApp delivery) or rejects with a reason. Rejected
+  and expired orders release their voucher use (`lib/payments/manual.ts`). Unpaid orders
+  expire when the seller opens Pesanan and nightly with the renewal cron.
 
 ## Development
 
@@ -138,7 +145,7 @@ live check still runs.
 Settings → **Tim admin**: the owner invites admins by email. A verified existing account
 gets access at once; otherwise the invitation (`store_invites`) is accepted the first time
 that address signs in with a verified email. Admins (`stores.admin_uids`) manage products,
-vault, orders, marketing, bots and storefront settings; billing, payouts (Xendit),
+vault, orders, marketing, bots and storefront settings; billing, the store's QRIS,
 domains and the team stay owner-only. Plan limits always follow the **owner's** plan.
 
 ## Bundles (Ultimate)
@@ -165,8 +172,7 @@ rewrites the Host header.
 ## Platform admin
 
 `/platform` is for the SaaS operator, not sellers. Access: the signed-in email must be in
-`PLATFORM_ADMIN_EMAILS` **and** verified (everyone else gets a 404). It shows GMV, platform
-fees and subscription revenue for the month; lets you suspend a store (storefront, checkout
-and bots close, the seller sees a banner), set any user's plan by hand, and settle what the
-platform owes sellers for orders it collected (`settlement = PLATFORM`). Every action is
-written to `platform_audit`.
+`PLATFORM_ADMIN_EMAILS` **and** verified (everyone else gets a 404). It shows GMV and
+subscription revenue for the month; lets you suspend a store (storefront, checkout and bots
+close, the seller sees a banner) and set any user's plan by hand. Every action is written to
+`platform_audit`.
