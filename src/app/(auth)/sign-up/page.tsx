@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GoogleButton } from "@/features/auth/google-button";
+import { GoogleButton, OrDivider } from "@/features/auth/google-button";
 import { authErrorMessage, startSession } from "@/features/auth/start-session";
 
 export default function SignUpPage() {
@@ -57,6 +57,7 @@ export default function SignUpPage() {
           <Button type="submit" disabled={pending}>
             {pending ? "Memproses…" : "Daftar"}
           </Button>
+          <OrDivider />
           <GoogleButton next="/onboarding" disabled={pending} onError={setError} />
           <p className="text-muted-foreground text-center text-sm">
             Sudah punya akun?{" "}

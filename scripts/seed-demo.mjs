@@ -373,8 +373,20 @@ order(PRODUCTS[4], { daysAgo: 6, status: "FAILED", proof: true, rejected: "Dana 
 // ---------------------------------------------------------------------------------------
 // 6b. A buyer account: signs in on the storefront and sees their orders, profile and claim
 
+// Fixed, easy-to-remember login (same password as the seller). The warranty-claim order and
+// the payment waiting for confirmation are theirs, so both sides of every flow can be tried.
+const BUYER_EMAIL = "pembeli@dionycte.com";
 const claimOrder = orders.find(([ref]) => ref.id === claimId)[1];
-const BUYER_EMAIL = claimOrder.customer_contact.email;
+claimOrder.customer_contact = { email: BUYER_EMAIL, phone: "6281311112222" };
+orders.find(([ref]) => ref.id === pendingId)[1].customer_contact = { ...claimOrder.customer_contact };
+// Earlier versions of this script used a random example.com buyer; remove it.
+for (const old of ["indra42@example.com"]) {
+  const u = await auth.getUserByEmail(old).catch(() => null);
+  if (u && !(await db.collection("users").doc(u.uid).get()).exists) {
+    await db.collection("customers").doc(u.uid).delete();
+    await auth.deleteUser(u.uid);
+  }
+}
 let buyerUid;
 try {
   buyerUid = (await auth.getUserByEmail(BUYER_EMAIL)).uid;
@@ -395,8 +407,8 @@ for (const [, o] of orders.filter(([ref, o]) => ref.id !== claimId && o.payment_
 }
 // Half of their orders were placed signed in; the rest get linked on first visit (verified email).
 let linkedCount = 0;
-for (const [, o] of orders) {
-  if (o.customer_contact.email === BUYER_EMAIL && linkedCount++ % 2 === 0) o.customer_uid = buyerUid;
+for (const [ref, o] of orders) {
+  if (o.customer_contact.email === BUYER_EMAIL && (ref.id === pendingId || linkedCount++ % 2 === 0)) o.customer_uid = buyerUid;
 }
 
 // Vouchers: HEMAT10 was used on a few paid orders; DIONYCTE5K is fresh; LEBARAN expired.
@@ -541,7 +553,9 @@ console.log(`
   Vault        ${credSeq} credentials (encrypted)
   Orders       ${orders.length} (${paidCount} paid, 1 awaiting confirmation, 2 failed)
 
-  Buyer login  ${BUYER_EMAIL} (same password) — storefront /masuk
+  Buyer login  ${BUYER_EMAIL} (same password) — on the storefront: /masuk
+               Has paid orders, a warranty claim and a payment awaiting confirmation;
+               shows up as "Indra Pembeli" in dashboard → Pelanggan.
 
   Try these:
     Storefront (local)   http://localhost:3001/${SLUG}
