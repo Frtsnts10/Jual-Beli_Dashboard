@@ -11,7 +11,7 @@ export default async function PlatformUsersPage() {
   const users = await allUsers();
   return (
     <>
-      <PageHeader title="Pengguna" description="Atur paket manual (komplimen, refund, pembayaran di luar Xendit). Semua perubahan tercatat di audit log." />
+      <PageHeader title="Pengguna" description="Atur paket manual (komplimen, refund, pembayaran di luar QRIS platform). Semua perubahan tercatat di audit log." />
       <div className="rounded-lg border">
         <Table>
           <TableHeader>

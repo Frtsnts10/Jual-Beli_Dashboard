@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { inspectQris } from "@/lib/qris";
 import { formatDate } from "@/lib/utils";
 import type { StorePayment } from "@/types/schema";
-import { removeStoreQris, saveStoreQris } from "./actions";
+import type { ActionResult } from "@/lib/action-result";
 
 /** Reads the QR code out of an uploaded image entirely in the browser (the image is never uploaded). */
 async function decodeQrImage(file: File): Promise<string | null> {
@@ -25,7 +25,25 @@ async function decodeQrImage(file: File): Promise<string | null> {
   return jsQR(data.data, data.width, data.height, { inversionAttempts: "attemptBoth" })?.data ?? null;
 }
 
-export function QrisCard({ storeId, payment }: { storeId: string; payment: StorePayment | null }) {
+/**
+ * Upload / replace a static QRIS. Used for a store's own QRIS (Settings → Pembayaran) and for
+ * the platform's QRIS (plan purchases); the caller passes the bound save/remove actions.
+ */
+export function QrisCard({
+  payment,
+  save,
+  remove,
+  title = "Pembayaran — QRIS toko",
+  description = "Pembeli membayar langsung ke QRIS Anda dengan nominal pas (ditambah kode unik). Mereka wajib mengunggah bukti bayar, lalu Anda konfirmasi di menu Pesanan setelah cek mutasi. Tanpa biaya platform.",
+  missing = "Belum ada QRIS — pembeli belum bisa checkout.",
+}: {
+  payment: StorePayment | null;
+  save: (payload: string) => Promise<ActionResult<{ merchant: string }>>;
+  remove: () => Promise<ActionResult>;
+  title?: string;
+  description?: string;
+  missing?: string;
+}) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [pending, start] = useTransition();
   const [reading, setReading] = useState(false);
@@ -41,7 +59,7 @@ export function QrisCard({ storeId, payment }: { storeId: string; payment: Store
       const info = inspectQris(payload);
       if (!info.ok) return setError(info.error);
       start(async () => {
-        const res = await saveStoreQris(storeId, payload);
+        const res = await save(payload);
         if (!res.ok) return void setError(res.error);
         toast.success(`QRIS ${res.data?.merchant} tersimpan`);
       });
@@ -58,12 +76,9 @@ export function QrisCard({ storeId, payment }: { storeId: string; payment: Store
     <Card id="pembayaran" className="scroll-mt-4">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <QrCode className="size-5" /> Pembayaran — QRIS toko
+          <QrCode className="size-5" /> {title}
         </CardTitle>
-        <CardDescription>
-          Pembeli membayar langsung ke QRIS Anda dengan nominal pas (ditambah kode unik). Mereka wajib mengunggah bukti bayar, lalu Anda konfirmasi di
-          menu Pesanan setelah cek mutasi. Tanpa biaya platform.
-        </CardDescription>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 text-sm">
         {payment ? (
@@ -78,11 +93,11 @@ export function QrisCard({ storeId, payment }: { storeId: string; payment: Store
           </div>
         ) : (
           <p className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
-            Belum ada QRIS — pembeli belum bisa checkout.
+            {missing}
           </p>
         )}
         <p className="text-muted-foreground text-xs">
-          Upload gambar QRIS statis toko Anda (dari GoPay/OVO/DANA Merchant, QRIS bank, dll). Gambar hanya dibaca di browser; yang disimpan hanya kode QRIS-nya.
+          Upload gambar QRIS statis (dari GoPay/OVO/DANA Merchant, QRIS bank, dll). Gambar hanya dibaca di browser; yang disimpan hanya kode QRIS-nya.
         </p>
         {error && <p className="text-destructive text-sm">{error}</p>}
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
@@ -93,9 +108,9 @@ export function QrisCard({ storeId, payment }: { storeId: string; payment: Store
             variant="ghost"
             disabled={busy}
             onClick={() =>
-              confirm("Hapus QRIS? Pembeli tidak bisa checkout sampai Anda upload QRIS lagi.") &&
+              confirm("Hapus QRIS? Pembayaran tidak bisa dilakukan sampai QRIS di-upload lagi.") &&
               start(async () => {
-                const res = await removeStoreQris(storeId);
+                const res = await remove();
                 if (!res.ok) toast.error(res.error);
               })
             }

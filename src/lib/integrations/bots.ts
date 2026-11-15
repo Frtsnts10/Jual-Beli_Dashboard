@@ -9,7 +9,7 @@ import { effectivePrice } from "@/types/schema";
 
 // Community bots (Ultimate, plan §3 "Bot Komunitas"): Telegram and Discord groups can ask
 // the store's bot for the catalogue and get one-tap checkout links. Checkout itself stays
-// on the storefront (same 2-field form + Xendit), so bots never handle payment data.
+// on the storefront (same 2-field form + QRIS), so bots never handle payment data.
 // Links carry ?ref=telegram / ?ref=discord, so bot sales show up in the affiliate report.
 
 export const TELEGRAM_API = process.env.TELEGRAM_API_BASE ?? "https://api.telegram.org";

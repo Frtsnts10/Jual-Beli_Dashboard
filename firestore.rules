@@ -9,10 +9,10 @@ rules_version = '2';
 //
 // - Writes are server-only everywhere. Server actions enforce things rules cannot see
 //   cleanly (tier limits, unique slugs, prices taken from the product, PAID only via the
-//   verified Xendit webhook), so allowing client writes would let a tenant bypass them.
+//   seller's or admin's confirmation), so allowing client writes would let a tenant bypass them.
 // - Dashboard tenants can read only their own stores, products, vault and orders.
 // - The public can read active stores and published products (storefront catalogue).
-//   Store secrets (WA token, Xendit sub-account) live in stores/{id}/private/*, which is
+//   Store secrets (WA token, bot tokens) live in stores/{id}/private/*, which is
 //   never readable by clients.
 // - Orders are created by the storefront's server route, never directly by browsers:
 //   a public `create` rule would let anyone write orders with an arbitrary amount.

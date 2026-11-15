@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IntegrationsForm } from "@/features/settings/integrations-form";
 import { QrisCard } from "@/features/payments/qris-card";
+import { removeStoreQris, saveStoreQris } from "@/features/payments/actions";
 import { inspectDomain, routingRecords, vercelDomainsEnabled } from "@/lib/integrations/vercel-domains";
 import { storefrontUrl } from "@/lib/store-url";
 import { DomainCard } from "@/features/domains/domain-card";
@@ -43,7 +44,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ store
       <PageHeader title="Pengaturan" description="Profil toko, tampilan etalase dan integrasi." />
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] [&>*]:min-w-0">
         <div className="grid min-w-0 gap-6 [&>*]:min-w-0">
-          {isOwner && <QrisCard storeId={storeId} payment={store.payment} />}
+          {isOwner && <QrisCard payment={store.payment} save={saveStoreQris.bind(null, storeId)} remove={removeStoreQris.bind(null, storeId)} />}
           {isOwner && (
           <DomainCard
             storeId={storeId}
