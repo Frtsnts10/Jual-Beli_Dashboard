@@ -61,6 +61,20 @@ Sent right after the seller adds stock to a product that buyers asked to be told
 Requests are marked notified only when n8n answers 2xx; on an error they stay pending and
 are sent with the next restock.
 
+### `order.notice` (Pro & Ultimate)
+Short payment notices — same shape as `order.delivery`, handle it in the same branch (send
+`message` to `to`):
+```json
+{ "event": "order.notice", "kind": "buyer_paid" | "buyer_rejected" | "seller_proof",
+  "order_id": "ORD-…", "store_id": "…", "to": "62812…", "message": "…", "wa": {…} }
+```
+- `buyer_paid` / `buyer_rejected`: from the dashboard when the seller confirms or rejects a
+  payment (one per checkout; a cart is one message). `buyer_paid` carries the receipt link
+  (`<storefront>/struk/<order id>`). The seller can turn these off in *Pengaturan → WhatsApp & Bot*.
+- `seller_proof`: from the **storefront** when a buyer uploads a payment proof, to the
+  seller's own number set in the same card. The storefront needs `N8N_WEBHOOK_URL` and
+  `N8N_WEBHOOK_SECRET` too (same values as the dashboard).
+
 ## Provider calls (examples)
 
 - **Fonnte**: `POST https://api.fonnte.com/send`, header `Authorization: <token>`, form

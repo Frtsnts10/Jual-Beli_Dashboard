@@ -1,4 +1,5 @@
 import { requireStore } from "@/lib/access/auth";
+import { storefrontUrl } from "@/lib/store-url";
 import { adminDb } from "@/lib/firebase/admin";
 import { getCredentialsByIds, listOrders, listProducts } from "@/lib/data/queries";
 import { DEFAULT_WA_TEMPLATE } from "@/config/tiers";
@@ -30,6 +31,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ storeId
       <OrdersTable
         storeId={storeId}
         storeName={store.store_name}
+        storefront={storefrontUrl(store)}
         orders={orders}
         credentials={credentials}
         productTitles={Object.fromEntries(products.map((p) => [p.id, p.title]))}

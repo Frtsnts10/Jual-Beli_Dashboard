@@ -3,7 +3,7 @@ import { createHmac } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { deliveryMessage, fillTemplate, waNumber } from "@/lib/integrations/whatsapp";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatIDR } from "@/lib/utils";
 import { DEFAULT_WA_TEMPLATE, TIERS } from "@/config/tiers";
 import { effectiveTier } from "@/lib/data/mappers";
 import { decryptSecret } from "@/lib/vault-crypto";
@@ -202,5 +202,43 @@ export async function notifyRestock(storeId: string, restockedIds: string[]): Pr
   } catch (err) {
     console.error(`Restock notification failed for ${storeId}:`, err);
     return 0;
+  }
+}
+
+/**
+ * Payment outcome to the buyer's WhatsApp (Pro & Ultimate with a provider, unless the seller
+ * turned it off): confirmed with the receipt link, or rejected with the seller's reason.
+ * Sent once per checkout (a cart is one message). Never throws.
+ */
+export async function noticeBuyer(groupId: string, kind: "paid" | "rejected", reason?: string): Promise<"sent" | "skipped" | "failed"> {
+  try {
+    const lead = await adminDb.collection("orders").doc(groupId).get();
+    if (!lead.exists) return "skipped";
+    const storeId = lead.get("store_id") as string;
+    const [ctx, integrations, store] = await Promise.all([
+      storeContext(storeId),
+      adminDb.collection("stores").doc(storeId).collection("private").doc("integrations").get(),
+      adminDb.collection("stores").doc(storeId).get(),
+    ]);
+    if (!TIERS[ctx.tier].autoFulfillment || !ctx.wa.provider || !ctx.wa.token || integrations.get("wa_notify_buyer") === false) return "skipped";
+    const total = (lead.get("group_total") as number | undefined) ?? (lead.get("amount") as number);
+    const base = storefrontUrl({ slug: store.get("slug"), custom_domain: store.get("custom_domain") ?? null, custom_domain_status: store.get("custom_domain_status") ?? null });
+    const message =
+      kind === "paid"
+        ? `Halo! Pembayaran ${formatIDR(total)} untuk pesanan ${groupId} di ${ctx.storeName} sudah dikonfirmasi. Terima kasih!\n\nAkun dikirim lewat pesan terpisah. Struk: ${base}/struk/${groupId}`
+        : `Halo, pembayaran pesanan ${groupId} di ${ctx.storeName} ditolak penjual: ${reason ?? "-"}.\n\nJika Anda sudah membayar ${formatIDR(total)}, balas pesan ini dengan bukti transfernya.`;
+    await postToN8n({
+      event: "order.notice",
+      kind: kind === "paid" ? "buyer_paid" : "buyer_rejected",
+      order_id: groupId,
+      store_id: storeId,
+      to: waNumber(lead.get("customer_contact.phone")),
+      message,
+      wa: { provider: ctx.wa.provider, token: ctx.wa.token, phone_number_id: ctx.wa.phone_number_id, server: ctx.wa.server },
+    });
+    return "sent";
+  } catch (err) {
+    console.error(`Buyer notice failed for ${groupId}:`, err);
+    return "failed";
   }
 }
