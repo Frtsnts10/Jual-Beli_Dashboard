@@ -1,5 +1,7 @@
 # n8n automation contract
 
+> Setup guide (Bahasa Indonesia) and a ready-to-import workflow: [n8n-setup.md](./n8n-setup.md), [n8n-workflow.json](./n8n-workflow.json).
+
 The dashboard posts **one webhook** (`N8N_WEBHOOK_URL`) for every WhatsApp message the
 platform sends. Your n8n workflow only has to: verify the signature → switch on `event` →
 call the store's WhatsApp provider.

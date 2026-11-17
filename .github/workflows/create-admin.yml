@@ -1,0 +1,48 @@
+# Creates (or resets the password of) a platform admin login — scripts/create-admin.mjs.
+# Start it from the Actions tab ("Create platform admin" → Run workflow); never runs on its own.
+#
+# Repository secrets it needs (Settings → Secrets and variables → Actions):
+#   FIREBASE_SERVICE_ACCOUNT  already used by the Firestore deploy
+#   ADMIN_PASSWORD            the admin's password, at least 10 characters (never printed)
+#
+# Afterwards add the email to PLATFORM_ADMIN_EMAILS on Vercel and redeploy.
+name: Create platform admin
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: Admin email (signs in to the dashboard, opens /platform)
+        required: true
+        default: admin@dionycte.com
+
+permissions:
+  contents: read
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Create admin
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_EMAIL: ${{ inputs.email }}
+        run: |
+          for name in FIREBASE_SERVICE_ACCOUNT ADMIN_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Repository secret $name is not set (see the comment at the top of this workflow)."
+              exit 1
+            fi
+          done
+          export FIREBASE_CLIENT_EMAIL="$(jq -r .client_email <<<"$FIREBASE_SERVICE_ACCOUNT")"
+          export FIREBASE_PRIVATE_KEY="$(jq -r .private_key <<<"$FIREBASE_SERVICE_ACCOUNT")"
+          echo "::add-mask::$ADMIN_PASSWORD"
+          node scripts/create-admin.mjs
