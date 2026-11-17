@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:emulator": "firebase emulators:exec --only firestore --project web-store-dashboard \"vitest run\"",
     "typecheck": "tsc --noEmit",
-    "seed:demo": "node --env-file=.env.local scripts/seed-demo.mjs"
+    "seed:demo": "node --env-file=.env.local scripts/seed-demo.mjs",
+    "create:admin": "node --env-file=.env.local scripts/create-admin.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

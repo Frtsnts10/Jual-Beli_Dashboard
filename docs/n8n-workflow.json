@@ -1,0 +1,491 @@
+{
+  "name": "Toko — WhatsApp",
+  "nodes": [
+    {
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "shop-wa",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "shop-wa",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      }
+    },
+    {
+      "id": "verify",
+      "name": "Verify & split",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// 1) Proves the request came from your dashboard/storefront (HMAC of the raw body with\n//    N8N_WEBHOOK_SECRET), 2) turns it into one item per WhatsApp message.\nconst crypto = require('crypto');\n// Self-hosted: set N8N_WEBHOOK_SECRET in n8n's environment. n8n Cloud (no env access):\n// paste the secret between the quotes instead.\nconst SECRET = $env.N8N_WEBHOOK_SECRET || '';\nif (!SECRET) throw new Error('N8N_WEBHOOK_SECRET is not set in n8n');\n\nconst item = $input.first();\nlet raw;\nif (item.binary && item.binary.data) raw = (await this.helpers.getBinaryDataBuffer(0, 'data')).toString('utf8');\nelse raw = JSON.stringify(item.json.body);\nconst expected = 'sha256=' + crypto.createHmac('sha256', SECRET).update(raw).digest('hex');\nconst got = String(item.json.headers['x-signature'] || '');\nif (got.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(got), Buffer.from(expected))) {\n  throw new Error('Bad signature: check N8N_WEBHOOK_SECRET is the same here and on Vercel');\n}\n\nconst p = JSON.parse(raw);\nconst wa = p.wa || {};\nif (!wa.provider || !wa.token) throw new Error('The store has no WhatsApp provider/token');\n// broadcast & product.restock send to many numbers; everything else to one.\nconst bulk = Array.isArray(p.recipients);\nconst targets = bulk ? p.recipients : [p.to];\nreturn targets.filter(Boolean).map((to) => ({\n  json: {\n    event: p.event,\n    to: String(to),\n    message: String(p.message || ''),\n    // Meta templates refuse line breaks and long runs of spaces.\n    meta_text: String(p.message || '').replace(/\\s*\\n+\\s*/g, ' · ').replace(/ {4,}/g, '   '),\n    bulk,\n    provider: wa.provider,\n    token: wa.token,\n    server: wa.server,\n    phone_number_id: wa.phone_number_id,\n  },\n}));"
+      }
+    },
+    {
+      "id": "isbulk",
+      "name": "Many recipients?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c-isbulk",
+              "leftValue": "={{ $json.bulk }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "accepted",
+      "name": "Reply: accepted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        180
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, queued: $input.all().length } }}",
+        "options": {
+          "responseCode": 202
+        }
+      }
+    },
+    {
+      "id": "provider",
+      "name": "Provider",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c-fonnte",
+                    "leftValue": "={{ $json.provider }}",
+                    "rightValue": "fonnte",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fonnte"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c-wablas",
+                    "leftValue": "={{ $json.provider }}",
+                    "rightValue": "wablas",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "wablas"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c-meta",
+                    "leftValue": "={{ $json.provider }}",
+                    "rightValue": "meta",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "meta"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "fonnte",
+      "name": "Fonnte",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        140
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "target",
+              "value": "={{ $json.to }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 6000
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "wablas",
+      "name": "Wablas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.server }}/api/send-message",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ phone: $json.to, message: $json.message }) }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 6000
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "meta",
+      "name": "Meta (template)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        460
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $json.phone_number_id }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $json.to, type: 'template', template: { name: 'pengiriman_akun', language: { code: 'id' }, components: [{ type: 'body', parameters: [{ type: 'text', text: $json.meta_text }] }] } }) }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 6000
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "check",
+      "name": "Provider accepted?",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Fonnte and Wablas answer HTTP 200 even when they didn't send ({\"status\": false, \"reason\": …}).\n// Fail the run then, so the dashboard records the delivery as failed (and can retry).\nfor (const it of $input.all()) {\n  const j = it.json || {};\n  if (j.status === false || j.status === 'false') {\n    throw new Error('WhatsApp provider refused: ' + String(j.reason || j.message || JSON.stringify(j)).slice(0, 200));\n  }\n}\nreturn $input.all();"
+      }
+    },
+    {
+      "id": "wasone",
+      "name": "Single message?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1540,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c-wasone",
+              "leftValue": "={{ !$('Verify & split').first().json.bulk }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "sent",
+      "name": "Reply: sent",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1760,
+        300
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true } }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Verify & split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify & split": {
+      "main": [
+        [
+          {
+            "node": "Many recipients?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Many recipients?": {
+      "main": [
+        [
+          {
+            "node": "Reply: accepted",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Provider",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply: accepted": {
+      "main": [
+        [
+          {
+            "node": "Provider",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Provider": {
+      "main": [
+        [
+          {
+            "node": "Fonnte",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wablas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Meta (template)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fonnte": {
+      "main": [
+        [
+          {
+            "node": "Provider accepted?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wablas": {
+      "main": [
+        [
+          {
+            "node": "Provider accepted?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta (template)": {
+      "main": [
+        [
+          {
+            "node": "Provider accepted?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Single message?": {
+      "main": [
+        [
+          {
+            "node": "Reply: sent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Provider accepted?": {
+      "main": [
+        [
+          {
+            "node": "Single message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "active": false
+}

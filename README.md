@@ -77,6 +77,16 @@ exact amount with a kode unik and uploads a proof; a platform admin confirms it 
 activates or extends the plan (`subscription_payments`). A paid plan past `subscription_expiry` acts as
 Starter (computed on read, no cron).
 
+## Demo and admin accounts
+
+- **Demo** (`scripts/seed-demo.mjs`, or Actions → *Seed demo account*): seller `demo@dionycte.com`
+  (dashboard, Ultimate, store "Dionycte") and buyer `pembeli@dionycte.com` (storefront `/masuk`),
+  both with the `DEMO_PASSWORD` secret. Re-running resets the demo store's data.
+- **Platform admin** (`scripts/create-admin.mjs`, or Actions → *Create platform admin*, needs the
+  `ADMIN_PASSWORD` secret): creates the login with a verified email. Then add the email to
+  `PLATFORM_ADMIN_EMAILS` on Vercel and redeploy.
+- **WhatsApp through n8n**: [docs/n8n-setup.md](docs/n8n-setup.md) (ready-to-import workflow included).
+
 ## Help desk, announcements and notifications
 
 - **Bantuan** (`/[storeId]/support`): sellers report bugs or ask questions, with an optional screenshot;
