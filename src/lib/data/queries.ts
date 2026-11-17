@@ -67,9 +67,10 @@ export const countAwaitingConfirmation = cache(async (storeId: string) => {
     .where("store_id", "==", storeId)
     .where("payment_status", "==", "PENDING")
     .where("proof_uploaded_at", "!=", null)
-    .count()
+    .select("group_id")
     .get();
-  return snap.data().count;
+  // A cart is one payment to check, however many orders it holds.
+  return new Set(snap.docs.map((d) => (d.get("group_id") as string | undefined) ?? d.id)).size;
 });
 
 export async function getCredentialsByIds(ids: string[]) {

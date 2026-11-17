@@ -89,7 +89,7 @@ export default async function VouchersPage({
       .collection("orders")
       .where("store_id", "==", storeId)
       .where("payment_status", "==", "PAID")
-      .select("voucher_code", "discount", "amount")
+      .select("voucher_code", "voucher_use", "group_id", "discount", "amount")
       .get(),
   ]);
   const stats = new Map<
@@ -100,7 +100,8 @@ export default async function VouchersPage({
     const code = o.get("voucher_code") as string | undefined;
     if (!code) continue;
     const s = stats.get(code) ?? { paid: 0, discount: 0, revenue: 0 };
-    s.paid++;
+    // A cart has the code on several orders but used the voucher once.
+    if (o.get("voucher_use") ?? !o.get("group_id")) s.paid++;
     s.discount += o.get("discount") ?? 0;
     s.revenue += o.get("amount") ?? 0;
     stats.set(code, s);

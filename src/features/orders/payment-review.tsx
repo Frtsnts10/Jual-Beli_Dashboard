@@ -12,7 +12,8 @@ import type { Order } from "@/types/schema";
 import { confirmPayment, getPaymentProof, rejectPayment } from "./actions";
 
 /** "Cek bukti": the buyer's screenshot next to the exact amount to look for in the QRIS mutations. */
-export function PaymentReview({ storeId, order, className }: { storeId: string; order: Order; className?: string }) {
+export function PaymentReview({ storeId, order, group = [order], className }: { storeId: string; order: Order; group?: Order[]; className?: string }) {
+  const isCart = order.group_size > 1;
   const [open, setOpen] = useState(false);
   const [proof, setProof] = useState<{ image: string; uploadedAt: string | null } | null | "none">(null);
   const [rejecting, setRejecting] = useState(false);
@@ -51,20 +52,39 @@ export function PaymentReview({ storeId, order, className }: { storeId: string; 
         <DialogHeader>
           <DialogTitle>Konfirmasi pembayaran</DialogTitle>
           <DialogDescription>
-            Cek mutasi QRIS Anda: harus ada dana masuk <b className="text-foreground">persis {formatIDR(order.amount)}</b>
+            Cek mutasi QRIS Anda: harus ada dana masuk <b className="text-foreground">persis {formatIDR(order.group_total)}</b>
             {order.unique_code > 0 && <> (termasuk kode unik {order.unique_code})</>}.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-3 text-sm">
           <div className="bg-muted grid grid-cols-2 gap-2 rounded-lg p-3 [&>*]:min-w-0">
             <div>
-              <div className="text-muted-foreground text-xs">Pesanan</div>
-              <div className="truncate font-medium">{order.product_title}</div>
+              <div className="text-muted-foreground text-xs">{isCart ? `Keranjang · ${order.group_size} pesanan` : "Pesanan"}</div>
+              {isCart ? (
+                <ul className="font-medium">
+                  {Object.entries(
+                    group.reduce<Record<string, number>>(
+                      (m, g) => ({
+                        ...m,
+                        [g.product_title]: (m[g.product_title] ?? 0) + 1,
+                      }),
+                      {},
+                    ),
+                  ).map(([title, qty]) => (
+                    <li key={title} className="truncate">
+                      {qty}× {title}
+                    </li>
+                  ))}
+                  {group.length < order.group_size && <li className="text-muted-foreground text-xs">+{order.group_size - group.length} lainnya</li>}
+                </ul>
+              ) : (
+                <div className="truncate font-medium">{order.product_title}</div>
+              )}
               <div className="text-muted-foreground font-mono text-xs">{order.id}</div>
             </div>
             <div className="text-right">
               <div className="text-muted-foreground text-xs">Nominal</div>
-              <div className="text-lg font-bold tabular-nums">{formatIDR(order.amount)}</div>
+              <div className="text-lg font-bold tabular-nums">{formatIDR(order.group_total)}</div>
               {order.voucher_code && <div className="text-muted-foreground text-xs">voucher {order.voucher_code}</div>}
             </div>
             <div className="col-span-2 text-xs break-all">
@@ -102,7 +122,16 @@ export function PaymentReview({ storeId, order, className }: { storeId: string; 
               <Button variant="ghost" onClick={() => setRejecting(false)} disabled={pending}>
                 Batal
               </Button>
-              <Button variant="destructive" disabled={pending} onClick={() => act(() => rejectPayment(storeId, order.id, reason), "Pembayaran ditolak")}>
+              <Button
+                variant="destructive"
+                disabled={pending}
+                onClick={() =>
+                  act(
+                    () => rejectPayment(storeId, order.id, reason),
+                    isCart ? `Pembayaran ditolak — ${order.group_size} pesanan dibatalkan` : "Pembayaran ditolak",
+                  )
+                }
+              >
                 <XCircle /> Tolak pembayaran
               </Button>
             </>
@@ -115,7 +144,7 @@ export function PaymentReview({ storeId, order, className }: { storeId: string; 
                 disabled={pending || proof === null}
                 onClick={() =>
                   (proof !== "none" || confirm("Belum ada bukti dari pembeli. Yakin dana sudah masuk?")) &&
-                  act(() => confirmPayment(storeId, order.id), "Lunas — akun dialokasikan")
+                  act(() => confirmPayment(storeId, order.id), isCart ? `Lunas — ${order.group_size} pesanan dialokasikan` : "Lunas — akun dialokasikan")
                 }
               >
                 {pending ? <Loader2 className="animate-spin" /> : <CheckCircle2 />} Dana masuk, konfirmasi

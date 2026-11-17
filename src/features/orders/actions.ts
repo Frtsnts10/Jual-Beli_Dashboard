@@ -6,7 +6,7 @@ import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { fulfillOrder, replaceCredential } from "@/lib/payments/fulfillment";
 import { deliverOrder } from "@/lib/integrations/automation";
-import { failOrder } from "@/lib/payments/manual";
+import { failOrder, groupOf } from "@/lib/payments/manual";
 
 async function ownedOrder(storeId: string, orderId: string) {
   const ref = adminDb.collection("orders").doc(orderId);
@@ -17,17 +17,27 @@ async function ownedOrder(storeId: string, orderId: string) {
 
 /**
  * The seller checked their QRIS mutations and the money is there: PAID, allocate and deliver.
- * Also allocates stock to a paid order that was waiting for a restock.
+ * A cart was one transfer, so every order in it is confirmed together. Also allocates stock
+ * to a paid order that was waiting for a restock (that order only).
  */
 export async function confirmPayment(storeId: string, orderId: string): Promise<ActionResult> {
   await requireStore(storeId);
   const found = await ownedOrder(storeId, orderId);
   if (!found) return fail("Pesanan tidak ditemukan.");
-  const wasWaitingForStock = found.snap.get("needs_stock") === true;
-  const result = await fulfillOrder(orderId);
-  if (result === "fulfilled") await deliverOrder(orderId, wasWaitingForStock ? "restock" : "paid");
+  const targets =
+    found.snap.get("payment_status") === "PAID" ? [found.snap] : (await groupOf(storeId, orderId)).filter((d) => d.get("payment_status") !== "PAID");
+  let short = 0;
+  for (const o of targets) {
+    const wasWaitingForStock = o.get("needs_stock") === true;
+    const result = await fulfillOrder(o.id);
+    if (result === "fulfilled") await deliverOrder(o.id, wasWaitingForStock ? "restock" : "paid");
+    if (result === "needs_stock") short++;
+  }
   revalidatePath(`/${storeId}`, "layout");
-  if (result === "needs_stock") return fail("Pesanan ditandai lunas, tapi stok brankas kosong. Tambah stok lalu klik Alokasikan.");
+  if (short)
+    return fail(
+      `${targets.length > 1 ? `${short} dari ${targets.length} pesanan` : "Pesanan"} ditandai lunas, tapi stok brankas kosong. Tambah stok lalu klik Alokasikan.`,
+    );
   return { ok: true };
 }
 
@@ -77,7 +87,11 @@ export async function getPaymentProof(storeId: string, orderId: string): Promise
   await requireStore(storeId);
   const found = await ownedOrder(storeId, orderId);
   if (!found) return fail("Pesanan tidak ditemukan.");
-  const proof = await adminDb.collection("payment_proofs").doc(orderId).get();
+  // One proof per checkout, stored under the group's lead order.
+  const proof = await adminDb
+    .collection("payment_proofs")
+    .doc((found.snap.get("group_id") as string | undefined) ?? orderId)
+    .get();
   if (!proof.exists) return fail("Pembeli belum mengunggah bukti pembayaran.");
   return { ok: true, data: { image: proof.get("image") as string, uploadedAt: proof.get("uploaded_at")?.toDate?.().toISOString() ?? null } };
 }
@@ -88,8 +102,11 @@ export async function rejectPayment(storeId: string, orderId: string, reason: st
   const found = await ownedOrder(storeId, orderId);
   if (!found) return fail("Pesanan tidak ditemukan.");
   const why = reason.trim().slice(0, 200);
-  if (why.length < 3) return fail("Tulis alasan singkat, mis. \"Dana tidak masuk\".");
-  if (!(await failOrder(orderId, why))) return fail("Pesanan ini sudah tidak menunggu pembayaran.");
+  if (why.length < 3) return fail('Tulis alasan singkat, mis. "Dana tidak masuk".');
+  // A cart was one transfer: rejecting it cancels every order in it.
+  let failed = 0;
+  for (const o of await groupOf(storeId, orderId)) if (await failOrder(o.id, why)) failed++;
+  if (!failed) return fail("Pesanan ini sudah tidak menunggu pembayaran.");
   revalidatePath(`/${storeId}`, "layout");
   return { ok: true };
 }

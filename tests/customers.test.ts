@@ -5,8 +5,12 @@ import type { CustomerProfile, Order } from "@/types/schema";
 let n = 0;
 function order(p: Partial<Order> & { email: string; at: string }): Order {
   const { email, at, ...rest } = p;
+  const id = `ORD-${++n}`;
   return {
-    id: `ORD-${++n}`,
+    id,
+    group_id: id,
+    group_size: 1,
+    group_total: 50_000,
     store_id: "s1",
     product_id: "p1",
     product_title: "Netflix",

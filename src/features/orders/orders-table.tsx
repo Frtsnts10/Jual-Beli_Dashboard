@@ -43,10 +43,24 @@ export function OrdersTable({
   const [filter, setFilter] = useState<Filter>(() => (orders.some(awaitingConfirmation) ? "confirm" : "all"));
   const [pending, start] = useTransition();
 
+  // A cart is several orders paid with one transfer; its payment is checked once, on the lead order.
+  const groups = useMemo(() => {
+    const m = new Map<string, Order[]>();
+    for (const o of orders) if (o.group_size > 1) m.set(o.group_id, [...(m.get(o.group_id) ?? []), o]);
+    return m;
+  }, [orders]);
+  const groupOf = (o: Order) => groups.get(o.group_id) ?? [o];
+  const isLead = (o: Order) => o.group_id === o.id;
   const visible = useMemo(
     () =>
       orders.filter((o) =>
-        filter === "all" ? true : filter === "confirm" ? awaitingConfirmation(o) : filter === "claims" ? o.warranty_status === "CLAIMED" : needsAction(o)
+        filter === "all"
+          ? true
+          : filter === "confirm"
+            ? awaitingConfirmation(o) && o.group_id === o.id
+            : filter === "claims"
+              ? o.warranty_status === "CLAIMED"
+              : needsAction(o),
       ),
     [orders, filter]
   );
@@ -95,7 +109,13 @@ export function OrdersTable({
       <DropdownMenuContent align="end">
         {o.payment_status === "FAILED" && (
           <DropdownMenuItem
-            onSelect={() => confirm(`Pesanan ${o.id} sudah gagal/ditolak. Tandai lunas karena dana ${formatIDR(o.amount)} ternyata masuk?`) && run(() => confirmPayment(storeId, o.id), "Pesanan lunas")}
+            onSelect={() =>
+              confirm(
+                o.group_size > 1
+                  ? `Keranjang ${o.group_id} (${o.group_size} pesanan) sudah gagal/ditolak. Tandai semuanya lunas karena dana ${formatIDR(o.group_total)} ternyata masuk?`
+                  : `Pesanan ${o.id} sudah gagal/ditolak. Tandai lunas karena dana ${formatIDR(o.amount)} ternyata masuk?`,
+              ) && run(() => confirmPayment(storeId, o.id), "Pesanan lunas")
+            }
           >
             <CheckCircle2 /> Ternyata sudah dibayar
           </DropdownMenuItem>
@@ -147,14 +167,30 @@ export function OrdersTable({
     <>
       <span className="font-medium tabular-nums">{formatIDR(o.amount)}</span>
       <div className="text-muted-foreground text-xs">
-        {[o.unique_code ? `kode unik ${o.unique_code}` : null, o.voucher_code ? `voucher ${o.voucher_code}` : null].filter(Boolean).join(" · ") || "QRIS"}
+        {[
+          o.group_size > 1 ? `transfer ${formatIDR(o.group_total)}` : null,
+          o.unique_code ? `kode unik ${o.unique_code}` : null,
+          o.voucher_code ? `voucher ${o.voucher_code}` : null,
+        ]
+          .filter(Boolean)
+          .join(" · ") || "QRIS"}
       </div>
     </>
   );
+  /** "Keranjang · 3 item" under the title: these orders were paid with one transfer. */
+  const cartTag = (o: Order) =>
+    o.group_size > 1 && (
+      <Badge variant="outline" className="mt-1 font-normal" title={`Dibayar sekaligus dengan ${o.group_id}`}>
+        Keranjang · {o.group_size} item{isLead(o) ? "" : ` · ${o.group_id}`}
+      </Badge>
+    );
+  /** Payment is reviewed on the cart's lead order only; the others point to it. */
+  const review = (o: Order, className?: string) =>
+    isLead(o) ? <PaymentReview storeId={storeId} order={o} group={groupOf(o)} className={className} /> : payBadge(o);
 
   const counts = {
     all: orders.length,
-    confirm: orders.filter(awaitingConfirmation).length,
+    confirm: orders.filter((o) => awaitingConfirmation(o) && isLead(o)).length,
     action: orders.filter(needsAction).length,
     claims: orders.filter((o) => o.warranty_status === "CLAIMED").length,
   };
@@ -192,6 +228,7 @@ export function OrdersTable({
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="font-medium">{o.product_title}</div>
+                    {cartTag(o)}
                     <div className="text-muted-foreground font-mono text-xs">
                       {o.id} · {formatDate(o.created_at, true)}
                     </div>
@@ -215,7 +252,7 @@ export function OrdersTable({
                   {o.delivery_error && o.delivery_status !== "SENT_VIA_WA" && <span className="text-destructive text-xs">Auto-kirim gagal</span>}
                 </div>
                 {o.warranty_status === "CLAIMED" && o.warranty_claim && <p className="text-muted-foreground mt-2 text-xs">“{o.warranty_claim.reason}”</p>}
-                {o.payment_status === "PENDING" && <PaymentReview storeId={storeId} order={o} className="mt-3 w-full" />}
+                {o.payment_status === "PENDING" && isLead(o) && review(o, "mt-3 w-full")}
               </div>
             ))}
           </div>
@@ -239,6 +276,7 @@ export function OrdersTable({
                   <TableRow key={o.id}>
                     <TableCell>
                       <div className="font-medium">{o.product_title}</div>
+                      {cartTag(o)}
                       <div className="text-muted-foreground font-mono text-xs">
                         {o.id} · {formatDate(o.created_at, true)}
                       </div>
@@ -250,7 +288,7 @@ export function OrdersTable({
                     </TableCell>
                     <TableCell className="text-right">{amount(o)}</TableCell>
                     <TableCell>
-                      {o.payment_status === "PENDING" ? <PaymentReview storeId={storeId} order={o} /> : payBadge(o)}
+                      {o.payment_status === "PENDING" ? review(o) : payBadge(o)}
                       {o.needs_stock && <div className="text-destructive mt-1 text-xs">Stok kosong</div>}
                     </TableCell>
                     <TableCell>
