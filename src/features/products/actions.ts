@@ -129,3 +129,35 @@ export async function deleteProduct(storeId: string, productId: string): Promise
   revalidatePath(`/${storeId}`, "layout");
   return { ok: true };
 }
+
+/** Spreadsheet import: plain products only (no flash sale / bundle), validated again here. */
+export async function importProducts(
+  storeId: string,
+  rows: Pick<ProductInput, "title" | "platform_type" | "price" | "duration_days" | "description" | "image_url" | "is_published">[]
+): Promise<ActionResult<{ added: number }>> {
+  await requireStore(storeId);
+  if (rows.length === 0) return fail("Tidak ada baris valid untuk diimpor.");
+  if (rows.length > 200) return fail("Maksimal 200 produk sekali impor.");
+  const inputs: ProductInput[] = rows.map((r) => ({ ...r, is_flash_sale: false, bundle_items: null, flash_sale_price: null, flash_sale_ends_at: null }));
+  for (const [i, input] of inputs.entries()) {
+    const error = validate(input);
+    if (error) return fail(`Baris ${i + 1}: ${error}`);
+  }
+  const existing = await adminDb.collection("products").where("store_id", "==", storeId).select("title").get();
+  const taken = new Set(existing.docs.map((d) => String(d.get("title")).trim().toLowerCase()));
+  const fresh = inputs.filter((p) => !taken.has(p.title.trim().toLowerCase()));
+  if (fresh.length === 0) return fail("Semua judul sudah ada di toko.");
+  const batch = adminDb.batch();
+  for (const input of fresh) {
+    batch.create(adminDb.collection("products").doc(), {
+      ...clean(input),
+      store_id: storeId,
+      stock_available: 0,
+      created_at: FieldValue.serverTimestamp(),
+      updated_at: FieldValue.serverTimestamp(),
+    });
+  }
+  await batch.commit();
+  revalidatePath(`/${storeId}`, "layout");
+  return { ok: true, data: { added: fresh.length } };
+}

@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { ProductDialog } from "@/features/products/product-dialog";
 import { ProductsTable } from "@/features/products/products-table";
+import { ImportDialog } from "@/features/import/import-dialog";
 
 export const metadata = { title: "Produk" };
 
@@ -29,6 +30,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ store
   return (
     <>
       <PageHeader title="Produk" description="Katalog yang tampil di etalase toko.">
+        <ImportDialog storeId={storeId} kind="products" existingTitles={products.map((p) => p.title)} />
         <ProductDialog
           storeId={storeId}
           flashSalePricing={TIERS[tier].marketing}

@@ -41,7 +41,7 @@ export function VoucherForm({ storeId, products }: { storeId: string; products: 
         });
       }}
     >
-      <div className="grid gap-4 sm:grid-cols-2 [&>*]:min-w-0">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 [&>*]:min-w-0">
         <div className="grid gap-2">
           <Label htmlFor="v-code">Kode</Label>
           <Input id="v-code" required placeholder="HEMAT10" value={f.code} onChange={(e) => setF((s) => ({ ...s, code: normaliseCode(e.target.value) }))} maxLength={20} />
@@ -64,8 +64,8 @@ export function VoucherForm({ storeId, products }: { storeId: string; products: 
         </div>
         {f.type === "percent" && (
           <div className="grid gap-2">
-            <Label htmlFor="v-max">Maks. potongan (Rp, opsional)</Label>
-            <Input id="v-max" inputMode="numeric" placeholder="Tanpa batas" value={f.max_discount} onChange={set("max_discount")} />
+            <Label htmlFor="v-max">Maks. potongan (Rp)</Label>
+            <Input id="v-max" inputMode="numeric" placeholder="Opsional · tanpa batas" value={f.max_discount} onChange={set("max_discount")} />
           </div>
         )}
         <div className="grid gap-2">

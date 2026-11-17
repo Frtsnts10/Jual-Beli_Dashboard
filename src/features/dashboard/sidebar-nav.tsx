@@ -44,7 +44,7 @@ export function SidebarNav({ storeId, openClaims, isOwner, className }: { storeI
             <Icon className="size-4" />
             {label}
             {!!badge && (
-              <span className="ml-auto rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white" title="Klaim garansi menunggu">
+              <span className="ml-auto rounded-md bg-red-500 px-1.5 text-[10px] font-semibold text-white" title="Klaim garansi menunggu">
                 {badge}
               </span>
             )}
