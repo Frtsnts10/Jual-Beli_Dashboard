@@ -1,19 +1,35 @@
 import Link from "next/link";
 import { Shield } from "lucide-react";
 import { requirePlatformAdmin } from "@/lib/access/platform";
+import { listNotifications } from "@/lib/data/notifications";
+import { countNewTickets } from "@/lib/data/support";
+import { NotificationBell } from "@/features/notifications/notification-bell";
 
-export const metadata = { title: { template: "%s · Platform", default: "Platform" }, robots: { index: false } };
+export const metadata = {
+  title: { template: "%s · Platform", default: "Platform" },
+  robots: { index: false },
+};
 
 const NAV = [
   { href: "/platform", label: "Ringkasan" },
   { href: "/platform/stores", label: "Toko" },
   { href: "/platform/users", label: "Pengguna" },
   { href: "/platform/payments", label: "Pembayaran paket" },
+  { href: "/platform/support", label: "Bantuan" },
+  { href: "/platform/announcements", label: "Pengumuman" },
   { href: "/platform/deletions", label: "Hapus akun" },
 ];
 
-export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
-  await requirePlatformAdmin();
+export default async function PlatformLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const admin = await requirePlatformAdmin();
+  const [notes, newTickets] = await Promise.all([
+    listNotifications(admin.uid),
+    countNewTickets(),
+  ]);
   return (
     <div className="min-h-svh">
       {/* Phone/tablet: title + "to dashboard" on one row, the section links scroll underneath. */}
@@ -21,13 +37,28 @@ export default async function PlatformLayout({ children }: { children: React.Rea
         <span className="flex h-12 items-center gap-2 font-semibold whitespace-nowrap md:h-auto">
           <Shield className="size-4" /> Admin Platform
         </span>
-        <Link href="/dashboard" className="text-muted-foreground ml-auto text-sm whitespace-nowrap hover:underline md:order-last">
-          Ke dashboard toko →
-        </Link>
+        <div className="ml-auto flex items-center gap-3 md:order-last">
+          <NotificationBell items={notes.items} unread={notes.unread} />
+          <Link
+            href="/dashboard"
+            className="text-muted-foreground text-sm whitespace-nowrap hover:underline"
+          >
+            Ke dashboard toko →
+          </Link>
+        </div>
         <nav className="-mx-4 flex w-[calc(100%+2rem)] gap-4 overflow-x-auto border-t px-4 py-2 text-sm md:mx-0 md:w-auto md:border-0 md:p-0">
           {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className="text-muted-foreground hover:text-foreground shrink-0 whitespace-nowrap">
+            <Link
+              key={n.href}
+              href={n.href}
+              className="text-muted-foreground hover:text-foreground shrink-0 whitespace-nowrap"
+            >
               {n.label}
+              {n.href === "/platform/support" && newTickets > 0 && (
+                <span className="ml-1 rounded-md bg-red-500 px-1.5 text-[10px] font-semibold text-white">
+                  {newTickets}
+                </span>
+              )}
             </Link>
           ))}
         </nav>

@@ -92,6 +92,24 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Admin center: support tickets (+ messages), announcements, per-user notifications and
+    // push-notification device tokens. Read and written only by dashboard server actions.
+    match /support_tickets/{ticketId} {
+      allow read, write: if false;
+      match /messages/{messageId} {
+        allow read, write: if false;
+      }
+    }
+    match /announcements/{id} {
+      allow read, write: if false;
+    }
+    match /notifications/{id} {
+      allow read, write: if false;
+    }
+    match /push_tokens/{token} {
+      allow read, write: if false;
+    }
+
     // store_slugs, store_domains and anything else: server-only.
     match /{document=**} {
       allow read, write: if false;
