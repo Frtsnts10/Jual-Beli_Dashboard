@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ImageUpload } from "@/components/image-upload";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { TEMPLATES } from "@/config/tiers";
@@ -64,13 +65,9 @@ export function StoreSettingsForm({
             <Label htmlFor="tagline">Tagline</Label>
             <Input id="tagline" value={form.tagline} maxLength={160} onChange={(e) => set("tagline", e.target.value)} placeholder="Akun premium murah, garansi full." />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="logo_url">URL logo</Label>
-            <Input id="logo_url" value={form.logo_url} onChange={(e) => set("logo_url", e.target.value)} placeholder="https://…" />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="banner_url">URL banner</Label>
-            <Input id="banner_url" value={form.banner_url} onChange={(e) => set("banner_url", e.target.value)} placeholder="https://…" />
+          <div className="grid gap-2 md:col-span-2">
+            <Label>Logo</Label>
+            <ImageUpload storeId={store.id} kind="logo" aspect="aspect-square max-w-28" value={form.logo_url} onChange={(url) => set("logo_url", url)} label="Unggah logo" />
           </div>
           <div className="flex items-center justify-between md:col-span-2">
             <div>

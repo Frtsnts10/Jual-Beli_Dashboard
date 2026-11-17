@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// Cloud Storage: only the dashboard server (Admin SDK) writes images, under
+// stores/{storeId}/{logo|banner|product}/. Browsers read them through the download-token
+// URL the server stores, which works without opening these rules. Paste into
+// Firebase console → Storage → Rules (or deploy with `firebase deploy --only storage`).
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

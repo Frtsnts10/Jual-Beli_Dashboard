@@ -2,19 +2,23 @@ import "server-only";
 import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
 import { formatPrivateKey } from "./private-key";
 
 // Not a secret; pinned so a stale FIREBASE_PROJECT_ID env var can't point the
 // Admin SDK at another project.
 export const FIREBASE_PROJECT_ID = "web-store-dashboard";
+/** Default Cloud Storage bucket (created when Storage is enabled in the Firebase console). */
+export const STORAGE_BUCKET = "web-store-dashboard.firebasestorage.app";
 
 function getAdminApp() {
   if (getApps().length > 0) return getApp();
   // Local development against the Firestore/Auth emulators needs no credentials.
   if (process.env.FIRESTORE_EMULATOR_HOST) {
-    return initializeApp({ projectId: FIREBASE_PROJECT_ID });
+    return initializeApp({ projectId: FIREBASE_PROJECT_ID, storageBucket: STORAGE_BUCKET });
   }
   return initializeApp({
+    storageBucket: STORAGE_BUCKET,
     credential: cert({
       projectId: FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
@@ -36,6 +40,7 @@ function lazy<T extends object>(resolve: () => T): T {
 
 export const adminDb = lazy(() => getFirestore(getAdminApp()));
 export const adminAuth = lazy(() => getAuth(getAdminApp()));
+export const adminBucket = lazy(() => getStorage(getAdminApp()).bucket());
 
 /** OAuth access token of the service account, for Google APIs the Admin SDK doesn't wrap. */
 export async function adminAccessToken(): Promise<string> {

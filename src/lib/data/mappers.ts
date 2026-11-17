@@ -55,6 +55,7 @@ export function mapStore(snap: Snap): Store {
       banner_url: d.storefront_config?.banner_url ?? "",
       logo_url: d.storefront_config?.logo_url ?? "",
     },
+    hero_slides: Array.isArray(d.hero_slides) ? d.hero_slides : [],
     is_active: d.is_active ?? true,
     suspended: d.suspended ?? false,
     store_info: {

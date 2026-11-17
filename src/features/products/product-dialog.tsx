@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ImageUpload } from "@/components/image-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -142,8 +143,8 @@ export function ProductDialog({
             <p className="text-muted-foreground text-xs">Dipakai jika stok di brankas tidak punya tanggal kedaluwarsa sendiri.</p>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="image">URL gambar</Label>
-            <Input id="image" value={form.image_url} onChange={(e) => set("image_url", e.target.value)} placeholder="https://…" />
+            <Label>Foto produk</Label>
+            <ImageUpload storeId={storeId} kind="product" aspect="aspect-square max-w-40" value={form.image_url} onChange={(url) => set("image_url", url)} label="Unggah foto" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="description">Deskripsi</Label>
