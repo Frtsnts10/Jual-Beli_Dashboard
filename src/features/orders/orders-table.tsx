@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, Copy, MessageCircle, MoreHorizontal, PackagePlus, RefreshCw, Send, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,8 @@ import { confirmPayment, markDelivered, rejectWarranty, replaceWarranty, resendD
 import { PaymentReview } from "./payment-review";
 import { PayBadge } from "@/components/pay-badge";
 import { segment, segmented } from "@/components/segmented";
+import { Pager } from "@/components/pager";
+import { paginate } from "@/lib/paging";
 
 type Filter = "all" | "confirm" | "action" | "claims";
 
@@ -47,6 +50,16 @@ export function OrdersTable({
       ),
     [orders, filter]
   );
+  const params = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const { rows, ...pager } = paginate(visible, { page: params.get("page") ?? undefined, size: params.get("size") ?? undefined }, 10);
+  const pickFilter = (f: Filter) => {
+    setFilter(f);
+    const sp = new URLSearchParams(params);
+    sp.delete("page"); // a new filter starts on its first page
+    router.replace(`${pathname}?${sp}`, { scroll: false });
+  };
 
   const run = (fn: () => Promise<{ ok: boolean; error?: string }>, success: string) =>
     start(async () => {
@@ -160,7 +173,7 @@ export function OrdersTable({
           <button
             key={key}
             type="button"
-            onClick={() => setFilter(key)}
+            onClick={() => pickFilter(key)}
             className={segment(filter === key)}
           >
             {label} ({counts[key]})
@@ -174,7 +187,7 @@ export function OrdersTable({
         <>
           {/* Phone: one card per order. */}
           <div className="grid gap-2 md:hidden">
-            {visible.map((o) => (
+            {rows.map((o) => (
               <div key={o.id} className="rounded-lg border p-3 text-sm">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
@@ -222,7 +235,7 @@ export function OrdersTable({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {visible.map((o) => (
+                {rows.map((o) => (
                   <TableRow key={o.id}>
                     <TableCell>
                       <div className="font-medium">{o.product_title}</div>
@@ -271,6 +284,7 @@ export function OrdersTable({
               </TableBody>
             </Table>
           </div>
+          <Pager {...pager} className="mt-4" />
         </>
       )}
     </>

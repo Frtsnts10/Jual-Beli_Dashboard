@@ -75,7 +75,7 @@ export function BotsCard({
                 Di Discord Developer Portal → aplikasi Anda → General Information, isi <em>Interactions Endpoint URL</em> dengan:
               </p>
               <div className="flex items-center gap-2">
-                <code className="bg-muted min-w-0 flex-1 truncate rounded px-2 py-1 text-xs">{discordEndpoint}</code>
+                <code className="bg-muted min-w-0 flex-1 truncate rounded-md px-2 py-1 text-xs">{discordEndpoint}</code>
                 <Button
                   variant="ghost"
                   size="icon"

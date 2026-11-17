@@ -26,7 +26,7 @@ export function AffiliateLinkBuilder({ baseUrl }: { baseUrl: string }) {
           <Copy /> Salin
         </Button>
       </div>
-      {link && <code className="bg-muted rounded px-2 py-1 text-xs break-all">{link}</code>}
+      {link && <code className="bg-muted rounded-md px-2 py-1 text-xs break-all">{link}</code>}
     </div>
   );
 }
