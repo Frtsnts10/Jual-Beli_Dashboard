@@ -4,6 +4,7 @@ import { adminDb } from "@/lib/firebase/admin";
 import { remindRenewal } from "@/lib/integrations/automation";
 import { storefrontUrl } from "@/lib/store-url";
 import { expireUnpaidOrders, pruneOldProofs } from "@/lib/payments/manual";
+import { notifyExpiringPlans } from "@/lib/billing/expiry-notice";
 
 // Auto-renewal reminders (Pro & Ultimate, plan §3) + expiry of unpaid QRIS orders:
 // once a day, message buyers whose
@@ -39,7 +40,11 @@ export async function GET(req: NextRequest) {
         const store = await adminDb.collection("stores").doc(storeId).get();
         stores.set(
           storeId,
-          storefrontUrl({ slug: store.get("slug"), custom_domain: store.get("custom_domain") ?? null, custom_domain_status: store.get("custom_domain_status") ?? null })
+          storefrontUrl({
+            slug: store.get("slug"),
+            custom_domain: store.get("custom_domain") ?? null,
+            custom_domain_status: store.get("custom_domain_status") ?? null,
+          }),
         );
       }
       const link = `${stores.get(storeId)}/checkout/${order.get("product_id")}`;
@@ -54,5 +59,16 @@ export async function GET(req: NextRequest) {
   // their voucher uses come back even in stores whose seller didn't open Pesanan.
   const expired = await expireUnpaidOrders();
   const proofsPruned = await pruneOldProofs();
-  return NextResponse.json({ due: due.size, sent, skipped, failed, expired, proofsPruned });
+  const planNotices = await notifyExpiringPlans().catch(
+    (err) => (console.error("plan expiry notices failed", err), -1),
+  );
+  return NextResponse.json({
+    due: due.size,
+    sent,
+    skipped,
+    failed,
+    expired,
+    proofsPruned,
+    planNotices,
+  });
 }

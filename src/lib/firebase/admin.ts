@@ -3,6 +3,7 @@ import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
+import { getMessaging } from "firebase-admin/messaging";
 import { formatPrivateKey } from "./private-key";
 
 // Not a secret; pinned so a stale FIREBASE_PROJECT_ID env var can't point the
@@ -15,7 +16,10 @@ function getAdminApp() {
   if (getApps().length > 0) return getApp();
   // Local development against the Firestore/Auth emulators needs no credentials.
   if (process.env.FIRESTORE_EMULATOR_HOST) {
-    return initializeApp({ projectId: FIREBASE_PROJECT_ID, storageBucket: STORAGE_BUCKET });
+    return initializeApp({
+      projectId: FIREBASE_PROJECT_ID,
+      storageBucket: STORAGE_BUCKET,
+    });
   }
   return initializeApp({
     storageBucket: STORAGE_BUCKET,
@@ -41,6 +45,7 @@ function lazy<T extends object>(resolve: () => T): T {
 export const adminDb = lazy(() => getFirestore(getAdminApp()));
 export const adminAuth = lazy(() => getAuth(getAdminApp()));
 export const adminBucket = lazy(() => getStorage(getAdminApp()).bucket());
+export const adminMessaging = lazy(() => getMessaging(getAdminApp()));
 
 /** OAuth access token of the service account, for Google APIs the Admin SDK doesn't wrap. */
 export async function adminAccessToken(): Promise<string> {

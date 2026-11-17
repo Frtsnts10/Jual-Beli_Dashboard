@@ -24,7 +24,7 @@ shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · QRIS
 | `/[storeId]/vault` | Credential vault — Available / Sold / Expired tabs, bulk import |
 | `/[storeId]/orders` | Orders, manual payment confirm, WhatsApp delivery, 1-click warranty replacement |
 | `/[storeId]/analytics` | Revenue, conversion, daily chart, top products/referrals; CSV export (`/analytics/export`) |
-| `/platform` | Platform admin (emails in `PLATFORM_ADMIN_EMAILS`): totals, stores (suspend), users (set plan), plan payments (platform QRIS, confirm proofs), buyer account-deletion requests (approve / reject) |
+| `/platform` | Platform admin (emails in `PLATFORM_ADMIN_EMAILS`): totals, stores (suspend), users (set plan), plan payments (platform QRIS, confirm proofs), buyer account-deletion requests (approve / reject), Bantuan (seller reports), Pengumuman (banners + notifications) |
 | `/[storeId]/marketing` | Ultimate: WhatsApp broadcast, affiliate report + link builder, flash sale |
 | `/[storeId]/billing` | Plan upgrade/renewal (monthly/yearly) paid to the platform QRIS with proof upload, payment history |
 | `/[storeId]/settings` | Store QRIS (Pembayaran), store profile, template (tier-gated), accent colour, custom domain, WA integration |
@@ -76,6 +76,21 @@ pays the platform's QRIS (set in `/platform/payments`, stored in `platform/setti
 exact amount with a kode unik and uploads a proof; a platform admin confirms it there, which
 activates or extends the plan (`subscription_payments`). A paid plan past `subscription_expiry` acts as
 Starter (computed on read, no cron).
+
+## Help desk, announcements and notifications
+
+- **Bantuan** (`/[storeId]/support`): sellers report bugs or ask questions, with an optional screenshot;
+  platform admins answer in `/platform/support` (Baru / Diproses / Selesai).
+- **Pengumuman** (`/platform/announcements`): a banner on the dashboards of all users or selected plans,
+  plus a notification to each of them; it ends on its date or with "Akhiri".
+- **Bell** in the dashboard header: replies, new reports (admins), plan payment confirmed or rejected,
+  plan ending in 3 days (the daily cron), announcements.
+- **Push to browser/phone** (Firebase Cloud Messaging), opt-in per device from the bell:
+  1. Firebase console → Project settings → Cloud Messaging → *Web Push certificates* → **Generate key pair**.
+  2. Put the public key in Vercel as `NEXT_PUBLIC_FIREBASE_VAPID_KEY` and redeploy.
+  3. Optional: `DASHBOARD_PUBLIC_URL` (e.g. `https://dashboard.example.com`) so a tapped push opens the right page.
+
+  On iPhone, push works only after the dashboard is added to the Home Screen (iOS 16.4+).
 
 ## Images (Firebase Storage)
 
