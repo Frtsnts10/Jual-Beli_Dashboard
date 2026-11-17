@@ -1,5 +1,6 @@
 "use server";
 
+import { isImageUrl } from "@/lib/media-kinds";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -89,7 +90,7 @@ export async function updateStoreSettings(storeId: string, input: StoreSettingsI
   }
   if (!HEX_RE.test(input.accent_color)) return fail("Warna aksen harus format hex, mis. #10B981.");
   for (const url of [input.banner_url, input.logo_url]) {
-    if (url && !/^https:\/\//.test(url)) return fail("URL gambar harus diawali https://");
+    if (url && !isImageUrl(url)) return fail("URL gambar harus diawali https://");
   }
 
   const storeRef = adminDb.collection("stores").doc(storeId);

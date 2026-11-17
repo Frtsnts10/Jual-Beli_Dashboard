@@ -77,6 +77,15 @@ exact amount with a kode unik and uploads a proof; a platform admin confirms it 
 activates or extends the plan (`subscription_payments`). A paid plan past `subscription_expiry` acts as
 Starter (computed on read, no cron).
 
+## Images (Firebase Storage)
+
+Logo, product photos and hero-banner slides are uploaded from the dashboard: the browser
+resizes them (WebP/JPEG), the server stores them under `stores/{storeId}/{logo|banner|product}/`
+in the default bucket (`web-store-dashboard.firebasestorage.app`) and saves a download-token
+URL. Setup: Firebase console → upgrade to **Blaze** → **Storage → Get started**, then paste
+`storage.rules` (closed to clients). The service account already has access. Hero slides live
+in `stores/{id}.hero_slides` (max 5) and show on top of every storefront template.
+
 ## Payments (seller's own QRIS)
 
 Store orders are paid straight to each seller's own QRIS — the platform never holds buyers'

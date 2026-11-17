@@ -29,6 +29,8 @@ import { TeamCard } from "@/features/team/team-card";
 import { BotsCard } from "@/features/bots/bots-card";
 import { headers } from "next/headers";
 import { segment, segmented } from "@/components/segmented";
+import { HeroBannerCard } from "@/features/banner/hero-banner-card";
+import { listProducts } from "@/lib/data/queries";
 import type { SubscriptionTier } from "@/types/schema";
 
 export const metadata = { title: "Pengaturan" };
@@ -58,7 +60,7 @@ export default async function SettingsPage({
   const requested = (await searchParams).tab;
   const tab: Tab = tabs.find((t) => t.key === requested)?.key ?? "toko";
   const storeRef = adminDb.collection("stores").doc(storeId);
-  const [integrations, vercelState, members, invites] = await Promise.all([
+  const [integrations, vercelState, members, invites, products] = await Promise.all([
     adminDb
       .collection("stores")
       .doc(storeId)
@@ -77,6 +79,7 @@ export default async function SettingsPage({
           .where("store_id", "==", storeId)
           .get()
       : null,
+    tab === "toko" ? listProducts(storeId) : Promise.resolve([]),
   ]);
   // Routing records, plus any TXT ownership challenge Vercel is asking for.
   const dnsRecords = store.custom_domain
@@ -135,6 +138,7 @@ export default async function SettingsPage({
                 rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN}
               />
               <StoreInfoForm storeId={storeId} info={store.store_info} />
+              <HeroBannerCard storeId={storeId} initial={store.hero_slides} products={products.map((p) => ({ id: p.id, title: p.title }))} />
             </>
           )}
           {tab === "integrasi" && (

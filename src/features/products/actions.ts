@@ -7,6 +7,7 @@ import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { PLATFORM_TYPES, TIERS } from "@/config/tiers";
 import type { PlatformType } from "@/types/schema";
+import { isImageUrl } from "@/lib/media-kinds";
 
 export interface ProductInput {
   title: string;
@@ -31,7 +32,7 @@ function validate(input: ProductInput): string | null {
   if (!Number.isInteger(input.duration_days) || input.duration_days < 1 || input.duration_days > 3650) {
     return "Durasi 1–3650 hari.";
   }
-  if (input.image_url && !/^https:\/\//.test(input.image_url)) return "URL gambar harus diawali https://";
+  if (input.image_url && !isImageUrl(input.image_url)) return "URL gambar harus diawali https://";
   if (input.flash_sale_price != null) {
     if (!Number.isInteger(input.flash_sale_price) || input.flash_sale_price < 1000) return "Harga flash sale minimal Rp 1.000.";
     if (input.flash_sale_price >= input.price) return "Harga flash sale harus lebih murah dari harga normal.";
