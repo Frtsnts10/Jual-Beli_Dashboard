@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IntegrationsForm } from "@/features/settings/integrations-form";
+import { WaNotifyCard } from "@/features/settings/wa-notify-card";
 import { QrisCard } from "@/features/payments/qris-card";
 import { removeStoreQris, saveStoreQris } from "@/features/payments/actions";
 import {
@@ -153,6 +154,13 @@ export default async function SettingsPage({
                   integrations.get("wa_message_template") ?? DEFAULT_WA_TEMPLATE
                 }
                 autoFulfillment={tier.autoFulfillment}
+              />
+              <WaNotifyCard
+                storeId={storeId}
+                allowed={tier.autoFulfillment}
+                ready={!!integrations.get("wa_api_provider") && !!integrations.get("wa_api_token")}
+                notifyBuyer={integrations.get("wa_notify_buyer") !== false}
+                sellerPhone={integrations.get("wa_notify_seller_phone") ?? null}
               />
               <BotsCard
                 storeId={storeId}

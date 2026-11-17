@@ -173,3 +173,23 @@ export async function updateIntegrations(
   revalidatePath(`/${storeId}/settings`);
   return { ok: true };
 }
+
+/** Pengaturan → WhatsApp & Bot → Notifikasi pembayaran. An empty seller phone turns that alert off. */
+export async function updateWaNotifications(storeId: string, input: { buyer: boolean; sellerPhone: string }): Promise<ActionResult> {
+  await requireStore(storeId);
+  const raw = input.sellerPhone.replace(/[\s-]/g, "");
+  let phone: string | null = null;
+  if (raw) {
+    const digits = raw.replace(/^\+/, "");
+    if (!/^(0|62)8\d{7,12}$/.test(digits)) return fail("Nomor WhatsApp tidak valid (contoh: 0812xxxxxxx).");
+    phone = digits.startsWith("0") ? `62${digits.slice(1)}` : digits;
+  }
+  await adminDb
+    .collection("stores")
+    .doc(storeId)
+    .collection("private")
+    .doc("integrations")
+    .set({ wa_notify_buyer: !!input.buyer, wa_notify_seller_phone: phone }, { merge: true });
+  revalidatePath(`/${storeId}/settings`);
+  return { ok: true };
+}

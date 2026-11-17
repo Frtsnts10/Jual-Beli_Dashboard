@@ -1,11 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { fulfillOrder, replaceCredential } from "@/lib/payments/fulfillment";
-import { deliverOrder } from "@/lib/integrations/automation";
+import { deliverOrder, noticeBuyer } from "@/lib/integrations/automation";
 import { failOrder, groupOf } from "@/lib/payments/manual";
 
 async function ownedOrder(storeId: string, orderId: string) {
@@ -24,8 +25,8 @@ export async function confirmPayment(storeId: string, orderId: string): Promise<
   await requireStore(storeId);
   const found = await ownedOrder(storeId, orderId);
   if (!found) return fail("Pesanan tidak ditemukan.");
-  const targets =
-    found.snap.get("payment_status") === "PAID" ? [found.snap] : (await groupOf(storeId, orderId)).filter((d) => d.get("payment_status") !== "PAID");
+  const allocatingOnly = found.snap.get("payment_status") === "PAID";
+  const targets = allocatingOnly ? [found.snap] : (await groupOf(storeId, orderId)).filter((d) => d.get("payment_status") !== "PAID");
   let short = 0;
   for (const o of targets) {
     const wasWaitingForStock = o.get("needs_stock") === true;
@@ -33,6 +34,8 @@ export async function confirmPayment(storeId: string, orderId: string): Promise<
     if (result === "fulfilled") await deliverOrder(o.id, wasWaitingForStock ? "restock" : "paid");
     if (result === "needs_stock") short++;
   }
+  // Payment confirmed (not just stock allocated): the buyer gets one WhatsApp with the receipt.
+  if (!allocatingOnly && targets.length) after(() => noticeBuyer((found.snap.get("group_id") as string | undefined) ?? orderId, "paid"));
   revalidatePath(`/${storeId}`, "layout");
   if (short)
     return fail(
@@ -107,6 +110,7 @@ export async function rejectPayment(storeId: string, orderId: string, reason: st
   let failed = 0;
   for (const o of await groupOf(storeId, orderId)) if (await failOrder(o.id, why)) failed++;
   if (!failed) return fail("Pesanan ini sudah tidak menunggu pembayaran.");
+  after(() => noticeBuyer((found.snap.get("group_id") as string | undefined) ?? orderId, "rejected", why));
   revalidatePath(`/${storeId}`, "layout");
   return { ok: true };
 }

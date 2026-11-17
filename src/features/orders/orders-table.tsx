@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle2, Copy, MessageCircle, MoreHorizontal, PackagePlus, RefreshCw, Send, XCircle } from "lucide-react";
+import { CheckCircle2, Copy, MessageCircle, MoreHorizontal, PackagePlus, ReceiptText, RefreshCw, Send, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ const needsAction = (o: Order) =>
 export function OrdersTable({
   storeId,
   storeName,
+  storefront,
   orders,
   credentials,
   productTitles,
@@ -36,6 +37,8 @@ export function OrdersTable({
   productTitles: Record<string, string>;
   storeId: string;
   storeName: string;
+  /** Storefront base URL, for the buyer's receipt link. */
+  storefront: string;
   orders: Order[];
   credentials: Record<string, Credential>;
   waTemplate: string;
@@ -155,6 +158,11 @@ export function OrdersTable({
         <DropdownMenuItem onSelect={() => window.open(`https://wa.me/${waNumber(o.customer_contact.phone)}`, "_blank", "noopener")}>
           <MessageCircle /> Chat pembeli di WhatsApp
         </DropdownMenuItem>
+        {o.payment_status === "PAID" && (
+          <DropdownMenuItem onSelect={() => window.open(`${storefront}/struk/${o.group_id}`, "_blank", "noopener")}>
+            <ReceiptText /> Lihat struk
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onSelect={() => void navigator.clipboard.writeText(o.id).then(() => toast.success("ID pesanan disalin"))}>
           <Copy /> Salin ID pesanan
         </DropdownMenuItem>
