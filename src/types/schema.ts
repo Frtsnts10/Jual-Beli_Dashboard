@@ -9,12 +9,7 @@ import type { RatingCounts } from "@/lib/rating";
 
 export type SubscriptionTier = "starter" | "pro" | "ultimate";
 
-export type LayoutTemplate =
-  | "template_a_bento"
-  | "template_b_list"
-  | "template_c_hero"
-  | "template_d_appstore"
-  | "template_e_brutalist";
+export type LayoutTemplate = "template_a_bento" | "template_b_list" | "template_c_hero" | "template_d_appstore" | "template_e_brutalist";
 
 export type PlatformType = "Media" | "AI" | "VPN" | "Music" | "Productivity" | "Other";
 
@@ -227,6 +222,16 @@ export interface Order {
   /** Voucher used at checkout; `amount` is already after `discount`. */
   voucher_code: string | null;
   discount: number;
+  /**
+   * Checkout this order belongs to: a cart is several orders paid with one QRIS transfer.
+   * The id of its first (lead) order, which also holds the proof and the unique code.
+   * Orders from before carts: their own id.
+   */
+  group_id: string;
+  /** Orders in the checkout (1 = bought on its own). */
+  group_size: number;
+  /** What the buyer transferred for the whole checkout (= amount when group_size is 1). */
+  group_total: number;
   created_at: string;
   paid_at: string | null;
   access_expires_at: string | null;

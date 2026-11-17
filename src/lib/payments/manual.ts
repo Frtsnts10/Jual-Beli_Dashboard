@@ -14,13 +14,27 @@ export async function failOrder(orderId: string, reason: string | null): Promise
   return adminDb.runTransaction(async (tx) => {
     const order = await tx.get(orderRef);
     if (!order.exists || order.get("payment_status") !== "PENDING") return false;
-    const code = order.get("voucher_code") as string | null;
+    // In a cart several orders carry the code but only one holds the use (voucher_use).
+    const code = (order.get("voucher_use") ?? !order.get("group_id")) ? (order.get("voucher_code") as string | null) : null;
     const voucherRef = code ? adminDb.collection("vouchers").doc(`${order.get("store_id")}_${code}`) : null;
     const voucher = voucherRef ? await tx.get(voucherRef) : null;
     tx.update(orderRef, { payment_status: "FAILED", rejected_reason: reason, failed_at: FieldValue.serverTimestamp() });
     if (voucherRef && voucher?.exists && (voucher.get("used_count") ?? 0) > 0) tx.update(voucherRef, { used_count: FieldValue.increment(-1) });
     return true;
   });
+}
+
+/**
+ * The orders paid together with this one (a cart = one QRIS transfer), lead first. An order
+ * bought on its own, or from before carts, is a group of one.
+ */
+export async function groupOf(storeId: string, orderId: string): Promise<FirebaseFirestore.DocumentSnapshot[]> {
+  const order = await adminDb.collection("orders").doc(orderId).get();
+  if (!order.exists || order.get("store_id") !== storeId) return [];
+  const groupId = (order.get("group_id") as string | undefined) ?? order.id;
+  if ((order.get("group_size") ?? 1) <= 1) return [order];
+  const snap = await adminDb.collection("orders").where("group_id", "==", groupId).get();
+  return snap.docs.filter((d) => d.get("store_id") === storeId).sort((a, b) => (a.id === groupId ? -1 : b.id === groupId ? 1 : a.id.localeCompare(b.id)));
 }
 
 /**
