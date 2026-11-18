@@ -15,6 +15,7 @@ import { countUserUnreadTickets } from "@/lib/data/support";
 import { NotificationBell } from "@/features/notifications/notification-bell";
 import { AnnouncementBar } from "@/features/notifications/announcement-bar";
 import { LiveRefresh } from "@/features/dashboard/live-refresh";
+import { Brand } from "@/components/brand";
 
 export default async function StoreLayout({
   children,
@@ -45,6 +46,7 @@ export default async function StoreLayout({
     <div className="flex h-svh overflow-hidden">
       <LiveRefresh storeId={storeId} />
       <aside className="bg-sidebar hidden w-64 shrink-0 flex-col gap-4 overflow-y-auto border-r p-4 lg:flex">
+        <Brand className="px-1" />
         <StoreSwitcher stores={switcherStores} currentId={storeId} />
         <SidebarNav
           storeId={storeId}

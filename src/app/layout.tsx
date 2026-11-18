@@ -4,8 +4,9 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { template: "%s · Dashboard", default: "Dashboard Toko Digital" },
-  description: "Pusat kendali toko produk digital: produk, brankas stok, pesanan dan etalase.",
+  title: { template: "%s · Jual", default: "Jual — Dashboard seller" },
+  description: "Jual: pusat kendali toko produk digital — produk, brankas stok, pesanan QRIS dan etalase di belidi.biz.id.",
+  applicationName: "Jual",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

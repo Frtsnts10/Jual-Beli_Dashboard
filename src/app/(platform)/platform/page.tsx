@@ -11,7 +11,7 @@ import { formatDate, formatIDR } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export const metadata = { title: "Ringkasan" };
+export const metadata = { title: { absolute: "Ringkasan · Jual Admin" } };
 
 export default async function PlatformOverviewPage() {
   const [o, activity, { plans }, qris, proofs, deletions] = await Promise.all([

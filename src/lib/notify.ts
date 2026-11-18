@@ -71,7 +71,7 @@ async function push(uids: string[], n: NotifyInput) {
         ...(base.startsWith("https://")
           ? { fcmOptions: { link: `${base}${n.href}` } }
           : {}),
-        notification: { icon: "/favicon.ico" },
+        notification: { icon: "/icon.png" },
       },
       data: { href: n.href },
     });
