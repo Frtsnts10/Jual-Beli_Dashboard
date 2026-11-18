@@ -12,7 +12,7 @@ import { featuresOfUid } from "@/lib/catalog";
 import { waNumber } from "@/lib/integrations/whatsapp";
 import type { LayoutTemplate, StoreInfo, WaProvider } from "@/types/schema";
 
-const RESERVED_SLUGS = new Set(["www", "app", "api", "admin", "dashboard", "mail", "static", "assets", "track", "checkout"]);
+const RESERVED_SLUGS = new Set(["www", "app", "api", "admin", "dashboard", "jual", "seller", "toko", "platform", "mail", "static", "assets", "track", "checkout"]);
 const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$/;
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
