@@ -44,7 +44,7 @@ export function PaymentReview({ storeId, order, group = [order], className }: { 
       }}
     >
       <DialogTrigger asChild>
-        <Button variant={hasProof ? "default" : "outline"} className={className}>
+        <Button variant={hasProof ? "default" : "outline"} size={className ? "default" : "xs"} className={className}>
           <ReceiptText /> {hasProof ? "Cek bukti" : "Belum ada bukti"}
         </Button>
       </DialogTrigger>

@@ -54,29 +54,32 @@ export function StoreSettingsForm({
         <CardHeader>
           <CardTitle>Profil toko</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2 [&>*]:min-w-0">
-          <div className="grid gap-2">
-            <Label htmlFor="store_name">Nama toko</Label>
-            <Input id="store_name" value={form.store_name} onChange={(e) => set("store_name", e.target.value)} />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="slug">Slug{rootDomain ? ` (${form.slug || "slug"}.${rootDomain})` : ""}</Label>
-            <Input id="slug" value={form.slug} onChange={(e) => set("slug", e.target.value.toLowerCase())} />
-          </div>
-          <div className="grid gap-2 md:col-span-2">
-            <Label htmlFor="tagline">Tagline</Label>
-            <Input id="tagline" value={form.tagline} maxLength={160} onChange={(e) => set("tagline", e.target.value)} placeholder="Akun premium murah, garansi full." />
-          </div>
-          <div className="grid gap-2 md:col-span-2">
+        {/* Logo on the left, the store's name, link, tagline and on/off switch beside it. */}
+        <CardContent className="flex flex-col gap-6 sm:flex-row">
+          <div className="grid shrink-0 content-start gap-2 sm:w-32">
             <Label>Logo</Label>
-            <ImageUpload storeId={store.id} kind="logo" aspect="aspect-square max-w-28" value={form.logo_url} onChange={(url) => set("logo_url", url)} label="Unggah logo" />
+            <ImageUpload storeId={store.id} kind="logo" aspect="aspect-square max-w-28 sm:max-w-none" value={form.logo_url} onChange={(url) => set("logo_url", url)} label="Unggah logo" />
           </div>
-          <div className="flex items-center justify-between md:col-span-2">
-            <div>
-              <Label htmlFor="active">Toko aktif</Label>
-              <p className="text-muted-foreground text-xs">Jika nonaktif, etalase menampilkan halaman tutup.</p>
+          <div className="grid min-w-0 flex-1 gap-4 md:grid-cols-2 [&>*]:min-w-0">
+            <div className="grid gap-2">
+              <Label htmlFor="store_name">Nama toko</Label>
+              <Input id="store_name" value={form.store_name} onChange={(e) => set("store_name", e.target.value)} />
             </div>
-            <Switch id="active" checked={form.is_active} onCheckedChange={(v) => set("is_active", v)} />
+            <div className="grid gap-2">
+              <Label htmlFor="slug">Slug{rootDomain ? ` (${form.slug || "slug"}.${rootDomain})` : ""}</Label>
+              <Input id="slug" value={form.slug} onChange={(e) => set("slug", e.target.value.toLowerCase())} />
+            </div>
+            <div className="grid gap-2 md:col-span-2">
+              <Label htmlFor="tagline">Tagline</Label>
+              <Input id="tagline" value={form.tagline} maxLength={160} onChange={(e) => set("tagline", e.target.value)} placeholder="Akun premium murah, garansi full." />
+            </div>
+            <div className="flex items-center justify-between gap-4 md:col-span-2">
+              <div>
+                <Label htmlFor="active">Toko aktif</Label>
+                <p className="text-muted-foreground text-xs">Jika nonaktif, etalase menampilkan halaman tutup.</p>
+              </div>
+              <Switch id="active" checked={form.is_active} onCheckedChange={(v) => set("is_active", v)} />
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -14,6 +14,7 @@ import {
 import { countUserUnreadTickets } from "@/lib/data/support";
 import { NotificationBell } from "@/features/notifications/notification-bell";
 import { AnnouncementBar } from "@/features/notifications/announcement-bar";
+import { LiveRefresh } from "@/features/dashboard/live-refresh";
 
 export default async function StoreLayout({
   children,
@@ -41,8 +42,9 @@ export default async function StoreLayout({
   }));
 
   return (
-    <div className="flex min-h-svh">
-      <aside className="bg-sidebar hidden w-64 shrink-0 flex-col gap-4 border-r p-4 lg:flex">
+    <div className="flex h-svh overflow-hidden">
+      <LiveRefresh storeId={storeId} />
+      <aside className="bg-sidebar hidden w-64 shrink-0 flex-col gap-4 overflow-y-auto border-r p-4 lg:flex">
         <StoreSwitcher stores={switcherStores} currentId={storeId} />
         <SidebarNav
           storeId={storeId}
@@ -52,8 +54,8 @@ export default async function StoreLayout({
           className="flex-col"
         />
       </aside>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 items-center gap-3 border-b px-4">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="flex h-14 shrink-0 items-center gap-3 border-b px-4">
           <div className="w-44 min-w-0 sm:w-56 lg:hidden">
             <StoreSwitcher stores={switcherStores} currentId={storeId} />
           </div>
@@ -80,7 +82,7 @@ export default async function StoreLayout({
           openClaims={openClaims}
           isOwner={role === "owner"}
           supportUnread={supportUnread}
-          className="overflow-x-auto border-b px-2 py-1 lg:hidden"
+          className="shrink-0 overflow-x-auto border-b px-2 py-1 lg:hidden"
         />
         <AnnouncementBar items={announcements} />
         {store.suspended && (
@@ -89,7 +91,7 @@ export default async function StoreLayout({
             ditutup. Hubungi support platform.
           </div>
         )}
-        <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

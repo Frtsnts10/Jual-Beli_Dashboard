@@ -28,7 +28,6 @@ const needsAction = (o: Order) =>
 export function OrdersTable({
   storeId,
   storeName,
-  storefront,
   orders,
   credentials,
   productTitles,
@@ -37,8 +36,6 @@ export function OrdersTable({
   productTitles: Record<string, string>;
   storeId: string;
   storeName: string;
-  /** Storefront base URL, for the buyer's receipt link. */
-  storefront: string;
   orders: Order[];
   credentials: Record<string, Credential>;
   waTemplate: string;
@@ -159,7 +156,7 @@ export function OrdersTable({
           <MessageCircle /> Chat pembeli di WhatsApp
         </DropdownMenuItem>
         {o.payment_status === "PAID" && (
-          <DropdownMenuItem onSelect={() => window.open(`${storefront}/struk/${o.group_id}`, "_blank", "noopener")}>
+          <DropdownMenuItem onSelect={() => window.open(`/receipt/${storeId}/${o.group_id}`, "_blank", "noopener")}>
             <ReceiptText /> Lihat struk
           </DropdownMenuItem>
         )}
@@ -259,7 +256,7 @@ export function OrdersTable({
                   {o.needs_stock && <span className="text-destructive text-xs">Stok kosong</span>}
                   {o.delivery_error && o.delivery_status !== "SENT_VIA_WA" && <span className="text-destructive text-xs">Auto-kirim gagal</span>}
                 </div>
-                {o.warranty_status === "CLAIMED" && o.warranty_claim && <p className="text-muted-foreground mt-2 text-xs">“{o.warranty_claim.reason}”</p>}
+                {o.warranty_status === "CLAIMED" && o.warranty_claim && <p className="text-muted-foreground mt-2 truncate text-xs" title={o.warranty_claim.reason}>“{o.warranty_claim.reason}”</p>}
                 {o.payment_status === "PENDING" && isLead(o) && review(o, "mt-3 w-full")}
               </div>
             ))}
@@ -314,12 +311,14 @@ export function OrdersTable({
                         </div>
                       )}
                     </TableCell>
-                    <TableCell className="hidden max-w-56 whitespace-normal xl:table-cell">
+                    <TableCell className="hidden max-w-48 xl:table-cell">
                       <Badge variant={o.warranty_status === "CLAIMED" ? "destructive" : o.warranty_status === "REPLACED" ? "secondary" : "outline"}>
                         {o.warranty_status}
                       </Badge>
                       {o.warranty_status === "CLAIMED" && o.warranty_claim && (
-                        <div className="text-muted-foreground mt-1 text-xs">“{o.warranty_claim.reason}”</div>
+                        <div className="text-muted-foreground mt-1 max-w-48 truncate text-xs" title={o.warranty_claim.reason}>
+                          “{o.warranty_claim.reason}”
+                        </div>
                       )}
                     </TableCell>
                     <TableCell>
