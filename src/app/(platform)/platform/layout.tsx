@@ -34,9 +34,9 @@ export default async function PlatformLayout({
     countNewTickets(),
   ]);
   return (
-    <div className="min-h-svh">
+    <div className="flex h-svh flex-col overflow-hidden">
       {/* Phone/tablet: title + bell/account on one row, the section links scroll underneath. */}
-      <header className="flex flex-wrap items-center gap-x-6 border-b px-4 md:h-14 md:flex-nowrap md:px-6">
+      <header className="flex shrink-0 flex-wrap items-center gap-x-6 border-b px-4 md:h-14 md:flex-nowrap md:px-6">
         <span className="flex h-12 items-center gap-2 font-semibold whitespace-nowrap md:h-auto">
           <Shield className="size-4" /> Admin Platform
         </span>
@@ -61,7 +61,7 @@ export default async function PlatformLayout({
           ))}
         </nav>
       </header>
-      <main className="p-4 md:p-6">{children}</main>
+      <main className="min-h-0 flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
     </div>
   );
 }

@@ -5,7 +5,9 @@ stock premium accounts in a vault, process orders and warranty claims, and style
 storefront. The buyer-facing storefront lives in the separate **Shop-Website** repo;
 both share one Firestore database.
 
-Spec: `plan-dashboard.md` (phase 1 implemented — see *Roadmap*).
+Highlights: one-QRIS cart checkout with proof upload, encrypted credential vault, automatic
+WhatsApp delivery through n8n, warranty claims, vouchers, reviews, customers, analytics,
+live order updates, and a platform admin that runs plans, features and storefront themes.
 
 ## Stack
 
@@ -22,9 +24,10 @@ shadcn/ui (Radix) · Firebase Auth + Firestore (Admin SDK on the server) · QRIS
 | `/[storeId]` | Overview: revenue, stock, alerts |
 | `/[storeId]/products` | Catalogue CRUD, publish toggle |
 | `/[storeId]/vault` | Credential vault — Available / Sold / Expired tabs, bulk import |
-| `/[storeId]/orders` | Orders, manual payment confirm, WhatsApp delivery, 1-click warranty replacement |
+| `/[storeId]/orders` | Orders and carts, QRIS proof check (confirm / reject), WhatsApp delivery, 1-click warranty replacement |
+| `/receipt/[storeId]/[orderId]` | Seller's printable receipt of a paid order or cart |
 | `/[storeId]/analytics` | Revenue, conversion, daily chart, top products/referrals; CSV export (`/analytics/export`) |
-| `/platform` | Platform admin (emails in `PLATFORM_ADMIN_EMAILS`): totals, stores (suspend), users (set plan), plan payments (platform QRIS, confirm proofs), buyer account-deletion requests (approve / reject), Bantuan (seller reports), Pengumuman (banners + notifications) |
+| `/platform` | Platform admin (emails in `PLATFORM_ADMIN_EMAILS`): totals, stores (suspend), users (set plan), plan payments (platform QRIS, confirm proofs), buyer account-deletion requests (approve / reject), Bantuan (seller reports), Pengumuman (banners + notifications), Paket (prices, limits, features per plan), Tema (storefront templates and their style), per-seller feature overrides |
 | `/[storeId]/marketing` | Ultimate: WhatsApp broadcast, affiliate report + link builder, flash sale |
 | `/[storeId]/billing` | Plan upgrade/renewal (monthly/yearly) paid to the platform QRIS with proof upload, payment history |
 | `/[storeId]/settings` | Store QRIS (Pembayaran), store profile, template (tier-gated), accent colour, custom domain, WA integration |
@@ -67,15 +70,33 @@ Fulfilment (`src/lib/payments/fulfillment.ts`) runs in a Firestore transaction: 
 exactly one AVAILABLE credential even under concurrent webhooks, and the webhook is
 idempotent.
 
-## Tiers
+## Plans, features and themes
 
-`src/config/tiers.ts` — Starter (1 store, 50 stock, 2 templates), Pro (3 stores,
-unlimited stock, all templates, auto-fulfilment), Ultimate (unlimited, custom domain,
-marketing). `users.subscription_tier` is server-only. Plans are bought on **Langganan**: the seller
+Platform admins run the catalogue from `/platform/plans` and `/platform/themes`; it is stored in
+`platform/catalog` and read by both apps (`src/lib/catalog-core.ts`, copied in the storefront
+repo; `src/config/tiers.ts` holds the defaults used until the admin saves).
+
+- **Per plan** (Starter / Pro / Ultimate): name, monthly/yearly price, store and stock limits
+  (or unlimited), features (auto-fulfilment, vouchers, marketing, custom domain, team) and
+  which templates the plan may use.
+- **Per theme**: enable/disable, name and description, and its style (corner radius, font,
+  accent colour) applied on the storefront.
+- **Per seller** (`/platform/users` → fitur khusus): force a feature on or off, grant extra
+  templates or custom limits (`users/{uid}.feature_overrides`).
+
+`users.subscription_tier` is server-only. Plans are bought on **Langganan**: the seller
 pays the platform's QRIS (set in `/platform/payments`, stored in `platform/settings`) for the
 exact amount with a kode unik and uploads a proof; a platform admin confirms it there, which
 activates or extends the plan (`subscription_payments`). A paid plan past `subscription_expiry` acts as
-Starter (computed on read, no cron).
+Starter (computed on read, no cron). Admin accounts (`PLATFORM_ADMIN_EMAILS`) only see `/platform`;
+they have no store or plan.
+
+## Live updates
+
+Every store page polls a small order fingerprint (`src/features/dashboard/live-actions.ts`, five
+count queries) every 8 seconds while the tab is visible. When a new order arrives, a buyer
+uploads a payment proof, or a payment or warranty claim changes, the page re-renders in place
+and a toast says what happened.
 
 ## Demo and admin accounts
 
@@ -211,3 +232,7 @@ rewrites the Host header.
 subscription revenue for the month; lets you suspend a store (storefront, checkout and bots
 close, the seller sees a banner) and set any user's plan by hand. Every action is written to
 `platform_audit`.
+
+## License
+
+[MIT](LICENSE)
