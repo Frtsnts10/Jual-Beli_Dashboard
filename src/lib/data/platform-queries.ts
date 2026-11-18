@@ -99,3 +99,48 @@ export async function accountDeletionRequests() {
   );
   return rows.sort((a, b) => a.requested_at.localeCompare(b.requested_at));
 }
+
+const jakartaDay = (d: Date) => d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
+
+/**
+ * Last 30 days across the platform, for Ringkasan: daily GMV (paid store orders) and plan
+ * revenue, the top stores by GMV, and the latest plan payments.
+ */
+export async function platformActivity(days = 30) {
+  const from = new Date(Date.now() - (days - 1) * 86_400_000);
+  from.setHours(0, 0, 0, 0);
+  const since = Timestamp.fromDate(from);
+  const [orders, subs, stores, recentSubs] = await Promise.all([
+    adminDb.collection("orders").where("paid_at", ">=", since).select("amount", "payment_status", "paid_at", "store_id").get(),
+    adminDb.collection("subscription_payments").where("paid_at", ">=", since).select("amount", "status", "paid_at").get(),
+    adminDb.collection("stores").select("store_name", "slug").get(),
+    adminDb.collection("subscription_payments").orderBy("created_at", "desc").limit(8).get(),
+  ]);
+  const series = new Map<string, { gmv: number; plans: number }>();
+  for (let i = 0; i < days; i++) series.set(jakartaDay(new Date(from.getTime() + i * 86_400_000)), { gmv: 0, plans: 0 });
+  const byStore = new Map<string, { gmv: number; orders: number }>();
+  for (const o of orders.docs) {
+    if (o.get("payment_status") !== "PAID") continue;
+    const amount = (o.get("amount") as number) ?? 0;
+    const day = series.get(jakartaDay(o.get("paid_at").toDate()));
+    if (day) day.gmv += amount;
+    const s = byStore.get(o.get("store_id")) ?? { gmv: 0, orders: 0 };
+    s.gmv += amount;
+    s.orders++;
+    byStore.set(o.get("store_id"), s);
+  }
+  for (const p of subs.docs) {
+    if (p.get("status") !== "PAID") continue;
+    const day = series.get(jakartaDay(p.get("paid_at").toDate()));
+    if (day) day.plans += (p.get("amount") as number) ?? 0;
+  }
+  const names = new Map(stores.docs.map((s) => [s.id, (s.get("store_name") as string) ?? s.id]));
+  return {
+    daily: [...series].map(([day, v]) => ({ day, ...v })),
+    topStores: [...byStore]
+      .map(([id, v]) => ({ id, name: names.get(id) ?? id, ...v }))
+      .sort((a, b) => b.gmv - a.gmv)
+      .slice(0, 5),
+    recentPayments: recentSubs.docs.map((d) => ({ ...mapSubscriptionPayment(d), email: (d.get("email") as string) ?? "" })),
+  };
+}
