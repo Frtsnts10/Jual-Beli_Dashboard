@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireStore } from "@/lib/access/auth";
 import { countCredentials, listCredentials, listProducts } from "@/lib/data/queries";
-import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { AddStockDialog } from "@/features/vault/add-stock-dialog";
 import { ImportDialog } from "@/features/import/import-dialog";
@@ -30,7 +29,7 @@ export default async function VaultPage({
   const sp = await searchParams;
   const { status: rawStatus, product } = sp;
   const status = TABS.find((t) => t.status === rawStatus)?.status ?? "AVAILABLE";
-  const { tier: plan } = await requireStore(storeId);
+  const { features } = await requireStore(storeId);
 
   const [products, items, ...counts] = await Promise.all([
     listProducts(storeId),
@@ -39,7 +38,7 @@ export default async function VaultPage({
   ]);
   const productTitles = Object.fromEntries(products.map((p) => [p.id, p.title]));
   const filtered = product ? items.filter((c) => c.product_id === product) : items;
-  const tier = TIERS[plan];
+  const tier = features;
   const { rows, ...pager } = paginate(filtered, sp, 10);
 
   return (

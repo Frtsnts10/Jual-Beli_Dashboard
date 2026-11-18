@@ -5,7 +5,6 @@ import { toISO } from "@/lib/data/mappers";
 import { listProducts } from "@/lib/data/queries";
 import { describeVoucher, type Voucher } from "@/lib/voucher";
 import { formatDate, formatIDR } from "@/lib/utils";
-import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -56,16 +55,16 @@ export default async function VouchersPage({
 }) {
   const { storeId } = await params;
   const sp = await searchParams;
-  const { tier } = await requireStore(storeId);
+  const { features } = await requireStore(storeId);
 
-  if (!TIERS[tier].vouchers) {
+  if (!features.vouchers) {
     return (
       <>
         <PageHeader title="Voucher" description="Kode promo untuk pembeli." />
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Lock className="size-4" /> Fitur paket Pro & Ultimate
+              <Lock className="size-4" /> Belum tersedia di paket Anda
             </CardTitle>
             <CardDescription>
               Buat kode diskon persen atau nominal, dengan kuota, minimal

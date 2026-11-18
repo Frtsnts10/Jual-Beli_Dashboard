@@ -6,7 +6,6 @@ import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { addStoreAdmin } from "@/lib/access/team";
-import { TIERS } from "@/config/tiers";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -17,8 +16,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
  * billing, the store QRIS, domains or the team (owner only).
  */
 export async function inviteAdmin(storeId: string, rawEmail: string): Promise<ActionResult<{ pending: boolean }>> {
-  const { user, store, tier } = await requireStore(storeId, { ownerOnly: true });
-  if (!TIERS[tier].multiAdmin) return fail("Multi-user admin adalah fitur paket Ultimate.");
+  const { user, store, features } = await requireStore(storeId, { ownerOnly: true });
+  if (!features.multiAdmin) return fail("Fitur tim (multi-admin) belum tersedia di paket Anda.");
   const email = rawEmail.trim().toLowerCase();
   if (!EMAIL_RE.test(email)) return fail("Email tidak valid.");
   if (email === user.email.toLowerCase()) return fail("Itu email Anda sendiri.");

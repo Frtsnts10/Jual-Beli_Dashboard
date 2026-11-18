@@ -3,7 +3,6 @@ import { AlertTriangle } from "lucide-react";
 import { requireStore } from "@/lib/access/auth";
 import { countCredentials, countOpenClaims, listOrders, listProducts } from "@/lib/data/queries";
 import { formatDate, formatIDR } from "@/lib/utils";
-import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { PayBadge } from "@/components/pay-badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,14 +11,14 @@ export const metadata = { title: "Ringkasan" };
 
 export default async function OverviewPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
-  const { store, tier: plan } = await requireStore(storeId);
+  const { store, features } = await requireStore(storeId);
   const [orders, products, available, claims] = await Promise.all([
     listOrders(storeId, 500),
     listProducts(storeId),
     countCredentials(storeId, "AVAILABLE"),
     countOpenClaims(storeId),
   ]);
-  const tier = TIERS[plan];
+  const tier = features;
 
   const monthStart = new Date();
   monthStart.setDate(1);

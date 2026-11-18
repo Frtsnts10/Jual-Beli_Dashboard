@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getOwnedStores, requireUser } from "@/lib/access/auth";
 import { isPlatformAdmin } from "@/lib/access/platform";
-import { TIERS } from "@/config/tiers";
+import { featuresOfUid } from "@/lib/catalog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateStoreForm } from "@/features/stores/create-store-form";
 
@@ -12,7 +12,7 @@ export default async function OnboardingPage() {
   const user = await requireUser();
   if (await isPlatformAdmin()) redirect("/platform"); // admin accounts don't open stores
   const stores = await getOwnedStores(user.uid);
-  const tier = TIERS[user.subscription_tier];
+  const tier = await featuresOfUid(user.uid);
   const atLimit = stores.length >= tier.maxStores;
 
   return (

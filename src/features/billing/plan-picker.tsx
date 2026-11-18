@@ -8,31 +8,31 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate, formatIDR } from "@/lib/utils";
-import { TIERS } from "@/config/tiers";
+import type { TierConfig } from "@/config/tiers";
+import { PLAN_KEYS, planPerks } from "@/lib/catalog-core";
 import { bonusDays, planChange } from "@/lib/billing/plan-change";
 import type { BillingPeriod, SubscriptionTier } from "@/types/schema";
 import { startSubscription, switchToStarter } from "./actions";
 import { segment, segmented } from "@/components/segmented";
 
-const PERKS: Record<SubscriptionTier, string[]> = {
-  starter: ["1 toko", "50 stok tersedia", "2 template", "Kirim akun manual via WA", "Bayar via QRIS toko, tanpa fee transaksi"],
-  pro: ["3 toko", "Stok tanpa batas", "Semua 5 template", "Auto-kirim akun via WhatsApp", "Voucher & pengingat perpanjang", "Tanpa fee transaksi"],
-  ultimate: ["Toko tanpa batas", "Custom domain", "Flash sale, broadcast & affiliate", "Multi-admin & bot Telegram/Discord", "Tanpa fee transaksi"],
-};
 
 export function PlanPicker({
   storeId,
   currentTier,
   expiry,
   canBuy,
+  plans,
 }: {
   storeId: string;
+  /** The platform catalog's plans (names, prices, contents). */
+  plans: Record<SubscriptionTier, TierConfig>;
   currentTier: SubscriptionTier;
   expiry: string | null;
   /** False while the platform has no QRIS to pay plans into. */
   canBuy: boolean;
 }) {
   const [period, setPeriod] = useState<BillingPeriod>("monthly");
+  const prices = { starter: plans.starter.priceMonthly, pro: plans.pro.priceMonthly, ultimate: plans.ultimate.priceMonthly };
   const [pending, start] = useTransition();
   const router = useRouter();
   const [now] = useState(() => Date.now());
@@ -55,12 +55,12 @@ export function PlanPicker({
         ))}
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 [&>*]:min-w-0">
-        {(Object.keys(TIERS) as SubscriptionTier[]).map((key) => {
-          const t = TIERS[key];
+        {PLAN_KEYS.map((key) => {
+          const t = plans[key];
           const price = period === "yearly" ? t.priceYearly : t.priceMonthly;
           const current = key === currentTier;
           const change = planChange(currentTier, expiry, key, now);
-          const bonus = bonusDays(currentTier, expiry, key, now);
+          const bonus = bonusDays(currentTier, expiry, key, now, prices);
           return (
             <Card key={key} className={current ? "border-primary" : ""}>
               <CardHeader>
@@ -73,7 +73,7 @@ export function PlanPicker({
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-2 text-sm">
-                {PERKS[key].map((perk) => (
+                {planPerks(t).map((perk) => (
                   <div key={perk} className="flex items-start gap-2">
                     <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" /> {perk}
                   </div>
@@ -88,7 +88,7 @@ export function PlanPicker({
                         className="w-full"
                         disabled={pending}
                         onClick={() => {
-                          if (!confirm(`Pindah ke Starter sekarang? Sisa paket ${TIERS[currentTier].name} sampai ${formatDate(expiry)} tidak dikembalikan.`)) return;
+                          if (!confirm(`Pindah ke Starter sekarang? Sisa paket ${plans[currentTier].name} sampai ${formatDate(expiry)} tidak dikembalikan.`)) return;
                           start(async () => {
                             const res = await switchToStarter(storeId);
                             if (!res.ok) return void toast.error(res.error);
@@ -111,7 +111,7 @@ export function PlanPicker({
                     </Button>
                     {bonus > 0 && (
                       <p className="text-muted-foreground text-xs">
-                        Mulai hari ini. Sisa paket {TIERS[currentTier].name} Anda jadi <b className="text-foreground">bonus {bonus} hari</b> — total{" "}
+                        Mulai hari ini. Sisa paket {plans[currentTier].name} Anda jadi <b className="text-foreground">bonus {bonus} hari</b> — total{" "}
                         {(period === "yearly" ? 365 : 30) + bonus} hari {t.name}.
                       </p>
                     )}

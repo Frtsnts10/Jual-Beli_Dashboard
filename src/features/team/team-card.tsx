@@ -87,7 +87,7 @@ export function TeamCard({
             </Button>
           </form>
         ) : (
-          <p className="text-muted-foreground">Multi-user admin tersedia di paket Ultimate.</p>
+          <p className="text-muted-foreground">Multi-user admin belum tersedia di paket Anda. Upgrade di menu Langganan.</p>
         )}
       </CardContent>
     </Card>

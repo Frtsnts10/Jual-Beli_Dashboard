@@ -1,5 +1,6 @@
 import "server-only";
 import { isAdminEmail } from "@/lib/access/platform";
+import { cleanOverrides } from "@/lib/catalog-core";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { effectiveTier, mapStore, mapSubscriptionPayment, toISO } from "@/lib/data/mappers";
@@ -53,6 +54,7 @@ export async function allUsers() {
       created_at: toISO(u.get("created_at")) ?? "",
       stores: storeCount.get(u.id) ?? 0,
       admin: isAdminEmail((u.get("email") as string) ?? ""),
+      overrides: cleanOverrides(u.get("feature_overrides")),
     }))
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 }

@@ -5,7 +5,6 @@ import { toISO } from "@/lib/data/mappers";
 import { listProducts } from "@/lib/data/queries";
 import { storefrontUrl } from "@/lib/store-url";
 import { formatDate, formatIDR } from "@/lib/utils";
-import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,16 +16,16 @@ export const metadata = { title: "Marketing" };
 
 export default async function MarketingPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
-  const { store, tier } = await requireStore(storeId);
+  const { store, features } = await requireStore(storeId);
 
-  if (!TIERS[tier].marketing) {
+  if (!features.marketing) {
     return (
       <>
-        <PageHeader title="Marketing" description="Growth engine paket Ultimate." />
+        <PageHeader title="Marketing" description="Flash sale, bundling, broadcast dan bot." />
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Lock className="size-4" /> Fitur paket Ultimate
+              <Lock className="size-4" /> Belum tersedia di paket Anda
             </CardTitle>
             <CardDescription>
               WhatsApp broadcast ke pelanggan lama, flash sale dengan timer, dan laporan affiliate/referral. Upgrade di halaman Langganan.

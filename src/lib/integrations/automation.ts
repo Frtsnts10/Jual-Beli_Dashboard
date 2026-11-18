@@ -4,8 +4,8 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { deliveryMessage, fillTemplate, waNumber } from "@/lib/integrations/whatsapp";
 import { formatDate, formatIDR } from "@/lib/utils";
-import { DEFAULT_WA_TEMPLATE, TIERS } from "@/config/tiers";
-import { effectiveTier } from "@/lib/data/mappers";
+import { DEFAULT_WA_TEMPLATE } from "@/config/tiers";
+import { featuresOfUser } from "@/lib/catalog";
 import { decryptSecret } from "@/lib/vault-crypto";
 import { storefrontUrl } from "@/lib/store-url";
 
@@ -44,12 +44,12 @@ async function storeContext(storeId: string) {
     adminDb.collection("stores").doc(storeId).collection("private").doc("integrations").get(),
   ]);
   const owner = await adminDb.collection("users").doc(store.get("owner_uid")).get();
-  const tier = effectiveTier(owner.get("subscription_tier"), owner.get("subscription_expiry"));
+  const features = await featuresOfUser(owner);
   const wa: WaConfig = {
     ...waPayload(integrations),
     template: integrations.get("wa_message_template") ?? DEFAULT_WA_TEMPLATE,
   };
-  return { storeName: store.get("store_name") as string, tier, wa };
+  return { storeName: store.get("store_name") as string, features, wa };
 }
 
 export async function postToN8n(payload: Record<string, unknown>) {
@@ -83,7 +83,7 @@ export async function deliverOrder(orderId: string, reason: "paid" | "warranty_r
   if (!order.exists || order.get("payment_status") !== "PAID" || credentialIds.length === 0) return "skipped";
 
   const ctx = await storeContext(order.get("store_id"));
-  if (!TIERS[ctx.tier].autoFulfillment || !ctx.wa.provider || !ctx.wa.token) return "skipped";
+  if (!ctx.features.autoFulfillment || !ctx.wa.provider || !ctx.wa.token) return "skipped";
 
   const credentials = await adminDb.getAll(...credentialIds.map((id) => adminDb.collection("credentials_vault").doc(id)));
   const components = await adminDb.getAll(...credentials.map((c) => adminDb.collection("products").doc(c.get("product_id"))));
@@ -125,7 +125,7 @@ export async function remindRenewal(orderId: string, storefrontLink: string) {
   const orderRef = adminDb.collection("orders").doc(orderId);
   const order = await orderRef.get();
   const ctx = await storeContext(order.get("store_id"));
-  if (!TIERS[ctx.tier].autoFulfillment || !ctx.wa.provider || !ctx.wa.token) return false;
+  if (!ctx.features.autoFulfillment || !ctx.wa.provider || !ctx.wa.token) return false;
 
   await postToN8n({
     event: "order.renewal_reminder",
@@ -157,7 +157,7 @@ const RESTOCK_TEMPLATE = "Halo! {product} di {store} sudah tersedia lagi. Stok t
 export async function notifyRestock(storeId: string, restockedIds: string[]): Promise<number> {
   try {
     const ctx = await storeContext(storeId);
-    if (!TIERS[ctx.tier].autoFulfillment || !ctx.wa.provider || !ctx.wa.token) return 0;
+    if (!ctx.features.autoFulfillment || !ctx.wa.provider || !ctx.wa.token) return 0;
 
     // Products to announce: the restocked ones, plus bundles that are now complete again.
     const products = await adminDb.collection("products").where("store_id", "==", storeId).get();
@@ -220,7 +220,7 @@ export async function noticeBuyer(groupId: string, kind: "paid" | "rejected", re
       adminDb.collection("stores").doc(storeId).collection("private").doc("integrations").get(),
       adminDb.collection("stores").doc(storeId).get(),
     ]);
-    if (!TIERS[ctx.tier].autoFulfillment || !ctx.wa.provider || !ctx.wa.token || integrations.get("wa_notify_buyer") === false) return "skipped";
+    if (!ctx.features.autoFulfillment || !ctx.wa.provider || !ctx.wa.token || integrations.get("wa_notify_buyer") === false) return "skipped";
     const total = (lead.get("group_total") as number | undefined) ?? (lead.get("amount") as number);
     const base = storefrontUrl({ slug: store.get("slug"), custom_domain: store.get("custom_domain") ?? null, custom_domain_status: store.get("custom_domain_status") ?? null });
     const message =

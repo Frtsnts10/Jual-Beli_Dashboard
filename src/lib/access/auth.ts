@@ -6,6 +6,8 @@ import { notFound, redirect } from "next/navigation";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { effectiveTier, mapStore, mapUser } from "@/lib/data/mappers";
 import type { Store, SubscriptionTier, UserDoc } from "@/types/schema";
+import type { TierConfig } from "@/config/tiers";
+import { featuresOfUser } from "@/lib/catalog";
 
 export const SESSION_COOKIE = "session";
 
@@ -66,6 +68,8 @@ export interface StoreAccess {
   role: StoreRole;
   /** The store owner's effective plan; limits and features follow the owner, not the admin. */
   tier: SubscriptionTier;
+  /** What the owner's plan (plus any admin-granted overrides) includes — platform/catalog. */
+  features: TierConfig;
 }
 
 /**
@@ -85,10 +89,7 @@ export const requireStore = cache(async (storeId: string, opts?: { ownerOnly?: b
   if (!role) notFound();
   if (opts?.ownerOnly && role !== "owner") notFound();
 
-  let tier = user.subscription_tier;
-  if (role === "admin") {
-    const owner = await adminDb.collection("users").doc(store.owner_uid).get();
-    tier = effectiveTier(owner.get("subscription_tier"), owner.get("subscription_expiry"));
-  }
-  return { user, store, role, tier };
+  const owner = await adminDb.collection("users").doc(store.owner_uid).get();
+  const tier = role === "owner" ? user.subscription_tier : effectiveTier(owner.get("subscription_tier"), owner.get("subscription_expiry"));
+  return { user, store, role, tier, features: await featuresOfUser(owner) };
 });

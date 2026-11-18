@@ -16,6 +16,8 @@ const NAV = [
   { href: "/platform/stores", label: "Toko" },
   { href: "/platform/users", label: "Pengguna" },
   { href: "/platform/payments", label: "Pembayaran paket" },
+  { href: "/platform/plans", label: "Paket" },
+  { href: "/platform/themes", label: "Tema" },
   { href: "/platform/support", label: "Bantuan" },
   { href: "/platform/announcements", label: "Pengumuman" },
   { href: "/platform/deletions", label: "Hapus akun" },

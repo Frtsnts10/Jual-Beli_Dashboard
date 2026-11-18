@@ -5,7 +5,6 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { TIERS } from "@/config/tiers";
 import { addDomain, inspectDomain, removeDomain, vercelDomainsEnabled } from "@/lib/integrations/vercel-domains";
 import { domainHosts, updateAuthorizedDomains } from "@/lib/integrations/firebase-auth-domains";
 
@@ -21,8 +20,8 @@ function normalise(raw: string) {
  * "Cek sekarang" step (checkDomain) confirms every link of that chain.
  */
 export async function connectDomain(storeId: string, raw: string): Promise<ActionResult> {
-  const { store, tier } = await requireStore(storeId, { ownerOnly: true });
-  if (!TIERS[tier].customDomain) return fail("Domain sendiri adalah fitur paket Ultimate.");
+  const { store, features } = await requireStore(storeId, { ownerOnly: true });
+  if (!features.customDomain) return fail("Domain sendiri belum tersedia di paket Anda.");
   if (store.custom_domain) return fail("Hapus domain yang sekarang dulu sebelum menambah yang baru.");
 
   const domain = normalise(raw);
@@ -87,7 +86,7 @@ function liveCheckProblem(domain: string, res: Response, isJson: boolean, foundS
   }
   if (isJson && foundStoreId) return "Domain ini mengarah ke toko lain di platform.";
   if (isJson) {
-    return "Domain sudah sampai ke etalase kami, tapi belum dikenali sebagai toko ini. Pastikan paket Ultimate aktif, lalu cek lagi dalam 1 menit.";
+    return "Domain sudah sampai ke etalase kami, tapi belum dikenali sebagai toko ini. Pastikan paket Anda mencakup domain sendiri, lalu cek lagi dalam 1 menit.";
   }
   if (res.status === 404) {
     return "Domain mengarah ke Vercel, tapi belum dipasang di project etalase. Tambahkan domain ini ke project etalase (bukan project dashboard).";

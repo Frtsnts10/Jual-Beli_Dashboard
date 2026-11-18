@@ -7,7 +7,8 @@ import { adminDb } from "@/lib/firebase/admin";
 import { getOwnedStores, requireStore, requireUser } from "@/lib/access/auth";
 import { isPlatformAdmin } from "@/lib/access/platform";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { DEFAULT_WA_TEMPLATE, TEMPLATES, TIERS } from "@/config/tiers";
+import { DEFAULT_WA_TEMPLATE, TEMPLATES } from "@/config/tiers";
+import { featuresOfUid } from "@/lib/catalog";
 import { waNumber } from "@/lib/integrations/whatsapp";
 import type { LayoutTemplate, StoreInfo, WaProvider } from "@/types/schema";
 
@@ -30,7 +31,7 @@ export async function createStore(input: { store_name: string; slug: string }): 
   const slugError = validateSlug(slug);
   if (slugError) return fail(slugError);
 
-  const tier = TIERS[user.subscription_tier];
+  const tier = await featuresOfUid(user.uid);
   const owned = await getOwnedStores(user.uid);
   if (owned.length >= tier.maxStores) {
     return fail(`Paket ${tier.name} maksimal ${tier.maxStores} toko. Upgrade untuk menambah toko.`);
@@ -78,8 +79,7 @@ export interface StoreSettingsInput {
 }
 
 export async function updateStoreSettings(storeId: string, input: StoreSettingsInput): Promise<ActionResult> {
-  const { store, tier: plan } = await requireStore(storeId);
-  const tier = TIERS[plan];
+  const { store, features: tier } = await requireStore(storeId);
 
   const storeName = input.store_name.trim();
   if (storeName.length < 2) return fail("Nama toko terlalu pendek.");

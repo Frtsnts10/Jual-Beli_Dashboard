@@ -2,7 +2,7 @@ import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
 import { mapSubscriptionPayment } from "@/lib/data/mappers";
 import { formatDate, formatIDR } from "@/lib/utils";
-import { TIERS } from "@/config/tiers";
+import { getCatalog } from "@/lib/catalog";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +27,7 @@ export const metadata = { title: "Langganan" };
 export default async function BillingPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
   const { user } = await requireStore(storeId, { ownerOnly: true });
+  const catalog = await getCatalog();
   await expireSubscriptionPayments(user.uid);
   const [payments, platformQris] = await Promise.all([adminDb.collection("subscription_payments").where("uid", "==", user.uid).get(), getPlatformQris()]);
   const history = payments.docs
@@ -46,14 +47,14 @@ export default async function BillingPage({ params }: { params: Promise<{ storeI
         description={
           user.subscription_tier === "starter"
             ? "Anda di paket Starter (gratis)."
-            : `Paket ${TIERS[user.subscription_tier].name} aktif sampai ${formatDate(user.subscription_expiry)}.`
+            : `Paket ${catalog.plans[user.subscription_tier].name} aktif sampai ${formatDate(user.subscription_expiry)}.`
         }
       />
       {open && (
         <Card id="bayar" className="mb-6 scroll-mt-4">
           <CardHeader>
             <CardTitle>
-              Bayar paket {TIERS[open.tier].name} {open.period === "yearly" ? "tahunan" : "bulanan"}
+              Bayar paket {catalog.plans[open.tier].name} {open.period === "yearly" ? "tahunan" : "bulanan"}
             </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-5 md:grid-cols-[14rem_1fr] md:items-start">
@@ -108,7 +109,7 @@ export default async function BillingPage({ params }: { params: Promise<{ storeI
           </CardContent>
         </Card>
       )}
-      <PlanPicker storeId={storeId} currentTier={user.subscription_tier} expiry={user.subscription_expiry} canBuy={!!platformQris} />
+      <PlanPicker storeId={storeId} currentTier={user.subscription_tier} expiry={user.subscription_expiry} canBuy={!!platformQris} plans={catalog.plans} />
       {history.length > 0 && (
         <Card className="mt-8">
           <CardHeader>
@@ -131,7 +132,7 @@ export default async function BillingPage({ params }: { params: Promise<{ storeI
                     <TableRow key={row.id}>
                       <TableCell className="hidden font-mono text-xs sm:table-cell">{row.id}</TableCell>
                       <TableCell className="whitespace-normal">
-                        {TIERS[row.tier].name} · {row.period === "yearly" ? "tahunan" : "bulanan"}
+                        {catalog.plans[row.tier].name} · {row.period === "yearly" ? "tahunan" : "bulanan"}
                       </TableCell>
                       <TableCell className="text-right">{formatIDR(row.amount)}</TableCell>
                       <TableCell>

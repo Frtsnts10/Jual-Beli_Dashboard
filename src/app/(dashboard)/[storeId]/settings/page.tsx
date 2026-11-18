@@ -1,7 +1,8 @@
 import { requireStore } from "@/lib/access/auth";
 import { adminDb } from "@/lib/firebase/admin";
 import { formatDate, formatIDR } from "@/lib/utils";
-import { DEFAULT_WA_TEMPLATE, TIERS } from "@/config/tiers";
+import { DEFAULT_WA_TEMPLATE } from "@/config/tiers";
+import { getCatalog, PLAN_KEYS } from "@/lib/catalog";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,7 +33,6 @@ import { headers } from "next/headers";
 import { segment, segmented } from "@/components/segmented";
 import { HeroBannerCard } from "@/features/banner/hero-banner-card";
 import { listProducts } from "@/lib/data/queries";
-import type { SubscriptionTier } from "@/types/schema";
 
 export const metadata = { title: "Pengaturan" };
 
@@ -53,8 +53,8 @@ export default async function SettingsPage({
   searchParams: Promise<{ tab?: string }>;
 }) {
   const { storeId } = await params;
-  const { user, store, role, tier: plan } = await requireStore(storeId);
-  const tier = TIERS[plan];
+  const { user, store, role, features: tier } = await requireStore(storeId);
+  const catalog = await getCatalog();
   const isOwner = role === "owner";
   // One section per tab (the page used to be eight cards in one long scroll).
   const tabs = TABS.filter((t) => isOwner || !t.owner);
@@ -136,6 +136,7 @@ export default async function SettingsPage({
               <StoreSettingsForm
                 store={store}
                 allowedTemplates={tier.templates}
+                templates={catalog.templates.filter((t) => t.enabled)}
                 rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN}
               />
               <StoreInfoForm storeId={storeId} info={store.store_info} />
@@ -206,8 +207,8 @@ export default async function SettingsPage({
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3 text-sm">
-              {(Object.keys(TIERS) as SubscriptionTier[]).map((key) => {
-                const t = TIERS[key];
+              {PLAN_KEYS.map((key) => {
+                const t = catalog.plans[key];
                 return (
                   <div
                     key={key}

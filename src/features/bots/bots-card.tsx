@@ -45,7 +45,7 @@ export function BotsCard({
       </CardHeader>
       <CardContent className="grid gap-6 text-sm [&>*]:min-w-0">
         {!allowed ? (
-          <p className="text-muted-foreground">Tersedia di paket Ultimate.</p>
+          <p className="text-muted-foreground">Belum tersedia di paket Anda. Upgrade di menu Langganan.</p>
         ) : (
           <>
             <div className="grid gap-2 [&>*]:min-w-0">

@@ -6,7 +6,6 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { TIERS } from "@/config/tiers";
 import { encryptSecret } from "@/lib/vault-crypto";
 import { notifyRestock } from "@/lib/integrations/automation";
 
@@ -20,7 +19,7 @@ export interface CredentialLine {
 const MAX_BATCH = 400; // Firestore batch limit is 500 writes
 
 export async function addCredentials(storeId: string, productId: string, lines: CredentialLine[]): Promise<ActionResult<{ added: number }>> {
-  const { tier: plan } = await requireStore(storeId);
+  const { features } = await requireStore(storeId);
   const product = await adminDb.collection("products").doc(productId).get();
   if (!product.exists || product.get("store_id") !== storeId) return fail("Produk tidak ditemukan.");
   if ((product.get("bundle_items") as string[] | null)?.length) return fail("Stok bundle diambil dari produk isinya — tambahkan stok ke produk-produk tersebut.");
@@ -37,7 +36,7 @@ export async function addCredentials(storeId: string, productId: string, lines: 
     }
   }
 
-  const tier = TIERS[plan];
+  const tier = features;
   if (Number.isFinite(tier.maxCredentials)) {
     const current = await adminDb
       .collection("credentials_vault")
