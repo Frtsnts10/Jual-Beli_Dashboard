@@ -3,6 +3,8 @@ import { formatIDR } from "@/lib/utils";
 /** Dependency-free SVG bar chart of daily paid revenue (server-rendered). */
 export function RevenueChart({ data }: { data: { day: string; value: number }[] }) {
   const max = Math.max(1, ...data.map((d) => d.value));
+  if (data.every((d) => d.value === 0))
+    return <p className="text-muted-foreground flex h-48 items-center justify-center rounded-md border border-dashed text-sm">Belum ada data di periode ini.</p>;
   const w = 100 / data.length;
   const labelEvery = Math.ceil(data.length / 8);
   return (

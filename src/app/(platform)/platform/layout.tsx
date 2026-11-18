@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { Shield } from "lucide-react";
 import { requirePlatformAdmin } from "@/lib/access/platform";
 import { listNotifications } from "@/lib/data/notifications";
 import { countNewTickets } from "@/lib/data/support";
 import { NotificationBell } from "@/features/notifications/notification-bell";
 import { UserMenu } from "@/features/auth/user-menu";
+import { PlatformNav } from "@/features/platform/platform-nav";
 
 export const metadata = {
   title: { template: "%s · Platform", default: "Platform" },
@@ -36,7 +36,7 @@ export default async function PlatformLayout({
   return (
     <div className="flex h-svh flex-col overflow-hidden">
       {/* Phone/tablet: title + bell/account on one row, the section links scroll underneath. */}
-      <header className="flex shrink-0 flex-wrap items-center gap-x-6 border-b px-4 md:h-14 md:flex-nowrap md:px-6">
+      <header className="bg-background flex shrink-0 flex-wrap items-center gap-x-6 border-b px-4 md:h-14 md:flex-nowrap md:px-6">
         <span className="flex h-12 items-center gap-2 font-semibold whitespace-nowrap md:h-auto">
           <Shield className="size-4" /> Admin Platform
         </span>
@@ -44,24 +44,9 @@ export default async function PlatformLayout({
           <NotificationBell items={notes.items} unread={notes.unread} />
           <UserMenu name={admin.full_name} email={admin.email} adminAccount />
         </div>
-        <nav className="-mx-4 flex w-[calc(100%+2rem)] gap-4 overflow-x-auto border-t px-4 py-2 text-sm md:mx-0 md:w-auto md:border-0 md:p-0">
-          {NAV.map((n) => (
-            <Link
-              key={n.href}
-              href={n.href}
-              className="text-muted-foreground hover:text-foreground shrink-0 whitespace-nowrap"
-            >
-              {n.label}
-              {n.href === "/platform/support" && newTickets > 0 && (
-                <span className="ml-1 rounded-md bg-red-500 px-1.5 text-[10px] font-semibold text-white">
-                  {newTickets}
-                </span>
-              )}
-            </Link>
-          ))}
-        </nav>
+        <PlatformNav items={NAV} newTickets={newTickets} />
       </header>
-      <main className="min-h-0 flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+      <main className="min-h-0 flex-1 overflow-y-auto p-4 md:p-6 [&_[data-slot=badge]]:rounded-full">{children}</main>
     </div>
   );
 }
