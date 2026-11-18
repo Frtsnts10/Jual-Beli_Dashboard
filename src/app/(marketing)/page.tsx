@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 import { formatIDR } from "@/lib/utils";
 import { getCatalog, PLAN_KEYS, planPerks } from "@/lib/catalog";
 import { Button } from "@/components/ui/button";
+import { Brand } from "@/components/brand";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 // Prices and plan contents come from the platform catalog (admin → Paket).
 export const dynamic = "force-dynamic";
@@ -12,7 +13,7 @@ export default async function LandingPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
       <header className="mb-16 flex items-center justify-between">
-        <span className="text-lg font-semibold">Toko Digital</span>
+        <Brand className="text-lg" logoClassName="h-8" />
         <div className="flex gap-2">
           <Button variant="ghost" asChild>
             <Link href="/sign-in">Masuk</Link>

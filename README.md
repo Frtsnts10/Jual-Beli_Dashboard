@@ -1,6 +1,6 @@
-# Shop Dashboard — SaaS Control Center (B2B)
+# Jual — Seller Dashboard (B2B)
 
-Multi-tenant dashboard where digital-product sellers create stores, manage products,
+**Jual** (domain `belidi.biz.id`, dashboard at `jual.belidi.biz.id`) is a multi-tenant dashboard where digital-product sellers create stores, manage products,
 stock premium accounts in a vault, process orders and warranty claims, and style their
 storefront. The buyer-facing storefront lives in the separate **Shop-Website** repo;
 both share one Firestore database.
