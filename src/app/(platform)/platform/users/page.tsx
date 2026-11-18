@@ -4,6 +4,7 @@ import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PlanEditor } from "@/features/platform/plan-editor";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata = { title: "Pengguna" };
 
@@ -28,15 +29,18 @@ export default async function PlatformUsersPage() {
             {users.map((u) => (
               <TableRow key={u.uid}>
                 <TableCell>
-                  <div className="font-medium">{u.name || "—"}</div>
+                  <div className="flex items-center gap-2 font-medium">
+                    {u.name || "—"}
+                    {u.admin && <Badge>Admin</Badge>}
+                  </div>
                   <div className="text-muted-foreground text-xs">{u.email}</div>
                 </TableCell>
                 <TableCell className="text-right">{u.stores}</TableCell>
-                <TableCell>{TIERS[u.tier].name}</TableCell>
-                <TableCell>{u.tier === "starter" ? "—" : formatDate(u.expiry)}</TableCell>
+                <TableCell>{u.admin ? "—" : TIERS[u.tier].name}</TableCell>
+                <TableCell>{u.admin || u.tier === "starter" ? "—" : formatDate(u.expiry)}</TableCell>
                 <TableCell>{formatDate(u.created_at)}</TableCell>
                 <TableCell>
-                  <PlanEditor uid={u.uid} tier={u.tier} />
+                  {u.admin ? <span className="text-muted-foreground block text-right text-xs">Akun admin</span> : <PlanEditor uid={u.uid} tier={u.tier} />}
                 </TableCell>
               </TableRow>
             ))}

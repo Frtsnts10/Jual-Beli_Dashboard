@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { getOwnedStores, requireStore, requireUser } from "@/lib/access/auth";
+import { isPlatformAdmin } from "@/lib/access/platform";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { DEFAULT_WA_TEMPLATE, TEMPLATES, TIERS } from "@/config/tiers";
 import { waNumber } from "@/lib/integrations/whatsapp";
@@ -22,6 +23,7 @@ function validateSlug(slug: string) {
 
 export async function createStore(input: { store_name: string; slug: string }): Promise<ActionResult<{ storeId: string }>> {
   const user = await requireUser();
+  if (await isPlatformAdmin()) return fail("Akun admin platform tidak bisa membuat toko. Daftar dengan email lain untuk berjualan.");
   const storeName = input.store_name.trim();
   const slug = input.slug.trim().toLowerCase();
   if (storeName.length < 2) return fail("Nama toko terlalu pendek.");

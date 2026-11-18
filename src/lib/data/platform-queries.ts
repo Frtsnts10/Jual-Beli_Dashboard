@@ -1,4 +1,5 @@
 import "server-only";
+import { isAdminEmail } from "@/lib/access/platform";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { effectiveTier, mapStore, mapSubscriptionPayment, toISO } from "@/lib/data/mappers";
@@ -51,6 +52,7 @@ export async function allUsers() {
       expiry: toISO(u.get("subscription_expiry")),
       created_at: toISO(u.get("created_at")) ?? "",
       stores: storeCount.get(u.id) ?? 0,
+      admin: isAdminEmail((u.get("email") as string) ?? ""),
     }))
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 }

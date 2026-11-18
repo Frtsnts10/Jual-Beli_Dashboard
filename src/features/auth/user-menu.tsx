@@ -14,7 +14,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function UserMenu({ name, email, tier, platformAdmin = false }: { name: string; email: string; tier: string; platformAdmin?: boolean }) {
+/**
+ * Account menu. Sellers see their plan; a platform admin account (`adminAccount`) has no plan
+ * or store — it shows its role instead.
+ */
+export function UserMenu({
+  name,
+  email,
+  tier,
+  platformAdmin = false,
+  adminAccount = false,
+}: {
+  name: string;
+  email: string;
+  tier?: string;
+  platformAdmin?: boolean;
+  adminAccount?: boolean;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -26,10 +42,10 @@ export function UserMenu({ name, email, tier, platformAdmin = false }: { name: s
         <DropdownMenuLabel>
           <div className="truncate">{name || email}</div>
           <div className="text-muted-foreground truncate text-xs font-normal">{email}</div>
-          <div className="text-muted-foreground mt-1 text-xs font-normal">Paket: {tier}</div>
+          <div className="text-muted-foreground mt-1 text-xs font-normal">{adminAccount ? "Peran: Admin platform" : `Paket: ${tier}`}</div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {platformAdmin && (
+        {platformAdmin && !adminAccount && (
           <DropdownMenuItem asChild>
             <Link href="/platform">
               <Shield /> Admin platform

@@ -1,4 +1,5 @@
 import "server-only";
+import { isPlatformAdmin } from "@/lib/access/platform";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
@@ -74,6 +75,8 @@ export interface StoreAccess {
  */
 export const requireStore = cache(async (storeId: string, opts?: { ownerOnly?: boolean }): Promise<StoreAccess> => {
   const user = await requireUser();
+  // Platform admin accounts run the platform, not a store: they only see /platform.
+  if (await isPlatformAdmin()) redirect("/platform");
   const snap = await adminDb.collection("stores").doc(storeId).get();
   if (!snap.exists) notFound();
   const store = mapStore(snap);
