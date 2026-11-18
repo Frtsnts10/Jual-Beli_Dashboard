@@ -7,7 +7,6 @@ import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { postToN8n, waPayload } from "@/lib/integrations/automation";
 import { fillTemplate, waNumber } from "@/lib/integrations/whatsapp";
-import { TIERS } from "@/config/tiers";
 
 const COOLDOWN_MS = 60 * 60 * 1000;
 const MAX_RECIPIENTS = 1000;
@@ -18,8 +17,8 @@ const MAX_RECIPIENTS = 1000;
  * One broadcast per hour per store to protect the seller's WhatsApp number from bans.
  */
 export async function sendBroadcast(storeId: string, input: { message: string; productId: string | null }): Promise<ActionResult<{ recipients: number }>> {
-  const { store, tier } = await requireStore(storeId);
-  if (!TIERS[tier].marketing) return fail("Broadcast hanya untuk paket Ultimate.");
+  const { store, features } = await requireStore(storeId);
+  if (!features.marketing) return fail("Broadcast belum tersedia di paket Anda.");
   const message = input.message.trim();
   if (message.length < 10) return fail("Pesan terlalu pendek.");
   if (message.length > 1000) return fail("Pesan maksimal 1000 karakter.");

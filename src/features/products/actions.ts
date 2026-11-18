@@ -5,7 +5,7 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { PLATFORM_TYPES, TIERS } from "@/config/tiers";
+import { PLATFORM_TYPES } from "@/config/tiers";
 import type { PlatformType } from "@/types/schema";
 import { isImageUrl } from "@/lib/media-kinds";
 
@@ -61,14 +61,14 @@ function clean(input: ProductInput) {
 }
 
 export async function saveProduct(storeId: string, productId: string | null, input: ProductInput): Promise<ActionResult> {
-  const { tier } = await requireStore(storeId);
+  const { features } = await requireStore(storeId);
   const error = validate(input);
   if (error) return fail(error);
-  if (input.flash_sale_price != null && !TIERS[tier].marketing) {
-    return fail("Harga & timer flash sale adalah fitur paket Ultimate.");
+  if (input.flash_sale_price != null && !features.marketing) {
+    return fail("Flash sale belum tersedia di paket Anda.");
   }
   if (input.bundle_items?.length) {
-    if (!TIERS[tier].marketing) return fail("Bundling adalah fitur paket Ultimate.");
+    if (!features.marketing) return fail("Bundling belum tersedia di paket Anda.");
     const items = [...new Set(input.bundle_items)];
     if (items.length < 2) return fail("Bundle butuh minimal 2 produk.");
     if (productId && items.includes(productId)) return fail("Bundle tidak bisa berisi dirinya sendiri.");

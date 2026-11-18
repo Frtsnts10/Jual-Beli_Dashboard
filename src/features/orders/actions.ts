@@ -80,7 +80,7 @@ export async function resendDelivery(storeId: string, orderId: string): Promise<
   if (!(await ownedOrder(storeId, orderId))) return fail("Pesanan tidak ditemukan.");
   const result = await deliverOrder(orderId, "paid");
   revalidatePath(`/${storeId}/orders`);
-  if (result === "skipped") return fail("Pengiriman otomatis butuh paket Pro/Ultimate dan provider WhatsApp di Pengaturan.");
+  if (result === "skipped") return fail("Pengiriman otomatis belum tersedia di paket Anda, atau provider WhatsApp belum diatur di Pengaturan.");
   if (result === "failed") return fail("Pengiriman otomatis gagal lagi. Cek koneksi n8n / token WhatsApp.");
   return { ok: true };
 }

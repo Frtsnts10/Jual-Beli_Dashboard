@@ -2,7 +2,7 @@ import { ExternalLink } from "lucide-react";
 import { getAccessibleStores, requireStore } from "@/lib/access/auth";
 import { countAwaitingConfirmation, countOpenClaims } from "@/lib/data/queries";
 import { storefrontUrl } from "@/lib/store-url";
-import { TIERS } from "@/config/tiers";
+import { getCatalog } from "@/lib/catalog";
 import { SidebarNav } from "@/features/dashboard/sidebar-nav";
 import { StoreSwitcher } from "@/features/stores/store-switcher";
 import { UserMenu } from "@/features/auth/user-menu";
@@ -70,7 +70,7 @@ export default async function StoreLayout({
             <UserMenu
               name={user.full_name}
               email={user.email}
-              tier={TIERS[user.subscription_tier].name}
+              tier={(await getCatalog()).plans[user.subscription_tier].name}
               platformAdmin={await isPlatformAdmin()}
             />
           </div>

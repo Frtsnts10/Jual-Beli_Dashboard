@@ -1,7 +1,7 @@
 import { subscriptionPaymentsForReview } from "@/lib/data/platform-queries";
 import { getPlatformQris } from "@/lib/data/platform-settings";
 import { formatDate, formatIDR } from "@/lib/utils";
-import { TIERS } from "@/config/tiers";
+import { getCatalog } from "@/lib/catalog";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,8 +12,9 @@ import { SubscriptionReview } from "@/features/platform/subscription-review";
 export const metadata = { title: "Pembayaran paket" };
 
 export default async function PlatformPaymentsPage() {
+  const { plans } = await getCatalog();
   const [qris, { pending, recent }] = await Promise.all([getPlatformQris(), subscriptionPaymentsForReview()]);
-  const plan = (p: (typeof pending)[number]) => `${TIERS[p.tier].name} ${p.period === "yearly" ? "tahunan" : "bulanan"}`;
+  const plan = (p: (typeof pending)[number]) => `${plans[p.tier].name} ${p.period === "yearly" ? "tahunan" : "bulanan"}`;
 
   return (
     <>

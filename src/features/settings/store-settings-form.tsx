@@ -10,17 +10,19 @@ import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/image-upload";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { TEMPLATES } from "@/config/tiers";
 import type { LayoutTemplate, Store } from "@/types/schema";
 import { updateStoreSettings, type StoreSettingsInput } from "@/features/stores/actions";
 
 export function StoreSettingsForm({
   store,
   allowedTemplates,
+  templates,
   rootDomain,
 }: {
   store: Store;
   allowedTemplates: LayoutTemplate[];
+  /** Templates the platform offers (switched on, with admin-edited names). */
+  templates: { id: LayoutTemplate; name: string; description: string }[];
   rootDomain?: string;
 }) {
   const [form, setForm] = useState<StoreSettingsInput>({
@@ -86,7 +88,7 @@ export function StoreSettingsForm({
         </CardHeader>
         <CardContent className="grid gap-4 [&>*]:min-w-0">
           <div className="grid gap-2 [&>*]:min-w-0" role="radiogroup" aria-label="Template etalase">
-            {TEMPLATES.map((t) => {
+            {templates.map((t) => {
               const locked = !allowedTemplates.includes(t.id) && t.id !== store.storefront_config.layout_template;
               const selected = form.layout_template === t.id;
               return (

@@ -1,10 +1,10 @@
 import "server-only";
 import { createPublicKey, verify } from "node:crypto";
 import { adminDb } from "@/lib/firebase/admin";
-import { effectiveTier, mapProduct, mapStore } from "@/lib/data/mappers";
+import { mapProduct, mapStore } from "@/lib/data/mappers";
 import { storefrontUrl } from "@/lib/store-url";
 import { formatIDR } from "@/lib/utils";
-import { TIERS } from "@/config/tiers";
+import { featuresOfUser } from "@/lib/catalog";
 import { effectivePrice } from "@/types/schema";
 
 // Community bots (Ultimate, plan §3 "Bot Komunitas"): Telegram and Discord groups can ask
@@ -28,8 +28,7 @@ export async function botCatalog(storeId: string, ref: "telegram" | "discord") {
   if (!storeSnap.exists) return null;
   const store = mapStore(storeSnap);
   const owner = await adminDb.collection("users").doc(store.owner_uid).get();
-  const tier = effectiveTier(owner.get("subscription_tier"), owner.get("subscription_expiry"));
-  if (!TIERS[tier].marketing || !store.is_active || store.suspended) return null;
+  if (!(await featuresOfUser(owner)).marketing || !store.is_active || store.suspended) return null;
 
   // All products, so bundle components that are unpublished still count for bundle stock.
   const snap = await adminDb.collection("products").where("store_id", "==", storeId).get();

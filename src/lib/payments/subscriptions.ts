@@ -3,6 +3,7 @@ import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { effectiveTier, toISO } from "@/lib/data/mappers";
 import { newExpiry } from "@/lib/billing/plan-change";
+import { getCatalog } from "@/lib/catalog";
 import type { SubscriptionTier } from "@/types/schema";
 
 /**
@@ -13,6 +14,8 @@ import type { SubscriptionTier } from "@/types/schema";
  */
 export async function applySubscriptionPayment(paymentId: string) {
   const paymentRef = adminDb.collection("subscription_payments").doc(paymentId);
+  const { plans } = await getCatalog();
+  const prices = { starter: plans.starter.priceMonthly, pro: plans.pro.priceMonthly, ultimate: plans.ultimate.priceMonthly };
   return adminDb.runTransaction(async (tx) => {
     const payment = await tx.get(paymentRef);
     if (!payment.exists) return "not_found" as const;
@@ -26,7 +29,7 @@ export async function applySubscriptionPayment(paymentId: string) {
 
     tx.update(userRef, {
       subscription_tier: payment.get("tier"),
-      subscription_expiry: Timestamp.fromMillis(newExpiry(current, expiry, payment.get("tier") as SubscriptionTier, days)),
+      subscription_expiry: Timestamp.fromMillis(newExpiry(current, expiry, payment.get("tier") as SubscriptionTier, days, Date.now(), prices)),
     });
     tx.update(paymentRef, { status: "PAID", paid_at: Timestamp.now(), rejected_reason: null });
     return "activated" as const;

@@ -2,7 +2,6 @@ import { Plus } from "lucide-react";
 import { requireStore } from "@/lib/access/auth";
 import { adminDb } from "@/lib/firebase/admin";
 import { listProducts, stockByProduct, waitingForRestock } from "@/lib/data/queries";
-import { TIERS } from "@/config/tiers";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { ProductDialog } from "@/features/products/product-dialog";
@@ -13,7 +12,7 @@ export const metadata = { title: "Produk" };
 
 export default async function ProductsPage({ params }: { params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
-  const { tier } = await requireStore(storeId);
+  const { features } = await requireStore(storeId);
   const [products, stock, waiting] = await Promise.all([listProducts(storeId), stockByProduct(storeId), waitingForRestock(storeId)]);
 
   // The storefront shows products.stock_available; resync it if it ever drifted from the vault.
@@ -33,7 +32,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ store
         <ImportDialog storeId={storeId} kind="products" existingTitles={products.map((p) => p.title)} />
         <ProductDialog
           storeId={storeId}
-          flashSalePricing={TIERS[tier].marketing}
+          flashSalePricing={features.marketing}
           bundleCandidates={products.filter((p) => !p.bundle_items).map((p) => ({ id: p.id, title: p.title }))}
           trigger={
             <Button>
@@ -42,7 +41,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ store
           }
         />
       </PageHeader>
-      <ProductsTable storeId={storeId} products={products} stock={stock} waiting={waiting} flashSalePricing={TIERS[tier].marketing} />
+      <ProductsTable storeId={storeId} products={products} stock={stock} waiting={waiting} flashSalePricing={features.marketing} />
     </>
   );
 }

@@ -8,7 +8,7 @@ import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { randomId } from "@/lib/ids";
 import { getPlatformQris } from "@/lib/data/platform-settings";
-import { TIERS } from "@/config/tiers";
+import { getCatalog } from "@/lib/catalog";
 import type { BillingPeriod, SubscriptionTier } from "@/types/schema";
 
 /** Sellers have a day to pay a plan purchase and upload the proof. */
@@ -35,8 +35,9 @@ export async function startSubscription(
       "Pembelian paket sedang ditutup sementara (admin platform belum memasang QRIS pembayaran). Coba lagi nanti.",
     );
 
-  const base =
-    period === "yearly" ? TIERS[tier].priceYearly : TIERS[tier].priceMonthly;
+  const plan = (await getCatalog()).plans[tier];
+  const base = period === "yearly" ? plan.priceYearly : plan.priceMonthly;
+  if (base < 1_000) return fail("Paket ini belum bisa dibeli. Hubungi admin platform.");
   const pending = await adminDb
     .collection("subscription_payments")
     .where("status", "==", "PENDING")

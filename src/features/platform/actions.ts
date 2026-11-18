@@ -12,7 +12,7 @@ import {
 import { deleteCustomerAccount } from "@/lib/customers/account-deletion";
 import { fail, type ActionResult } from "@/lib/action-result";
 import type { SubscriptionTier } from "@/types/schema";
-import { TIERS } from "@/config/tiers";
+import { getCatalog } from "@/lib/catalog";
 import { notify } from "@/lib/notify";
 
 async function audit(
@@ -162,9 +162,10 @@ export async function confirmSubscriptionPayment(
   const result = await applySubscriptionPayment(paymentId);
   if (result === "not_found") return fail("Pembayaran tidak ditemukan.");
   await audit("subscription.confirm", paymentId, admin.email, { result });
+  const { plans } = await getCatalog();
   if (result === "activated")
     await notifyBuyer(paymentId, "subscription_paid", (p) => [
-      `Paket ${TIERS[p.tier as SubscriptionTier]?.name ?? p.tier} aktif`,
+      `Paket ${plans[p.tier as SubscriptionTier]?.name ?? p.tier} aktif`,
       "Pembayaran Anda dikonfirmasi. Terima kasih!",
     ]);
   revalidatePath("/platform", "layout");

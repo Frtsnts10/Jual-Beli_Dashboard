@@ -72,7 +72,7 @@ export function DomainCard({
       <CardContent className="grid gap-5 text-sm">
         {!domain && !allowed && (
           <p className="text-muted-foreground flex items-center gap-2">
-            <Lock className="size-4" /> Domain sendiri tersedia di paket Ultimate.
+            <Lock className="size-4" /> Domain sendiri belum tersedia di paket Anda.
           </p>
         )}
 

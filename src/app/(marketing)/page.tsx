@@ -1,18 +1,14 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { formatIDR } from "@/lib/utils";
-import { TIERS } from "@/config/tiers";
+import { getCatalog, PLAN_KEYS, planPerks } from "@/lib/catalog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import type { SubscriptionTier } from "@/types/schema";
+// Prices and plan contents come from the platform catalog (admin → Paket).
+export const dynamic = "force-dynamic";
 
-const PERKS: Record<SubscriptionTier, string[]> = {
-  starter: ["1 toko", "50 stok akun", "Checkout QRIS & e-wallet", "2 template etalase", "Kirim akun manual via WA"],
-  pro: ["3 toko", "Stok tanpa batas", "Auto-kirim akun via WhatsApp", "Pengingat perpanjangan H-3", "Klaim garansi 1-klik", "Semua 5 template"],
-  ultimate: ["Toko & admin tanpa batas", "Custom domain", "WhatsApp broadcast CRM", "Flash sale, bundling, affiliate", "Bot Discord & Telegram"],
-};
-
-export default function LandingPage() {
+export default async function LandingPage() {
+  const catalog = await getCatalog();
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
       <header className="mb-16 flex items-center justify-between">
@@ -33,8 +29,8 @@ export default function LandingPage() {
         </p>
       </section>
       <section className="grid gap-6 md:grid-cols-3">
-        {(Object.keys(TIERS) as SubscriptionTier[]).map((key) => {
-          const t = TIERS[key];
+        {PLAN_KEYS.map((key) => {
+          const t = catalog.plans[key];
           return (
             <Card key={key} className={key === "pro" ? "border-primary" : ""}>
               <CardHeader>
@@ -48,7 +44,7 @@ export default function LandingPage() {
                 </p>
               </CardHeader>
               <CardContent className="grid gap-2 text-sm">
-                {PERKS[key].map((perk) => (
+                {planPerks(t).map((perk) => (
                   <div key={perk} className="flex items-start gap-2">
                     <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" /> {perk}
                   </div>

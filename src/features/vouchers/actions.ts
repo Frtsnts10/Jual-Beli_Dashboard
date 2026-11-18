@@ -6,7 +6,6 @@ import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { CODE_RE, MIN_PAYABLE, normaliseCode, voucherDocId, type VoucherType } from "@/lib/voucher";
-import { TIERS } from "@/config/tiers";
 
 export interface VoucherInput {
   code: string;
@@ -24,11 +23,11 @@ const int = (n: unknown) => (typeof n === "number" && Number.isFinite(n) ? Math.
 
 async function requireVoucherStore(storeId: string) {
   const ctx = await requireStore(storeId);
-  return TIERS[ctx.tier].vouchers ? ctx : null;
+  return ctx.features.vouchers ? ctx : null;
 }
 
 export async function createVoucher(storeId: string, input: VoucherInput): Promise<ActionResult> {
-  if (!(await requireVoucherStore(storeId))) return fail("Voucher tersedia di paket Pro dan Ultimate.");
+  if (!(await requireVoucherStore(storeId))) return fail("Voucher belum tersedia di paket Anda.");
   const code = normaliseCode(input.code);
   if (!CODE_RE.test(code)) return fail("Kode 3–20 huruf/angka tanpa spasi, mis. HEMAT10.");
   if (input.type !== "percent" && input.type !== "fixed") return fail("Jenis potongan tidak valid.");
@@ -90,7 +89,7 @@ async function ownedVoucher(storeId: string, code: string) {
 }
 
 export async function setVoucherActive(storeId: string, code: string, active: boolean): Promise<ActionResult> {
-  if (!(await requireVoucherStore(storeId))) return fail("Voucher tersedia di paket Pro dan Ultimate.");
+  if (!(await requireVoucherStore(storeId))) return fail("Voucher belum tersedia di paket Anda.");
   const found = await ownedVoucher(storeId, code);
   if (!found) return fail("Voucher tidak ditemukan.");
   await found.ref.update({ active });

@@ -2,7 +2,7 @@ import "server-only";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { notify } from "@/lib/notify";
-import { TIERS } from "@/config/tiers";
+import { getCatalog } from "@/lib/catalog";
 import type { SubscriptionTier } from "@/types/schema";
 
 const WINDOW_MS = 3 * 24 * 60 * 60 * 1000;
@@ -36,7 +36,7 @@ export async function notifyExpiringPlans(now = Date.now()): Promise<number> {
       .get();
     await notify([u.id], {
       type: "plan_expiring",
-      title: `Paket ${TIERS[tier]?.name ?? tier} berakhir ${days} hari lagi`,
+      title: `Paket ${(await getCatalog()).plans[tier]?.name ?? tier} berakhir ${days} hari lagi`,
       body: "Perpanjang sekarang supaya fitur toko tidak turun ke Starter.",
       href: store.empty ? "/dashboard" : `/${store.docs[0].id}/billing`,
     });

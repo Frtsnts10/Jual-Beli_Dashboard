@@ -8,7 +8,6 @@ import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { DISCORD_API, TELEGRAM_API } from "@/lib/integrations/bots";
-import { TIERS } from "@/config/tiers";
 
 const integrationsRef = (storeId: string) => adminDb.collection("stores").doc(storeId).collection("private").doc("integrations");
 
@@ -19,7 +18,7 @@ async function dashboardOrigin() {
 
 async function requireBots(storeId: string) {
   const access = await requireStore(storeId);
-  if (!TIERS[access.tier].marketing) throw new Error("NOT_ULTIMATE");
+  if (!access.features.marketing) throw new Error("NOT_ULTIMATE");
   return access;
 }
 
@@ -28,7 +27,7 @@ export async function connectTelegram(storeId: string, rawToken: string): Promis
   try {
     await requireBots(storeId);
   } catch {
-    return fail("Bot komunitas adalah fitur paket Ultimate.");
+    return fail("Bot komunitas belum tersedia di paket Anda.");
   }
   const token = rawToken.trim();
   if (!/^\d+:[A-Za-z0-9_-]{30,}$/.test(token)) return fail("Format token BotFather tidak valid.");
@@ -80,7 +79,7 @@ export async function connectDiscord(
   try {
     await requireBots(storeId);
   } catch {
-    return fail("Bot komunitas adalah fitur paket Ultimate.");
+    return fail("Bot komunitas belum tersedia di paket Anda.");
   }
   const applicationId = input.applicationId.trim();
   const publicKey = input.publicKey.trim().toLowerCase();
