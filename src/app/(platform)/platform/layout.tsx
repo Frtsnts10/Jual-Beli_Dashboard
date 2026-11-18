@@ -4,6 +4,7 @@ import { requirePlatformAdmin } from "@/lib/access/platform";
 import { listNotifications } from "@/lib/data/notifications";
 import { countNewTickets } from "@/lib/data/support";
 import { NotificationBell } from "@/features/notifications/notification-bell";
+import { UserMenu } from "@/features/auth/user-menu";
 
 export const metadata = {
   title: { template: "%s · Platform", default: "Platform" },
@@ -32,19 +33,14 @@ export default async function PlatformLayout({
   ]);
   return (
     <div className="min-h-svh">
-      {/* Phone/tablet: title + "to dashboard" on one row, the section links scroll underneath. */}
+      {/* Phone/tablet: title + bell/account on one row, the section links scroll underneath. */}
       <header className="flex flex-wrap items-center gap-x-6 border-b px-4 md:h-14 md:flex-nowrap md:px-6">
         <span className="flex h-12 items-center gap-2 font-semibold whitespace-nowrap md:h-auto">
           <Shield className="size-4" /> Admin Platform
         </span>
-        <div className="ml-auto flex items-center gap-3 md:order-last">
+        <div className="ml-auto flex items-center gap-2 md:order-last">
           <NotificationBell items={notes.items} unread={notes.unread} />
-          <Link
-            href="/dashboard"
-            className="text-muted-foreground text-sm whitespace-nowrap hover:underline"
-          >
-            Ke dashboard toko →
-          </Link>
+          <UserMenu name={admin.full_name} email={admin.email} adminAccount />
         </div>
         <nav className="-mx-4 flex w-[calc(100%+2rem)] gap-4 overflow-x-auto border-t px-4 py-2 text-sm md:mx-0 md:w-auto md:border-0 md:p-0">
           {NAV.map((n) => (

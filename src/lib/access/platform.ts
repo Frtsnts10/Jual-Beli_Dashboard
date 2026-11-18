@@ -14,6 +14,9 @@ function adminEmails() {
     .filter(Boolean);
 }
 
+/** Whether this email is on the PLATFORM_ADMIN_EMAILS list (for labelling, not for access). */
+export const isAdminEmail = (email: string) => adminEmails().includes(email.trim().toLowerCase());
+
 export const isPlatformAdmin = cache(async () => {
   const session = await getSessionUser();
   return !!session?.email && session.email_verified === true && adminEmails().includes(session.email.toLowerCase());

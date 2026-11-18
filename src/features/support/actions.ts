@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireUser } from "@/lib/access/auth";
-import { isPlatformAdmin, requirePlatformAdmin } from "@/lib/access/platform";
+import { isPlatformAdmin, requirePlatformAdmin, isAdminEmail } from "@/lib/access/platform";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { randomId } from "@/lib/ids";
 import { saveImageAt } from "@/lib/media";
@@ -236,9 +236,11 @@ export async function createAnnouncement(input: {
   });
   const users = await adminDb
     .collection("users")
-    .select("subscription_tier")
+    .select("subscription_tier", "email")
     .get();
+  // Announcements are for sellers; admin accounts aren't sellers.
   const uids = users.docs
+    .filter((u) => !isAdminEmail((u.get("email") as string) ?? ""))
     .filter(
       (u) =>
         !tiers ||
