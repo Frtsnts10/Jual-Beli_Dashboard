@@ -5,6 +5,8 @@ import { isPlatformAdmin } from "@/lib/access/platform";
 import { featuresOfUid } from "@/lib/catalog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateStoreForm } from "@/features/stores/create-store-form";
+import { SignOutButton } from "@/features/auth/sign-out-button";
+import { Brand } from "@/components/brand";
 
 export const metadata = { title: "Buat toko" };
 
@@ -16,7 +18,8 @@ export default async function OnboardingPage() {
   const atLimit = stores.length >= tier.maxStores;
 
   return (
-    <div className="bg-muted/40 flex min-h-svh items-center justify-center p-6">
+    <div className="bg-muted/40 flex min-h-svh flex-col items-center justify-center gap-6 p-6">
+      <Brand className="text-xl" logoClassName="h-10" />
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-xl">{stores.length ? "Tambah toko baru" : "Buat toko pertama Anda"}</CardTitle>
@@ -37,6 +40,10 @@ export default async function OnboardingPage() {
           )}
         </CardContent>
       </Card>
+      <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-2 text-sm">
+        Masuk sebagai <span className="text-foreground font-medium">{user.email}</span>
+        <SignOutButton />
+      </div>
     </div>
   );
 }

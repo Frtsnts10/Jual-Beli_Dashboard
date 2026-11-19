@@ -1,6 +1,9 @@
 // Creates (or resets) a platform admin login in the real Firebase project:
 //
-//   ADMIN_EMAIL=admin@dionycte.com ADMIN_PASSWORD=… npm run create:admin
+//   ADMIN_EMAIL=admin@belidi.biz.id ADMIN_PASSWORD=… npm run create:admin
+//
+// To move an existing admin login to a new email (same account, same uid), also set
+// ADMIN_RENAME_FROM=<old email>.
 //
 // or from GitHub: Actions → "Create platform admin" → Run workflow.
 //
@@ -41,6 +44,23 @@ const db = getFirestore();
 
 let uid;
 let created = false;
+let renamed = null;
+
+// Rename: the old login keeps its uid (and its notifications/audit trail), it just signs in
+// with the new email from now on.
+const from = (process.env.ADMIN_RENAME_FROM ?? "").trim().toLowerCase();
+if (from && from !== email) {
+  const old = await auth.getUserByEmail(from).catch((err) => (err?.code === "auth/user-not-found" ? null : Promise.reject(err)));
+  const taken = await auth.getUserByEmail(email).catch((err) => (err?.code === "auth/user-not-found" ? null : Promise.reject(err)));
+  if (!old) console.log(`(No login with ${from} — creating ${email} instead.)`);
+  else if (taken) fail(`${email} already has its own login; remove it in Firebase Authentication first, or run without ADMIN_RENAME_FROM.`);
+  else {
+    await auth.updateUser(old.uid, { email });
+    await db.collection("users").doc(old.uid).set({ email }, { merge: true });
+    renamed = from;
+  }
+}
+
 try {
   uid = (await auth.getUserByEmail(email)).uid;
   await auth.updateUser(uid, { password, emailVerified: true, disabled: false });
@@ -58,12 +78,13 @@ if (!(await ref.get()).exists) {
 
 const admins = (process.env.PLATFORM_ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase());
 console.log(`
-✔ Admin login ${created ? "created" : "updated (password reset, email verified)"}
+✔ Admin login ${created ? "created" : renamed ? `moved from ${renamed} (password reset, email verified)` : "updated (password reset, email verified)"}
 
   Email      ${email}
   Password   (the ADMIN_PASSWORD you set)
   Sign in    <dashboard>/sign-in, then open /platform
 
   ${admins.includes(email) ? "" : `Next: add ${email} to PLATFORM_ADMIN_EMAILS on Vercel (comma-separated) and redeploy —\n  until then this account is a normal seller and /platform answers 404.`}
+  ${renamed ? `Remove ${renamed} from PLATFORM_ADMIN_EMAILS too.` : ""}
 `);
 process.exit(0);

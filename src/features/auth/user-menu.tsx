@@ -1,9 +1,8 @@
 "use client";
 
-import { signOut } from "firebase/auth";
 import Link from "next/link";
 import { LogOut, Shield, User } from "lucide-react";
-import { auth } from "@/lib/firebase/client";
+import { signOutEverywhere } from "./sign-out-button";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -53,13 +52,7 @@ export function UserMenu({
           </DropdownMenuItem>
         )}
         <DropdownMenuItem
-          onSelect={async () => {
-            await fetch("/api/auth/session", { method: "DELETE" });
-            await signOut(auth).catch(() => {});
-            // Full reload so no signed-in client state survives sign-out.
-            // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-            window.location.href = "/sign-in";
-          }}
+          onSelect={() => void signOutEverywhere()}
         >
           <LogOut /> Keluar
         </DropdownMenuItem>
