@@ -2,6 +2,7 @@
 
 import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
+import { requirePlatformAdmin } from "@/lib/access/platform";
 
 export interface StorePulse {
   orders: number;
@@ -34,4 +35,28 @@ export async function storePulse(storeId: string): Promise<StorePulse> {
     count(adminDb.collection("announcements").where("active", "==", true)),
   ]);
   return { orders: all, paid, awaiting, failed, claims, notes, banners };
+}
+
+export interface PlatformPulse {
+  proofs: number;
+  tickets: number;
+  deletions: number;
+  stores: number;
+  users: number;
+  notes: number;
+}
+
+/** Fingerprint of what a platform admin acts on: plan payment proofs, help desk, deletions. */
+export async function platformPulse(): Promise<PlatformPulse> {
+  const admin = await requirePlatformAdmin();
+  const count = async (q: FirebaseFirestore.Query) => (await q.count().get()).data().count;
+  const [proofs, tickets, deletions, stores, users, notes] = await Promise.all([
+    count(adminDb.collection("subscription_payments").where("status", "==", "PENDING").where("proof_uploaded_at", "!=", null)),
+    count(adminDb.collection("support_tickets").where("unread_by_admin", "==", true)),
+    count(adminDb.collection("account_deletion_requests").where("status", "==", "PENDING")),
+    count(adminDb.collection("stores")),
+    count(adminDb.collection("users")),
+    count(adminDb.collection("notifications").where("uid", "==", admin.uid)),
+  ]);
+  return { proofs, tickets, deletions, stores, users, notes };
 }
