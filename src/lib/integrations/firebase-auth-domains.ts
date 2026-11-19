@@ -39,3 +39,39 @@ export async function updateAuthorizedDomains(change: { add?: string[]; remove?:
 
 /** The apex and its www. alias — both serve the store. */
 export const domainHosts = (domain: string) => (domain.startsWith("www.") ? [domain, domain.slice(4)] : [domain, `www.${domain}`]);
+
+/** A store's own subdomain (`<slug>.<root domain>`), or null without NEXT_PUBLIC_ROOT_DOMAIN. */
+export function subdomainHost(slug: string): string | null {
+  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
+  return root ? `${slug}.${root}` : null;
+}
+
+/**
+ * Firebase has no wildcard authorized domains, so every store subdomain is registered on its own:
+ * when a store is created, renamed or deleted. Best effort — logs instead of failing the action.
+ */
+export async function syncStoreSubdomain(change: { add?: string | null; remove?: string | null }) {
+  const add = change.add ? subdomainHost(change.add) : null;
+  const remove = change.remove ? subdomainHost(change.remove) : null;
+  if (!add && !remove) return;
+  await updateAuthorizedDomains({ add: add ? [add] : [], remove: remove ? [remove] : [] }).catch((err) =>
+    console.error("authorized domains update failed", err),
+  );
+}
+
+/**
+ * Registers every store's subdomain and connected custom domain (for stores created before this
+ * was automatic). Returns how many hosts were checked; throws when the API call fails.
+ */
+export async function syncAllStoreDomains(): Promise<number> {
+  if (!authDomainsEnabled()) return 0;
+  const { adminDb } = await import("@/lib/firebase/admin");
+  const stores = await adminDb.collection("stores").select("slug", "custom_domain").get();
+  const hosts = stores.docs.flatMap((s) => {
+    const sub = subdomainHost(s.get("slug") as string);
+    const domain = s.get("custom_domain") as string | null;
+    return [...(sub ? [sub] : []), ...(domain ? domainHosts(domain) : [])];
+  });
+  await updateAuthorizedDomains({ add: hosts });
+  return hosts.length;
+}

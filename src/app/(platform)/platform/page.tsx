@@ -11,6 +11,7 @@ import { formatDate, formatIDR } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResetDataCard } from "@/features/platform/reset-data-card";
+import { SyncAuthDomainsButton } from "@/features/platform/sync-auth-domains-button";
 import { requirePlatformAdmin } from "@/lib/access/platform";
 import { verifyMethod } from "@/lib/access/reauth";
 
@@ -101,6 +102,15 @@ export default async function PlatformOverviewPage() {
               </div>
             </div>
           ))}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
+            <div className="min-w-0">
+              <div className="font-medium">Login Google di toko</div>
+              <div className="text-muted-foreground text-xs">
+                Toko baru, ganti alamat dan domain sendiri didaftarkan otomatis ke Authorized domains Firebase. Tekan sinkronkan sekali untuk toko yang dibuat sebelumnya.
+              </div>
+            </div>
+            <SyncAuthDomainsButton />
+          </div>
         </CardContent>
       </Card>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

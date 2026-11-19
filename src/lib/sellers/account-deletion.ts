@@ -2,6 +2,7 @@ import "server-only";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminAuth, adminBucket, adminDb } from "@/lib/firebase/admin";
 import { removeDomain, vercelDomainsEnabled } from "@/lib/integrations/vercel-domains";
+import { syncStoreSubdomain } from "@/lib/integrations/firebase-auth-domains";
 
 async function deleteQuery(q: FirebaseFirestore.Query) {
   for (;;) {
@@ -28,7 +29,10 @@ async function wipeStore(store: FirebaseFirestore.DocumentSnapshot) {
   }
   const slug = store.get("slug") as string | undefined;
   const domain = store.get("custom_domain") as string | undefined;
-  if (slug) await adminDb.collection("store_slugs").doc(slug).delete();
+  if (slug) {
+    await adminDb.collection("store_slugs").doc(slug).delete();
+    await syncStoreSubdomain({ remove: slug });
+  }
   if (domain) {
     await adminDb.collection("store_domains").doc(domain).delete();
     if (vercelDomainsEnabled()) await removeDomain(domain).catch(() => {});
