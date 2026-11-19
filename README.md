@@ -91,6 +91,16 @@ activates or extends the plan (`subscription_payments`). A paid plan past `subsc
 Starter (computed on read, no cron). Admin accounts (`PLATFORM_ADMIN_EMAILS`) only see `/platform`;
 they have no store or plan.
 
+## Tema AI
+
+Sellers on a plan with the **Tema AI** feature (Paket, or per seller) can click *Buat tema dengan
+AI* in Pengaturan → Toko. Claude (`src/lib/ai/theme.ts`, structured output) picks one of the
+templates their plan allows, an accent colour, corner style and font, and writes a tagline and
+the "Tentang toko" text; nothing is free-form code. The seller previews it before applying;
+corners/font are stored per store in `stores/{id}.theme_override` and read by the storefront.
+Admins switch it on and set the monthly quota per seller in Tema (stored in `platform/catalog.ai`).
+Needs `ANTHROPIC_API_KEY` on the dashboard project.
+
 ## Live updates
 
 Every store page polls a small order fingerprint (`src/features/dashboard/live-actions.ts`, five

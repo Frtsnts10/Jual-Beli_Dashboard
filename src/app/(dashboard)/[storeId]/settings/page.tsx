@@ -1,4 +1,4 @@
-import { requireStore } from "@/lib/access/auth";
+import { getOwnedStores, requireStore } from "@/lib/access/auth";
 import { adminDb } from "@/lib/firebase/admin";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { DEFAULT_WA_TEMPLATE } from "@/config/tiers";
@@ -33,6 +33,9 @@ import { headers } from "next/headers";
 import { segment, segmented } from "@/components/segmented";
 import { HeroBannerCard } from "@/features/banner/hero-banner-card";
 import { listProducts } from "@/lib/data/queries";
+import { AiThemeCard } from "@/features/ai-theme/ai-theme-card";
+import { DeleteAccountSection } from "@/features/auth/delete-account-section";
+import { getAiThemeStatus } from "@/features/ai-theme/actions";
 
 export const metadata = { title: "Pengaturan" };
 
@@ -42,6 +45,7 @@ const TABS = [
   { key: "domain", label: "Domain", owner: true },
   { key: "integrasi", label: "WhatsApp & Bot", owner: false },
   { key: "tim", label: "Tim", owner: true },
+  { key: "akun", label: "Akun", owner: false },
 ] as const;
 type Tab = (typeof TABS)[number]["key"];
 
@@ -55,6 +59,8 @@ export default async function SettingsPage({
   const { storeId } = await params;
   const { user, store, role, features: tier } = await requireStore(storeId);
   const catalog = await getCatalog();
+  const [aiStatus, rawStore] = await Promise.all([getAiThemeStatus(storeId), adminDb.collection("stores").doc(storeId).get()]);
+  const hasOverride = !!rawStore.get("theme_override");
   const isOwner = role === "owner";
   // One section per tab (the page used to be eight cards in one long scroll).
   const tabs = TABS.filter((t) => isOwner || !t.owner);
@@ -133,6 +139,14 @@ export default async function SettingsPage({
           )}
           {tab === "toko" && (
             <>
+              {aiStatus && (aiStatus.blocked === null || aiStatus.blocked === "plan") && (
+                <AiThemeCard
+                  storeId={storeId}
+                  status={aiStatus}
+                  templateNames={Object.fromEntries(catalog.templates.map((t) => [t.id, t.name]))}
+                  hasOverride={hasOverride}
+                />
+              )}
               <StoreSettingsForm
                 store={store}
                 allowedTemplates={tier.templates}
@@ -174,6 +188,7 @@ export default async function SettingsPage({
               />
             </>
           )}
+          {tab === "akun" && <DeleteAccountSection email={user.email} footprint={await accountFootprint(user.uid)} />}
           {tab === "tim" && (
             <TeamCard
               storeId={storeId}
@@ -250,4 +265,13 @@ export default async function SettingsPage({
       </div>
     </>
   );
+}
+
+/** What deleting this account would remove, for the danger zone. */
+async function accountFootprint(uid: string) {
+  const stores = await getOwnedStores(uid);
+  const count = async (name: string) =>
+    (await Promise.all(stores.map(async (st) => (await adminDb.collection(name).where("store_id", "==", st.id).count().get()).data().count))).reduce((a, b) => a + b, 0);
+  const [products, orders, stock] = await Promise.all([count("products"), count("orders"), count("credentials_vault")]);
+  return { stores: stores.map((st) => st.store_name), products, orders, stock };
 }

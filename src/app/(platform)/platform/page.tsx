@@ -35,6 +35,7 @@ export default async function PlatformOverviewPage() {
       label: "Domain platform (subdomain toko)",
       fix: "Isi NEXT_PUBLIC_ROOT_DOMAIN (mis. belidi.biz.id) di env Vercel dashboard dan etalase, lalu redeploy — tiap toko jadi namatoko.<domain>.",
     },
+    { ok: has("ANTHROPIC_API_KEY"), label: "Tema AI (Claude)", fix: "Isi ANTHROPIC_API_KEY di env Vercel dashboard agar seller bisa memakai Tema AI (nyalakan di menu Tema).", href: "/platform/themes" },
     {
       ok: has("VERCEL_TOKEN") && has("VERCEL_STOREFRONT_PROJECT_ID"),
       label: "Domain sendiri seller otomatis",
