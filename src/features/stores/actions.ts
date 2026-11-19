@@ -1,6 +1,7 @@
 "use server";
 
 import { isImageUrl } from "@/lib/media-kinds";
+import { syncStoreSubdomain } from "@/lib/integrations/firebase-auth-domains";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -63,6 +64,7 @@ export async function createStore(input: { store_name: string; slug: string }): 
     if (err instanceof Error && err.message === "SLUG_TAKEN") return fail("Slug sudah dipakai toko lain.");
     throw err;
   }
+  await syncStoreSubdomain({ add: slug });
   revalidatePath("/", "layout");
   return { ok: true, data: { storeId: storeRef.id } };
 }
@@ -123,6 +125,7 @@ export async function updateStoreSettings(storeId: string, input: StoreSettingsI
     if (err instanceof Error && err.message === "SLUG_TAKEN") return fail("Slug sudah dipakai toko lain.");
     throw err;
   }
+  if (slug !== store.slug) await syncStoreSubdomain({ add: slug, remove: store.slug });
   revalidatePath(`/${storeId}`, "layout");
   return { ok: true };
 }

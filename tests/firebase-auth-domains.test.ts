@@ -48,4 +48,13 @@ describe("updateAuthorizedDomains", () => {
     await updateAuthorizedDomains({ add: ["x.com"] });
     expect(calls).toHaveLength(0);
   });
+  it("registers a store subdomain under the root domain and swaps it on rename", async () => {
+    vi.stubEnv("NEXT_PUBLIC_ROOT_DOMAIN", "belidi.biz.id");
+    const { syncStoreSubdomain } = await import("@/lib/integrations/firebase-auth-domains");
+    await syncStoreSubdomain({ add: "dionycte" });
+    expect(domains).toContain("dionycte.belidi.biz.id");
+    await syncStoreSubdomain({ add: "dion", remove: "dionycte" });
+    expect(domains).toContain("dion.belidi.biz.id");
+    expect(domains).not.toContain("dionycte.belidi.biz.id");
+  });
 });
