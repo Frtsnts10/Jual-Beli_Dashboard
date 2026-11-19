@@ -33,7 +33,8 @@ export function SubscriptionProof({ storeId, paymentId, hasProof }: { storeId: s
   const [pending, start] = useTransition();
 
   return (
-    <div className="grid gap-3">
+    // Proof preview and its buttons sit side by side (wrap under each other only on narrow screens).
+    <div className="flex flex-wrap items-end gap-4">
       <input
         ref={input}
         type="file"
@@ -45,7 +46,7 @@ export function SubscriptionProof({ storeId, paymentId, hasProof }: { storeId: s
           e.target.value = "";
         }}
       />
-      {preview && <img src={preview} alt="Pratinjau bukti pembayaran" className="mx-auto max-h-64 rounded-lg border object-contain" />}
+      {preview && <img src={preview} alt="Pratinjau bukti pembayaran" className="max-h-48 max-w-full rounded-lg border object-contain" />}
       <div className="flex flex-wrap gap-2">
         {preview ? (
           <Button
