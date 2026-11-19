@@ -29,6 +29,17 @@ export default async function PlatformOverviewPage() {
     { ok: has("N8N_WEBHOOK_URL") && has("N8N_WEBHOOK_SECRET"), label: "Otomasi WhatsApp (n8n)", fix: "Isi N8N_WEBHOOK_URL dan N8N_WEBHOOK_SECRET di env Vercel." },
     { ok: has("CRON_SECRET"), label: "Cron harian", fix: "Isi CRON_SECRET di env Vercel (pengingat H-3, kedaluwarsa pesanan)." },
     { ok: has("VAULT_ENCRYPTION_KEY"), label: "Enkripsi brankas", fix: "Isi VAULT_ENCRYPTION_KEY di env Vercel." },
+    {
+      // Referenced directly: NEXT_PUBLIC_* values are inlined at build time.
+      ok: !!process.env.NEXT_PUBLIC_ROOT_DOMAIN,
+      label: "Domain platform (subdomain toko)",
+      fix: "Isi NEXT_PUBLIC_ROOT_DOMAIN (mis. belidi.biz.id) di env Vercel dashboard dan etalase, lalu redeploy — tiap toko jadi namatoko.<domain>.",
+    },
+    {
+      ok: has("VERCEL_TOKEN") && has("VERCEL_STOREFRONT_PROJECT_ID"),
+      label: "Domain sendiri seller otomatis",
+      fix: "Isi VERCEL_TOKEN dan VERCEL_STOREFRONT_PROJECT_ID (+ VERCEL_TEAM_ID untuk project team) agar domain seller dipasang ke Vercel otomatis.",
+    },
   ];
   const todo = [
     { n: proofs.docs.filter((d) => d.get("proof_uploaded_at")).length, label: "bukti bayar paket menunggu konfirmasi", href: "/platform/payments" },
