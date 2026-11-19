@@ -10,10 +10,16 @@ import { getPlatformQris } from "@/lib/data/platform-settings";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ResetDataCard } from "@/features/platform/reset-data-card";
+import { requirePlatformAdmin } from "@/lib/access/platform";
+import { verifyMethod } from "@/lib/access/reauth";
 
 export const metadata = { title: { absolute: "Ringkasan · Jual Admin" } };
+// "Reset semua data" runs from this page and can take a while on a full database.
+export const maxDuration = 300;
 
 export default async function PlatformOverviewPage() {
+  const admin = await requirePlatformAdmin();
   const [o, activity, plans, qris, proofs, deletions] = await Promise.all([
     platformOverview(),
     platformActivity(),
@@ -208,6 +214,7 @@ export default async function PlatformOverviewPage() {
           </CardContent>
         </Card>
       </div>
+      <ResetDataCard email={admin.email} verifyWith={await verifyMethod(admin.uid)} />
     </>
   );
 }

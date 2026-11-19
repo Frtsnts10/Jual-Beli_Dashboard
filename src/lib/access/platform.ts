@@ -7,7 +7,8 @@ import { requireUser, getSessionUser } from "@/lib/access/auth";
 // email in PLATFORM_ADMIN_EMAILS (comma-separated) and requires a verified email, so the
 // allow-list can't be satisfied by signing up with someone else's address.
 
-function adminEmails() {
+/** PLATFORM_ADMIN_EMAILS, lower-cased. */
+export function adminEmails() {
   return (process.env.PLATFORM_ADMIN_EMAILS ?? "")
     .split(",")
     .map((e) => e.trim().toLowerCase())
