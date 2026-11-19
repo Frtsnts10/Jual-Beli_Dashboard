@@ -3,6 +3,21 @@ import { cleanOverrides, mergeCatalog, planPerks, resolveFeatures, templateFor }
 import { TIERS } from "@/config/tiers";
 
 describe("mergeCatalog", () => {
+  it("adds admin-created plans and orders every plan by price, Starter first", () => {
+    const c = mergeCatalog({
+      plans: {
+        business: { custom: true, name: "Business", priceMonthly: 149000, priceYearly: 1490000, vouchers: true },
+        mega: { custom: true, name: "Mega", priceMonthly: 499000 },
+        stray: { name: "Not flagged" },
+        "Bad Key": { custom: true, name: "x" },
+      },
+    });
+    expect(c.customPlans.sort()).toEqual(["business", "mega"]);
+    expect(c.planKeys).toEqual(["starter", "pro", "business", "ultimate", "mega"]);
+    expect(c.plans.business).toMatchObject({ name: "Business", priceMonthly: 149000, vouchers: true, maxStores: TIERS.pro.maxStores });
+    expect(resolveFeatures(c, "business").name).toBe("Business");
+    expect(resolveFeatures(c, "deleted-plan").name).toBe(c.plans.starter.name);
+  });
   it("is the built-in plans and templates when nothing is stored", () => {
     const c = mergeCatalog(null);
     expect(c.plans.pro).toEqual(TIERS.pro);

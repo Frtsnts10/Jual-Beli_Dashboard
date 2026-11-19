@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { signOut } from "firebase/auth";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 import { AlertTriangle, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { auth } from "@/lib/firebase/client";
@@ -21,12 +21,36 @@ export interface AccountFootprint {
 }
 
 /** Settings → Akun: the danger zone. Deleting wipes the account and every store it owns. */
-export function DeleteAccountSection({ email, footprint }: { email: string; footprint: AccountFootprint }) {
+export function DeleteAccountSection({ email, footprint, verifyWith }: { email: string; footprint: AccountFootprint; verifyWith: "password" | "google" }) {
   const [armed, setArmed] = useState(false);
   const [typedEmail, setTypedEmail] = useState("");
   const [phrase, setPhrase] = useState("");
+  const [password, setPassword] = useState("");
   const [pending, start] = useTransition();
-  const ready = typedEmail.trim().toLowerCase() === email.toLowerCase() && phrase.trim() === PHRASE;
+  const ready = typedEmail.trim().toLowerCase() === email.toLowerCase() && phrase.trim() === PHRASE && (verifyWith === "google" || password.length > 0);
+
+  /** Proves it's really the owner at the keyboard: a fresh sign-in, its ID token goes to the server. */
+  const verify = async () => {
+    try {
+      const cred =
+        verifyWith === "password"
+          ? await signInWithEmailAndPassword(auth, email, password)
+          : await signInWithPopup(auth, new GoogleAuthProvider().setCustomParameters({ login_hint: email, prompt: "select_account" }));
+      return await cred.user.getIdToken(true);
+    } catch (err) {
+      const code = (err as { code?: string }).code ?? "";
+      toast.error(
+        /invalid-credential|wrong-password|user-mismatch/.test(code)
+          ? "Password salah."
+          : /popup-closed|cancelled-popup/.test(code)
+            ? "Verifikasi Google dibatalkan."
+            : /too-many-requests/.test(code)
+              ? "Terlalu banyak percobaan. Coba lagi beberapa menit lagi."
+              : "Verifikasi gagal. Coba lagi.",
+      );
+      return null;
+    }
+  };
 
   return (
     <Card className="border-destructive/50">
@@ -67,7 +91,14 @@ export function DeleteAccountSection({ email, footprint }: { email: string; foot
               </Label>
               <Input id="del-phrase" autoComplete="off" value={phrase} onChange={(e) => setPhrase(e.target.value)} />
             </div>
-            <p className="text-muted-foreground text-xs">Demi keamanan, Anda harus masuk dalam 10 menit terakhir. Kalau belum, keluar dan masuk lagi dulu.</p>
+            {verifyWith === "password" ? (
+              <div className="grid gap-2">
+                <Label htmlFor="del-password">Password akun</Label>
+                <Input id="del-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-xs">Saat menekan tombol hapus, Anda akan diminta masuk dengan Google sekali lagi untuk memastikan ini memang Anda.</p>
+            )}
             <div className="flex flex-wrap gap-2">
               <Button variant="ghost" disabled={pending} onClick={() => setArmed(false)}>
                 Batal
@@ -77,7 +108,9 @@ export function DeleteAccountSection({ email, footprint }: { email: string; foot
                 disabled={!ready || pending}
                 onClick={() =>
                   start(async () => {
-                    const res = await deleteMyAccount({ email: typedEmail, phrase });
+                    const idToken = await verify();
+                    if (!idToken) return;
+                    const res = await deleteMyAccount({ email: typedEmail, phrase, idToken });
                     if (!res.ok) return void toast.error(res.error);
                     await signOut(auth).catch(() => {});
                     // eslint-disable-next-line @next/next/no-location-assign-relative-destination

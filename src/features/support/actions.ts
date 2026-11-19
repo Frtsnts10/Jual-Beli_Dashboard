@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/access/auth";
 import { isPlatformAdmin, requirePlatformAdmin, isAdminEmail } from "@/lib/access/platform";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { randomId } from "@/lib/ids";
+import { getCatalog } from "@/lib/catalog";
 import { saveImageAt } from "@/lib/media";
 import { notify, platformAdminUids } from "@/lib/notify";
 import {
@@ -209,9 +210,9 @@ export async function createAnnouncement(input: {
   if (title.length < 3) return fail("Judul minimal 3 karakter.");
   if (!["info", "warning", "maintenance"].includes(input.level))
     return fail("Jenis tidak dikenal.");
+  const { plans } = await getCatalog();
   const tiers =
-    input.tiers?.filter((t) => ["starter", "pro", "ultimate"].includes(t)) ??
-    null;
+    input.tiers?.filter((t) => t in plans) ?? null;
   if (tiers && tiers.length === 0)
     return fail("Pilih minimal satu paket, atau Semua pengguna.");
   const endsAt = input.endsAt ? new Date(input.endsAt) : null;

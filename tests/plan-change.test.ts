@@ -29,3 +29,13 @@ describe("plan changes", () => {
     expect(newExpiry("starter", null, "ultimate", 365, now)).toBe(now + 365 * DAY);
   });
 });
+
+describe("plan changes with admin-added plans", () => {
+  const prices = { starter: 0, pro: 99000, business: 149000, ultimate: 249000 };
+  const expiry = new Date(Date.now() + 10 * 86_400_000).toISOString();
+  it("ranks plans by monthly price", () => {
+    expect(planChange("pro", expiry, "business", Date.now(), prices)).toBe("upgrade");
+    expect(planChange("ultimate", expiry, "business", Date.now(), prices)).toBe("downgrade");
+    expect(planChange("business", expiry, "business", Date.now(), prices)).toBe("renew");
+  });
+});

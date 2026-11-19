@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { FEATURE_INFO, FEATURE_KEYS, type FeatureKey } from "@/lib/catalog-core";
 import type { TierConfig } from "@/config/tiers";
 import type { LayoutTemplate, SubscriptionTier } from "@/types/schema";
-import { savePlan } from "./catalog-actions";
+import { deletePlan, savePlan } from "./catalog-actions";
 
 /** Number field with an "∞" toggle (null = unlimited). */
 export function LimitField({ id, label, value, onChange }: { id: string; label: string; value: number | null; onChange: (v: number | null) => void }) {
@@ -28,7 +30,7 @@ export function LimitField({ id, label, value, onChange }: { id: string; label: 
 
 const fin = (v: number) => (Number.isFinite(v) ? v : null);
 
-export function PlanForm({ tier, plan, templates }: { tier: SubscriptionTier; plan: TierConfig; templates: { id: LayoutTemplate; name: string; enabled: boolean }[] }) {
+export function PlanForm({ tier, plan, custom = false, templates }: { tier: SubscriptionTier; plan: TierConfig; custom?: boolean; templates: { id: LayoutTemplate; name: string; enabled: boolean }[] }) {
   const [name, setName] = useState(plan.name);
   const [priceMonthly, setPriceMonthly] = useState(plan.priceMonthly);
   const [priceYearly, setPriceYearly] = useState(plan.priceYearly);
@@ -38,12 +40,13 @@ export function PlanForm({ tier, plan, templates }: { tier: SubscriptionTier; pl
   const [features, setFeatures] = useState<Record<FeatureKey, boolean>>(Object.fromEntries(FEATURE_KEYS.map((k) => [k, plan[k]])) as Record<FeatureKey, boolean>);
   const [pending, start] = useTransition();
   const free = tier === "starter";
+  const router = useRouter();
 
   return (
-    <Card>
+    <Card id={`plan-${tier}`}>
       <CardHeader>
         <CardTitle>{name || tier}</CardTitle>
-        <CardDescription>{free ? "Paket gratis untuk semua seller baru." : "Paket berbayar lewat QRIS platform."}</CardDescription>
+        <CardDescription>{free ? "Paket gratis untuk semua seller baru." : custom ? "Paket tambahan, berbayar lewat QRIS platform." : "Paket berbayar lewat QRIS platform."}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
         <div className="grid gap-2">
@@ -99,7 +102,25 @@ export function PlanForm({ tier, plan, templates }: { tier: SubscriptionTier; pl
           ))}
         </div>
       </CardContent>
-      <CardFooter className="justify-end">
+      <CardFooter className="justify-end gap-2">
+        {custom && (
+          <Button
+            variant="outline"
+            disabled={pending}
+            className="text-destructive mr-auto"
+            onClick={() => {
+              if (!confirm(`Hapus paket ${plan.name}? Hanya bisa jika tidak ada seller di paket ini.`)) return;
+              start(async () => {
+                const res = await deletePlan(tier);
+                if (!res.ok) return void toast.error(res.error);
+                toast.success(`Paket ${plan.name} dihapus`);
+                router.refresh();
+              });
+            }}
+          >
+            <Trash2 /> Hapus
+          </Button>
+        )}
         <Button
           disabled={pending}
           onClick={() =>

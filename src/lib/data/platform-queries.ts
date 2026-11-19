@@ -20,7 +20,10 @@ export async function platformOverview() {
     adminDb.collection("subscription_payments").where("paid_at", ">=", since).select("amount", "status").get(),
   ]);
   const tiers: Record<SubscriptionTier, number> = { starter: 0, pro: 0, ultimate: 0 };
-  for (const u of users.docs) tiers[effectiveTier(u.get("subscription_tier"), u.get("subscription_expiry"))]++;
+  for (const u of users.docs) {
+    const t = effectiveTier(u.get("subscription_tier"), u.get("subscription_expiry"));
+    tiers[t] = (tiers[t] ?? 0) + 1;
+  }
   const paid = orders.docs.filter((o) => o.get("payment_status") === "PAID");
   return {
     users: users.size,

@@ -15,7 +15,7 @@ import type { SubscriptionTier } from "@/types/schema";
 export async function applySubscriptionPayment(paymentId: string) {
   const paymentRef = adminDb.collection("subscription_payments").doc(paymentId);
   const { plans } = await getCatalog();
-  const prices = { starter: plans.starter.priceMonthly, pro: plans.pro.priceMonthly, ultimate: plans.ultimate.priceMonthly };
+  const prices = Object.fromEntries(Object.entries(plans).map(([k, p]) => [k, p.priceMonthly]));
   return adminDb.runTransaction(async (tx) => {
     const payment = await tx.get(paymentRef);
     if (!payment.exists) return "not_found" as const;

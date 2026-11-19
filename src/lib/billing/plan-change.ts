@@ -7,30 +7,32 @@ import type { SubscriptionTier } from "@/types/schema";
 // the exact outcome before the seller pays, and the activation applies the same numbers.
 
 const DAY_MS = 86_400_000;
-const RANK: Record<SubscriptionTier, number> = { starter: 0, pro: 1, ultimate: 2 };
 
 export type PlanChange = "renew" | "upgrade" | "downgrade" | "new";
 
 /** What buying `target` means for someone whose effective plan is `current` (active until `expiry`). */
-export function planChange(current: SubscriptionTier, expiry: string | null, target: SubscriptionTier, now = Date.now()): PlanChange {
+export function planChange(current: SubscriptionTier, expiry: string | null, target: SubscriptionTier, now = Date.now(), prices?: MonthlyPrices): PlanChange {
   const active = current !== "starter" && !!expiry && new Date(expiry).getTime() > now;
   if (!active) return "new";
   if (current === target) return "renew";
-  return RANK[target] > RANK[current] ? "upgrade" : "downgrade";
+  // Up or down by monthly price (plans an admin adds slot in by what they cost).
+  return monthly(target, prices) > monthly(current, prices) ? "upgrade" : "downgrade";
 }
 
 /** Monthly price per plan; the platform catalog's when given, else the built-in defaults. */
 export type MonthlyPrices = Partial<Record<SubscriptionTier, number>>;
 
 /** Daily value of a plan, from its monthly price. */
-const daily = (tier: SubscriptionTier, prices?: MonthlyPrices) => (prices?.[tier] ?? TIERS[tier].priceMonthly) / 30;
+const monthly = (tier: SubscriptionTier, prices?: MonthlyPrices) => prices?.[tier] ?? TIERS[tier]?.priceMonthly ?? 0;
+const daily = (tier: SubscriptionTier, prices?: MonthlyPrices) => monthly(tier, prices) / 30;
 
 /**
  * Whole days of `target` that the unused part of the current plan is worth. 0 for a renewal
  * (the new period is appended to the current one instead) or when nothing paid is left.
  */
 export function bonusDays(current: SubscriptionTier, expiry: string | null, target: SubscriptionTier, now = Date.now(), prices?: MonthlyPrices): number {
-  if (planChange(current, expiry, target, now) !== "upgrade" && planChange(current, expiry, target, now) !== "downgrade") return 0;
+  const change = planChange(current, expiry, target, now, prices);
+  if (change !== "upgrade" && change !== "downgrade") return 0;
   if (target === "starter" || !daily(target, prices)) return 0;
   const remainingDays = (new Date(expiry!).getTime() - now) / DAY_MS;
   return Math.floor((remainingDays * daily(current, prices)) / daily(target, prices));
@@ -38,6 +40,6 @@ export function bonusDays(current: SubscriptionTier, expiry: string | null, targ
 
 /** New expiry after paying for `periodDays` of `target`. */
 export function newExpiry(current: SubscriptionTier, expiry: string | null, target: SubscriptionTier, periodDays: number, now = Date.now(), prices?: MonthlyPrices): number {
-  if (planChange(current, expiry, target, now) === "renew") return new Date(expiry!).getTime() + periodDays * DAY_MS;
+  if (planChange(current, expiry, target, now, prices) === "renew") return new Date(expiry!).getTime() + periodDays * DAY_MS;
   return now + (periodDays + bonusDays(current, expiry, target, now, prices)) * DAY_MS;
 }

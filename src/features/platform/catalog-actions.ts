@@ -5,7 +5,8 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import { requirePlatformAdmin, isAdminEmail } from "@/lib/access/platform";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { cleanOverrides, FEATURE_KEYS, FONTS, PLAN_KEYS, RADIUS, type FeatureKey, type FeatureOverrides, type FontKey, type RadiusKey } from "@/lib/catalog-core";
+import { getCatalog } from "@/lib/catalog";
+import { BUILTIN_PLANS, cleanOverrides, FEATURE_KEYS, FONTS, PLAN_KEY_RE, RADIUS, type FeatureKey, type FeatureOverrides, type FontKey, type RadiusKey } from "@/lib/catalog-core";
 import { TEMPLATES } from "@/config/tiers";
 import type { LayoutTemplate, SubscriptionTier } from "@/types/schema";
 
@@ -32,7 +33,8 @@ export interface PlanInput {
 /** Admin → Paket: what one plan costs and includes. */
 export async function savePlan(tier: SubscriptionTier, input: PlanInput): Promise<ActionResult> {
   const admin = await requirePlatformAdmin();
-  if (!PLAN_KEYS.includes(tier)) return fail("Paket tidak dikenal.");
+  const catalog = await getCatalog();
+  if (!catalog.plans[tier]) return fail("Paket tidak dikenal.");
   const name = input.name.trim().slice(0, 30);
   if (name.length < 2) return fail("Nama paket minimal 2 huruf.");
   for (const v of [input.priceMonthly, input.priceYearly]) if (!Number.isInteger(v) || v < 0 || v > 100_000_000) return fail("Harga tidak valid.");
@@ -49,9 +51,56 @@ export async function savePlan(tier: SubscriptionTier, input: PlanInput): Promis
     maxCredentials: input.maxCredentials,
     templates,
     ...Object.fromEntries(FEATURE_KEYS.map((k) => [k, !!input.features[k]])),
+    ...(catalog.customPlans.includes(tier) ? { custom: true } : {}),
   };
   await catalogRef().set({ plans: { [tier]: plan }, updated_at: FieldValue.serverTimestamp() }, { merge: true });
   await audit("catalog.plan", tier, admin.email, plan);
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+/** Admin → Paket → Tambah paket: a new paid plan, starting from Pro's contents; filled in on its card. */
+export async function createPlan(rawName: string): Promise<ActionResult<{ key: string }>> {
+  const admin = await requirePlatformAdmin();
+  const name = rawName.trim().slice(0, 30);
+  if (name.length < 2) return fail("Nama paket minimal 2 huruf.");
+  const catalog = await getCatalog();
+  if (Object.values(catalog.plans).some((p) => p.name.toLowerCase() === name.toLowerCase())) return fail("Sudah ada paket dengan nama itu.");
+  if (catalog.customPlans.length >= 12) return fail("Maksimal 12 paket tambahan.");
+  const base = name.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 20) || "paket";
+  let key = PLAN_KEY_RE.test(base) ? base : `paket-${base}`.slice(0, 20);
+  for (let i = 2; catalog.plans[key] || BUILTIN_PLANS.includes(key); i++) key = `${base.slice(0, 18)}-${i}`;
+  const from = catalog.plans.pro;
+  const plan = {
+    custom: true,
+    name,
+    priceMonthly: from.priceMonthly,
+    priceYearly: from.priceYearly,
+    maxStores: Number.isFinite(from.maxStores) ? from.maxStores : null,
+    maxCredentials: Number.isFinite(from.maxCredentials) ? from.maxCredentials : null,
+    templates: from.templates,
+    ...Object.fromEntries(FEATURE_KEYS.map((k) => [k, from[k]])),
+  };
+  await catalogRef().set({ plans: { [key]: plan }, updated_at: FieldValue.serverTimestamp() }, { merge: true });
+  await audit("catalog.plan_create", key, admin.email, plan);
+  revalidatePath("/", "layout");
+  return { ok: true, data: { key } };
+}
+
+/** Removes a plan an admin added — only while no seller is on it or paying for it. */
+export async function deletePlan(key: SubscriptionTier): Promise<ActionResult> {
+  const admin = await requirePlatformAdmin();
+  const catalog = await getCatalog();
+  if (!catalog.customPlans.includes(key)) return fail("Paket bawaan tidak bisa dihapus.");
+  const [users, pending] = await Promise.all([
+    adminDb.collection("users").where("subscription_tier", "==", key).count().get(),
+    adminDb.collection("subscription_payments").where("tier", "==", key).get(),
+  ]);
+  const waiting = pending.docs.filter((d) => d.get("status") === "PENDING").length;
+  if (users.data().count) return fail(`Masih ada ${users.data().count} seller di paket ini. Pindahkan dulu lewat menu Pengguna.`);
+  if (waiting) return fail("Masih ada pembayaran paket ini yang menunggu konfirmasi.");
+  await catalogRef().update({ [`plans.${key}`]: FieldValue.delete(), updated_at: FieldValue.serverTimestamp() });
+  await audit("catalog.plan_delete", key, admin.email, { name: catalog.plans[key].name });
   revalidatePath("/", "layout");
   return { ok: true };
 }

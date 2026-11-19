@@ -109,7 +109,7 @@ export default async function BillingPage({ params }: { params: Promise<{ storeI
           </CardContent>
         </Card>
       )}
-      <PlanPicker storeId={storeId} currentTier={user.subscription_tier} expiry={user.subscription_expiry} canBuy={!!platformQris} plans={catalog.plans} />
+      <PlanPicker storeId={storeId} currentTier={user.subscription_tier} expiry={user.subscription_expiry} canBuy={!!platformQris} plans={catalog.plans} planKeys={catalog.planKeys} />
       {history.length > 0 && (
         <Card className="mt-8">
           <CardHeader>

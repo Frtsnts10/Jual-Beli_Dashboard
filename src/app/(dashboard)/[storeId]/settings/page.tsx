@@ -1,8 +1,8 @@
 import { getOwnedStores, requireStore } from "@/lib/access/auth";
-import { adminDb } from "@/lib/firebase/admin";
+import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { DEFAULT_WA_TEMPLATE } from "@/config/tiers";
-import { getCatalog, PLAN_KEYS } from "@/lib/catalog";
+import { getCatalog } from "@/lib/catalog";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -188,7 +188,7 @@ export default async function SettingsPage({
               />
             </>
           )}
-          {tab === "akun" && <DeleteAccountSection email={user.email} footprint={await accountFootprint(user.uid)} />}
+          {tab === "akun" && <DeleteAccountSection email={user.email} footprint={await accountFootprint(user.uid)} verifyWith={await verifyMethod(user.uid)} />}
           {tab === "tim" && (
             <TeamCard
               storeId={storeId}
@@ -222,7 +222,7 @@ export default async function SettingsPage({
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3 text-sm">
-              {PLAN_KEYS.map((key) => {
+              {catalog.planKeys.map((key) => {
                 const t = catalog.plans[key];
                 return (
                   <div
@@ -274,4 +274,10 @@ async function accountFootprint(uid: string) {
     (await Promise.all(stores.map(async (st) => (await adminDb.collection(name).where("store_id", "==", st.id).count().get()).data().count))).reduce((a, b) => a + b, 0);
   const [products, orders, stock] = await Promise.all([count("products"), count("orders"), count("credentials_vault")]);
   return { stores: stores.map((st) => st.store_name), products, orders, stock };
+}
+
+/** How the seller proves it's them before deleting: their password if they have one, else Google. */
+async function verifyMethod(uid: string): Promise<"password" | "google"> {
+  const u = await adminAuth.getUser(uid).catch(() => null);
+  return u?.providerData.some((p) => p.providerId === "password") || !u?.providerData.some((p) => p.providerId === "google.com") ? "password" : "google";
 }

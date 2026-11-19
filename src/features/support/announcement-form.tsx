@@ -17,14 +17,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { createAnnouncement, endAnnouncement } from "./actions";
 
-const TIERS = [
-  ["starter", "Starter"],
-  ["pro", "Pro"],
-  ["ultimate", "Ultimate"],
-] as const;
-
 /** Admin: write a banner + notification for all users or selected plans. */
-export function AnnouncementForm() {
+export function AnnouncementForm({ plans }: { plans: { key: string; name: string }[] }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -107,7 +101,7 @@ export function AnnouncementForm() {
             >
               Semua pengguna
             </Button>
-            {TIERS.map(([k, label]) => {
+            {plans.map(({ key: k, name: label }) => {
               const on = !all && tiers.includes(k);
               return (
                 <Button

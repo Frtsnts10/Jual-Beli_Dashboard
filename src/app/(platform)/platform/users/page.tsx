@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 export const metadata = { title: "Pengguna" };
 
 export default async function PlatformUsersPage() {
-  const { plans, templates } = await getCatalog();
+  const { plans, planKeys, templates } = await getCatalog();
+  const planList = planKeys.map((key) => ({ key, name: plans[key].name }));
   const users = await allUsers();
   return (
     <>
@@ -54,7 +55,7 @@ export default async function PlatformUsersPage() {
                         overrides={u.overrides}
                         templates={templates.filter((t) => t.enabled).map((t) => ({ id: t.id, name: t.name, inPlan: plans[u.tier].templates.includes(t.id) }))}
                       />
-                      <PlanEditor uid={u.uid} tier={u.tier} />
+                      <PlanEditor uid={u.uid} tier={u.tier} plans={planList} />
                     </div>
                   )}
                 </TableCell>

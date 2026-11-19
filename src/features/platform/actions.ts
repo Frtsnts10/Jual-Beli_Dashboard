@@ -58,8 +58,7 @@ export async function setUserPlan(
   days: number,
 ): Promise<ActionResult> {
   const admin = await requirePlatformAdmin();
-  if (!["starter", "pro", "ultimate"].includes(tier))
-    return fail("Paket tidak dikenal.");
+  if (!(await getCatalog()).plans[tier]) return fail("Paket tidak dikenal.");
   if (
     tier !== "starter" &&
     (!Number.isInteger(days) || days < 1 || days > 3650)
