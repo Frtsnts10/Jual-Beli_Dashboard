@@ -14,7 +14,11 @@ on:
       email:
         description: Admin email (signs in to the dashboard, opens /platform)
         required: true
-        default: admin@dionycte.com
+        default: admin@belidi.biz.id
+      rename_from:
+        description: Optional — the admin's current email, to move that login to the email above (same account)
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -35,6 +39,7 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           ADMIN_EMAIL: ${{ inputs.email }}
+          ADMIN_RENAME_FROM: ${{ inputs.rename_from }}
         run: |
           for name in FIREBASE_SERVICE_ACCOUNT ADMIN_PASSWORD; do
             if [ -z "${!name}" ]; then
