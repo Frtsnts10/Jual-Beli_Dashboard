@@ -44,19 +44,34 @@ export interface PlatformPulse {
   stores: number;
   users: number;
   notes: number;
+  /** All store orders and the paid ones (Ringkasan: GMV, charts, top stores). */
+  orders: number;
+  paidOrders: number;
+  /** Plan payments and the confirmed ones (Ringkasan: plan revenue, latest payments). */
+  planPayments: number;
+  paidPlans: number;
+  banners: number;
 }
 
-/** Fingerprint of what a platform admin acts on: plan payment proofs, help desk, deletions. */
+/**
+ * Fingerprint of everything the admin pages show: plan payment proofs, help desk, deletions,
+ * sign-ups, platform orders and plan revenue (count queries only).
+ */
 export async function platformPulse(): Promise<PlatformPulse> {
   const admin = await requirePlatformAdmin();
   const count = async (q: FirebaseFirestore.Query) => (await q.count().get()).data().count;
-  const [proofs, tickets, deletions, stores, users, notes] = await Promise.all([
+  const [proofs, tickets, deletions, stores, users, notes, orders, paidOrders, planPayments, paidPlans, banners] = await Promise.all([
     count(adminDb.collection("subscription_payments").where("status", "==", "PENDING").where("proof_uploaded_at", "!=", null)),
     count(adminDb.collection("support_tickets").where("unread_by_admin", "==", true)),
     count(adminDb.collection("account_deletion_requests").where("status", "==", "PENDING")),
     count(adminDb.collection("stores")),
     count(adminDb.collection("users")),
     count(adminDb.collection("notifications").where("uid", "==", admin.uid)),
+    count(adminDb.collection("orders")),
+    count(adminDb.collection("orders").where("payment_status", "==", "PAID")),
+    count(adminDb.collection("subscription_payments")),
+    count(adminDb.collection("subscription_payments").where("status", "==", "PAID")),
+    count(adminDb.collection("announcements").where("active", "==", true)),
   ]);
-  return { proofs, tickets, deletions, stores, users, notes };
+  return { proofs, tickets, deletions, stores, users, notes, orders, paidOrders, planPayments, paidPlans, banners };
 }

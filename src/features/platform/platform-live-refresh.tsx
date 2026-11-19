@@ -9,10 +9,13 @@ function describe(a: PlatformPulse, b: PlatformPulse): string | null {
   if (b.deletions > a.deletions) return "Pengajuan hapus akun baru";
   if (b.stores > a.stores) return "Toko baru dibuat";
   if (b.users > a.users) return "Pengguna baru mendaftar";
+  if (b.paidPlans > a.paidPlans) return "Pembayaran paket dikonfirmasi";
+  if (b.paidOrders > a.paidOrders) return b.paidOrders - a.paidOrders === 1 ? "1 pesanan lunas di platform" : `${b.paidOrders - a.paidOrders} pesanan lunas di platform`;
+  // New unpaid orders, announcement changes, etc.: refresh quietly.
   return null;
 }
 
-/** Keeps every admin page live: plan payment proofs, help desk, deletion requests, sign-ups. */
+/** Keeps every admin page live: Ringkasan numbers and charts, plan payments, help desk, deletions, sign-ups. */
 export function PlatformLiveRefresh() {
   useLivePulse(platformPulse, describe);
   return null;
