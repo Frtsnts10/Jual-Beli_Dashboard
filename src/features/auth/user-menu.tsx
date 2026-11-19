@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { LogOut, Shield, User } from "lucide-react";
+import { LogOut, Shield, Trash2, User } from "lucide-react";
+import { DeleteAccountDialog } from "./delete-account-dialog";
 import { signOutEverywhere } from "./sign-out-button";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +32,9 @@ export function UserMenu({
   platformAdmin?: boolean;
   adminAccount?: boolean;
 }) {
+  const [deleting, setDeleting] = useState(false);
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" aria-label="Akun">
@@ -56,7 +60,17 @@ export function UserMenu({
         >
           <LogOut /> Keluar
         </DropdownMenuItem>
+        {!adminAccount && !platformAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-destructive focus:text-destructive [&_svg]:text-destructive" onSelect={() => setDeleting(true)}>
+              <Trash2 /> Hapus akun
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
+    <DeleteAccountDialog open={deleting} onOpenChange={setDeleting} />
+    </>
   );
 }

@@ -12,6 +12,8 @@ function describe(a: StorePulse, b: StorePulse): string | null {
   if (b.orders > a.orders) return b.orders - a.orders === 1 ? "Pesanan baru masuk" : `${b.orders - a.orders} pesanan baru masuk`;
   if (b.awaiting > a.awaiting) return "Pembeli mengunggah bukti pembayaran";
   if (b.claims > a.claims) return "Klaim garansi baru";
+  if (b.banners > a.banners) return "Pengumuman baru dari admin";
+  if (b.notes > a.notes) return "Notifikasi baru";
   return null;
 }
 

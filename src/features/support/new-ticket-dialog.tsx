@@ -114,10 +114,16 @@ export function NewTicketDialog({ storeId }: { storeId: string }) {
           </div>
           <AttachImage value={image} onChange={setImage} />
         </div>
+        {(subject.trim().length < 3 || message.trim().length < 10) && (
+          <p className="text-muted-foreground text-xs">
+            Isi judul minimal 3 karakter dan deskripsi minimal 10 karakter
+            {message.trim().length < 10 && message.trim().length > 0 ? ` (deskripsi baru ${message.trim().length})` : ""}.
+          </p>
+        )}
         <DialogFooter>
           <Button
             disabled={
-              pending || subject.trim().length < 5 || message.trim().length < 10
+              pending || subject.trim().length < 3 || message.trim().length < 10
             }
             onClick={submit}
           >

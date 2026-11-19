@@ -44,7 +44,7 @@ export async function createTicket(input: {
   const message = input.message.trim().slice(0, 4000);
   if (!TICKET_CATEGORIES.some((c) => c.key === input.category))
     return fail("Pilih kategori.");
-  if (subject.length < 5) return fail("Judul minimal 5 karakter.");
+  if (subject.length < 3) return fail("Judul minimal 3 karakter.");
   if (message.length < 10)
     return fail("Ceritakan masalahnya (minimal 10 karakter).");
   const open = await adminDb
