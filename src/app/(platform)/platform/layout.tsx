@@ -37,8 +37,11 @@ export default async function PlatformLayout({
     <div className="flex h-svh flex-col overflow-hidden">
       {/* Phone/tablet: title + bell/account on one row, the section links scroll underneath. */}
       <header className="bg-background flex shrink-0 flex-wrap items-center gap-x-6 border-b px-4 md:h-14 md:flex-nowrap md:px-6">
-        <Brand suffix="Admin" className="h-12 md:h-auto" />
-        <div className="ml-auto flex items-center gap-2 md:order-last">
+        {/* Desktop: brand and account take equal side columns so the links sit in the middle. */}
+        <div className="flex h-12 items-center md:h-auto md:flex-1 md:basis-0">
+          <Brand suffix="Admin" />
+        </div>
+        <div className="ml-auto flex items-center gap-2 md:order-last md:ml-0 md:flex-1 md:basis-0 md:justify-end">
           <NotificationBell items={notes.items} unread={notes.unread} />
           <UserMenu name={admin.full_name} email={admin.email} adminAccount />
         </div>

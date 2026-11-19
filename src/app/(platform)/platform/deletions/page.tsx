@@ -13,7 +13,7 @@ export default async function DeletionRequestsPage() {
     <>
       <PageHeader
         title="Hapus akun"
-        description="Pembeli mengajukan penghapusan akun dari halaman Akun → Keamanan di website toko. Proses dalam 7 hari: setujui untuk menghapus, atau tolak dengan alasan."
+        description="Pembeli mengajukan dari halaman Akun → Keamanan di website toko; penjual dari menu akun di dashboard. Proses dalam 7 hari: setujui untuk menghapus, atau tolak dengan alasan."
       />
       <Card>
         <CardHeader>
@@ -27,14 +27,18 @@ export default async function DeletionRequestsPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium break-all">{r.name || r.email}</span>
-                    {r.isSeller && <Badge variant="warning">Juga akun penjual</Badge>}
+                    {r.kind === "seller" ? (
+                      <Badge variant="destructive">Akun penjual · {r.stores} toko</Badge>
+                    ) : (
+                      r.isSeller && <Badge variant="warning">Juga akun penjual</Badge>
+                    )}
                   </div>
                   <div className="text-muted-foreground text-xs break-all">
                     {r.email} · {r.orders} pesanan{r.store ? ` · dari ${r.store}` : ""} · {formatDate(r.requested_at, true)}
                   </div>
                   {r.reason && <p className="text-muted-foreground mt-1 text-xs">“{r.reason}”</p>}
                 </div>
-                <DeletionReview r={{ uid: r.uid, email: r.email, orders: r.orders, isSeller: r.isSeller }} />
+                <DeletionReview r={{ uid: r.uid, email: r.email, orders: r.orders, isSeller: r.isSeller, kind: r.kind, stores: r.stores }} />
               </div>
             ))}
           </CardContent>

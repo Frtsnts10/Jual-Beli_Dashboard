@@ -10,6 +10,7 @@ import {
   rejectSubscriptionPayment,
 } from "@/lib/payments/subscriptions";
 import { deleteCustomerAccount } from "@/lib/customers/account-deletion";
+import { deleteSellerAccount } from "@/lib/sellers/account-deletion";
 import { fail, type ActionResult } from "@/lib/action-result";
 import type { SubscriptionTier } from "@/types/schema";
 import { getCatalog } from "@/lib/catalog";
@@ -199,6 +200,13 @@ export async function approveAccountDeletion(
   const req = await ref.get();
   if (!req.exists || req.get("status") !== "PENDING")
     return fail("Pengajuan tidak ditemukan atau sudah diproses.");
+  if (req.get("kind") === "seller") {
+    const { stores } = await deleteSellerAccount(uid);
+    // The audit keeps the uid only — the point of the request is that the email goes.
+    await audit("seller.delete", uid, admin.email, { stores });
+    revalidatePath("/platform", "layout");
+    return { ok: true, data: { loginDeleted: true } };
+  }
   const res = await deleteCustomerAccount(uid);
   // The audit keeps the uid only — the point of the request is that the email goes.
   await audit("customer.delete", uid, admin.email, {
@@ -228,6 +236,8 @@ export async function rejectAccountDeletion(
     reviewed_at: FieldValue.serverTimestamp(),
   });
   await audit("customer.delete_rejected", uid, admin.email, { reason: why });
+  if (req.get("kind") === "seller")
+    await notify([uid], { type: "deletion_rejected", title: "Pengajuan hapus akun ditolak", body: `Alasan: ${why}`, href: "/dashboard" });
   revalidatePath("/platform", "layout");
   return { ok: true };
 }

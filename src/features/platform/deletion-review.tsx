@@ -9,7 +9,11 @@ import { Input } from "@/components/ui/input";
 import { approveAccountDeletion, rejectAccountDeletion } from "./actions";
 
 /** Approve (delete now) or reject (with a reason the buyer sees) one deletion request. */
-export function DeletionReview({ r }: { r: { uid: string; email: string; orders: number; isSeller: boolean } }) {
+export function DeletionReview({
+  r,
+}: {
+  r: { uid: string; email: string; orders: number; isSeller: boolean; kind: "buyer" | "seller"; stores: number };
+}) {
   const [open, setOpen] = useState(false);
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState("");
@@ -28,14 +32,22 @@ export function DeletionReview({ r }: { r: { uid: string; email: string; orders:
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Hapus akun pembeli?</DialogTitle>
+          <DialogTitle>{r.kind === "seller" ? "Hapus akun penjual?" : "Hapus akun pembeli?"}</DialogTitle>
           <DialogDescription className="break-all">{r.email}</DialogDescription>
         </DialogHeader>
+        {r.kind === "seller" ? (
+          <ul className="text-muted-foreground grid list-inside list-disc gap-1 text-sm">
+            <li>{r.stores} toko miliknya ditutup permanen; stok di brankasnya dihapus.</li>
+            <li>Login, profil penjual dan profil pembeli dihapus.</li>
+            <li>Riwayat pesanan toko tetap tersimpan.</li>
+          </ul>
+        ) : (
         <ul className="text-muted-foreground grid list-inside list-disc gap-1 text-sm">
           <li>{r.isSeller ? "Profil pembeli dihapus. Login tetap ada karena dipakai sebagai akun penjual." : "Login dan profil pembeli dihapus permanen."}</li>
           <li>{r.orders} pesanan tetap tersimpan untuk penjual, tapi tidak lagi terhubung ke akun ini.</li>
           <li>Ulasannya tetap tampil dengan nama “Pembeli”.</li>
         </ul>
+        )}
         {rejecting && (
           <Input autoFocus value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Alasan penolakan (dilihat pembeli)" maxLength={300} />
         )}

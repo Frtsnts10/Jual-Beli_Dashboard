@@ -94,6 +94,8 @@ export async function accountDeletionRequests() {
         requested_at: toISO(d.get("requested_at")) ?? "",
         orders: orders.data().count,
         isSeller: seller.exists,
+        kind: (d.get("kind") as string) === "seller" ? ("seller" as const) : ("buyer" as const),
+        stores: d.get("kind") === "seller" ? (await adminDb.collection("stores").where("owner_uid", "==", d.id).count().get()).data().count : 0,
       };
     })
   );

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export function PlatformNav({ items, newTickets }: { items: { href: string; label: string }[]; newTickets: number }) {
   const pathname = usePathname();
   return (
-    <nav className="-mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-t px-4 py-2 text-sm md:mx-0 md:w-auto md:border-0 md:p-0">
+    <nav className="-mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-t px-4 py-2 text-sm md:mx-0 md:w-auto md:min-w-0 md:border-0 md:p-0">
       {items.map((n) => {
         const active = n.href === "/platform" ? pathname === n.href : pathname.startsWith(n.href);
         return (
