@@ -12,7 +12,6 @@ export interface TicketRow {
   category: string;
   subject: string;
   status: TicketStatus;
-  page_url: string;
   unread_by_admin: boolean;
   unread_by_user: boolean;
   created_at: string;
@@ -37,7 +36,6 @@ const mapTicket = (d: FirebaseFirestore.DocumentSnapshot): TicketRow => ({
   category: d.get("category") ?? "other",
   subject: d.get("subject") ?? "",
   status: d.get("status") ?? "NEW",
-  page_url: d.get("page_url") ?? "",
   unread_by_admin: !!d.get("unread_by_admin"),
   unread_by_user: !!d.get("unread_by_user"),
   created_at: toISO(d.get("created_at")) ?? "",

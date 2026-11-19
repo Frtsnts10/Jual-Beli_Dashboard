@@ -36,6 +36,30 @@ export async function markNotificationsRead(
   return { ok: true };
 }
 
+/** Path part of a notification link, without query, hash or trailing slash. */
+const pathOf = (href: string) => href.split(/[?#]/)[0].replace(/(.)\/+$/, "$1");
+
+/**
+ * Marks the signed-in user's unread notifications that point at `path` as read — opening the page a
+ * notification is about counts as reading it. Returns how many changed.
+ */
+export async function markReadForPath(path: string): Promise<number> {
+  const user = await requireUser();
+  const here = pathOf(path);
+  const snap = await adminDb
+    .collection("notifications")
+    .where("uid", "==", user.uid)
+    .where("read", "==", false)
+    .limit(200)
+    .get();
+  const hits = snap.docs.filter((d) => pathOf((d.get("href") as string | undefined) ?? "") === here);
+  if (!hits.length) return 0;
+  const batch = adminDb.batch();
+  hits.forEach((d) => batch.update(d.ref, { read: true }));
+  await batch.commit();
+  return hits.length;
+}
+
 /** A device that allowed push notifications (FCM registration token). */
 export async function registerPushToken(token: string): Promise<ActionResult> {
   const user = await requireUser();

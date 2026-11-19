@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Bell, BellRing, CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/utils";
 import type { NotificationItem } from "@/lib/data/notifications";
-import { markNotificationsRead, registerPushToken } from "./actions";
+import { markNotificationsRead, markReadForPath, registerPushToken } from "./actions";
 
 const VAPID = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
 
@@ -68,6 +68,15 @@ export function NotificationBell({
     // Keep the token fresh on devices that already allowed push.
     if (Notification.permission === "granted") enablePush().catch(() => {});
   }, []);
+
+  // Opening the page a notification points at reads it — also for ones that arrive while it is open.
+  const pathname = usePathname();
+  useEffect(() => {
+    if (!unread) return;
+    markReadForPath(pathname)
+      .then((n) => n > 0 && router.refresh())
+      .catch(() => {});
+  }, [pathname, unread, router]);
 
   const open = (n: NotificationItem) =>
     start(async () => {

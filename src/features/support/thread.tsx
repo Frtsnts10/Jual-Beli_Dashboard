@@ -133,7 +133,6 @@ export function TicketThread({
             <>
               {" "}
               · {ticket.email}
-              {ticket.page_url && <> · halaman: {ticket.page_url}</>}
             </>
           )}
         </CardDescription>
