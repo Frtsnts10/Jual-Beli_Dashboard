@@ -28,7 +28,7 @@ import { TICKET_CATEGORIES, type TicketCategory } from "@/lib/support";
 import { createTicket } from "./actions";
 import { AttachImage } from "./thread";
 
-/** "Laporan baru": category, title, description, optional screenshot; the page it came from is attached. */
+/** "Laporan baru": category, title, description, optional screenshot. */
 export function NewTicketDialog({ storeId }: { storeId: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -45,7 +45,6 @@ export function NewTicketDialog({ storeId }: { storeId: string }) {
         category,
         subject,
         message,
-        pageUrl: document.referrer || window.location.href,
         image,
       });
       if (!res.ok) return void toast.error(res.error);

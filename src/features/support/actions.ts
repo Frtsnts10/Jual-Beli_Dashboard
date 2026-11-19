@@ -36,7 +36,6 @@ export async function createTicket(input: {
   category: TicketCategory;
   subject: string;
   message: string;
-  pageUrl: string;
   image?: string | null;
 }): Promise<ActionResult<{ id: string }>> {
   const user = await requireUser();
@@ -70,7 +69,6 @@ export async function createTicket(input: {
     category: input.category,
     subject,
     status: "NEW",
-    page_url: input.pageUrl.slice(0, 300),
     unread_by_admin: true,
     unread_by_user: false,
     created_at: FieldValue.serverTimestamp(),
