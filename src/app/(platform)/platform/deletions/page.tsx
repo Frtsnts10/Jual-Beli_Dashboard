@@ -13,7 +13,7 @@ export default async function DeletionRequestsPage() {
     <>
       <PageHeader
         title="Hapus akun"
-        description="Pembeli mengajukan dari halaman Akun → Keamanan di website toko. Proses dalam 7 hari: setujui untuk menghapus, atau tolak dengan alasan. (Penjual menghapus akunnya sendiri di Pengaturan → Akun.)"
+        description="Pembeli mengajukan dari Akun → Keamanan di website toko, penjual dari Pengaturan → Akun di dashboard. Proses dalam 7 hari: setujui untuk menghapus (permanen), atau tolak dengan alasan."
       />
       <Card>
         <CardHeader>

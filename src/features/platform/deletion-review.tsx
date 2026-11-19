@@ -37,9 +37,9 @@ export function DeletionReview({
         </DialogHeader>
         {r.kind === "seller" ? (
           <ul className="text-muted-foreground grid list-inside list-disc gap-1 text-sm">
-            <li>{r.stores} toko miliknya ditutup permanen; stok di brankasnya dihapus.</li>
-            <li>Login, profil penjual dan profil pembeli dihapus.</li>
-            <li>Riwayat pesanan toko tetap tersimpan.</li>
+            <li>{r.stores} toko miliknya dihapus permanen beserta produk, stok brankas, voucher, ulasan dan gambarnya.</li>
+            <li>Seluruh riwayat pesanan, bukti bayar dan struk toko tersebut ikut terhapus.</li>
+            <li>Login, profil penjual, langganan, laporan bantuan dan notifikasinya dihapus.</li>
           </ul>
         ) : (
         <ul className="text-muted-foreground grid list-inside list-disc gap-1 text-sm">

@@ -1,5 +1,7 @@
 import { getOwnedStores, requireStore } from "@/lib/access/auth";
-import { adminAuth, adminDb } from "@/lib/firebase/admin";
+import { adminDb } from "@/lib/firebase/admin";
+import { toISO } from "@/lib/data/mappers";
+import { verifyMethod } from "@/lib/access/reauth";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { DEFAULT_WA_TEMPLATE } from "@/config/tiers";
 import { getCatalog } from "@/lib/catalog";
@@ -188,7 +190,7 @@ export default async function SettingsPage({
               />
             </>
           )}
-          {tab === "akun" && <DeleteAccountSection email={user.email} footprint={await accountFootprint(user.uid)} verifyWith={await verifyMethod(user.uid)} />}
+          {tab === "akun" && <DeleteAccountSection email={user.email} footprint={await accountFootprint(user.uid)} verifyWith={await verifyMethod(user.uid)} request={await deletionRequest(user.uid)} />}
           {tab === "tim" && (
             <TeamCard
               storeId={storeId}
@@ -276,8 +278,13 @@ async function accountFootprint(uid: string) {
   return { stores: stores.map((st) => st.store_name), products, orders, stock };
 }
 
-/** How the seller proves it's them before deleting: their password if they have one, else Google. */
-async function verifyMethod(uid: string): Promise<"password" | "google"> {
-  const u = await adminAuth.getUser(uid).catch(() => null);
-  return u?.providerData.some((p) => p.providerId === "password") || !u?.providerData.some((p) => p.providerId === "google.com") ? "password" : "google";
+/** The seller's own deletion request, if any (Admin → Hapus akun approves or rejects it). */
+async function deletionRequest(uid: string) {
+  const d = await adminDb.collection("account_deletion_requests").doc(uid).get();
+  if (!d.exists || d.get("kind") !== "seller") return null;
+  return {
+    status: d.get("status") === "REJECTED" ? ("REJECTED" as const) : ("PENDING" as const),
+    requested_at: toISO(d.get("requested_at")) ?? "",
+    rejected_reason: (d.get("rejected_reason") as string | null) ?? null,
+  };
 }
