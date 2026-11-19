@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { SubscriptionTier } from "@/types/schema";
 import { setUserPlan } from "./actions";
 
-export function PlanEditor({ uid, tier }: { uid: string; tier: SubscriptionTier }) {
+export function PlanEditor({ uid, tier, plans }: { uid: string; tier: SubscriptionTier; plans: { key: SubscriptionTier; name: string }[] }) {
   const [value, setValue] = useState<SubscriptionTier>(tier);
   const [days, setDays] = useState(30);
   const [pending, start] = useTransition();
@@ -19,9 +19,11 @@ export function PlanEditor({ uid, tier }: { uid: string; tier: SubscriptionTier 
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="starter">Starter</SelectItem>
-          <SelectItem value="pro">Pro</SelectItem>
-          <SelectItem value="ultimate">Ultimate</SelectItem>
+          {plans.map((p) => (
+            <SelectItem key={p.key} value={p.key}>
+              {p.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
       {value !== "starter" && <Input type="number" className="w-20" min={1} value={days} onChange={(e) => setDays(Number(e.target.value))} aria-label="Hari" />}

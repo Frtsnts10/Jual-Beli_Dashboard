@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export const metadata = { title: { absolute: "Ringkasan · Jual Admin" } };
 
 export default async function PlatformOverviewPage() {
-  const [o, activity, { plans }, qris, proofs, deletions] = await Promise.all([
+  const [o, activity, plans, qris, proofs, deletions] = await Promise.all([
     platformOverview(),
     platformActivity(),
     getCatalog(),
@@ -50,7 +50,14 @@ export default async function PlatformOverviewPage() {
     { label: "GMV bulan ini", value: formatIDR(o.gmv), hint: `${o.ordersPaid} pesanan lunas, dibayar langsung ke QRIS seller` },
     { label: "Pendapatan langganan bulan ini", value: formatIDR(o.subscriptionRevenue), hint: "Pro & Ultimate" },
     { label: "Toko", value: String(o.stores), hint: `${o.users} pengguna` },
-    { label: "Paket aktif", value: `${o.tiers.pro} Pro · ${o.tiers.ultimate} Ultimate`, hint: `${o.tiers.starter} Starter` },
+    {
+      label: "Paket aktif",
+      value: plans.planKeys
+        .filter((k) => k !== "starter")
+        .map((k) => `${o.tiers[k] ?? 0} ${plans.plans[k].name}`)
+        .join(" · "),
+      hint: `${o.tiers.starter ?? 0} ${plans.plans.starter.name}`,
+    },
   ];
   return (
     <>
@@ -187,7 +194,7 @@ export default async function PlatformOverviewPage() {
                         <div className="text-muted-foreground text-xs">{formatDate(p.created_at)}</div>
                       </TableCell>
                       <TableCell>
-                        {plans[p.tier]?.name ?? p.tier} · {p.period === "yearly" ? "tahunan" : "bulanan"}
+                        {plans.plans[p.tier]?.name ?? p.tier} · {p.period === "yearly" ? "tahunan" : "bulanan"}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">{formatIDR(p.amount)}</TableCell>
                       <TableCell>

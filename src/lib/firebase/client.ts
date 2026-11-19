@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
 
 // Public client config for the "web-store-dashboard" Firebase project — safe to embed.
 // The client SDK is only used for Firebase Auth; all Firestore access goes through the
@@ -16,3 +16,9 @@ const firebaseConfig = {
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
+
+// Local testing against the Auth emulator.
+const emulator = process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST;
+if (emulator && !(auth as unknown as { emulatorConfig?: unknown }).emulatorConfig) {
+  connectAuthEmulator(auth, `http://${emulator}`, { disableWarnings: true });
+}

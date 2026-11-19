@@ -1,4 +1,5 @@
 import { listAnnouncements } from "@/lib/data/support";
+import { getCatalog } from "@/lib/catalog";
 import { formatDate } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +24,7 @@ const LEVEL: Record<string, string> = {
 };
 
 export default async function AnnouncementsPage() {
-  const list = await listAnnouncements();
+  const [list, catalog] = await Promise.all([listAnnouncements(), getCatalog()]);
   return (
     <>
       <PageHeader
@@ -35,7 +36,7 @@ export default async function AnnouncementsPage() {
           <CardTitle>Pengumuman baru</CardTitle>
         </CardHeader>
         <CardContent>
-          <AnnouncementForm />
+          <AnnouncementForm plans={catalog.planKeys.map((key) => ({ key, name: catalog.plans[key].name }))} />
         </CardContent>
       </Card>
       <Card>
@@ -74,7 +75,7 @@ export default async function AnnouncementsPage() {
                       )}
                       <p className="text-muted-foreground mt-1 text-xs">
                         {a.tiers
-                          ? `Paket: ${a.tiers.join(", ")}`
+                          ? `Paket: ${a.tiers.map((t) => catalog.plans[t]?.name ?? t).join(", ")}`
                           : "Semua pengguna"}{" "}
                         · {formatDate(a.created_at, true)}
                         {a.ends_at &&

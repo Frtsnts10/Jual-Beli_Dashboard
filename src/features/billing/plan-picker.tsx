@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate, formatIDR } from "@/lib/utils";
 import type { TierConfig } from "@/config/tiers";
-import { PLAN_KEYS, planPerks } from "@/lib/catalog-core";
+import { planPerks } from "@/lib/catalog-core";
 import { bonusDays, planChange } from "@/lib/billing/plan-change";
 import type { BillingPeriod, SubscriptionTier } from "@/types/schema";
 import { startSubscription, switchToStarter } from "./actions";
@@ -22,22 +22,25 @@ export function PlanPicker({
   expiry,
   canBuy,
   plans,
+  planKeys,
 }: {
   storeId: string;
   /** The platform catalog's plans (names, prices, contents). */
   plans: Record<SubscriptionTier, TierConfig>;
+  /** Display order (catalog.planKeys). */
+  planKeys: SubscriptionTier[];
   currentTier: SubscriptionTier;
   expiry: string | null;
   /** False while the platform has no QRIS to pay plans into. */
   canBuy: boolean;
 }) {
   const [period, setPeriod] = useState<BillingPeriod>("monthly");
-  const prices = { starter: plans.starter.priceMonthly, pro: plans.pro.priceMonthly, ultimate: plans.ultimate.priceMonthly };
+  const prices = Object.fromEntries(planKeys.map((k) => [k, plans[k].priceMonthly]));
   const [pending, start] = useTransition();
   const router = useRouter();
   const [now] = useState(() => Date.now());
 
-  const buy = (key: Exclude<SubscriptionTier, "starter">) =>
+  const buy = (key: SubscriptionTier) =>
     start(async () => {
       const res = await startSubscription(storeId, key, period);
       if (!res.ok) return void toast.error(res.error);
@@ -55,11 +58,11 @@ export function PlanPicker({
         ))}
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 [&>*]:min-w-0">
-        {PLAN_KEYS.map((key) => {
+        {planKeys.map((key) => {
           const t = plans[key];
           const price = period === "yearly" ? t.priceYearly : t.priceMonthly;
           const current = key === currentTier;
-          const change = planChange(currentTier, expiry, key, now);
+          const change = planChange(currentTier, expiry, key, now, prices);
           const bonus = bonusDays(currentTier, expiry, key, now, prices);
           return (
             <Card key={key} className={current ? "border-primary" : ""}>

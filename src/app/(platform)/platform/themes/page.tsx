@@ -1,5 +1,5 @@
 import { adminDb } from "@/lib/firebase/admin";
-import { getCatalog, PLAN_KEYS } from "@/lib/catalog";
+import { getCatalog } from "@/lib/catalog";
 import { aiConfigured } from "@/lib/ai/theme";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,7 +29,7 @@ export default async function ThemesPage() {
         <AiSettingsCard
           initial={catalog.ai}
           configured={aiConfigured()}
-          plansWithAi={PLAN_KEYS.filter((k) => catalog.plans[k].aiTheme).map((k) => catalog.plans[k].name)}
+          plansWithAi={catalog.planKeys.filter((k) => catalog.plans[k].aiTheme).map((k) => catalog.plans[k].name)}
           usedThisMonth={aiUsed}
         />
         <Card className="gap-0 pb-0">
@@ -42,7 +42,7 @@ export default async function ThemesPage() {
               <TemplateForm
                 key={t.id}
                 template={t}
-                plansUsing={PLAN_KEYS.filter((k) => catalog.plans[k].templates.includes(t.id)).map((k) => catalog.plans[k].name)}
+                plansUsing={catalog.planKeys.filter((k) => catalog.plans[k].templates.includes(t.id)).map((k) => catalog.plans[k].name)}
                 storesUsing={used.get(t.id) ?? 0}
               />
             ))}

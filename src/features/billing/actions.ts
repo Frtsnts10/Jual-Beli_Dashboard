@@ -22,11 +22,11 @@ const DATA_URL_RE = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/;
  */
 export async function startSubscription(
   storeId: string,
-  tier: Exclude<SubscriptionTier, "starter">,
+  tier: SubscriptionTier,
   period: BillingPeriod,
 ): Promise<ActionResult<{ id: string }>> {
   const { user } = await requireStore(storeId, { ownerOnly: true });
-  if (!(tier === "pro" || tier === "ultimate"))
+  if (tier === "starter" || !(await getCatalog()).plans[tier])
     return fail("Paket tidak dikenal.");
   if (!(period === "monthly" || period === "yearly"))
     return fail("Periode tidak dikenal.");

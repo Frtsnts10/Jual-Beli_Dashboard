@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { formatIDR } from "@/lib/utils";
-import { getCatalog, PLAN_KEYS, planPerks } from "@/lib/catalog";
+import { getCatalog, planPerks } from "@/lib/catalog";
 import { Button } from "@/components/ui/button";
 import { Brand } from "@/components/brand";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,7 +30,7 @@ export default async function LandingPage() {
         </p>
       </section>
       <section className="grid gap-6 md:grid-cols-3">
-        {PLAN_KEYS.map((key) => {
+        {catalog.planKeys.map((key) => {
           const t = catalog.plans[key];
           return (
             <Card key={key} className={key === "pro" ? "border-primary" : ""}>
