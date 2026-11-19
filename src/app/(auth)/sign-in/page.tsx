@@ -13,7 +13,9 @@ import { GoogleButton, OrDivider } from "@/features/auth/google-button";
 import { authErrorMessage, startSession } from "@/features/auth/start-session";
 
 function SignInForm() {
-  const next = useSearchParams().get("next") ?? "/dashboard";
+  const params = useSearchParams();
+  const next = params.get("next") ?? "/dashboard";
+  const deleted = params.get("deleted") === "1";
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -38,6 +40,7 @@ function SignInForm() {
         <CardDescription>Kelola toko, produk dan pesanan Anda.</CardDescription>
       </CardHeader>
       <CardContent>
+          {deleted && <p className="bg-muted mb-4 rounded-md p-3 text-sm">Akun Anda dan seluruh datanya sudah dihapus.</p>}
         <form onSubmit={onSubmit} className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>

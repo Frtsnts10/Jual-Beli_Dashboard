@@ -103,3 +103,14 @@ export async function setFeatureOverrides(uid: string, input: FeatureOverrides):
   revalidatePath("/", "layout");
   return { ok: true };
 }
+
+/** Admin → Tema → Tema AI: the platform-wide switch and the monthly designs per seller. */
+export async function saveAiSettings(input: { enabled: boolean; monthlyLimit: number }): Promise<ActionResult> {
+  const admin = await requirePlatformAdmin();
+  if (!Number.isInteger(input.monthlyLimit) || input.monthlyLimit < 1 || input.monthlyLimit > 100) return fail("Jatah per bulan 1–100.");
+  const ai = { enabled: !!input.enabled, monthlyLimit: input.monthlyLimit };
+  await catalogRef().set({ ai, updated_at: FieldValue.serverTimestamp() }, { merge: true });
+  await audit("catalog.ai", "ai", admin.email, ai);
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
