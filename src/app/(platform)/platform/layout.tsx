@@ -5,6 +5,7 @@ import { countNewTickets } from "@/lib/data/support";
 import { NotificationBell } from "@/features/notifications/notification-bell";
 import { UserMenu } from "@/features/auth/user-menu";
 import { PlatformNav } from "@/features/platform/platform-nav";
+import { PlatformLiveRefresh } from "@/features/platform/platform-live-refresh";
 
 export const metadata = {
   title: { template: "%s · Jual Admin", default: "Jual Admin" },
@@ -35,6 +36,7 @@ export default async function PlatformLayout({
   ]);
   return (
     <div className="flex h-svh flex-col overflow-hidden">
+      <PlatformLiveRefresh />
       {/* Phone/tablet: title + bell/account on one row, the section links scroll underneath. */}
       <header className="bg-background flex shrink-0 flex-wrap items-center gap-x-6 border-b px-4 md:h-14 md:flex-nowrap md:px-6">
         {/* Desktop: brand and account take equal side columns so the links sit in the middle. */}
