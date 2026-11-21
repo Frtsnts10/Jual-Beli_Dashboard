@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -17,6 +18,8 @@ const MAX_RECIPIENTS = 1000;
  * One broadcast per hour per store to protect the seller's WhatsApp number from bans.
  */
 export async function sendBroadcast(storeId: string, input: { message: string; productId: string | null }): Promise<ActionResult<{ recipients: number }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { store, features } = await requireStore(storeId);
   if (!features.marketing) return fail("Broadcast belum tersedia di paket Anda.");
   const message = input.message.trim();

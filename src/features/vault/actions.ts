@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
@@ -19,6 +20,8 @@ export interface CredentialLine {
 const MAX_BATCH = 400; // Firestore batch limit is 500 writes
 
 export async function addCredentials(storeId: string, productId: string, lines: CredentialLine[]): Promise<ActionResult<{ added: number }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { features } = await requireStore(storeId);
   const product = await adminDb.collection("products").doc(productId).get();
   if (!product.exists || product.get("store_id") !== storeId) return fail("Produk tidak ditemukan.");
@@ -94,6 +97,8 @@ async function removeFromPool(storeId: string, credentialId: string, change: "ex
 }
 
 export async function expireCredential(storeId: string, credentialId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   if ((await removeFromPool(storeId, credentialId, "expire")) === "not_found") return fail("Stok tidak ditemukan.");
   revalidatePath(`/${storeId}/vault`);
@@ -101,6 +106,8 @@ export async function expireCredential(storeId: string, credentialId: string): P
 }
 
 export async function deleteCredential(storeId: string, credentialId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const result = await removeFromPool(storeId, credentialId, "delete");
   if (result === "not_found") return fail("Stok tidak ditemukan.");

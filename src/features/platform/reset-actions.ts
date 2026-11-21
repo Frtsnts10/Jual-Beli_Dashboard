@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -16,6 +17,8 @@ const RESET_PHRASE = "RESET SEMUA DATA";
  * admin's password (or Google) again and the phrase.
  */
 export async function resetAllData(input: { phrase: string; idToken: string }): Promise<ActionResult<ResetSummary>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   if (input.phrase.trim() !== RESET_PHRASE) return fail(`Ketik persis: ${RESET_PHRASE}`);
   const check = await freshlyVerified(input.idToken, admin.uid);

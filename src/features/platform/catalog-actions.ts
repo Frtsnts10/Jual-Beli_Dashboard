@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -32,6 +33,8 @@ export interface PlanInput {
 
 /** Admin → Paket: what one plan costs and includes. */
 export async function savePlan(tier: SubscriptionTier, input: PlanInput): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   const catalog = await getCatalog();
   if (!catalog.plans[tier]) return fail("Paket tidak dikenal.");
@@ -61,6 +64,8 @@ export async function savePlan(tier: SubscriptionTier, input: PlanInput): Promis
 
 /** Admin → Paket → Tambah paket: a new paid plan, starting from Pro's contents; filled in on its card. */
 export async function createPlan(rawName: string): Promise<ActionResult<{ key: string }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   const name = rawName.trim().slice(0, 30);
   if (name.length < 2) return fail("Nama paket minimal 2 huruf.");
@@ -89,6 +94,8 @@ export async function createPlan(rawName: string): Promise<ActionResult<{ key: s
 
 /** Removes a plan an admin added — only while no seller is on it or paying for it. */
 export async function deletePlan(key: SubscriptionTier): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   const catalog = await getCatalog();
   if (!catalog.customPlans.includes(key)) return fail("Paket bawaan tidak bisa dihapus.");
@@ -116,6 +123,8 @@ export interface TemplateInput {
 
 /** Admin → Tema: offer or withdraw a storefront template, rename it, adjust its look. */
 export async function saveTemplate(id: LayoutTemplate, input: TemplateInput): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   if (!isTemplate(id)) return fail("Template tidak dikenal.");
   const name = input.name.trim().slice(0, 40);
@@ -138,6 +147,8 @@ export async function saveTemplate(id: LayoutTemplate, input: TemplateInput): Pr
 
 /** Admin → Pengguna → Fitur khusus: give or take features from one seller, beyond their plan. */
 export async function setFeatureOverrides(uid: string, input: FeatureOverrides): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   const ref = adminDb.collection("users").doc(uid);
   const user = await ref.get();
@@ -155,6 +166,8 @@ export async function setFeatureOverrides(uid: string, input: FeatureOverrides):
 
 /** Admin → Tema → Tema AI: the platform-wide switch and the monthly designs per seller. */
 export async function saveAiSettings(input: { enabled: boolean; monthlyLimit: number }): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   if (!Number.isInteger(input.monthlyLimit) || input.monthlyLimit < 1 || input.monthlyLimit > 100) return fail("Jatah per bulan 1–100.");
   const ai = { enabled: !!input.enabled, monthlyLimit: input.monthlyLimit };

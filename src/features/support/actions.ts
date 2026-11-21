@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -39,6 +40,8 @@ export async function createTicket(input: {
   message: string;
   image?: string | null;
 }): Promise<ActionResult<{ id: string }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const user = await requireUser();
   const subject = input.subject.trim().slice(0, 120);
   const message = input.message.trim().slice(0, 4000);
@@ -99,6 +102,8 @@ export async function replyTicket(
   text: string,
   image?: string | null,
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const user = await requireUser();
   const admin = await isPlatformAdmin();
   const ref = adminDb.collection("support_tickets").doc(ticketId);
@@ -156,6 +161,8 @@ export async function setTicketStatus(
   ticketId: string,
   status: TicketStatus,
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const user = await requireUser();
   const admin = await isPlatformAdmin();
   if (!(status in TICKET_STATUS)) return fail("Status tidak dikenal.");
@@ -204,6 +211,8 @@ export async function createAnnouncement(input: {
   tiers: string[] | null;
   endsAt: string | null;
 }): Promise<ActionResult<{ notified: number }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   const title = input.title.trim().slice(0, 100);
   const body = input.body.trim().slice(0, 1000);
@@ -257,6 +266,8 @@ export async function createAnnouncement(input: {
 }
 
 export async function endAnnouncement(id: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requirePlatformAdmin();
   await adminDb.collection("announcements").doc(id).update({ active: false });
   revalidatePath("/", "layout");

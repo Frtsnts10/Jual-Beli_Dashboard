@@ -61,6 +61,9 @@ function SignInForm() {
           </Button>
           <OrDivider />
           <GoogleButton next={next} disabled={pending} onError={setError} />
+          <Button variant="secondary" asChild>
+            <Link href="/demo">Coba demo tanpa daftar</Link>
+          </Button>
           <p className="text-muted-foreground text-center text-sm">
             Belum punya akun?{" "}
             <Link href="/sign-up" className="text-foreground underline underline-offset-4">

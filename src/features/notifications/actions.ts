@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -62,6 +63,8 @@ export async function markReadForPath(path: string): Promise<number> {
 
 /** A device that allowed push notifications (FCM registration token). */
 export async function registerPushToken(token: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const user = await requireUser();
   if (!/^[\w:-]{20,4096}$/.test(token)) return fail("Token tidak valid.");
   await adminDb
@@ -74,6 +77,8 @@ export async function registerPushToken(token: string): Promise<ActionResult> {
 export async function unregisterPushToken(
   token: string,
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const user = await requireUser();
   const ref = adminDb.collection("push_tokens").doc(token);
   const snap = await ref.get();

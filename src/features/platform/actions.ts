@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -32,6 +33,8 @@ export async function setStoreSuspended(
   suspended: boolean,
   reason: string,
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   if (suspended && reason.trim().length < 5)
     return fail("Tulis alasan suspend (min. 5 karakter).");
@@ -57,6 +60,8 @@ export async function setUserPlan(
   tier: SubscriptionTier,
   days: number,
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   if (!(await getCatalog()).plans[tier]) return fail("Paket tidak dikenal.");
   if (
@@ -82,6 +87,8 @@ export async function setUserPlan(
 export async function savePlatformQris(
   payload: string,
 ): Promise<ActionResult<{ merchant: string }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   const qris = payload.trim();
   const info = inspectQris(qris);
@@ -109,6 +116,8 @@ export async function savePlatformQris(
 }
 
 export async function removePlatformQris(): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   await adminDb
     .collection("platform")
@@ -123,6 +132,8 @@ export async function removePlatformQris(): Promise<ActionResult> {
 export async function getSubscriptionProof(
   paymentId: string,
 ): Promise<ActionResult<{ image: string; uploadedAt: string | null }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requirePlatformAdmin();
   const proof = await adminDb.collection("payment_proofs").doc(paymentId).get();
   if (!proof.exists || !paymentId.startsWith("SUB-"))
@@ -158,6 +169,8 @@ async function notifyBuyer(
 export async function confirmSubscriptionPayment(
   paymentId: string,
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   const result = await applySubscriptionPayment(paymentId);
   if (result === "not_found") return fail("Pembayaran tidak ditemukan.");
@@ -176,6 +189,8 @@ export async function rejectSubscription(
   paymentId: string,
   reason: string,
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   const why = reason.trim().slice(0, 200);
   if (why.length < 3) return fail("Tulis alasan singkat.");
@@ -194,6 +209,8 @@ export async function rejectSubscription(
 export async function approveAccountDeletion(
   uid: string,
 ): Promise<ActionResult<{ loginDeleted: boolean }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   const ref = adminDb.collection("account_deletion_requests").doc(uid);
   const req = await ref.get();
@@ -219,6 +236,8 @@ export async function rejectAccountDeletion(
   uid: string,
   reason: string,
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const admin = await requirePlatformAdmin();
   const why = reason.trim().slice(0, 300);
   if (why.length < 5)

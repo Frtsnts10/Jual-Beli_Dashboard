@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -9,6 +10,8 @@ import { inspectQris } from "@/lib/qris";
 
 /** Saves the seller's own static QRIS (decoded in the browser from their QR image). */
 export async function saveStoreQris(storeId: string, payload: string): Promise<ActionResult<{ merchant: string }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId, { ownerOnly: true });
   const qris = payload.trim();
   if (qris.length > 512) return fail("Kode QR terlalu panjang untuk QRIS.");
@@ -23,6 +26,8 @@ export async function saveStoreQris(storeId: string, payload: string): Promise<A
 }
 
 export async function removeStoreQris(storeId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId, { ownerOnly: true });
   await adminDb.collection("stores").doc(storeId).update({ payment: null });
   revalidatePath(`/${storeId}`, "layout");

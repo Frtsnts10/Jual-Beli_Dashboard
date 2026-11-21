@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -27,6 +28,8 @@ async function requireVoucherStore(storeId: string) {
 }
 
 export async function createVoucher(storeId: string, input: VoucherInput): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   if (!(await requireVoucherStore(storeId))) return fail("Voucher belum tersedia di paket Anda.");
   const code = normaliseCode(input.code);
   if (!CODE_RE.test(code)) return fail("Kode 3–20 huruf/angka tanpa spasi, mis. HEMAT10.");
@@ -89,6 +92,8 @@ async function ownedVoucher(storeId: string, code: string) {
 }
 
 export async function setVoucherActive(storeId: string, code: string, active: boolean): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   if (!(await requireVoucherStore(storeId))) return fail("Voucher belum tersedia di paket Anda.");
   const found = await ownedVoucher(storeId, code);
   if (!found) return fail("Voucher tidak ditemukan.");
@@ -99,6 +104,8 @@ export async function setVoucherActive(storeId: string, code: string, active: bo
 
 /** Only never-used vouchers can be deleted; used ones stay for the order history (deactivate instead). */
 export async function deleteVoucher(storeId: string, code: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const found = await ownedVoucher(storeId, code);
   if (!found) return fail("Voucher tidak ditemukan.");

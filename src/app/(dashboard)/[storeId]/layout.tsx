@@ -16,6 +16,8 @@ import { NotificationBell } from "@/features/notifications/notification-bell";
 import { AnnouncementBar } from "@/features/notifications/announcement-bar";
 import { LiveRefresh } from "@/features/dashboard/live-refresh";
 import { Brand } from "@/components/brand";
+import { isDemoSession } from "@/lib/access/demo";
+import Link from "next/link";
 
 export default async function StoreLayout({
   children,
@@ -86,6 +88,16 @@ export default async function StoreLayout({
           supportUnread={supportUnread}
           className="shrink-0 overflow-x-auto border-b px-2 py-1 lg:hidden"
         />
+        {(await isDemoSession()) && (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b bg-sky-50 px-6 py-2 text-sm text-sky-900 dark:bg-sky-950/40 dark:text-sky-100">
+            <span>
+              <b>Mode demo</b> — Anda melihat toko contoh. Semua halaman bisa dibuka, tapi perubahan tidak disimpan.
+            </span>
+            <Link href="/sign-up" className="font-medium underline underline-offset-4">
+              Buat toko sendiri, gratis
+            </Link>
+          </div>
+        )}
         <AnnouncementBar items={announcements} />
         {store.suspended && (
           <div className="bg-destructive/10 text-destructive border-b px-6 py-2 text-sm">

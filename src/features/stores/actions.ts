@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { isImageUrl } from "@/lib/media-kinds";
 import { syncStoreSubdomain } from "@/lib/integrations/firebase-auth-domains";
 import { revalidatePath } from "next/cache";
@@ -24,6 +25,8 @@ function validateSlug(slug: string) {
 }
 
 export async function createStore(input: { store_name: string; slug: string }): Promise<ActionResult<{ storeId: string }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const user = await requireUser();
   if (await isPlatformAdmin()) return fail("Akun admin platform tidak bisa membuat toko. Daftar dengan email lain untuk berjualan.");
   const storeName = input.store_name.trim();
@@ -81,6 +84,8 @@ export interface StoreSettingsInput {
 }
 
 export async function updateStoreSettings(storeId: string, input: StoreSettingsInput): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { store, features: tier } = await requireStore(storeId);
 
   const storeName = input.store_name.trim();
@@ -134,6 +139,8 @@ const MAX_FAQ = 20;
 
 /** Saves the storefront's info pages (Tentang, FAQ, Kebijakan garansi) and the WhatsApp chat number. */
 export async function updateStoreInfo(storeId: string, input: StoreInfo): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const about = input.about.trim().slice(0, 4000);
   const warranty = input.warranty_policy.trim().slice(0, 4000);
@@ -158,6 +165,8 @@ export async function updateIntegrations(
   storeId: string,
   input: { wa_api_provider: WaProvider | ""; wa_api_token: string; wa_phone_number_id?: string; wa_server?: string; wa_message_template: string }
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const phoneNumberId = (input.wa_phone_number_id ?? "").trim();
   const server = (input.wa_server ?? "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
@@ -181,6 +190,8 @@ export async function updateIntegrations(
 
 /** Pengaturan → WhatsApp & Bot → Notifikasi pembayaran. An empty seller phone turns that alert off. */
 export async function updateWaNotifications(storeId: string, input: { buyer: boolean; sellerPhone: string }): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const raw = input.sellerPhone.replace(/[\s-]/g, "");
   let phone: string | null = null;

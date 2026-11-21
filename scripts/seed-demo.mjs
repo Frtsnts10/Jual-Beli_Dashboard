@@ -1,9 +1,11 @@
 // Seeds a complete demo account into the real Firebase project, so every screen of the
 // dashboard and storefront has something to show:
 //
-//   • login  demo@dionycte.com  (password printed at the end, or DEMO_PASSWORD)
+//   • login  demo@belidi.biz.id  (password printed at the end, or DEMO_PASSWORD) — a *demo*
+//            account (custom claim demo: true): read-only, opened from "Coba demo" without a
+//            password; the buyer pembeli.demo@belidi.biz.id is a read-only demo buyer too
 //   • plan   Ultimate, 1 year
-//   • store  "Dionycte"  — slug dionycte, custom domain dionycte.com, Bento template
+//   • store  "Toko Demo"  — slug demo (demo.<root domain>), Bento template
 //   • 7 products (one flash sale, one bundle), ~60 vault credentials (encrypted),
 //     ~40 orders over the last 30 days (paid / pending / failed, a warranty claim, an
 //     order waiting for stock, affiliate codes, QRIS proofs), a broadcast,
@@ -16,7 +18,7 @@
 // or, without a computer, from GitHub: Actions → "Seed demo account" → Run workflow.
 //
 // Safe to re-run: every run first deletes the previous demo data (everything belonging to
-// store id "demo-dionycte"), then writes it fresh. It never touches other stores.
+// store id "demo-store"), then writes it fresh. It never touches other stores.
 
 import { createCipheriv, randomBytes } from "node:crypto";
 import { cert, initializeApp } from "firebase-admin/app";
@@ -24,10 +26,10 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 
 const PROJECT_ID = "web-store-dashboard";
-const STORE_ID = "demo-dionycte";
-const SLUG = "dionycte";
-const DOMAIN = "dionycte.com";
-const EMAIL = "demo@dionycte.com";
+const STORE_ID = "demo-store";
+const SLUG = "demo";
+const EMAIL = "demo@belidi.biz.id";
+const STORE_NAME = "Toko Demo";
 const DAY = 86_400_000;
 
 // ---------------------------------------------------------------------------------------
@@ -91,13 +93,13 @@ const QRIS_BODY =
   tlv("00", "01") + tlv("01", "11") +
   tlv("26", tlv("00", "ID.CO.QRIS.WWW") + tlv("01", "936009150000000001") + tlv("02", "ID1020099999999")) +
   tlv("51", tlv("00", "ID.CO.QRIS.WWW") + tlv("02", "ID1020099999999") + tlv("03", "UMI")) +
-  tlv("52", "5815") + tlv("53", "360") + tlv("58", "ID") + tlv("59", "DIONYCTE STORE") + tlv("60", "JAKARTA") + "6304";
+  tlv("52", "5815") + tlv("53", "360") + tlv("58", "ID") + tlv("59", "TOKO DEMO") + tlv("60", "JAKARTA") + "6304";
 const DEMO_QRIS = QRIS_BODY + crc16(QRIS_BODY);
 /** A stand-in "payment successful" screenshot for demo orders. */
 const proofImage = (amount, at) =>
   "data:image/svg+xml;base64," +
   Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="520"><rect width="360" height="520" fill="#f6f7f9"/><rect x="20" y="20" width="320" height="480" rx="16" fill="#fff"/><circle cx="180" cy="110" r="38" fill="#10b981"/><path d="M162 110l12 12 24-26" stroke="#fff" stroke-width="7" fill="none"/><text x="180" y="190" font-family="sans-serif" font-size="20" text-anchor="middle" font-weight="700">Pembayaran Berhasil</text><text x="180" y="240" font-family="sans-serif" font-size="30" text-anchor="middle" font-weight="700">Rp ${String(amount).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</text><text x="180" y="290" font-family="sans-serif" font-size="15" text-anchor="middle" fill="#555">ke DIONYCTE STORE (QRIS)</text><text x="180" y="320" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#888">${new Date(at).toISOString().slice(0, 16).replace("T", " ")} UTC</text></svg>`
+    `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="520"><rect width="360" height="520" fill="#f6f7f9"/><rect x="20" y="20" width="320" height="480" rx="16" fill="#fff"/><circle cx="180" cy="110" r="38" fill="#10b981"/><path d="M162 110l12 12 24-26" stroke="#fff" stroke-width="7" fill="none"/><text x="180" y="190" font-family="sans-serif" font-size="20" text-anchor="middle" font-weight="700">Pembayaran Berhasil</text><text x="180" y="240" font-family="sans-serif" font-size="30" text-anchor="middle" font-weight="700">Rp ${String(amount).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</text><text x="180" y="290" font-family="sans-serif" font-size="15" text-anchor="middle" fill="#555">ke TOKO DEMO (QRIS)</text><text x="180" y="320" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#888">${new Date(at).toISOString().slice(0, 16).replace("T", " ")} UTC</text></svg>`
   ).toString("base64");
 const now = Date.now();
 
@@ -108,16 +110,18 @@ const password = process.env.DEMO_PASSWORD || `Demo-${randomBytes(4).toString("h
 let uid;
 try {
   uid = (await auth.getUserByEmail(EMAIL)).uid;
-  await auth.updateUser(uid, { password, emailVerified: true, displayName: "Demo Dionycte" });
+  await auth.updateUser(uid, { password, emailVerified: true, displayName: "Seller Demo" });
 } catch (err) {
   if (err?.code !== "auth/user-not-found") throw err;
-  uid = (await auth.createUser({ email: EMAIL, password, emailVerified: true, displayName: "Demo Dionycte" })).uid;
+  uid = (await auth.createUser({ email: EMAIL, password, emailVerified: true, displayName: "Seller Demo" })).uid;
 }
+// Marks the login as the showcase account: "Coba demo" signs in as it, everything is read-only.
+await auth.setCustomUserClaims(uid, { demo: true });
 
 // ---------------------------------------------------------------------------------------
-// 2. Refuse to steal the slug/domain from a real store
+// 2. Refuse to steal the slug from a real store
 
-for (const [col, id] of [["store_slugs", SLUG], ["store_domains", DOMAIN]]) {
+for (const [col, id] of [["store_slugs", SLUG]]) {
   const snap = await db.collection(col).doc(id).get();
   if (snap.exists && snap.get("store_id") !== STORE_ID) {
     const owner = await db.collection("stores").doc(snap.get("store_id")).get();
@@ -150,7 +154,8 @@ await Promise.all(oldSubs.docs.map((d) => d.ref.delete()));
 
 await db.collection("users").doc(uid).set({
   email: EMAIL,
-  full_name: "Demo Dionycte",
+  full_name: "Seller Demo",
+  is_demo: true,
   subscription_tier: "ultimate",
   subscription_expiry: ts(now + 365 * DAY),
   created_at: ts(now - 45 * DAY),
@@ -159,10 +164,9 @@ await db.collection("users").doc(uid).set({
 const storeRef = db.collection("stores").doc(STORE_ID);
 await storeRef.set({
   owner_uid: uid,
-  store_name: "Dionycte",
+  store_name: STORE_NAME,
   slug: SLUG,
-  custom_domain: DOMAIN,
-  custom_domain_status: { state: "pending", checks: { attached: false, dns: false, live: false }, message: null, checked_at: null },
+  custom_domain: null,
   storefront_config: {
     layout_template: "template_a_bento",
     accent_color: "#7C3AED",
@@ -172,10 +176,10 @@ await storeRef.set({
   },
   is_active: true,
   suspended: false,
-  payment: { qris_payload: DEMO_QRIS, merchant_name: "DIONYCTE STORE", nmid: "ID1020099999999", updated_at: ts(now - 40 * DAY) },
+  payment: { qris_payload: DEMO_QRIS, merchant_name: "TOKO DEMO", nmid: "ID1020099999999", updated_at: ts(now - 40 * DAY) },
   store_info: {
     about:
-      "Dionycte menjual akun premium resmi sejak 2024. Semua akun dicek sebelum dikirim, dan dikirim otomatis ke WhatsApp Anda begitu pembayaran masuk — 24 jam.",
+      "Toko Demo menjual akun premium resmi sejak 2024. Semua akun dicek sebelum dikirim, dan dikirim otomatis ke WhatsApp Anda begitu pembayaran masuk — 24 jam.",
     faq: [
       { q: "Berapa lama akun dikirim?", a: "Otomatis dalam 1–2 menit setelah pembayaran berhasil, langsung ke WhatsApp." },
       { q: "Apakah akunnya bergaransi?", a: "Ya, bergaransi penuh selama masa aktif. Klaim lewat halaman Lacak pesanan." },
@@ -194,7 +198,6 @@ await storeRef.collection("private").doc("integrations").set({
     "Halo! Terima kasih sudah order {product} di {store}.\n\nEmail: {email}\nPassword: {password}\nPIN: {pin}\nAktif s/d: {expiry}\n\nOrder ID: {order_id}",
 });
 await db.collection("store_slugs").doc(SLUG).set({ store_id: STORE_ID });
-await db.collection("store_domains").doc(DOMAIN).set({ store_id: STORE_ID });
 
 // ---------------------------------------------------------------------------------------
 // 5. Products
@@ -218,7 +221,7 @@ const BUNDLE = { key: "bundle", title: "Paket Hiburan: Netflix + Spotify", type:
   description: "Hemat Rp 8.000 dibanding beli terpisah. Satu order, dua akun.", items: ["netflix", "spotify"] };
 
 // Letters and digits only, like Firestore auto-ids: the storefront rejects anything else in /checkout/<id>.
-const productId = (key) => `demoDionycte${key[0].toUpperCase()}${key.slice(1)}`;
+const productId = (key) => `demoStore${key[0].toUpperCase()}${key.slice(1)}`;
 const writes = [];
 for (const p of PRODUCTS) {
   writes.push(db.collection("products").doc(productId(p.key)).set({
@@ -271,7 +274,7 @@ const REFERRALS = ["ANDIREF", "PROMOKAMPUS", "TIKTOK10"];
 const batchOps = [];
 let credSeq = 0;
 function credential(productKey, { status, orderId = null, soldAt = null, expiry }) {
-  const id = `demoDionycteCred${String(++credSeq).padStart(3, "0")}`;
+  const id = `demoStoreCred${String(++credSeq).padStart(3, "0")}`;
   const n = credSeq;
   batchOps.push([db.collection("credentials_vault").doc(id), {
     store_id: STORE_ID,
@@ -373,7 +376,7 @@ order(PRODUCTS[4], { daysAgo: 6, status: "FAILED", proof: true, rejected: "Dana 
 
 // Fixed, easy-to-remember login (same password as the seller). The warranty-claim order and
 // the payment waiting for confirmation are theirs, so both sides of every flow can be tried.
-const BUYER_EMAIL = "pembeli@dionycte.com";
+const BUYER_EMAIL = "pembeli.demo@belidi.biz.id";
 const claimOrder = orders.find(([ref]) => ref.id === claimId)[1];
 claimOrder.customer_contact = { email: BUYER_EMAIL, phone: "6281311112222" };
 orders.find(([ref]) => ref.id === pendingId)[1].customer_contact = { ...claimOrder.customer_contact };
@@ -393,6 +396,7 @@ try {
   if (err?.code !== "auth/user-not-found") throw err;
   buyerUid = (await auth.createUser({ email: BUYER_EMAIL, password, emailVerified: true, displayName: "Indra Pembeli" })).uid;
 }
+await auth.setCustomUserClaims(buyerUid, { demo: true });
 await db.collection("customers").doc(buyerUid).set({
   email: BUYER_EMAIL,
   name: "Indra Pembeli",
@@ -409,10 +413,10 @@ for (const [ref, o] of orders) {
   if (o.customer_contact.email === BUYER_EMAIL && (ref.id === pendingId || linkedCount++ % 2 === 0)) o.customer_uid = buyerUid;
 }
 
-// Vouchers: HEMAT10 was used on a few paid orders; DIONYCTE5K is fresh; LEBARAN expired.
+// Vouchers: HEMAT10 was used on a few paid orders; DEMO5K is fresh; LEBARAN expired.
 const VOUCHERS = [
   { code: "HEMAT10", type: "percent", value: 10, max_discount: 20_000, min_amount: 0, max_uses: 100, expires: now + 30 * DAY },
-  { code: "DIONYCTE5K", type: "fixed", value: 5_000, min_amount: 40_000, max_uses: null, expires: null },
+  { code: "DEMO5K", type: "fixed", value: 5_000, min_amount: 40_000, max_uses: null, expires: null },
   { code: "LEBARAN", type: "percent", value: 25, max_discount: null, min_amount: 0, max_uses: 50, expires: now - 3 * DAY },
 ];
 const hemat = orders.filter(([, o]) => o.payment_status === "PAID" && o.customer_contact.email !== BUYER_EMAIL).slice(0, 4);
@@ -512,7 +516,7 @@ for (const [i, phone] of ["+6281311110001", "+6281311110002", claimOrder.custome
 
 await db.collection("broadcasts").doc(`${STORE_ID}-bc-1`).set({
   store_id: STORE_ID,
-  message: "Flash sale ChatGPT Plus cuma Rp 129.000 sampai 3 hari lagi! Order di dionycte.com",
+  message: "Flash sale ChatGPT Plus cuma Rp 129.000 sampai 3 hari lagi! Order di demo.belidi.biz.id",
   audience: "all",
   product_id: null,
   recipients: CUSTOMERS.length,
@@ -546,11 +550,11 @@ console.log(`
   Password     ${process.env.DEMO_PASSWORD ? "(the DEMO_PASSWORD you set)" : password}
   Plan         Ultimate (1 year)
 
-  Store        Dionycte — slug "${SLUG}", domain ${DOMAIN}, store id ${STORE_ID}
+  Store        ${STORE_NAME} — slug "${SLUG}", store id ${STORE_ID}
   Products     ${PRODUCTS.length + 1} (flash sale: ChatGPT Plus, bundle: Netflix + Spotify, VPN sold out)
   Reviews      ${reviewCount} (moderate them in dashboard → Ulasan)
   Restock      3 buyers waiting for NordVPN (add stock in Brankas → WhatsApp via n8n)
-  Vouchers     HEMAT10 (10%, maks 20rb), DIONYCTE5K (Rp 5.000, min. 40rb), LEBARAN (expired)
+  Vouchers     HEMAT10 (10%, maks 20rb), DEMO5K (Rp 5.000, min. 40rb), LEBARAN (expired)
   Vault        ${credSeq} credentials (encrypted)
   Orders       ${orders.length} (${paidCount} paid, 1 awaiting confirmation, 2 failed)
 

@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -20,6 +21,8 @@ function normalise(raw: string) {
  * "Cek sekarang" step (checkDomain) confirms every link of that chain.
  */
 export async function connectDomain(storeId: string, raw: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { store, features } = await requireStore(storeId, { ownerOnly: true });
   if (!features.customDomain) return fail("Domain sendiri belum tersedia di paket Anda.");
   if (store.custom_domain) return fail("Hapus domain yang sekarang dulu sebelum menambah yang baru.");
@@ -61,6 +64,8 @@ export async function connectDomain(storeId: string, raw: string): Promise<Actio
 }
 
 export async function disconnectDomain(storeId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { store } = await requireStore(storeId, { ownerOnly: true });
   if (!store.custom_domain) return { ok: true };
   if (vercelDomainsEnabled()) {
@@ -115,6 +120,8 @@ async function liveCheck(domain: string, storeId: string) {
  * *this* store. The domain is marked active only when every check passes.
  */
 export async function checkDomain(storeId: string): Promise<ActionResult<{ active: boolean }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { store } = await requireStore(storeId);
   const domain = store.custom_domain;
   if (!domain) return fail("Belum ada domain.");

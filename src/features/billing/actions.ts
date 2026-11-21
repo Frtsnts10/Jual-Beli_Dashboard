@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { notify, platformAdminUids } from "@/lib/notify";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
@@ -25,6 +26,8 @@ export async function startSubscription(
   tier: SubscriptionTier,
   period: BillingPeriod,
 ): Promise<ActionResult<{ id: string }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { user } = await requireStore(storeId, { ownerOnly: true });
   if (tier === "starter" || !(await getCatalog()).plans[tier])
     return fail("Paket tidak dikenal.");
@@ -86,6 +89,8 @@ export async function uploadSubscriptionProof(
   paymentId: string,
   image: string,
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { user } = await requireStore(storeId, { ownerOnly: true });
   if (image.length > 950_000 || !DATA_URL_RE.test(image))
     return fail(
@@ -126,6 +131,8 @@ export async function cancelSubscriptionPayment(
   storeId: string,
   paymentId: string,
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { user } = await requireStore(storeId, { ownerOnly: true });
   const ref = adminDb.collection("subscription_payments").doc(paymentId);
   const snap = await ref.get();
@@ -145,6 +152,8 @@ export async function cancelSubscriptionPayment(
  * to confirm). Waiting for the expiry date does the same without losing anything.
  */
 export async function switchToStarter(storeId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { user } = await requireStore(storeId, { ownerOnly: true });
   await adminDb
     .collection("users")

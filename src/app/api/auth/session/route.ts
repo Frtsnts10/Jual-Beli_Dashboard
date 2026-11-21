@@ -5,6 +5,7 @@ import { SESSION_COOKIE } from "@/lib/access/auth";
 import { acceptPendingInvites } from "@/lib/access/team";
 
 const EXPIRES_IN_MS = 14 * 24 * 60 * 60 * 1000;
+const DEMO_EXPIRES_IN_MS = 24 * 60 * 60 * 1000;
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,12 +34,16 @@ export async function POST(req: NextRequest) {
 
     // Invitations only count for a verified address (password sign-ups verify by email link;
     // Google accounts are verified), so nobody can claim an invite by typing someone's email.
-    if (decoded.email_verified) await acceptPendingInvites(decoded.uid, decoded.email);
+    // Never for the shared demo login: an invite to it would show that store to every visitor.
+    const demo = decoded.demo === true;
+    if (decoded.email_verified && !demo) await acceptPendingInvites(decoded.uid, decoded.email);
 
-    const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn: EXPIRES_IN_MS });
+    // The demo session is short-lived; it is shared and read-only anyway.
+    const expiresIn = demo ? DEMO_EXPIRES_IN_MS : EXPIRES_IN_MS;
+    const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
     const res = NextResponse.json({ success: true });
     res.cookies.set(SESSION_COOKIE, sessionCookie, {
-      maxAge: EXPIRES_IN_MS / 1000,
+      maxAge: expiresIn / 1000,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",

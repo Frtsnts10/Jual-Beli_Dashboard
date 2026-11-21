@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -18,6 +19,8 @@ const DELETE_PHRASE = "HAPUS AKUN SAYA";
  * which runs lib/sellers/account-deletion.ts; until then the seller can withdraw it.
  */
 export async function requestMyAccountDeletion(input: { email: string; phrase: string; idToken: string; reason: string }): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const user = await requireUser();
   if (await isPlatformAdmin()) return fail("Akun admin platform tidak bisa dihapus dari sini.");
   const check = await freshlyVerified(input.idToken, user.uid);
@@ -53,6 +56,8 @@ export async function requestMyAccountDeletion(input: { email: string; phrase: s
 
 /** Seller: withdraw a pending deletion request (or clear a rejected one). */
 export async function cancelMyAccountDeletion(): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const user = await requireUser();
   const ref = adminDb.collection("account_deletion_requests").doc(user.uid);
   const snap = await ref.get();

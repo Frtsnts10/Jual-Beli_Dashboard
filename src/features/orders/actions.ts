@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
@@ -22,6 +23,8 @@ async function ownedOrder(storeId: string, orderId: string) {
  * to a paid order that was waiting for a restock (that order only).
  */
 export async function confirmPayment(storeId: string, orderId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const found = await ownedOrder(storeId, orderId);
   if (!found) return fail("Pesanan tidak ditemukan.");
@@ -45,6 +48,8 @@ export async function confirmPayment(storeId: string, orderId: string): Promise<
 }
 
 export async function markDelivered(storeId: string, orderId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const found = await ownedOrder(storeId, orderId);
   if (!found) return fail("Pesanan tidak ditemukan.");
@@ -55,6 +60,8 @@ export async function markDelivered(storeId: string, orderId: string): Promise<A
 }
 
 export async function replaceWarranty(storeId: string, orderId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   if (!(await ownedOrder(storeId, orderId))) return fail("Pesanan tidak ditemukan.");
   const result = await replaceCredential(orderId);
@@ -66,6 +73,8 @@ export async function replaceWarranty(storeId: string, orderId: string): Promise
 }
 
 export async function rejectWarranty(storeId: string, orderId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const found = await ownedOrder(storeId, orderId);
   if (!found) return fail("Pesanan tidak ditemukan.");
@@ -76,6 +85,8 @@ export async function rejectWarranty(storeId: string, orderId: string): Promise<
 
 /** Retries automatic WhatsApp delivery (Pro & Ultimate) after a failure. */
 export async function resendDelivery(storeId: string, orderId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   if (!(await ownedOrder(storeId, orderId))) return fail("Pesanan tidak ditemukan.");
   const result = await deliverOrder(orderId, "paid");
@@ -87,6 +98,8 @@ export async function resendDelivery(storeId: string, orderId: string): Promise<
 
 /** The buyer's payment screenshot, for the seller's "Cek bukti" dialog. */
 export async function getPaymentProof(storeId: string, orderId: string): Promise<ActionResult<{ image: string; uploadedAt: string | null }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const found = await ownedOrder(storeId, orderId);
   if (!found) return fail("Pesanan tidak ditemukan.");
@@ -101,6 +114,8 @@ export async function getPaymentProof(storeId: string, orderId: string): Promise
 
 /** The transfer isn't in the seller's mutations (or doesn't match): the order fails, its voucher use is freed. */
 export async function rejectPayment(storeId: string, orderId: string, reason: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const found = await ownedOrder(storeId, orderId);
   if (!found) return fail("Pesanan tidak ditemukan.");
