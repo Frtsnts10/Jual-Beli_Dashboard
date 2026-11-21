@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
@@ -11,6 +12,8 @@ const MAX_SLIDES = 5;
 
 /** Replaces the store's hero slides (order = display order). */
 export async function saveHeroSlides(storeId: string, slides: HeroSlide[]): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   if (slides.length > MAX_SLIDES) return fail(`Maksimal ${MAX_SLIDES} slide.`);
   const productIds = new Set((await adminDb.collection("products").where("store_id", "==", storeId).select().get()).docs.map((d) => d.id));

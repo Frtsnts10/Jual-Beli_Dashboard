@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/sign-in", "/sign-up", "/forgot-password"];
+const PUBLIC_PATHS = ["/sign-in", "/sign-up", "/forgot-password", "/demo"];
 
 // Cheap optimistic gate: bounce visitors without a session cookie to sign-in.
 // The cookie is verified for real in lib/access/auth.ts on every page and action.

@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
@@ -16,6 +17,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
  * billing, the store QRIS, domains or the team (owner only).
  */
 export async function inviteAdmin(storeId: string, rawEmail: string): Promise<ActionResult<{ pending: boolean }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { user, store, features } = await requireStore(storeId, { ownerOnly: true });
   if (!features.multiAdmin) return fail("Fitur tim (multi-admin) belum tersedia di paket Anda.");
   const email = rawEmail.trim().toLowerCase();
@@ -42,6 +45,8 @@ export async function inviteAdmin(storeId: string, rawEmail: string): Promise<Ac
 }
 
 export async function removeAdmin(storeId: string, uid: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId, { ownerOnly: true });
   const storeRef = adminDb.collection("stores").doc(storeId);
   const batch = adminDb.batch();
@@ -53,6 +58,8 @@ export async function removeAdmin(storeId: string, uid: string): Promise<ActionR
 }
 
 export async function cancelInvite(storeId: string, inviteId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId, { ownerOnly: true });
   const ref = adminDb.collection("store_invites").doc(inviteId);
   const snap = await ref.get();

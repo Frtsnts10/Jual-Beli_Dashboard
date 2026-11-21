@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { saveImage } from "@/lib/media";
@@ -7,6 +8,8 @@ import type { MediaKind } from "@/lib/media-kinds";
 
 /** Uploads a logo / banner / product photo (compressed in the browser first). */
 export async function uploadStoreImage(storeId: string, kind: MediaKind, dataUrl: string): Promise<ActionResult<{ url: string }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   if (!["logo", "banner", "product"].includes(kind)) return fail("Jenis gambar tidak dikenal.");
   try {

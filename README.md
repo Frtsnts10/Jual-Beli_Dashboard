@@ -110,9 +110,14 @@ and a toast says what happened.
 
 ## Demo and admin accounts
 
-- **Demo** (`scripts/seed-demo.mjs`, or Actions → *Seed demo account*): seller `demo@dionycte.com`
-  (dashboard, Ultimate, store "Dionycte") and buyer `pembeli@dionycte.com` (storefront `/masuk`),
-  both with the `DEMO_PASSWORD` secret. Re-running resets the demo store's data.
+- **Demo / showcase** (`scripts/seed-demo.mjs`, or Actions → *Seed demo account*): seller
+  `demo@belidi.biz.id` (Ultimate, store "Toko Demo" at `demo.<root domain>`) and buyer
+  `pembeli.demo@belidi.biz.id`. Both carry the custom claim `demo: true`, which makes them
+  **read-only** and opens them without a password: **Coba demo** on the sign-in and landing pages
+  (`/demo`) for the seller, **Masuk sebagai pembeli demo** on the demo store's `/masuk` for the
+  buyer. Every server action that changes data starts with `demoBlocked()` (`lib/access/demo.ts`);
+  invites are never accepted for the demo login. Visitors can still check out on the demo store as
+  guests and use "Simulasikan pembayaran". Re-running the script resets the demo store's data.
 - **Platform admin** (`scripts/create-admin.mjs`, or Actions → *Create platform admin*, needs the
   `ADMIN_PASSWORD` secret): creates the login with a verified email. Then add the email to
   `PLATFORM_ADMIN_EMAILS` on Vercel and redeploy.

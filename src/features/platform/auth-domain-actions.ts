@@ -1,11 +1,14 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { requirePlatformAdmin } from "@/lib/access/platform";
 import { authDomainsEnabled, syncAllStoreDomains } from "@/lib/integrations/firebase-auth-domains";
 import { fail, type ActionResult } from "@/lib/action-result";
 
 /** Admin → Ringkasan: register every store's subdomain/custom domain for Google sign-in. */
 export async function syncStoreAuthDomains(): Promise<ActionResult<{ hosts: number }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requirePlatformAdmin();
   if (!authDomainsEnabled()) return fail("Butuh FIREBASE_PRIVATE_KEY (service account) di env Vercel dashboard.");
   try {

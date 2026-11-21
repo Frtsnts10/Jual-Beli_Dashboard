@@ -28,6 +28,14 @@ export default async function LandingPage() {
         <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-lg">
           Etalase siap pakai, checkout 2 langkah, brankas stok dan pengiriman akun lewat WhatsApp — dalam satu dashboard.
         </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <Button asChild>
+            <Link href="/sign-up">Daftar gratis</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/demo">Coba demo</Link>
+          </Button>
+        </div>
       </section>
       <section className="grid gap-6 md:grid-cols-3">
         {catalog.planKeys.map((key) => {

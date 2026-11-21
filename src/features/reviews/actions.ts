@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -9,6 +10,8 @@ import { ratingDelta } from "@/lib/rating";
 
 /** Hides or shows a review on the storefront, keeping the product's star counts in step. */
 export async function setReviewHidden(storeId: string, reviewId: string, hidden: boolean): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const ref = adminDb.collection("reviews").doc(reviewId);
   const result = await adminDb.runTransaction(async (tx) => {

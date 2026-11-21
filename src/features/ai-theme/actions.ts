@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireStore } from "@/lib/access/auth";
@@ -35,6 +36,8 @@ export async function getAiThemeStatus(storeId: string): Promise<AiThemeStatus> 
 
 /** Uses one of the month's designs and asks Claude for a theme; nothing is saved until applied. */
 export async function generateAiTheme(storeId: string, brief: string): Promise<ActionResult<{ design: AiThemeDesign; used: number; limit: number }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { blocked, limit, features } = await statusFor(storeId);
   if (blocked === "platform_off") return fail("Tema AI sedang dimatikan admin platform.");
   if (blocked === "not_configured") return fail("Tema AI belum disiapkan admin platform.");
@@ -93,6 +96,8 @@ export async function generateAiTheme(storeId: string, brief: string): Promise<A
 
 /** Applies a generated design: template, accent, tagline, corners, font and the "Tentang" text. */
 export async function applyAiTheme(storeId: string, d: AiThemeDesign): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { features } = await requireStore(storeId);
   // The design came back through the browser: check every field again.
   if (!features.templates.includes(d.template)) return fail("Template ini tidak tersedia di paket Anda.");
@@ -113,6 +118,8 @@ export async function applyAiTheme(storeId: string, d: AiThemeDesign): Promise<A
 
 /** Back to the template's own corners and font (keeps template, colour and texts). */
 export async function clearThemeOverride(storeId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   await adminDb.collection("stores").doc(storeId).update({ theme_override: null });
   revalidatePath(`/${storeId}`, "layout");

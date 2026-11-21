@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { randomBytes } from "node:crypto";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -24,6 +25,8 @@ async function requireBots(storeId: string) {
 
 /** Validates a BotFather token and points the bot's webhook at this store's endpoint. */
 export async function connectTelegram(storeId: string, rawToken: string): Promise<ActionResult<{ username: string }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   try {
     await requireBots(storeId);
   } catch {
@@ -54,6 +57,8 @@ export async function connectTelegram(storeId: string, rawToken: string): Promis
 }
 
 export async function disconnectTelegram(storeId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const snap = await integrationsRef(storeId).get();
   const token = snap.get("telegram_bot_token");
@@ -76,6 +81,8 @@ export async function connectDiscord(
   storeId: string,
   input: { applicationId: string; publicKey: string; botToken: string }
 ): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   try {
     await requireBots(storeId);
   } catch {
@@ -102,6 +109,8 @@ export async function connectDiscord(
 }
 
 export async function disconnectDiscord(storeId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   await integrationsRef(storeId).update({ discord_application_id: FieldValue.delete(), discord_public_key: FieldValue.delete() });
   revalidatePath(`/${storeId}/settings`);

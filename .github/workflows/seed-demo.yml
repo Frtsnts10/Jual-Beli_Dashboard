@@ -5,7 +5,8 @@
 # Repository secrets it needs (Settings → Secrets and variables → Actions):
 #   FIREBASE_SERVICE_ACCOUNT  already used by the Firestore deploy
 #   VAULT_ENCRYPTION_KEY      the SAME value as on Vercel, or the dashboard can't read the demo vault
-#   DEMO_PASSWORD             the password to give demo@dionycte.com (never printed in the log)
+#   DEMO_PASSWORD             the password to give demo@belidi.biz.id (never printed in the log;
+#                             visitors use "Coba demo" and never need it)
 name: Seed demo account
 
 on:

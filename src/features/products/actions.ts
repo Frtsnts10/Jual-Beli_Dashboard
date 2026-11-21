@@ -1,5 +1,6 @@
 "use server";
 
+import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -61,6 +62,8 @@ function clean(input: ProductInput) {
 }
 
 export async function saveProduct(storeId: string, productId: string | null, input: ProductInput): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   const { features } = await requireStore(storeId);
   const error = validate(input);
   if (error) return fail(error);
@@ -101,6 +104,8 @@ export async function saveProduct(storeId: string, productId: string | null, inp
 }
 
 export async function setProductPublished(storeId: string, productId: string, published: boolean): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const ref = adminDb.collection("products").doc(productId);
   const snap = await ref.get();
@@ -111,6 +116,8 @@ export async function setProductPublished(storeId: string, productId: string, pu
 }
 
 export async function deleteProduct(storeId: string, productId: string): Promise<ActionResult> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   const ref = adminDb.collection("products").doc(productId);
   const snap = await ref.get();
@@ -136,6 +143,8 @@ export async function importProducts(
   storeId: string,
   rows: Pick<ProductInput, "title" | "platform_type" | "price" | "duration_days" | "description" | "image_url" | "is_published">[]
 ): Promise<ActionResult<{ added: number }>> {
+  const demo = await demoBlocked();
+  if (demo) return demo;
   await requireStore(storeId);
   if (rows.length === 0) return fail("Tidak ada baris valid untuk diimpor.");
   if (rows.length > 200) return fail("Maksimal 200 produk sekali impor.");
