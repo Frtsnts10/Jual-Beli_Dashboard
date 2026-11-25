@@ -80,49 +80,52 @@ export default async function PlatformOverviewPage() {
           </CardContent>
         </Card>
       )}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Setup platform</CardTitle>
-          <CardDescription>{checks.every((c) => c.ok) ? "Semua siap." : "Lengkapi yang bertanda merah."}</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-3 text-sm">
-          {checks.map((c) => (
-            <div key={c.label} className="flex items-start gap-2">
-              {c.ok ? <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" /> : <CircleAlert className="text-destructive mt-0.5 size-4 shrink-0" />}
-              <div className="min-w-0">
-                <div className="font-medium">{c.label}</div>
-                {!c.ok &&
-                  (c.href ? (
-                    <Link href={c.href} className="text-muted-foreground text-xs underline underline-offset-4">
-                      {c.fix}
-                    </Link>
-                  ) : (
-                    <div className="text-muted-foreground text-xs">{c.fix}</div>
-                  ))}
-              </div>
-            </div>
+      {/* Numbers stacked on the left, the setup checklist beside them. */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(16rem,22rem)_minmax(0,1fr)]">
+        <div className="grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-1">
+          {stats.map((s) => (
+            <Card key={s.label} className="gap-2">
+              <CardHeader>
+                <CardDescription>{s.label}</CardDescription>
+                <CardTitle className="text-2xl">{s.value}</CardTitle>
+              </CardHeader>
+              <CardContent className="text-muted-foreground text-xs">{s.hint}</CardContent>
+            </Card>
           ))}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
-            <div className="min-w-0">
-              <div className="font-medium">Login Google di toko</div>
-              <div className="text-muted-foreground text-xs">
-                Toko baru, ganti alamat dan domain sendiri didaftarkan otomatis ke Authorized domains Firebase. Tekan sinkronkan sekali untuk toko yang dibuat sebelumnya.
+        </div>
+        <Card className="min-w-0">
+          <CardHeader>
+            <CardTitle>Setup platform</CardTitle>
+            <CardDescription>{checks.every((c) => c.ok) ? "Semua siap." : "Lengkapi yang bertanda merah."}</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 text-sm">
+            {checks.map((c) => (
+              <div key={c.label} className="flex items-start gap-2">
+                {c.ok ? <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" /> : <CircleAlert className="text-destructive mt-0.5 size-4 shrink-0" />}
+                <div className="min-w-0">
+                  <div className="font-medium">{c.label}</div>
+                  {!c.ok &&
+                    (c.href ? (
+                      <Link href={c.href} className="text-muted-foreground text-xs underline underline-offset-4">
+                        {c.fix}
+                      </Link>
+                    ) : (
+                      <div className="text-muted-foreground text-xs">{c.fix}</div>
+                    ))}
+                </div>
               </div>
+            ))}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
+              <div className="min-w-0">
+                <div className="font-medium">Login Google di toko</div>
+                <div className="text-muted-foreground text-xs">
+                  Toko baru, ganti alamat dan domain sendiri didaftarkan otomatis ke Authorized domains Firebase. Tekan sinkronkan sekali untuk toko yang dibuat sebelumnya.
+                </div>
+              </div>
+              <SyncAuthDomainsButton />
             </div>
-            <SyncAuthDomainsButton />
-          </div>
-        </CardContent>
-      </Card>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((s) => (
-          <Card key={s.label} className="gap-2">
-            <CardHeader>
-              <CardDescription>{s.label}</CardDescription>
-              <CardTitle className="text-2xl">{s.value}</CardTitle>
-            </CardHeader>
-            <CardContent className="text-muted-foreground text-xs">{s.hint}</CardContent>
-          </Card>
-        ))}
+          </CardContent>
+        </Card>
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
