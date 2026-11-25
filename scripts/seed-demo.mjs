@@ -17,6 +17,8 @@
 //
 // or, without a computer, from GitHub: Actions → "Seed demo account" → Run workflow.
 //
+// Also removes the earlier demo (demo@dionycte.com and its store "demo-dionycte") if it is still there.
+//
 // Safe to re-run: every run first deletes the previous demo data (everything belonging to
 // store id "demo-store"), then writes it fresh. It never touches other stores.
 
@@ -102,6 +104,56 @@ const proofImage = (amount, at) =>
     `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="520"><rect width="360" height="520" fill="#f6f7f9"/><rect x="20" y="20" width="320" height="480" rx="16" fill="#fff"/><circle cx="180" cy="110" r="38" fill="#10b981"/><path d="M162 110l12 12 24-26" stroke="#fff" stroke-width="7" fill="none"/><text x="180" y="190" font-family="sans-serif" font-size="20" text-anchor="middle" font-weight="700">Pembayaran Berhasil</text><text x="180" y="240" font-family="sans-serif" font-size="30" text-anchor="middle" font-weight="700">Rp ${String(amount).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</text><text x="180" y="290" font-family="sans-serif" font-size="15" text-anchor="middle" fill="#555">ke TOKO DEMO (QRIS)</text><text x="180" y="320" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#888">${new Date(at).toISOString().slice(0, 16).replace("T", " ")} UTC</text></svg>`
   ).toString("base64");
 const now = Date.now();
+
+// ---------------------------------------------------------------------------------------
+// 0. Remove the previous demo (demo@dionycte.com, store "demo-dionycte"), replaced by this one
+
+const LEGACY = { seller: "demo@dionycte.com", buyer: "pembeli@dionycte.com", storeId: "demo-dionycte" };
+async function deleteQuery(q) {
+  for (;;) {
+    const snap = await q.limit(400).get();
+    if (snap.empty) return;
+    const batch = db.batch();
+    snap.docs.forEach((d) => batch.delete(d.ref));
+    await batch.commit();
+    if (snap.size < 400) return;
+  }
+}
+const legacySeller = await auth.getUserByEmail(LEGACY.seller).catch(() => null);
+const legacyStore = await db.collection("stores").doc(LEGACY.storeId).get();
+// Only the legacy demo's own store — never a store some real seller owns.
+if (legacyStore.exists && (!legacySeller || legacyStore.get("owner_uid") === legacySeller.uid)) {
+  const orders = await db.collection("orders").where("store_id", "==", LEGACY.storeId).select().get();
+  for (let i = 0; i < orders.size; i += 400) {
+    const batch = db.batch();
+    orders.docs.slice(i, i + 400).forEach((o) => batch.delete(db.collection("payment_proofs").doc(o.id)));
+    await batch.commit();
+  }
+  for (const col of ["orders", "products", "credentials_vault", "vouchers", "reviews", "restock_requests", "broadcasts", "store_invites", "payment_proofs"]) {
+    await deleteQuery(db.collection(col).where("store_id", "==", LEGACY.storeId));
+  }
+  for (const [col, key] of [["store_slugs", legacyStore.get("slug")], ["store_domains", legacyStore.get("custom_domain")]]) {
+    if (!key) continue;
+    const ref = db.collection(col).doc(key);
+    if ((await ref.get()).get("store_id") === LEGACY.storeId) await ref.delete();
+  }
+  await db.recursiveDelete(legacyStore.ref);
+  console.log(`Removed the old demo store ${LEGACY.storeId}.`);
+}
+if (legacySeller) {
+  for (const col of ["subscription_payments", "notifications", "push_tokens", "support_tickets"]) await deleteQuery(db.collection(col).where("uid", "==", legacySeller.uid));
+  await db.collection("users").doc(legacySeller.uid).delete();
+  await db.collection("customers").doc(legacySeller.uid).delete();
+  await auth.deleteUser(legacySeller.uid);
+  console.log(`Removed the old demo login ${LEGACY.seller}.`);
+}
+const legacyBuyer = await auth.getUserByEmail(LEGACY.buyer).catch(() => null);
+if (legacyBuyer && !(await db.collection("users").doc(legacyBuyer.uid).get()).exists) {
+  await db.collection("customers").doc(legacyBuyer.uid).delete();
+  await db.collection("account_deletion_requests").doc(legacyBuyer.uid).delete();
+  await auth.deleteUser(legacyBuyer.uid);
+  console.log(`Removed the old demo buyer ${LEGACY.buyer}.`);
+}
 
 // ---------------------------------------------------------------------------------------
 // 1. Login account
