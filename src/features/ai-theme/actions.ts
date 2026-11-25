@@ -19,8 +19,8 @@ export interface AiThemeStatus {
   limit: number;
 }
 
-async function statusFor(storeId: string): Promise<AiThemeStatus & { features: Awaited<ReturnType<typeof requireStore>>["features"] }> {
-  const { features } = await requireStore(storeId);
+async function statusFor(storeId: string, readOnly = false): Promise<AiThemeStatus & { features: Awaited<ReturnType<typeof requireStore>>["features"] }> {
+  const { features } = await requireStore(storeId, { allowSuspended: readOnly });
   const { ai } = await getCatalog();
   const snap = await adminDb.collection("stores").doc(storeId).get();
   const usage = snap.get("ai_theme_usage") as { month?: string; count?: number } | undefined;
@@ -30,7 +30,7 @@ async function statusFor(storeId: string): Promise<AiThemeStatus & { features: A
 }
 
 export async function getAiThemeStatus(storeId: string): Promise<AiThemeStatus> {
-  const { blocked, used, limit } = await statusFor(storeId);
+  const { blocked, used, limit } = await statusFor(storeId, true);
   return { blocked, used, limit };
 }
 
