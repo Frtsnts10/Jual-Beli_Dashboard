@@ -80,9 +80,9 @@ export default async function PlatformOverviewPage() {
           </CardContent>
         </Card>
       )}
-      {/* Numbers stacked on the left, the setup checklist beside them. */}
-      <div className="grid gap-6 lg:grid-cols-[minmax(16rem,22rem)_minmax(0,1fr)]">
-        <div className="grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-1">
+      {/* 70/30: the numbers in a 2×2 grid on the left, the setup checklist on the right. */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]">
+        <div className="grid content-start gap-4 sm:grid-cols-2">
           {stats.map((s) => (
             <Card key={s.label} className="gap-2">
               <CardHeader>
