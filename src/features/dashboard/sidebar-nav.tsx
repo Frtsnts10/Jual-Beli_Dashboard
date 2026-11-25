@@ -24,12 +24,15 @@ export function SidebarNav({
   openClaims,
   isOwner,
   supportUnread = 0,
+  suspended = false,
   className,
 }: {
   storeId: string;
   openClaims: number;
   isOwner: boolean;
   supportUnread?: number;
+  /** Store suspended by the platform: everything but Bantuan is disabled. */
+  suspended?: boolean;
   className?: string;
 }) {
   const pathname = usePathname();
@@ -77,6 +80,18 @@ export function SidebarNav({
     <nav ref={navRef} className={cn("flex gap-1", className)}>
       {items.map(({ href, label, icon: Icon, exact, badge, badgeTitle }) => {
         const active = exact ? pathname === href : pathname.startsWith(href);
+        if (suspended && !href.endsWith("/support"))
+          return (
+            <span
+              key={href}
+              aria-disabled
+              title="Toko disuspend"
+              className="text-muted-foreground flex shrink-0 cursor-not-allowed items-center gap-2 rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap opacity-40"
+            >
+              <Icon className="size-4" />
+              {label}
+            </span>
+          );
         return (
           <Link
             key={href}

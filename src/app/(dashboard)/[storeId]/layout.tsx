@@ -16,6 +16,7 @@ import { NotificationBell } from "@/features/notifications/notification-bell";
 import { AnnouncementBar } from "@/features/notifications/announcement-bar";
 import { LiveRefresh } from "@/features/dashboard/live-refresh";
 import { Brand } from "@/components/brand";
+import { SuspendedGate } from "@/features/dashboard/suspended-gate";
 import { isDemoSession } from "@/lib/access/demo";
 import Link from "next/link";
 
@@ -55,6 +56,7 @@ export default async function StoreLayout({
           openClaims={openClaims}
           isOwner={role === "owner"}
           supportUnread={supportUnread}
+          suspended={store.suspended}
           className="flex-col"
         />
       </aside>
@@ -63,14 +65,16 @@ export default async function StoreLayout({
           <div className="w-44 min-w-0 sm:w-56 lg:hidden">
             <StoreSwitcher stores={switcherStores} currentId={storeId} />
           </div>
-          <a
-            href={storefrontUrl(store)}
-            target="_blank"
-            rel="noreferrer"
-            className="text-muted-foreground hover:text-foreground hidden items-center gap-1 text-sm whitespace-nowrap sm:flex"
-          >
-            Lihat toko <ExternalLink className="size-3.5" />
-          </a>
+          {!store.suspended && (
+            <a
+              href={storefrontUrl(store)}
+              target="_blank"
+              rel="noreferrer"
+              className="text-muted-foreground hover:text-foreground hidden items-center gap-1 text-sm whitespace-nowrap sm:flex"
+            >
+              Lihat toko <ExternalLink className="size-3.5" />
+            </a>
+          )}
           <div className="ml-auto flex items-center gap-2">
             <NotificationBell items={notes.items} unread={notes.unread} />
             <UserMenu
@@ -86,6 +90,7 @@ export default async function StoreLayout({
           openClaims={openClaims}
           isOwner={role === "owner"}
           supportUnread={supportUnread}
+          suspended={store.suspended}
           className="shrink-0 overflow-x-auto border-b px-2 py-1 lg:hidden"
         />
         {(await isDemoSession()) && (
@@ -102,10 +107,15 @@ export default async function StoreLayout({
         {store.suspended && (
           <div className="bg-destructive/10 text-destructive border-b px-6 py-2 text-sm">
             Toko ini disuspend oleh admin platform — etalase dan checkout
-            ditutup. Hubungi support platform.
+            ditutup, dan dashboard toko ini hanya bisa dilihat.{" "}
+            <Link href={`/${storeId}/support`} className="font-medium underline underline-offset-4">
+              Hubungi admin lewat Bantuan
+            </Link>
           </div>
         )}
-        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto p-4 md:p-6">
+          <SuspendedGate suspended={store.suspended}>{children}</SuspendedGate>
+        </main>
       </div>
     </div>
   );

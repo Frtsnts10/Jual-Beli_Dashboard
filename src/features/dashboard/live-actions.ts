@@ -35,7 +35,7 @@ async function safeCount(q: FirebaseFirestore.Query): Promise<number> {
 }
 
 export async function storePulse(storeId: string): Promise<StorePulse> {
-  const { user } = await requireStore(storeId);
+  const { user } = await requireStore(storeId, { allowSuspended: true });
   const orders = adminDb.collection("orders").where("store_id", "==", storeId);
   const count = safeCount;
   const [all, paid, awaiting, failed, claims, notes, banners] = await Promise.all([

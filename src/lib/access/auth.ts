@@ -1,7 +1,7 @@
 import "server-only";
 import { isPlatformAdmin } from "@/lib/access/platform";
 import { cache } from "react";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { effectiveTier, mapStore, mapUser } from "@/lib/data/mappers";
@@ -77,7 +77,7 @@ export interface StoreAccess {
  * added). Every store-scoped page and server action goes through this, which is what keeps
  * tenants isolated. Pass { ownerOnly: true } for billing, team, the store QRIS and domains.
  */
-export const requireStore = cache(async (storeId: string, opts?: { ownerOnly?: boolean }): Promise<StoreAccess> => {
+export const requireStore = cache(async (storeId: string, opts?: { ownerOnly?: boolean; allowSuspended?: boolean }): Promise<StoreAccess> => {
   const user = await requireUser();
   // Platform admin accounts run the platform, not a store: they only see /platform.
   if (await isPlatformAdmin()) redirect("/platform");
@@ -88,6 +88,11 @@ export const requireStore = cache(async (storeId: string, opts?: { ownerOnly?: b
     store.owner_uid === user.uid ? "owner" : ((snap.get("admin_uids") as string[] | undefined) ?? []).includes(user.uid) ? "admin" : null;
   if (!role) notFound();
   if (opts?.ownerOnly && role !== "owner") notFound();
+  // A suspended store is read-only for its seller: the dashboard disables every control (except
+  // Bantuan), and any server action reaching here is refused. Read-only polling opts out.
+  if (store.suspended && !opts?.allowSuspended && (await headers()).has("next-action")) {
+    throw new Error("Toko ini disuspend oleh admin platform. Hubungi Bantuan.");
+  }
 
   const owner = await adminDb.collection("users").doc(store.owner_uid).get();
   const tier = role === "owner" ? user.subscription_tier : effectiveTier(owner.get("subscription_tier"), owner.get("subscription_expiry"));
