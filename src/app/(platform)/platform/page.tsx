@@ -80,18 +80,43 @@ export default async function PlatformOverviewPage() {
           </CardContent>
         </Card>
       )}
-      {/* 70/30: the numbers in a 2×2 grid on the left, the setup checklist on the right. */}
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]">
-        <div className="grid content-start gap-4 sm:grid-cols-2">
-          {stats.map((s) => (
-            <Card key={s.label} className="gap-2">
-              <CardHeader>
-                <CardDescription>{s.label}</CardDescription>
-                <CardTitle className="text-2xl">{s.value}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-muted-foreground text-xs">{s.hint}</CardContent>
-            </Card>
-          ))}
+      {/* 60/40: numbers (2×2) and the two daily charts on the left, the setup checklist on the right;
+          the charts stretch so both columns end level. */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <div className="flex min-w-0 flex-col gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {stats.map((s) => (
+              <Card key={s.label} className="gap-2">
+                <CardHeader>
+                  <CardDescription>{s.label}</CardDescription>
+                  <CardTitle className="text-2xl">{s.value}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-muted-foreground text-xs">{s.hint}</CardContent>
+              </Card>
+            ))}
+          </div>
+        <div className="grid flex-1 gap-4 sm:grid-cols-2 [&>*]:min-w-0">
+          <Card>
+            <CardHeader>
+              <CardTitle>GMV harian</CardTitle>
+              <CardDescription>
+                30 hari terakhir · {formatIDR(activity.daily.reduce((s, d) => s + d.gmv, 0))} dari pesanan lunas semua toko
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RevenueChart data={activity.daily.map((d) => ({ day: d.day, value: d.gmv }))} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Pendapatan langganan harian</CardTitle>
+              <CardDescription>30 hari terakhir · {formatIDR(activity.daily.reduce((s, d) => s + d.plans, 0))} dari pembayaran paket</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RevenueChart data={activity.daily.map((d) => ({ day: d.day, value: d.plans }))} />
+            </CardContent>
+          </Card>
+        </div>
         </div>
         <Card className="min-w-0">
           <CardHeader>
@@ -124,29 +149,6 @@ export default async function PlatformOverviewPage() {
               </div>
               <SyncAuthDomainsButton />
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="mt-6 grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
-        <Card>
-          <CardHeader>
-            <CardTitle>GMV harian</CardTitle>
-            <CardDescription>
-              30 hari terakhir · {formatIDR(activity.daily.reduce((s, d) => s + d.gmv, 0))} dari pesanan lunas semua toko
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RevenueChart data={activity.daily.map((d) => ({ day: d.day, value: d.gmv }))} />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Pendapatan langganan harian</CardTitle>
-            <CardDescription>30 hari terakhir · {formatIDR(activity.daily.reduce((s, d) => s + d.plans, 0))} dari pembayaran paket</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RevenueChart data={activity.daily.map((d) => ({ day: d.day, value: d.plans }))} />
           </CardContent>
         </Card>
       </div>
