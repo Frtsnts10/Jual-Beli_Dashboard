@@ -16,6 +16,7 @@ export async function uploadStoreImage(storeId: string, kind: MediaKind, dataUrl
     return { ok: true, data: { url: await saveImage(storeId, kind, dataUrl) } };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "";
+    console.warn("uploadStoreImage", kind, msg || err);
     if (msg === "BAD_IMAGE") return fail("Gambar tidak valid. Pakai JPG, PNG atau WebP.");
     if (msg === "TOO_BIG") return fail("Gambar terlalu besar setelah dikompres (maks 2,5 MB).");
     console.error("uploadStoreImage", err);
