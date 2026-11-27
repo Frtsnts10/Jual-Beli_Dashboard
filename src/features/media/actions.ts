@@ -3,15 +3,18 @@
 import { demoBlocked } from "@/lib/access/demo";
 import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
-import { saveImage } from "@/lib/media";
+import { MAX_IMAGE_BYTES, saveImage } from "@/lib/media";
 import type { MediaKind } from "@/lib/media-kinds";
+import { toDataUrl, type ImagePayload } from "@/lib/image-blob";
 
 /** Uploads a logo / banner / product photo (compressed in the browser first). */
-export async function uploadStoreImage(storeId: string, kind: MediaKind, dataUrl: string): Promise<ActionResult<{ url: string }>> {
+export async function uploadStoreImage(storeId: string, kind: MediaKind, image: ImagePayload): Promise<ActionResult<{ url: string }>> {
   const demo = await demoBlocked();
   if (demo) return demo;
   await requireStore(storeId);
   if (!["logo", "banner", "product"].includes(kind)) return fail("Jenis gambar tidak dikenal.");
+  const dataUrl = await toDataUrl(image, MAX_IMAGE_BYTES);
+  if (!dataUrl) return fail("Gambar tidak valid atau terlalu besar (maks 2,5 MB setelah dikompres).");
   try {
     return { ok: true, data: { url: await saveImage(storeId, kind, dataUrl) } };
   } catch (err) {

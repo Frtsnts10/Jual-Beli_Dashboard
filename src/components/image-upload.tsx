@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { uploadStoreImage } from "@/features/media/actions";
 import type { MediaKind } from "@/lib/media-kinds";
+import { dataUrlToBlob } from "@/lib/image-blob";
 
 /** Longest side after resizing, per use. */
 const MAX_DIM: Record<MediaKind, number> = {
@@ -98,7 +99,7 @@ export function ImageUpload({
         );
       }
       try {
-        const res = await uploadStoreImage(storeId, kind, data);
+        const res = await uploadStoreImage(storeId, kind, dataUrlToBlob(data));
         if (!res.ok) return void toast.error(res.error);
         onChange(res.data!.url);
         toast.success("Foto terunggah. Jangan lupa simpan.");

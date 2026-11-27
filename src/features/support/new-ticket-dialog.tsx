@@ -1,5 +1,6 @@
 "use client";
 
+import { dataUrlToBlob } from "@/lib/image-blob";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { LifeBuoy, Loader2 } from "lucide-react";
@@ -45,7 +46,7 @@ export function NewTicketDialog({ storeId }: { storeId: string }) {
         category,
         subject,
         message,
-        image,
+        image: image && dataUrlToBlob(image),
       });
       if (!res.ok) return void toast.error(res.error);
       toast.success("Laporan terkirim. Admin akan membalas di sini.");

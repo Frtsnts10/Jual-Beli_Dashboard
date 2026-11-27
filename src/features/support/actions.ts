@@ -9,7 +9,8 @@ import { isPlatformAdmin, requirePlatformAdmin, isAdminEmail } from "@/lib/acces
 import { fail, type ActionResult } from "@/lib/action-result";
 import { randomId } from "@/lib/ids";
 import { getCatalog } from "@/lib/catalog";
-import { saveImageAt } from "@/lib/media";
+import { MAX_IMAGE_BYTES, saveImageAt } from "@/lib/media";
+import { toDataUrl, type ImagePayload } from "@/lib/image-blob";
 import { notify, platformAdminUids } from "@/lib/notify";
 import {
   TICKET_CATEGORIES,
@@ -22,8 +23,9 @@ const MAX_OPEN = 10;
 
 async function attach(
   uid: string,
-  image?: string | null,
+  payload?: ImagePayload | null,
 ): Promise<string | null> {
+  const image = await toDataUrl(payload, MAX_IMAGE_BYTES);
   if (!image) return null;
   try {
     return await saveImageAt(`support/${uid}`, image);
@@ -38,7 +40,7 @@ export async function createTicket(input: {
   category: TicketCategory;
   subject: string;
   message: string;
-  image?: string | null;
+  image?: ImagePayload | null;
 }): Promise<ActionResult<{ id: string }>> {
   const demo = await demoBlocked();
   if (demo) return demo;
@@ -100,7 +102,7 @@ export async function createTicket(input: {
 export async function replyTicket(
   ticketId: string,
   text: string,
-  image?: string | null,
+  image?: ImagePayload | null,
 ): Promise<ActionResult> {
   const demo = await demoBlocked();
   if (demo) return demo;

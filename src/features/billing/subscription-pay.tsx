@@ -1,6 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- local preview of the seller's screenshot */
+import { dataUrlToBlob } from "@/lib/image-blob";
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUp, Loader2, X } from "lucide-react";
@@ -53,7 +54,7 @@ export function SubscriptionProof({ storeId, paymentId, hasProof }: { storeId: s
             disabled={pending}
             onClick={() =>
               start(async () => {
-                const res = await uploadSubscriptionProof(storeId, paymentId, preview);
+                const res = await uploadSubscriptionProof(storeId, paymentId, dataUrlToBlob(preview));
                 if (!res.ok) return void toast.error(res.error);
                 toast.success("Bukti terkirim — menunggu konfirmasi admin");
                 setPreview(null);
