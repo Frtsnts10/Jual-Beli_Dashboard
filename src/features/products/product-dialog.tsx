@@ -17,6 +17,7 @@ import { saveProduct, type ProductInput } from "./actions";
 const empty: ProductInput = {
   title: "",
   description: "",
+  terms: "",
   image_url: "",
   platform_type: "Media",
   price: 25000,
@@ -39,31 +40,41 @@ export function ProductDialog({
   storeId,
   product,
   trigger,
+  open: openProp,
+  onOpenChange,
   flashSalePricing = false,
   bundleCandidates = [],
 }: {
+  /** Controlled mode (e.g. opened from a row menu, which must close first): no trigger needed. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   /** Non-bundle products that can go into a bundle (Ultimate). Empty hides bundling. */
   bundleCandidates?: { id: string; title: string }[];
   storeId: string;
   product?: Product;
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
   /** Ultimate plans can set a discounted price and countdown. */
   flashSalePricing?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<ProductInput>(empty);
+  const initial = (): ProductInput => (product ? { ...product, terms: product.terms ?? "", image_url: product.image_url ?? "" } : empty);
+  const [innerOpen, setInnerOpen] = useState(false);
+  const open = openProp ?? innerOpen;
+  // Controlled dialogs are mounted per product (keyed by the parent), so they start filled in.
+  const [form, setForm] = useState<ProductInput>(initial);
+  const setOpen = (o: boolean) => {
+    if (o) setForm(initial());
+    if (onOpenChange) onOpenChange(o);
+    else setInnerOpen(o);
+  };
   const [pending, start] = useTransition();
   const set = <K extends keyof ProductInput>(key: K, value: ProductInput[K]) => setForm((f) => ({ ...f, [key]: value }));
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(o) => {
-        setOpen(o);
-        if (o) setForm(product ? { ...product, image_url: product.image_url ?? "" } : empty);
-      }}
+      onOpenChange={setOpen}
     >
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{product ? "Edit produk" : "Produk baru"}</DialogTitle>
@@ -149,6 +160,18 @@ export function ProductDialog({
           <div className="grid gap-2">
             <Label htmlFor="description">Deskripsi</Label>
             <Textarea id="description" value={form.description} onChange={(e) => set("description", e.target.value)} rows={3} />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="terms">Syarat & ketentuan (S&K)</Label>
+            <Textarea
+              id="terms"
+              value={form.terms}
+              onChange={(e) => set("terms", e.target.value)}
+              rows={4}
+              maxLength={3000}
+              placeholder={"Contoh:\n1. Dilarang mengganti password/profil.\n2. 1 profil untuk 1 perangkat.\n3. Garansi hangus jika melanggar S&K."}
+            />
+            <p className="text-muted-foreground text-xs">Opsional. Tampil di halaman produk, dan pembeli wajib mencentang setuju sebelum bayar.</p>
           </div>
           <div className="flex items-center justify-between">
             <Label htmlFor="published">Tampil di etalase</Label>

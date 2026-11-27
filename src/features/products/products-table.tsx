@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -31,6 +31,9 @@ export function ProductsTable({
   flashSalePricing: boolean;
 }) {
   const [pending, start] = useTransition();
+  // Edit opens after the row menu has closed: a dialog nested inside a dropdown left the menu
+  // open behind it and the whole page unclickable (pointer-events: none) once the dialog closed.
+  const [editing, setEditing] = useState<Product | null>(null);
 
   if (products.length === 0) {
     return <p className="text-muted-foreground rounded-lg border border-dashed p-10 text-center text-sm">Belum ada produk.</p>;
@@ -98,17 +101,9 @@ export function ProductsTable({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <ProductDialog
-          storeId={storeId}
-          product={p}
-          flashSalePricing={flashSalePricing}
-          bundleCandidates={products.filter((x) => !x.bundle_items).map((x) => ({ id: x.id, title: x.title }))}
-          trigger={
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <Pencil /> Edit
-            </DropdownMenuItem>
-          }
-        />
+        <DropdownMenuItem onSelect={() => setEditing(p)}>
+          <Pencil /> Edit
+        </DropdownMenuItem>
         <DropdownMenuItem
           className="text-destructive"
           onSelect={() => {
@@ -128,6 +123,17 @@ export function ProductsTable({
 
   return (
     <>
+      {editing && (
+        <ProductDialog
+          key={editing.id}
+          storeId={storeId}
+          product={editing}
+          open
+          onOpenChange={(o) => !o && setEditing(null)}
+          flashSalePricing={flashSalePricing}
+          bundleCandidates={products.filter((x) => !x.bundle_items).map((x) => ({ id: x.id, title: x.title }))}
+        />
+      )}
       {/* Phone: one card per product. */}
       <div className="grid gap-2 md:hidden">
         {products.map((p) => (

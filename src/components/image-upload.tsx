@@ -17,17 +17,39 @@ const MAX_DIM: Record<MediaKind, number> = {
   banner: 1920,
 };
 
+/** Decodes any image the browser can read (JPG, PNG, WebP, AVIF, GIF, BMP, JFIF…). */
+async function decode(file: File): Promise<{ img: CanvasImageSource; width: number; height: number }> {
+  try {
+    const bitmap = await createImageBitmap(file);
+    return { img: bitmap, width: bitmap.width, height: bitmap.height };
+  } catch {
+    // Some browsers can show a format that createImageBitmap refuses; an <img> decodes those.
+    const url = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      return { img, width: img.naturalWidth, height: img.naturalHeight };
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+}
+
 /** Resizes in the browser and re-encodes (WebP where supported, else JPEG) to stay small. */
 export async function compress(file: File, maxDim: number): Promise<string> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+  const { img, width, height } = await decode(file);
+  if (!width || !height) throw new Error("EMPTY");
+  const scale = Math.min(1, maxDim / Math.max(width, height));
   const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  const webp = canvas
-    .toDataURL("image/webp", 0.85)
-    .startsWith("data:image/webp");
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  const ctx = canvas.getContext("2d")!;
+  // Transparent PNG/GIF would turn black as JPEG.
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const webp = canvas.toDataURL("image/webp", 0.85).startsWith("data:image/webp");
   for (const q of [0.85, 0.75, 0.6, 0.45]) {
     const url = canvas.toDataURL(webp ? "image/webp" : "image/jpeg", q);
     if (url.length < 3_000_000) return url;
@@ -59,27 +81,62 @@ export function ImageUpload({
   const [pending, start] = useTransition();
   const [byUrl, setByUrl] = useState(false);
 
-  const pick = (file?: File) =>
-    file &&
+  const [over, setOver] = useState(false);
+
+  const pick = (file?: File | null) => {
+    if (!file) return;
+    if (file.type && !file.type.startsWith("image/")) return void toast.error("File ini bukan gambar.");
     start(async () => {
       let data: string;
       try {
         data = await compress(file, MAX_DIM[kind]);
       } catch {
         return void toast.error(
-          "Gambar tidak bisa dibuka. Pakai JPG, PNG atau WebP.",
+          /hei[cf]/i.test(file.type + file.name)
+            ? "Foto HEIC (iPhone) belum bisa dibuka di browser ini. Simpan sebagai JPG dulu, atau pakai Chrome/Safari terbaru."
+            : "Gambar tidak bisa dibuka. Coba simpan ulang sebagai JPG atau PNG.",
         );
       }
-      const res = await uploadStoreImage(storeId, kind, data);
-      if (!res.ok) return void toast.error(res.error);
-      onChange(res.data!.url);
+      try {
+        const res = await uploadStoreImage(storeId, kind, data);
+        if (!res.ok) return void toast.error(res.error);
+        onChange(res.data!.url);
+        toast.success("Foto terunggah. Jangan lupa simpan.");
+      } catch {
+        toast.error("Gagal mengunggah. Periksa koneksi lalu coba lagi.");
+      }
     });
+  };
 
   return (
     <div className="grid gap-2">
       <div
+        role="button"
+        tabIndex={0}
+        aria-label={label}
+        title="Klik, seret gambar ke sini, atau tempel (Ctrl+V)"
+        onClick={() => !pending && input.current?.click()}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter" && e.key !== " ") return;
+          e.preventDefault();
+          input.current?.click();
+        }}
+        onPaste={(e) => {
+          const file = [...e.clipboardData.files].find((f) => f.type.startsWith("image/"));
+          if (!file) return;
+          e.preventDefault();
+          pick(file);
+        }}
+        onDragOver={(e) => (e.preventDefault(), setOver(true))}
+        onDragLeave={() => setOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setOver(false);
+          pick(e.dataTransfer.files?.[0]);
+        }}
         className={cn(
-          "bg-muted relative flex w-full max-w-xs items-center justify-center overflow-hidden rounded-md border",
+          "bg-muted relative flex w-full max-w-xs cursor-pointer items-center justify-center overflow-hidden rounded-md border",
+          over && "border-primary ring-primary/30 ring-2",
           aspect,
         )}
       >
@@ -97,7 +154,7 @@ export function ImageUpload({
       <input
         ref={input}
         type="file"
-        accept="image/png,image/jpeg,image/webp"
+        accept="image/*"
         className="sr-only"
         onChange={(e) => (pick(e.target.files?.[0]), (e.target.value = ""))}
       />
