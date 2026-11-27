@@ -1,5 +1,6 @@
 "use server";
 
+import { toDataUrl, type ImagePayload } from "@/lib/image-blob";
 import { demoBlocked } from "@/lib/access/demo";
 import { revalidatePath } from "next/cache";
 import { notify, platformAdminUids } from "@/lib/notify";
@@ -87,11 +88,12 @@ export async function startSubscription(
 export async function uploadSubscriptionProof(
   storeId: string,
   paymentId: string,
-  image: string,
+  payload: ImagePayload,
 ): Promise<ActionResult> {
   const demo = await demoBlocked();
   if (demo) return demo;
   const { user } = await requireStore(storeId, { ownerOnly: true });
+  const image = (await toDataUrl(payload, 712_000)) ?? "";
   if (image.length > 950_000 || !DATA_URL_RE.test(image))
     return fail(
       "Gambar tidak valid atau terlalu besar. Unggah screenshot JPG/PNG.",

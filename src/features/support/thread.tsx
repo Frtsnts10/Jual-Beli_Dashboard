@@ -1,6 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- screenshots attached to reports */
+import { dataUrlToBlob } from "@/lib/image-blob";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, ImagePlus, Loader2, Send, X } from "lucide-react";
@@ -105,7 +106,7 @@ export function TicketThread({
 
   const send = () =>
     start(async () => {
-      const res = await replyTicket(ticket.id, text, image);
+      const res = await replyTicket(ticket.id, text, image && dataUrlToBlob(image));
       if (!res.ok) return void toast.error(res.error);
       setText("");
       setImage(null);
