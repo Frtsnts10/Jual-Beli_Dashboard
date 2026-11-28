@@ -9,6 +9,7 @@ import { fail, type ActionResult } from "@/lib/action-result";
 import { PLATFORM_TYPES } from "@/config/tiers";
 import type { PlatformType } from "@/types/schema";
 import { isImageUrl } from "@/lib/media-kinds";
+import { normalizeFocus, type ImageFocus } from "@/lib/image-focus";
 
 export interface ProductInput {
   title: string;
@@ -16,6 +17,7 @@ export interface ProductInput {
   /** S&K produk; optional. */
   terms: string;
   image_url: string;
+  image_focus: ImageFocus | null;
   platform_type: PlatformType;
   price: number;
   duration_days: number;
@@ -50,6 +52,7 @@ function clean(input: ProductInput) {
     description: input.description.trim().slice(0, 2000),
     terms: (input.terms ?? "").trim().slice(0, 3000),
     image_url: input.image_url.trim() || null,
+    image_focus: input.image_url.trim() ? normalizeFocus(input.image_focus) : null,
     platform_type: input.platform_type,
     price: input.price,
     duration_days: input.duration_days,
@@ -151,7 +154,7 @@ export async function importProducts(
   await requireStore(storeId);
   if (rows.length === 0) return fail("Tidak ada baris valid untuk diimpor.");
   if (rows.length > 200) return fail("Maksimal 200 produk sekali impor.");
-  const inputs: ProductInput[] = rows.map((r) => ({ ...r, terms: "", is_flash_sale: false, bundle_items: null, flash_sale_price: null, flash_sale_ends_at: null }));
+  const inputs: ProductInput[] = rows.map((r) => ({ ...r, terms: "", image_focus: null, is_flash_sale: false, bundle_items: null, flash_sale_price: null, flash_sale_ends_at: null }));
   for (const [i, input] of inputs.entries()) {
     const error = validate(input);
     if (error) return fail(`Baris ${i + 1}: ${error}`);
