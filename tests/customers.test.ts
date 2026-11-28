@@ -17,6 +17,7 @@ function order(p: Partial<Order> & { email: string; at: string }): Order {
     amount: 50_000,
     credential_id: null,
     credential_ids: [],
+  credential_slots: {},
     customer_contact: { email, phone: "+628111" },
     customer_uid: null,
     payment_status: "PAID",

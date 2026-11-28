@@ -10,6 +10,7 @@ import { PLATFORM_TYPES } from "@/config/tiers";
 import type { PlatformType } from "@/types/schema";
 import { isImageUrl } from "@/lib/media-kinds";
 import { normalizeFocus, type ImageFocus } from "@/lib/image-focus";
+import { normalizeStockConfig, type StockConfig } from "@/lib/stock-config";
 
 export interface ProductInput {
   title: string;
@@ -18,6 +19,7 @@ export interface ProductInput {
   terms: string;
   image_url: string;
   image_focus: ImageFocus | null;
+  stock_config?: StockConfig;
   platform_type: PlatformType;
   price: number;
   duration_days: number;
@@ -53,6 +55,7 @@ function clean(input: ProductInput) {
     terms: (input.terms ?? "").trim().slice(0, 3000),
     image_url: input.image_url.trim() || null,
     image_focus: input.image_url.trim() ? normalizeFocus(input.image_focus) : null,
+    stock_config: normalizeStockConfig(input.stock_config),
     platform_type: input.platform_type,
     price: input.price,
     duration_days: input.duration_days,

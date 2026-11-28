@@ -6,8 +6,9 @@ import { deliveryMessage, fillTemplate, waNumber } from "@/lib/integrations/what
 import { formatDate, formatIDR } from "@/lib/utils";
 import { DEFAULT_WA_TEMPLATE } from "@/config/tiers";
 import { featuresOfUser } from "@/lib/catalog";
-import { decryptSecret } from "@/lib/vault-crypto";
 import { storefrontUrl } from "@/lib/store-url";
+import { credentialValues } from "@/lib/data/mappers";
+import { entryConfig, normalizeStockConfig, templateFor } from "@/lib/stock-config";
 
 // Automation bridge to n8n (plan-dashboard.md §2/§4). The dashboard decides *what* to send;
 // an n8n workflow listening on N8N_WEBHOOK_URL does the *sending* through the store's
@@ -87,15 +88,19 @@ export async function deliverOrder(orderId: string, reason: "paid" | "warranty_r
 
   const credentials = await adminDb.getAll(...credentialIds.map((id) => adminDb.collection("credentials_vault").doc(id)));
   const components = await adminDb.getAll(...credentials.map((c) => adminDb.collection("products").doc(c.get("product_id"))));
+  const slots = (order.get("credential_slots") as Record<string, number> | undefined) ?? {};
   const message = deliveryMessage(
-    ctx.wa.template,
     { store: ctx.storeName, order_id: orderId, expiry: formatDate(order.get("access_expires_at")?.toDate?.().toISOString()) },
-    credentials.map((c, i) => ({
-      product: credentials.length > 1 ? components[i].get("title") : order.get("product_title"),
-      email: c.get("account_email"),
-      password: decryptSecret(c.get("account_password")),
-      pin: decryptSecret(c.get("profile_pin")),
-    }))
+    credentials.map((c, i) => {
+      const values = credentialValues(c.data() ?? {});
+      const config = entryConfig(normalizeStockConfig(components[i].get("stock_config")), values);
+      return {
+        product: credentials.length > 1 ? components[i].get("title") : order.get("product_title"),
+        template: templateFor(config, ctx.wa.template),
+        values,
+        slot: slots[c.id] ? `${slots[c.id]}/${c.get("slots_total") ?? 1}` : "",
+      };
+    })
   );
 
   try {

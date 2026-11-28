@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ImageUpload } from "@/components/image-upload";
 import { ImageFocusEditor } from "@/components/image-focus-editor";
+import { StockConfigEditor } from "./stock-config-editor";
+import { DEFAULT_STOCK_CONFIG } from "@/lib/stock-config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,6 +23,7 @@ const empty: ProductInput = {
   terms: "",
   image_url: "",
   image_focus: null,
+  stock_config: DEFAULT_STOCK_CONFIG,
   platform_type: "Media",
   price: 25000,
   duration_days: 30,
@@ -58,8 +61,13 @@ export function ProductDialog({
   /** Ultimate plans can set a discounted price and countdown. */
   flashSalePricing?: boolean;
 }) {
-  const initial = (): ProductInput => (product ? { ...product, terms: product.terms ?? "", image_url: product.image_url ?? "", image_focus: product.image_focus ?? null } : empty);
+  const initial = (): ProductInput => (product ? { ...product, terms: product.terms ?? "", image_url: product.image_url ?? "", image_focus: product.image_focus ?? null, stock_config: product.stock_config ?? DEFAULT_STOCK_CONFIG } : empty);
   const [innerOpen, setInnerOpen] = useState(false);
+  // Opened by default only for products already set up beyond a plain single-buyer account.
+  const [stockOpen] = useState(() => {
+    const c = product?.stock_config;
+    return !!c && (c.type !== "account" || c.slots > 1 || !!c.wa_template);
+  });
   const open = openProp ?? innerOpen;
   // Controlled dialogs are mounted per product (keyed by the parent), so they start filled in.
   const [form, setForm] = useState<ProductInput>(initial);
@@ -149,6 +157,20 @@ export function ProductDialog({
                 </div>
               )}
             </div>
+          )}
+          {!form.bundle_items && (
+            <details open={stockOpen}>
+              <summary className="cursor-pointer text-sm font-medium">
+                Stok & pengiriman{" "}
+                <span className="text-muted-foreground font-normal">
+                  · {{ account: "Akun login", code: "Kode/voucher", link: "Link undangan" }[form.stock_config?.type ?? "account"]}
+                  {(form.stock_config?.slots ?? 1) > 1 ? ` · sharing ${form.stock_config?.slots} pembeli` : ""}
+                </span>
+              </summary>
+              <div className="mt-2">
+                <StockConfigEditor value={form.stock_config ?? DEFAULT_STOCK_CONFIG} onChange={(v) => set("stock_config", v)} storeTemplate />
+              </div>
+            </details>
           )}
           <div className="grid gap-2">
             <Label htmlFor="duration">Masa aktif (hari)</Label>

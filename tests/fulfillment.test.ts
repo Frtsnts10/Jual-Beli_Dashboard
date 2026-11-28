@@ -132,3 +132,58 @@ d("replaceCredential", () => {
     expect(await replaceCredential("ORD-1")).toBe("not_paid");
   });
 });
+
+d("shared entries (akun sharing)", () => {
+  beforeEach(clear);
+
+  async function shared(productId: string, slots: number) {
+    const ref = await adminDb.collection("credentials_vault").add({
+      store_id: "s1", product_id: productId, fields: { email: "share@x.com", password: "p" }, account_email: "share@x.com",
+      account_password: "p", profile_pin: "", slots_total: slots, slots_used: 0, status: "AVAILABLE", expiry_date: null,
+    });
+    await adminDb.collection("products").doc(productId).update({ stock_available: slots });
+    return ref.id;
+  }
+
+  it("sells one entry to N buyers, each with their own slot, then marks it SOLD", async () => {
+    await product("p1", { stock_config: { type: "account", slots: 3 } });
+    const id = await shared("p1", 3);
+    for (const o of ["ORD-1", "ORD-2", "ORD-3"]) {
+      await order(o, "p1");
+      expect(await fulfillOrder(o)).toBe("fulfilled");
+    }
+    const slots = await Promise.all(["ORD-1", "ORD-2", "ORD-3"].map(async (o) => (await get("orders", o)).credential_slots[id]));
+    expect(slots).toEqual([1, 2, 3]);
+    const c = await get("credentials_vault", id);
+    expect(c.slots_used).toBe(3);
+    expect(c.status).toBe("SOLD");
+    expect((await get("products", "p1")).stock_available).toBe(0);
+    await order("ORD-4", "p1");
+    expect(await fulfillOrder("ORD-4")).toBe("needs_stock");
+  });
+
+  it("keeps a partly sold entry AVAILABLE for the next buyer", async () => {
+    await product("p1");
+    const id = await shared("p1", 2);
+    await order("ORD-1", "p1");
+    await fulfillOrder("ORD-1");
+    const c = await get("credentials_vault", id);
+    expect(c.status).toBe("AVAILABLE");
+    expect(c.slots_used).toBe(1);
+    expect((await get("products", "p1")).stock_available).toBe(1);
+  });
+
+  it("warranty replacement moves the buyer to another entry and leaves the shared one for its other buyers", async () => {
+    await product("p1");
+    const a = await shared("p1", 2);
+    await order("ORD-1", "p1");
+    await fulfillOrder("ORD-1");
+    const b = await shared("p1", 2);
+    await adminDb.collection("products").doc("p1").update({ stock_available: 3 });
+    expect(await replaceCredential("ORD-1")).toBe("replaced");
+    const o = await get("orders", "ORD-1");
+    expect(o.credential_id).toBe(b);
+    expect(o.credential_slots[b]).toBe(1);
+    expect((await get("credentials_vault", a)).status).toBe("AVAILABLE");
+  });
+});

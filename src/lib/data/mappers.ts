@@ -1,5 +1,6 @@
-import { normalizeFocus } from "@/lib/image-focus";
 import "server-only";
+import { normalizeFocus } from "@/lib/image-focus";
+import { normalizeStockConfig } from "@/lib/stock-config";
 import { ratingCounts } from "@/lib/rating";
 import { decryptSecret } from "@/lib/vault-crypto";
 import { Timestamp, type DocumentSnapshot } from "firebase-admin/firestore";
@@ -86,6 +87,7 @@ export function mapProduct(snap: Snap): Product {
     description: d.description ?? "",
     terms: d.terms ?? "",
     image_focus: normalizeFocus(d.image_focus),
+    stock_config: normalizeStockConfig(d.stock_config),
     image_url: d.image_url ?? null,
     platform_type: d.platform_type ?? "Other",
     price: d.price ?? 0,
@@ -102,6 +104,15 @@ export function mapProduct(snap: Snap): Product {
   };
 }
 
+/** A vault entry's field values (decrypted), keyed like its product's stock_config fields. */
+export function credentialValues(d: FirebaseFirestore.DocumentData): Record<string, string> {
+  if (d.fields && typeof d.fields === "object") {
+    return Object.fromEntries(Object.entries(d.fields as Record<string, string>).map(([k, v]) => [k, decryptSecret(v)]));
+  }
+  // Entries from before per-product fields: the classic email / password / PIN.
+  return { email: d.account_email ?? "", password: decryptSecret(d.account_password), pin: decryptSecret(d.profile_pin) };
+}
+
 export function mapCredential(snap: Snap): Credential {
   const d = snap.data() ?? {};
   return {
@@ -111,6 +122,9 @@ export function mapCredential(snap: Snap): Credential {
     account_email: d.account_email ?? "",
     account_password: decryptSecret(d.account_password),
     profile_pin: decryptSecret(d.profile_pin),
+    values: credentialValues(d),
+    slots_total: d.slots_total ?? 1,
+    slots_used: d.slots_used ?? (d.status === "SOLD" ? 1 : 0),
     status: d.status ?? "AVAILABLE",
     expiry_date: toISO(d.expiry_date),
     order_id: d.order_id ?? null,
@@ -129,6 +143,7 @@ export function mapOrder(snap: Snap): Order {
     amount: d.amount ?? 0,
     credential_id: d.credential_id ?? null,
     credential_ids: d.credential_ids ?? (d.credential_id ? [d.credential_id] : []),
+    credential_slots: d.credential_slots ?? {},
     customer_contact: { email: d.customer_contact?.email ?? "", phone: d.customer_contact?.phone ?? "" },
     customer_uid: d.customer_uid ?? null,
     payment_status: d.payment_status ?? "PENDING",

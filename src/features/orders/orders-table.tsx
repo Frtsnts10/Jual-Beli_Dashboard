@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_STOCK_CONFIG, entryConfig, templateFor, type StockConfig } from "@/lib/stock-config";
 import { useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, Copy, MessageCircle, MoreHorizontal, PackagePlus, ReceiptText, RefreshCw, Send, XCircle } from "lucide-react";
@@ -31,9 +32,12 @@ export function OrdersTable({
   orders,
   credentials,
   productTitles,
+  stockConfigs,
   waTemplate,
 }: {
   productTitles: Record<string, string>;
+  /** Per-product stock settings: which template and fields a delivery uses. */
+  stockConfigs: Record<string, StockConfig>;
   storeId: string;
   storeName: string;
   orders: Order[];
@@ -86,13 +90,12 @@ export function OrdersTable({
     const creds = o.credential_ids.map((id) => credentials[id]).filter(Boolean);
     if (creds.length === 0) return toast.error("Akun belum dialokasikan.");
     const text = deliveryMessage(
-      waTemplate,
       { store: storeName, order_id: o.id, expiry: formatDate(o.access_expires_at) },
       creds.map((c) => ({
         product: creds.length > 1 ? (productTitles[c.product_id] ?? o.product_title) : o.product_title,
-        email: c.account_email,
-        password: c.account_password,
-        pin: c.profile_pin,
+        template: templateFor(entryConfig(stockConfigs[c.product_id] ?? DEFAULT_STOCK_CONFIG, c.values), waTemplate),
+        values: c.values,
+        slot: o.credential_slots[c.id] ? `${o.credential_slots[c.id]}/${c.slots_total}` : "",
       }))
     );
     window.open(`https://wa.me/${waNumber(o.customer_contact.phone)}?text=${encodeURIComponent(text)}`, "_blank", "noopener");

@@ -33,6 +33,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ storeId
         orders={orders}
         credentials={credentials}
         productTitles={Object.fromEntries(products.map((p) => [p.id, p.title]))}
+        stockConfigs={Object.fromEntries(products.map((p) => [p.id, p.stock_config]))}
         waTemplate={integrations.get("wa_message_template") ?? DEFAULT_WA_TEMPLATE}
       />
     </>

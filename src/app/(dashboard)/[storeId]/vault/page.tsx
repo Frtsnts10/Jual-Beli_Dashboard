@@ -48,13 +48,13 @@ export default async function VaultPage({
         description={
           Number.isFinite(tier.maxCredentials)
             ? `Paket ${tier.name}: ${counts[0]}/${tier.maxCredentials} stok tersedia.`
-            : "Gudang akun premium yang siap dikirim ke pembeli."
+            : "Stok yang siap dikirim ke pembeli: akun, kode, atau link — kolomnya diatur per produk."
         }
       >
         <ImportDialog storeId={storeId} kind="stock" products={products.filter((p) => !p.bundle_items).map((p) => ({ id: p.id, title: p.title }))} />
         <AddStockDialog
           storeId={storeId}
-          products={products.filter((p) => !p.bundle_items).map((p) => ({ id: p.id, title: p.title }))}
+          products={products.filter((p) => !p.bundle_items).map((p) => ({ id: p.id, title: p.title, config: p.stock_config }))}
           defaultProductId={product}
         />
       </PageHeader>
@@ -78,7 +78,7 @@ export default async function VaultPage({
         )}
       </div>
 
-      <VaultTable storeId={storeId} items={rows} productTitles={productTitles} />
+      <VaultTable storeId={storeId} items={rows} productTitles={productTitles} configs={Object.fromEntries(products.map((p) => [p.id, p.stock_config]))} />
       <Pager {...pager} className="mt-4" />
     </>
   );

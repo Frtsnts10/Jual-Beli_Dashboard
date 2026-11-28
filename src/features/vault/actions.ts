@@ -9,7 +9,11 @@ import { requireStore } from "@/lib/access/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { encryptSecret } from "@/lib/vault-crypto";
 import { notifyRestock } from "@/lib/integrations/automation";
+import { normalizeStockConfig, type StockLine } from "@/lib/stock-config";
 
+export type { StockLine } from "@/lib/stock-config";
+
+/** Older callers (spreadsheet import) still send the classic email / password / PIN columns. */
 export interface CredentialLine {
   account_email: string;
   account_password: string;
@@ -19,18 +23,28 @@ export interface CredentialLine {
 
 const MAX_BATCH = 400; // Firestore batch limit is 500 writes
 
-export async function addCredentials(storeId: string, productId: string, lines: CredentialLine[]): Promise<ActionResult<{ added: number }>> {
+const toStockLine = (l: StockLine | CredentialLine): StockLine =>
+  "values" in l ? l : { values: { email: l.account_email, password: l.account_password, pin: l.profile_pin }, expiry_date: l.expiry_date };
+
+export async function addCredentials(storeId: string, productId: string, input: (StockLine | CredentialLine)[]): Promise<ActionResult<{ added: number }>> {
   const demo = await demoBlocked();
   if (demo) return demo;
   const { features } = await requireStore(storeId);
   const product = await adminDb.collection("products").doc(productId).get();
   if (!product.exists || product.get("store_id") !== storeId) return fail("Produk tidak ditemukan.");
   if ((product.get("bundle_items") as string[] | null)?.length) return fail("Stok bundle diambil dari produk isinya — tambahkan stok ke produk-produk tersebut.");
+  const config = normalizeStockConfig(product.get("stock_config"));
 
-  const rows = lines
-    .map((l) => ({ ...l, account_email: l.account_email.trim(), account_password: l.account_password.trim() }))
-    .filter((l) => l.account_email && l.account_password);
-  if (rows.length === 0) return fail("Tidak ada baris valid (email & password wajib).");
+  const rows = input.map(toStockLine).map((l) => ({
+    expiry_date: (l.expiry_date ?? "").trim(),
+    values: Object.fromEntries(config.fields.map((f) => [f.key, String(l.values?.[f.key] ?? "").trim().slice(0, 500)])),
+  }));
+  const missing = rows.findIndex((r) => config.fields.some((f) => f.required && !r.values[f.key]));
+  if (rows.length === 0) return fail("Tidak ada baris untuk disimpan.");
+  if (missing >= 0) {
+    const need = config.fields.filter((f) => f.required).map((f) => f.label).join(", ");
+    return fail(`Baris ${missing + 1} belum lengkap. Wajib diisi: ${need}.`);
+  }
   if (rows.length > MAX_BATCH) return fail(`Maksimal ${MAX_BATCH} baris sekali impor.`);
 
   for (const row of rows) {
@@ -58,13 +72,19 @@ export async function addCredentials(storeId: string, productId: string, lines: 
     return fail("Brankas belum dikonfigurasi (VAULT_ENCRYPTION_KEY). Hubungi admin platform.");
   }
   const batch = adminDb.batch();
+  const display = config.fields.find((f) => !f.secret);
   for (const row of rows) {
+    const fields = Object.fromEntries(config.fields.map((f) => [f.key, f.secret ? encryptSecret(row.values[f.key]) : row.values[f.key]]));
     batch.create(adminDb.collection("credentials_vault").doc(), {
       store_id: storeId,
       product_id: productId,
-      account_email: row.account_email,
-      account_password: encryptSecret(row.account_password),
-      profile_pin: encryptSecret(row.profile_pin.trim()),
+      fields,
+      // Legacy columns, kept so older readers and searches still work.
+      account_email: display ? row.values[display.key] : "",
+      account_password: encryptSecret(row.values.password ?? ""),
+      profile_pin: encryptSecret(row.values.pin ?? ""),
+      slots_total: config.slots,
+      slots_used: 0,
       status: "AVAILABLE",
       expiry_date: row.expiry_date ? Timestamp.fromDate(new Date(`${row.expiry_date}T23:59:59+07:00`)) : null,
       order_id: null,
@@ -72,7 +92,8 @@ export async function addCredentials(storeId: string, productId: string, lines: 
       created_at: FieldValue.serverTimestamp(),
     });
   }
-  batch.update(product.ref, { stock_available: FieldValue.increment(rows.length) });
+  // Stock counts sales, not entries: a shared entry adds one unit per slot.
+  batch.update(product.ref, { stock_available: FieldValue.increment(rows.length * config.slots) });
   await batch.commit();
   revalidatePath(`/${storeId}`, "layout");
   // Buyers who tapped "Kabari saya" while it was sold out get a WhatsApp, after responding.
@@ -86,9 +107,12 @@ async function removeFromPool(storeId: string, credentialId: string, change: "ex
   return adminDb.runTransaction(async (tx) => {
     const snap = await tx.get(ref);
     if (!snap.exists || snap.get("store_id") !== storeId) return "not_found" as const;
-    if (change === "delete" && snap.get("status") === "SOLD") return "sold" as const;
+    const used = (snap.get("slots_used") as number | undefined) ?? (snap.get("status") === "SOLD" ? 1 : 0);
+    // A shared entry already sold to someone stays: those buyers still use it.
+    if (change === "delete" && (snap.get("status") === "SOLD" || used > 0)) return "sold" as const;
     if (snap.get("status") === "AVAILABLE") {
-      tx.update(adminDb.collection("products").doc(snap.get("product_id")), { stock_available: FieldValue.increment(-1) });
+      const free = Math.max(0, ((snap.get("slots_total") as number | undefined) ?? 1) - used);
+      tx.update(adminDb.collection("products").doc(snap.get("product_id")), { stock_available: FieldValue.increment(-free) });
     }
     if (change === "delete") tx.delete(ref);
     else tx.update(ref, { status: "EXPIRED" });
@@ -111,7 +135,7 @@ export async function deleteCredential(storeId: string, credentialId: string): P
   await requireStore(storeId);
   const result = await removeFromPool(storeId, credentialId, "delete");
   if (result === "not_found") return fail("Stok tidak ditemukan.");
-  if (result === "sold") return fail("Stok yang sudah terjual tidak bisa dihapus.");
+  if (result === "sold") return fail("Stok yang sudah terjual (termasuk sebagian slot) tidak bisa dihapus. Tandai kedaluwarsa saja.");
   revalidatePath(`/${storeId}`, "layout");
   return { ok: true };
 }
