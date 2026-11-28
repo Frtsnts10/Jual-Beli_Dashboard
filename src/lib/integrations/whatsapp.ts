@@ -12,17 +12,24 @@ export function fillTemplate(template: string, vars: Record<string, string>) {
 
 export interface DeliveredAccount {
   product: string;
-  email: string;
-  password: string;
-  pin: string;
+  /** The template for this account's product (product's own, store's, or automatic). */
+  template: string;
+  values: Record<string, string>;
+  /** "2/5" for a shared entry, "" otherwise. */
+  slot: string;
 }
 
 /**
  * The delivery message for an order. A bundle repeats the seller's template once per
  * account (with {product} set to that component), separated by a divider.
  */
-export function deliveryMessage(template: string, base: { store: string; order_id: string; expiry: string }, accounts: DeliveredAccount[]) {
+export function deliveryMessage(base: { store: string; order_id: string; expiry: string }, accounts: DeliveredAccount[]) {
   return accounts
-    .map((a) => fillTemplate(template, { ...base, product: a.product, email: a.email, password: a.password, pin: a.pin || "-" }))
+    .map((a) => {
+      const vars: Record<string, string> = { ...base, product: a.product, slot: a.slot || "-" };
+      for (const [k, v] of Object.entries(a.values)) vars[k] = v || "-";
+      // Placeholders with nothing to fill (e.g. no PIN) read "-" instead of showing "{pin}".
+      return fillTemplate(a.template, vars).replace(/\{(\w+)\}/g, "-");
+    })
     .join("\n\n———\n\n");
 }

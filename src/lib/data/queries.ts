@@ -33,10 +33,14 @@ export async function stockByProduct(storeId: string) {
     .collection("credentials_vault")
     .where("store_id", "==", storeId)
     .where("status", "==", "AVAILABLE")
-    .select("product_id")
+    .select("product_id", "slots_total", "slots_used")
     .get();
+  // Sales still possible: a shared entry counts its free slots, a classic one counts 1.
   const counts: Record<string, number> = {};
-  for (const doc of snap.docs) counts[doc.get("product_id")] = (counts[doc.get("product_id")] ?? 0) + 1;
+  for (const doc of snap.docs) {
+    const free = Math.max(0, ((doc.get("slots_total") as number | undefined) ?? 1) - ((doc.get("slots_used") as number | undefined) ?? 0));
+    counts[doc.get("product_id")] = (counts[doc.get("product_id")] ?? 0) + free;
+  }
   return counts;
 }
 

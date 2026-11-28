@@ -1,4 +1,5 @@
 import type { ImageFocus } from "@/lib/image-focus";
+import type { StockConfig } from "@/lib/stock-config";
 // Firestore data model — see plan-dashboard.md §5. Keep in sync with the
 // storefront repo's src/types/schema.ts.
 //
@@ -125,6 +126,8 @@ export interface Product {
   image_url: string | null;
   /** Seller-chosen focal point + zoom of the photo (null = centred). */
   image_focus: ImageFocus | null;
+  /** Stock type, vault fields, sharing slots and WA template (see lib/stock-config). */
+  stock_config: StockConfig;
   platform_type: PlatformType;
   price: number;
   /** How long a sold account stays active, used when a credential has no expiry of its own. */
@@ -178,6 +181,11 @@ export interface Credential {
   account_email: string;
   account_password: string;
   profile_pin: string;
+  /** Field values keyed like the product's stock_config fields (legacy entries: email/password/pin). */
+  values: Record<string, string>;
+  /** Sharing: how many buyers this entry can be sold to, and how many it has been sold to. */
+  slots_total: number;
+  slots_used: number;
   status: CredentialStatus;
   expiry_date: string | null;
   order_id: string | null;
@@ -201,6 +209,8 @@ export interface Order {
   credential_id: string | null;
   /** All allocated credentials — one per bundle component. */
   credential_ids: string[];
+  /** Shared entries: which slot (1-based) of each credential this order got. */
+  credential_slots: Record<string, number>;
   customer_contact: { email: string; phone: string };
   /** Buyer account (customers/{uid}) when the order was placed signed in, or linked after email verification. */
   customer_uid: string | null;

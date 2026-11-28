@@ -8,25 +8,34 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { addCredentials, type CredentialLine } from "./actions";
+import { DEFAULT_STOCK_CONFIG, lineFormat, parseStockLines, type StockConfig } from "@/lib/stock-config";
+import { addCredentials } from "./actions";
 
-function parseLines(text: string): CredentialLine[] {
-  return text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [account_email = "", account_password = "", profile_pin = "", expiry_date = ""] = line.split("|").map((p) => p.trim());
-      return { account_email, account_password, profile_pin, expiry_date };
-    });
+const NOUN = { account: "akun", code: "kode", link: "link" } as const;
+
+/** An example line built from the product's own fields. */
+function example(config: StockConfig) {
+  const sample: Record<string, string> = { email: "akun1@mail.com", password: "rahasia123", pin: "1234", kode: "ABCD-EFGH-1234", link: "https://contoh.com/invite/abc" };
+  return config.fields.map((f) => sample[f.key] ?? (f.secret ? "rahasia" : f.label.toLowerCase())).join("|") + "|2026-12-31";
 }
 
-export function AddStockDialog({ storeId, products, defaultProductId }: { storeId: string; products: { id: string; title: string }[]; defaultProductId?: string }) {
+export function AddStockDialog({
+  storeId,
+  products,
+  defaultProductId,
+}: {
+  storeId: string;
+  products: { id: string; title: string; config: StockConfig }[];
+  defaultProductId?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(defaultProductId ?? products[0]?.id ?? "");
   const [text, setText] = useState("");
   const [pending, start] = useTransition();
-  const count = parseLines(text).length;
+  const config = products.find((p) => p.id === productId)?.config ?? DEFAULT_STOCK_CONFIG;
+  const lines = parseStockLines(text, config);
+  const noun = NOUN[config.type];
+  const optional = config.fields.filter((f) => !f.required).map((f) => f.label);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -37,9 +46,10 @@ export function AddStockDialog({ storeId, products, defaultProductId }: { storeI
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Tambah stok akun</DialogTitle>
+          <DialogTitle>Tambah stok</DialogTitle>
           <DialogDescription>
-            Satu akun per baris dengan format <code className="text-foreground">email|password|pin|YYYY-MM-DD</code>. PIN dan tanggal kedaluwarsa boleh dikosongkan.
+            Satu {noun} per baris dengan format <code className="text-foreground break-all">{lineFormat(config)}</code>.{" "}
+            {optional.length > 0 && <>{optional.join(", ")} boleh dikosongkan. </>}Tanggal kedaluwarsa boleh dikosongkan.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
@@ -57,33 +67,38 @@ export function AddStockDialog({ storeId, products, defaultProductId }: { storeI
                 ))}
               </SelectContent>
             </Select>
+            {config.slots > 1 && (
+              <p className="text-muted-foreground text-xs">
+                Akun sharing: setiap baris dijual ke {config.slots} pembeli, jadi {lines.length || 1} baris = {(lines.length || 1) * config.slots} stok.
+              </p>
+            )}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="lines">Daftar akun</Label>
+            <Label htmlFor="lines">Daftar {noun}</Label>
             <Textarea
               id="lines"
               rows={8}
               className="font-mono text-xs"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder={"akun1@mail.com|rahasia123|1234|2026-12-31\nakun2@mail.com|rahasia456"}
+              placeholder={example(config)}
             />
           </div>
         </div>
         <DialogFooter>
           <Button
-            disabled={pending || !productId || count === 0}
+            disabled={pending || !productId || lines.length === 0}
             onClick={() =>
               start(async () => {
-                const res = await addCredentials(storeId, productId, parseLines(text));
+                const res = await addCredentials(storeId, productId, lines);
                 if (!res.ok) return void toast.error(res.error);
-                toast.success(`${res.data?.added} akun ditambahkan`);
+                toast.success(`${res.data?.added} ${noun} ditambahkan`);
                 setText("");
                 setOpen(false);
               })
             }
           >
-            {pending ? "Menyimpan…" : `Simpan ${count || ""} akun`}
+            {pending ? "Menyimpan…" : `Simpan ${lines.length || ""} ${noun}`}
           </Button>
         </DialogFooter>
       </DialogContent>
