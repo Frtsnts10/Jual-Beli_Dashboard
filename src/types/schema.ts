@@ -1,3 +1,4 @@
+import type { ImageFocus } from "@/lib/image-focus";
 // Firestore data model — see plan-dashboard.md §5. Keep in sync with the
 // storefront repo's src/types/schema.ts.
 //
@@ -122,6 +123,8 @@ export interface Product {
   /** Product terms & conditions (S&K), shown on the product page and agreed to at checkout. */
   terms: string;
   image_url: string | null;
+  /** Seller-chosen focal point + zoom of the photo (null = centred). */
+  image_focus: ImageFocus | null;
   platform_type: PlatformType;
   price: number;
   /** How long a sold account stays active, used when a credential has no expiry of its own. */

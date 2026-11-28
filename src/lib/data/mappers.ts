@@ -1,3 +1,4 @@
+import { normalizeFocus } from "@/lib/image-focus";
 import "server-only";
 import { ratingCounts } from "@/lib/rating";
 import { decryptSecret } from "@/lib/vault-crypto";
@@ -84,6 +85,7 @@ export function mapProduct(snap: Snap): Product {
     title: d.title ?? "",
     description: d.description ?? "",
     terms: d.terms ?? "",
+    image_focus: normalizeFocus(d.image_focus),
     image_url: d.image_url ?? null,
     platform_type: d.platform_type ?? "Other",
     price: d.price ?? 0,

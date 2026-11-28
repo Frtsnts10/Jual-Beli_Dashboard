@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ImageUpload } from "@/components/image-upload";
+import { ImageFocusEditor } from "@/components/image-focus-editor";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,6 +20,7 @@ const empty: ProductInput = {
   description: "",
   terms: "",
   image_url: "",
+  image_focus: null,
   platform_type: "Media",
   price: 25000,
   duration_days: 30,
@@ -56,7 +58,7 @@ export function ProductDialog({
   /** Ultimate plans can set a discounted price and countdown. */
   flashSalePricing?: boolean;
 }) {
-  const initial = (): ProductInput => (product ? { ...product, terms: product.terms ?? "", image_url: product.image_url ?? "" } : empty);
+  const initial = (): ProductInput => (product ? { ...product, terms: product.terms ?? "", image_url: product.image_url ?? "", image_focus: product.image_focus ?? null } : empty);
   const [innerOpen, setInnerOpen] = useState(false);
   const open = openProp ?? innerOpen;
   // Controlled dialogs are mounted per product (keyed by the parent), so they start filled in.
@@ -155,7 +157,8 @@ export function ProductDialog({
           </div>
           <div className="grid gap-2">
             <Label>Foto produk</Label>
-            <ImageUpload storeId={storeId} kind="product" aspect="aspect-square max-w-40" value={form.image_url} onChange={(url) => set("image_url", url)} label="Unggah foto" />
+            <ImageUpload storeId={storeId} kind="product" aspect="aspect-square max-w-40" value={form.image_url} onChange={(url) => setForm((f) => ({ ...f, image_url: url, image_focus: null }))} label="Unggah foto" />
+            {form.image_url && <ImageFocusEditor src={form.image_url} value={form.image_focus} onChange={(v) => set("image_focus", v)} />}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="description">Deskripsi</Label>
